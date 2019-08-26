@@ -23,6 +23,7 @@ public class MCHelper {
         jda.addEventListener(new NetherCommand());
         jda.addEventListener(new OverworldCommand());
         jda.addEventListener(new UnitsCommand());
+        jda.addEventListener(new CoordCommand());
         //jda.addEventListener(new CryptoCommand());
     }
 }
