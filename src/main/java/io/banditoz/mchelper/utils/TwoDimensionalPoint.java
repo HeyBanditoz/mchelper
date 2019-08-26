@@ -1,10 +1,15 @@
 package io.banditoz.mchelper.utils;
 
+import java.io.Serializable;
+
 /**
  * Notchian 2D point
  */
-public class TwoDimensionalPoint {
+public class TwoDimensionalPoint implements Serializable {
     protected double x, z;
+
+    public TwoDimensionalPoint() {
+    }
 
     public TwoDimensionalPoint(double x, double z) {
         this.x = x;
