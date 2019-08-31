@@ -36,7 +36,7 @@ public abstract class Command extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(MessageReceivedEvent e, Exception ex) {
-        StringBuilder reply = new StringBuilder("**Exception thrown: **" + ex.toString()); // bold for Discord, and code blocks
+        StringBuilder reply = new StringBuilder("**Exception thrown:** " + ex.toString()); // bold for Discord, and code blocks
         if (SEND_FULL_STACK_TRACE) {
             reply.append("\n```");
             for (int i = 0; i < ex.getStackTrace().length; i++) {
