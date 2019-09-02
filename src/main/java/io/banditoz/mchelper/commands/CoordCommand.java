@@ -51,6 +51,7 @@ public class CoordCommand extends Command {
                         map.forEach((k, p) -> write(p, o, e));
                         o.close();
                         f.close();
+                        sendReply(e, "Added.");
                     } catch (IOException ex) {
                         sendExceptionMessage(e, ex);
                     }
@@ -59,8 +60,8 @@ public class CoordCommand extends Command {
                 }
             } else if (commandArgs[1].equalsIgnoreCase("show") || commandArgs[1].equalsIgnoreCase("list")) {
                 if (commandArgs.length > 2) {
-                    if (map.containsKey(commandArgs[2].toLowerCase())) {
-                        sendReply(e, map.get(commandArgs[2].toLowerCase()).toString());
+                    if (map.containsKey(commandArgs[2])) {
+                        sendReply(e, map.get(commandArgs[2]).toString());
                     } else {
                         sendReply(e, "Point \"" + commandArgs[2] + "\" does not exist.");
                     }
@@ -71,13 +72,14 @@ public class CoordCommand extends Command {
                 }
             } else if (commandArgs[1].equalsIgnoreCase("delete") || commandArgs[1].equalsIgnoreCase("remove")) {
                 try {
-                    if (map.containsKey(commandArgs[2].toLowerCase())) {
-                        map.remove(commandArgs[2].toLowerCase());
+                    if (map.containsKey(commandArgs[2])) {
+                        map.remove(commandArgs[2]);
                         FileOutputStream f = new FileOutputStream(new File("coords.txt"));
                         ObjectOutputStream o = new ObjectOutputStream(f);
                         map.forEach((k, p) -> write(p, o, e));
                         f.close();
                         o.close();
+                        sendReply(e, "Deleted.");
                     } else {
                         sendReply(e, "Point \"" + commandArgs[2] + "\" does not exist.");
                     }
