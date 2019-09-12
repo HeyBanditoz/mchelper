@@ -7,10 +7,8 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class TeXRenderer {
     /**
@@ -18,11 +16,11 @@ public class TeXRenderer {
      * @param tex The TeX to render.
      * @return A BufferedImage of the equation.
      */
-    public static InputStream renderTeX(String tex) throws IOException {
+    public static ByteArrayOutputStream renderTeX(String tex) throws IOException {
         // create a formula
         TeXFormula formula = new TeXFormula(tex);
 
-        // render the formla to an icon of the same size as the formula.
+        // render the formula to an icon of the same size as the formula.
         TeXIcon icon = formula
                 .createTeXIcon(TeXConstants.STYLE_DISPLAY, 40);
 
@@ -41,6 +39,6 @@ public class TeXRenderer {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(image, "png", os);
-        return new ByteArrayInputStream(os.toByteArray());
+        return os;
     }
 }
