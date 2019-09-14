@@ -35,7 +35,6 @@ public abstract class Command extends ListenerAdapter {
      * Sends a reply containing the exception message. Use CommandUtils#sendExceptionMessage instead.
      * @param e The MessageReceivedEvent to reply to.
      * @param ex The exception.
-     * @deprecated
      */
     public void sendExceptionMessage(MessageReceivedEvent e, Exception ex) {
         CommandUtils.sendExceptionMessage(e, ex);
