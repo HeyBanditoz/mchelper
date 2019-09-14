@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.CommandUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -31,24 +32,13 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
-     * Sends a reply containing the exception message.
+     * Sends a reply containing the exception message. Use CommandUtils#sendExceptionMessage instead.
      * @param e The MessageReceivedEvent to reply to.
      * @param ex The exception.
+     * @deprecated
      */
     public void sendExceptionMessage(MessageReceivedEvent e, Exception ex) {
-        StringBuilder reply = new StringBuilder("**Exception thrown:** " + ex.toString()); // bold for Discord, and code blocks
-        if (SEND_FULL_STACK_TRACE) {
-            reply.append("\n```");
-            for (int i = 0; i < ex.getStackTrace().length; i++) {
-                reply.append(ex.getStackTrace()[i]);
-                reply.append("\n");
-            }
-            reply.append("```");
-        }
-        else {
-            ex.printStackTrace();
-        }
-        sendReply(e, reply.toString());
+        CommandUtils.sendExceptionMessage(e, ex);
     }
 
     /**

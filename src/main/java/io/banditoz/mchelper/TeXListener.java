@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.utils.CommandUtils;
 import io.banditoz.mchelper.utils.TeXRenderer;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -25,9 +26,7 @@ public class TeXListener extends ListenerAdapter {
                         .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                         .queue();
             } catch (Exception ex) {
-                event.getMessage().getChannel()
-                        .sendMessage("**Exception thrown:** " + ex.toString())
-                        .queue();
+                CommandUtils.sendExceptionMessage(event, ex);
             }
         }
     }
