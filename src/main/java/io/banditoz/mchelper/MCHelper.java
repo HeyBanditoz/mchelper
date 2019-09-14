@@ -25,6 +25,6 @@ public class MCHelper {
         jda.addEventListener(new UnitsCommand());
         jda.addEventListener(new CoordCommand());
         jda.addEventListener(new TeXCommand());
-        //jda.addEventListener(new CryptoCommand());
+        jda.addEventListener(new TeXListener());
     }
 }
