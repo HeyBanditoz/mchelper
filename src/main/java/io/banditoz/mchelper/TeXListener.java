@@ -17,9 +17,9 @@ import static io.banditoz.mchelper.commands.Command.sendExceptionMessage;
 public class TeXListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        event.getChannel().sendTyping().queue();
         Matcher m = Pattern.compile("\\$\\$(.*?)\\$\\$").matcher(event.getMessage().getContentDisplay());
         if (m.find()) {
+            event.getChannel().sendTyping().queue();
             String latexString = m.group(1);
             try {
                 ByteArrayOutputStream latex = TeXRenderer.renderTeX(latexString);
