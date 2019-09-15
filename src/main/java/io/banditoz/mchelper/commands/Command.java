@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.utils.CommandUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 public abstract class Command extends ListenerAdapter {
     protected abstract void onCommand(MessageReceivedEvent e, String[] commandArgs);
     public abstract String commandName();
-    protected final boolean SEND_FULL_STACK_TRACE = false;
+    protected static final boolean SEND_FULL_STACK_TRACE = false;
     protected static final String REGEX = "\\S+";
 
     @Override
@@ -33,11 +32,23 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * Sends a reply containing the exception message. Use CommandUtils#sendExceptionMessage instead.
-     * @param e The MessageReceivedEvent to reply to.
+     * @param event The MessageReceivedEvent to reply to.
      * @param ex The exception.
      */
-    public void sendExceptionMessage(MessageReceivedEvent e, Exception ex) {
-        CommandUtils.sendExceptionMessage(e, ex);
+    public static void sendExceptionMessage(MessageReceivedEvent event, Exception ex) {
+        StringBuilder reply = new StringBuilder("**Exception thrown:** " + ex.toString()); // bold for Discord, and code blocks
+        if (SEND_FULL_STACK_TRACE) {
+            reply.append("\n```");
+            for (int i = 0; i < ex.getStackTrace().length; i++) {
+                reply.append(ex.getStackTrace()[i]);
+                reply.append("\n");
+            }
+            reply.append("```");
+        }
+        else {
+            ex.printStackTrace();
+        }
+        event.getChannel().sendMessage(reply.toString()).queue();
     }
 
     /**
