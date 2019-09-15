@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils;
 
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -7,6 +8,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -41,4 +43,17 @@ public class TeXRenderer {
         ImageIO.write(image, "png", os);
         return os;
     }
+
+    /*
+    TODO I'll do this in the future.
+    public static void renderTeX(MessageReceivedEvent event) throws Exception {
+        long before = System.currentTimeMillis();
+        ByteArrayOutputStream latex = TeXRenderer.renderTeX(args.toString());
+        long after = System.currentTimeMillis() - before;
+        e.getMessage().getChannel()
+                .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
+                .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
+                .queue();
+        latex.close();
+     */
 }

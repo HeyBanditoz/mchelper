@@ -22,9 +22,11 @@ public class TeXCommand extends Command {
         }
         try {
             String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(args.toString())) + ".png";
+            long before = System.currentTimeMillis();
             ByteArrayOutputStream latex = TeXRenderer.renderTeX(args.toString());
+            long after = System.currentTimeMillis() - before;
             e.getMessage().getChannel()
-                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator())
+                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
                     .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                     .queue();
             latex.close();

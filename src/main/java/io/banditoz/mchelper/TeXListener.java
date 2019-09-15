@@ -22,12 +22,15 @@ public class TeXListener extends ListenerAdapter {
             event.getChannel().sendTyping().queue();
             String latexString = m.group(1);
             try {
+                long before = System.currentTimeMillis();
                 ByteArrayOutputStream latex = TeXRenderer.renderTeX(latexString);
+                long after = System.currentTimeMillis() - before;
                 String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(latexString)) + ".png";
                 event.getMessage().getChannel()
-                        .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator())
+                        .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
                         .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                         .queue();
+                latex.close();
             } catch (Exception ex) {
                 sendExceptionMessage(event, ex);
             }
