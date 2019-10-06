@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Base64;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +26,7 @@ public class TeXListener extends ListenerAdapter {
                 long before = System.currentTimeMillis();
                 ByteArrayOutputStream latex = TeXRenderer.renderTeX(latexString);
                 long after = System.currentTimeMillis() - before;
-                String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(latexString)) + ".png";
+                String imageName = DigestUtils.md5Hex(latexString) + ".png";
                 event.getMessage().getChannel()
                         .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
                         .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
