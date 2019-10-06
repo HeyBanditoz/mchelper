@@ -10,13 +10,13 @@ public class NetherCommand extends Command {
     }
 
     @Override
-    protected void onCommand(MessageReceivedEvent e, String[] commandArgs) {
+    protected void onCommand() {
         try {
             TwoDimensionalPoint point1 = new TwoDimensionalPoint(commandArgs[1], commandArgs[2]);
             TwoDimensionalPoint nether = point1.getNetherCoordinates();
-            sendReply(e, nether.toIntegerString());
+            sendReply(nether.toIntegerString());
         } catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
         }
     }
 }

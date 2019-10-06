@@ -12,22 +12,18 @@ public class EvalCommand extends Command {
     }
 
     @Override
-    protected void onCommand(MessageReceivedEvent e, String[] commandArgs) {
+    protected void onCommand() {
         try {
             BigDecimal result;
-            StringBuilder args = new StringBuilder();
-            for (int i = 1; i < commandArgs.length; i++) {
-                args.append(commandArgs[i]).append(" ");
-            }
-            result = new Expression(args.toString()).eval();
+            result = new Expression(commandArgsString).eval();
             if (result.toPlainString().length() >= 256) {
-                sendReply(e, result.toEngineeringString());
+                sendReply(result.toEngineeringString());
             }
             else {
-                sendReply(e, result.toPlainString());
+                sendReply(result.toPlainString());
             }
         } catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
         }
     }
 }

@@ -14,16 +14,12 @@ public class UnitsCommand extends Command {
     }
 
     @Override
-    public void onCommand(MessageReceivedEvent e, String[] commandArgs) {
-        StringBuilder args = new StringBuilder();
+    public void onCommand() {
         try {
-            for (int i = 1; i < commandArgs.length; i++) {
-                args.append(commandArgs[i]).append(" ");
+            if (!commandArgsString.contains("to")) {
+                throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + commandArgsString);
             }
-            if (!args.toString().contains("to")) {
-                throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + args.toString());
-            }
-            String[] argsSplit = args.toString().split(" to ");
+            String[] argsSplit = commandArgsString.split(" to ");
 
             Process p = new ProcessBuilder("units", "-t", argsSplit[0], argsSplit[1]).start();
 
@@ -37,10 +33,10 @@ public class UnitsCommand extends Command {
             }
 
             reader.close();
-            sendReply(e, output.toString());
+            sendReply(output.toString());
         }
         catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.commands.CommandUtils;
 import io.banditoz.mchelper.utils.TeXRenderer;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -10,9 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.banditoz.mchelper.commands.Command.sendExceptionMessage;
-
 
 public class TeXListener extends ListenerAdapter {
     @Override
@@ -32,7 +30,7 @@ public class TeXListener extends ListenerAdapter {
                         .queue();
                 latex.close();
             } catch (Exception ex) {
-                sendExceptionMessage(event, ex);
+                CommandUtils.sendExceptionMessage(event, ex);
             }
         }
     }

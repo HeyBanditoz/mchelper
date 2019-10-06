@@ -10,13 +10,13 @@ public class OverworldCommand extends Command {
     }
 
     @Override
-    protected void onCommand(MessageReceivedEvent e, String[] commandArgs) {
+    protected void onCommand() {
         try {
             TwoDimensionalPoint point1 = new TwoDimensionalPoint(commandArgs[1], commandArgs[2]);
             TwoDimensionalPoint overworld = point1.getOverworldCoordinates();
-            sendReply(e, overworld.toIntegerString());
+            sendReply(overworld.toIntegerString());
         } catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
         }
     }
 }

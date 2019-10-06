@@ -7,16 +7,17 @@ public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         if (containsCommand(e)) {
+            initialize(e);
             try {
                 if (CommandPermissions.isBotOwner(e.getAuthor())) {
                     e.getChannel().sendTyping().queue();
-                    onCommand(e, commandArgs(e.getMessage()));
+                    onCommand();
                 }
                 else {
-                    sendReply(e, String.format("User %s (ID: %s) does not have permission to run this command!", e.getAuthor().getAsTag(), e.getAuthor().getId()));
+                    sendReply(String.format("User %s (ID: %s) does not have permission to run this command!", e.getAuthor().getAsTag(), e.getAuthor().getId()));
                 }
             } catch (Exception ex) {
-                sendExceptionMessage(e, ex);
+                sendExceptionMessage(ex);
             }
         }
     }

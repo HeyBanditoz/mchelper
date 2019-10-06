@@ -16,7 +16,7 @@ public class InfoCommand extends Command {
     }
 
     @Override
-    public void onCommand(MessageReceivedEvent e, String[] commandArgs) {
+    public void onCommand() {
         try {
             OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
             long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
@@ -28,9 +28,9 @@ public class InfoCommand extends Command {
                     .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
                     .addField("Guilds", Integer.toString(MCHelper.jda.getGuilds().size()), true)
                     .addField("Users", Integer.toString(MCHelper.jda.getGuilds().size()), true);
-            sendEmbedReply(e, eb.build());
+            sendEmbedReply(eb.build());
         } catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
         }
     }
 }

@@ -15,15 +15,11 @@ public class TeXCommand extends Command {
     }
 
     @Override
-    protected void onCommand(MessageReceivedEvent e, String[] commandArgs) {
-        StringBuilder args = new StringBuilder();
-        for (int i = 1; i < commandArgs.length; i++) {
-            args.append(commandArgs[i]).append(" ");
-        }
+    protected void onCommand() {
         try {
-            String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(args.toString())) + ".png";
+            String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(commandArgsString)) + ".png";
             long before = System.currentTimeMillis();
-            ByteArrayOutputStream latex = TeXRenderer.renderTeX(args.toString());
+            ByteArrayOutputStream latex = TeXRenderer.renderTeX(commandArgsString);
             long after = System.currentTimeMillis() - before;
             e.getMessage().getChannel()
                     .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
@@ -31,6 +27,6 @@ public class TeXCommand extends Command {
                     .queue();
             latex.close();
         } catch (Exception ex) {
-            sendExceptionMessage(e, ex);
+            sendExceptionMessage(ex);
 }    }
 }
