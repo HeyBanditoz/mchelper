@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.utils;
 
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -8,7 +7,6 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 

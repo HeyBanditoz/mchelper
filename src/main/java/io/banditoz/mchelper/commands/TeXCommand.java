@@ -1,11 +1,11 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.utils.TeXRenderer;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 
 public class TeXCommand extends Command {
@@ -26,7 +26,8 @@ public class TeXCommand extends Command {
                     .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                     .queue();
             latex.close();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             sendExceptionMessage(ex);
-}    }
+        }
+    }
 }

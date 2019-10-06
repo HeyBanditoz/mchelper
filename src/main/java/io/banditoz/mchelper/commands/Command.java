@@ -5,6 +5,8 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ public abstract class Command extends ListenerAdapter {
     protected String commandArgsString;
     protected String[] commandArgs;
     protected MessageReceivedEvent e;
+    protected Logger logger;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
@@ -28,7 +31,7 @@ public abstract class Command extends ListenerAdapter {
                 this.e.getChannel().sendTyping().queue();
                 onCommand();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                sendExceptionMessage(ex, false);
             }
         }
     }
@@ -44,6 +47,15 @@ public abstract class Command extends ListenerAdapter {
             commandArgsBuilder.append(commandArgs(e.getMessage())[i]).append(" ");
         }
         commandArgsString = commandArgsBuilder.toString();
+        logger = LoggerFactory.getLogger(getClass());
+    }
+
+    /**
+     * Sends a reply containing the exception message.
+     * @param ex The exception.
+     */
+    public void sendExceptionMessage(Exception ex, boolean caught) {
+        CommandUtils.sendExceptionMessage(this.e, ex, logger, caught);
     }
 
     /**
@@ -51,7 +63,7 @@ public abstract class Command extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex);
+        CommandUtils.sendExceptionMessage(this.e, ex, logger, true);
     }
 
     /**

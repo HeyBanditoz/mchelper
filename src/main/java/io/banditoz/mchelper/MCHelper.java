@@ -1,7 +1,6 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.*;
-import io.banditoz.mchelper.commands.UnitsCommand;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import net.dv8tion.jda.core.JDA;

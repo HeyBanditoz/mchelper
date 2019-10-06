@@ -2,6 +2,8 @@ package io.banditoz.mchelper.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,6 +19,7 @@ public class SettingsManager {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Settings Settings;
     private final Path configFile = new File(".").toPath().resolve("Config.json");
+    private final Logger logger = LoggerFactory.getLogger(SettingsManager.class);
 
     public static SettingsManager getInstance() {
         if (instance == null) {
@@ -27,8 +30,8 @@ public class SettingsManager {
 
     public SettingsManager() {
         if (!configFile.toFile().exists()) {
-            System.out.println("SettingsManager: Creating default Settings");
-            System.out.println("SettingsManager: You will need to edit the Config.json with your login information.");
+            logger.info("SettingsManager: Creating default Settings");
+            logger.info("SettingsManager: You will need to edit the Config.json with your login information.");
             this.Settings = getDefaultSettings();
             saveSettings();
             System.exit(1);
@@ -41,10 +44,9 @@ public class SettingsManager {
             BufferedReader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8);
             this.Settings = gson.fromJson(reader, Settings.class);
             reader.close();
-            System.out.println("SettingsManager: Settings loaded");
+            logger.info("SettingsManager: Settings loaded");
         } catch (IOException e) {
-            System.out.println("SettingsManager: Error Loading Settings");
-            e.printStackTrace();
+            logger.error("SettingsManager: Error Loading Settings", e);
         }
     }
 

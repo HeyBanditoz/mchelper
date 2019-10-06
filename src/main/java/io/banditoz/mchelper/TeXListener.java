@@ -5,6 +5,8 @@ import io.banditoz.mchelper.utils.TeXRenderer;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TeXListener extends ListenerAdapter {
+    private static Logger logger = LoggerFactory.getLogger(TeXListener.class);
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         Matcher m = Pattern.compile("\\$\\$(.*?)\\$\\$").matcher(event.getMessage().getContentDisplay());
@@ -30,7 +33,7 @@ public class TeXListener extends ListenerAdapter {
                         .queue();
                 latex.close();
             } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(event, ex);
+                CommandUtils.sendExceptionMessage(event, ex, logger, true);
             }
         }
     }

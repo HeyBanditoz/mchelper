@@ -1,11 +1,10 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.Command;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 public class UnitsCommand extends Command {
     @Override
@@ -34,8 +33,7 @@ public class UnitsCommand extends Command {
 
             reader.close();
             sendReply(output.toString());
-        }
-        catch (Exception ex) {
+        } catch (IOException | InterruptedException ex) {
             sendExceptionMessage(ex);
         }
     }

@@ -1,10 +1,8 @@
 package io.banditoz.mchelper.commands;
 
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 public class BashCommand extends ElevatedCommand {
     @Override
@@ -33,7 +31,7 @@ public class BashCommand extends ElevatedCommand {
             }
             sendReply(output.toString());
         }
-        catch (Exception ex) {
+        catch (InterruptedException | IOException ex) {
             sendExceptionMessage(ex);
         }
     }

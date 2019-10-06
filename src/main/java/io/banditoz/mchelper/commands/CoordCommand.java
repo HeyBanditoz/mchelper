@@ -1,11 +1,8 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.utils.NamedCoordinatePoint;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class CoordCommand extends Command {
@@ -32,11 +29,7 @@ public class CoordCommand extends Command {
                 }
                 fi.close();
                 oi.close();
-            } catch (FileNotFoundException ex) {
-                sendExceptionMessage(ex);
-            } catch (IOException ex) {
-                sendExceptionMessage(ex);
-            } catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException | IOException ex) {
                 sendExceptionMessage(ex);
             }
         }
@@ -48,7 +41,7 @@ public class CoordCommand extends Command {
                         map.put(n.getName(), n);
                         FileOutputStream f = new FileOutputStream(new File("coords.txt"));
                         ObjectOutputStream o = new ObjectOutputStream(f);
-                        map.forEach((k, p) -> write(p, o, e));
+                        map.forEach((k, p) -> write(p, o));
                         o.close();
                         f.close();
                         sendReply("Added.");
@@ -76,7 +69,7 @@ public class CoordCommand extends Command {
                         map.remove(commandArgs[2]);
                         FileOutputStream f = new FileOutputStream(new File("coords.txt"));
                         ObjectOutputStream o = new ObjectOutputStream(f);
-                        map.forEach((k, p) -> write(p, o, e));
+                        map.forEach((k, p) -> write(p, o));
                         f.close();
                         o.close();
                         sendReply("Deleted.");
@@ -87,16 +80,16 @@ public class CoordCommand extends Command {
                     sendExceptionMessage(ex);
                 }
             } else if (commandArgs[1].equalsIgnoreCase("help")) {
-                help(e);
+                help();
             } else {
                 sendReply("Unrecognized operator " + commandArgs[1] + ".");
             }
         } else {
-            help(e);
+            help();
         }
     }
 
-    protected void write(NamedCoordinatePoint p, ObjectOutputStream o, MessageReceivedEvent e) {
+    protected void write(NamedCoordinatePoint p, ObjectOutputStream o) {
         try {
             o.writeObject(p);
         } catch (IOException ex) {
@@ -104,7 +97,7 @@ public class CoordCommand extends Command {
         }
     }
 
-    protected void help(MessageReceivedEvent e) {
+    protected void help() {
         String s = "save or add: adds new coord to list. \n" +
                 "show or list: display all coords \n" +
                 "show <name> or list <name>: display coord with <name>.\n" +
