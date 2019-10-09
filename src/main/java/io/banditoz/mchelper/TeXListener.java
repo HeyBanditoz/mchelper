@@ -15,9 +15,11 @@ import java.util.regex.Pattern;
 
 public class TeXListener extends ListenerAdapter {
     private static Logger logger = LoggerFactory.getLogger(TeXListener.class);
+    private static Pattern pattern = Pattern.compile("\\$\\$(.*?)\\$\\$");
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        Matcher m = Pattern.compile("\\$\\$(.*?)\\$\\$").matcher(event.getMessage().getContentDisplay());
+        Matcher m = pattern.matcher(event.getMessage().getContentDisplay());
         if (m.find()) {
             event.getChannel().sendTyping().queue();
             String latexString = m.group(1);

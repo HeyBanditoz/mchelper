@@ -11,9 +11,11 @@ import java.util.regex.Pattern;
 
 public class RedditListener extends ListenerAdapter {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Pattern pattern = Pattern.compile("https://reddit.app.link/\\w.*");
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        Matcher m = Pattern.compile("https://reddit.app.link/\\w.*").matcher(event.getMessage().getContentDisplay());
+        Matcher m = pattern.matcher(event.getMessage().getContentDisplay());
         try {
             if (m.find()) {
                 event.getChannel().sendMessage(ExtractRedditLink.extractFromRedditAppLink(m.group())).queue();
