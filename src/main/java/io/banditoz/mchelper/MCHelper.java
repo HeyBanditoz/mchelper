@@ -31,5 +31,6 @@ public class MCHelper {
         jda.addEventListener(new TeXCommand());
         jda.addEventListener(new TeXListener());
         jda.addEventListener(new RedditListener());
+        jda.addEventListener(new PickCommand());
     }
 }
