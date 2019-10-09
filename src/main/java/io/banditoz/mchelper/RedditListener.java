@@ -3,11 +3,14 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.utils.ExtractRedditLink;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RedditListener extends ListenerAdapter {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         Matcher m = Pattern.compile("https://reddit.app.link/\\w.*").matcher(event.getMessage().getContentDisplay());
@@ -16,7 +19,7 @@ public class RedditListener extends ListenerAdapter {
                 event.getChannel().sendMessage(ExtractRedditLink.extractFromRedditAppLink(m.group())).queue();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Exception on converting Reddit link!", ex);
         }
     }
 }

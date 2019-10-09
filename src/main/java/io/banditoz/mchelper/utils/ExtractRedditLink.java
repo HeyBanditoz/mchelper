@@ -3,6 +3,7 @@ package io.banditoz.mchelper.utils;
 import io.banditoz.mchelper.MCHelper;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.http.client.HttpResponseException;
 
 import java.io.IOException;
 
@@ -13,6 +14,9 @@ public class ExtractRedditLink {
                 .url(url)
                 .build();
         Response response = MCHelper.client.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new HttpResponseException(response.code(), "Response was not successful!");
+        }
         return response.header("Location").replaceAll("\\?utm_source.*", "");
     }
 }
