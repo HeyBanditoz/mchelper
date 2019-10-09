@@ -12,7 +12,13 @@ public class PickCommand extends Command {
 
     @Override
     protected void onCommand() {
-        List<String> options = Arrays.asList(commandArgsString.split("\\s+"));
-        sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
+        if (commandArgsString.contains("or")) {
+            List<String> options = Arrays.asList(commandArgsString.split("or"));
+            sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
+        }
+        else {
+            List<String> options = Arrays.asList(commandArgsString.split("\\s+"));
+            sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
+        }
     }
 }
