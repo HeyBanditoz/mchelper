@@ -86,13 +86,12 @@ public abstract class Command extends ListenerAdapter {
     }
 
     protected String[] commandArgs(String string) {
+        String message = string.replaceAll("\\*\\*<.*>\\*\\*", "");
         List<String> matches = new ArrayList<>();
-        Matcher matcher = Pattern.compile(REGEX).matcher(string);
+
+        Matcher matcher = Pattern.compile(REGEX).matcher(message);
         while (matcher.find()) {
             matches.add(matcher.group());
-        }
-        if (string.contains("**<")) {
-            matches.remove(0);
         }
         return matches.toArray(new String[0]);
     }
