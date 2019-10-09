@@ -18,11 +18,11 @@ public class TeXCommand extends Command {
     protected void onCommand() {
         try {
             String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(commandArgsString)) + ".png";
-            long before = System.currentTimeMillis();
+            long before = System.nanoTime();
             ByteArrayOutputStream latex = TeXRenderer.renderTeX(commandArgsString);
-            long after = System.currentTimeMillis() - before;
+            long after = System.nanoTime() - before;
             e.getMessage().getChannel()
-                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
+                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + (after / 1000000) + " ms to generate)")
                     .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                     .queue();
             latex.close();

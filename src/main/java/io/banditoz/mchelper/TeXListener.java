@@ -24,12 +24,12 @@ public class TeXListener extends ListenerAdapter {
             event.getChannel().sendTyping().queue();
             String latexString = m.group(1);
             try {
-                long before = System.currentTimeMillis();
+                long before = System.nanoTime();
                 ByteArrayOutputStream latex = TeXRenderer.renderTeX(latexString);
-                long after = System.currentTimeMillis() - before;
+                long after = System.nanoTime() - before;
                 String imageName = DigestUtils.md5Hex(latexString) + ".png";
                 event.getMessage().getChannel()
-                        .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
+                        .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (took " + (after / 1000000) + " ms to generate)")
                         .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                         .queue();
                 latex.close();
