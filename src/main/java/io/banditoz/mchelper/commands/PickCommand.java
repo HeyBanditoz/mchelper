@@ -12,12 +12,14 @@ public class PickCommand extends Command {
 
     @Override
     protected void onCommand() {
-        if (commandArgsString.contains("or")) {
-            List<String> options = Arrays.asList(commandArgsString.split("or"));
+        if (commandArgsString.contains(" or ")) {
+            List<String> options = Arrays.asList(commandArgsString.split("\\s+or\\s+"));
+            logger.debug("Options (matches or): " + options.toString());
             sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
         }
         else {
             List<String> options = Arrays.asList(commandArgsString.split("\\s+"));
+            logger.debug("Options (matches whitespace): " + options.toString());
             sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
         }
     }
