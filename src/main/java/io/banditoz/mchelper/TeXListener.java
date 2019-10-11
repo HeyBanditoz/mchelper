@@ -4,12 +4,9 @@ import io.banditoz.mchelper.commands.CommandUtils;
 import io.banditoz.mchelper.utils.TeXRenderer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,15 +21,7 @@ public class TeXListener extends ListenerAdapter {
             event.getChannel().sendTyping().queue();
             String latexString = m.group(1);
             try {
-                long before = System.nanoTime();
-                ByteArrayOutputStream latex = TeXRenderer.renderTeX(latexString);
-                long after = System.nanoTime() - before;
-                String imageName = DigestUtils.md5Hex(latexString) + ".png";
-                event.getMessage().getChannel()
-                        .sendMessage("TeX for " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (took " + (after / 1000000) + " ms to generate)")
-                        .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
-                        .queue();
-                latex.close();
+                TeXRenderer.sendTeXToChannel(event, latexString);
             } catch (Exception ex) {
                 CommandUtils.sendExceptionMessage(event, ex, logger, true);
             }

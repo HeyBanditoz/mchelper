@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.utils;
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -7,8 +9,10 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 public class TeXRenderer {
     /**
@@ -16,7 +20,7 @@ public class TeXRenderer {
      * @param tex The TeX to render.
      * @return A BufferedImage of the equation.
      */
-    public static ByteArrayOutputStream renderTeX(String tex) throws IOException {
+    private static ByteArrayOutputStream renderTeX(String tex) throws IOException {
         // create a formula
         TeXFormula formula = new TeXFormula(tex);
 
@@ -42,16 +46,15 @@ public class TeXRenderer {
         return os;
     }
 
-    /*
-    TODO I'll do this in the future.
-    public static void renderTeX(MessageReceivedEvent event) throws Exception {
+    public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
+        String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(args)) + ".png";
         long before = System.currentTimeMillis();
-        ByteArrayOutputStream latex = TeXRenderer.renderTeX(args.toString());
+        ByteArrayOutputStream latex = TeXRenderer.renderTeX(args);
         long after = System.currentTimeMillis() - before;
         e.getMessage().getChannel()
                 .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
                 .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
                 .queue();
         latex.close();
-     */
+    }
 }
