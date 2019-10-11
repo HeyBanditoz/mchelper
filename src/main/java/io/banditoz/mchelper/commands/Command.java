@@ -104,6 +104,6 @@ public abstract class Command extends ListenerAdapter {
     }
 
     protected boolean containsCommand(MessageReceivedEvent e) {
-        return commandName().equalsIgnoreCase(commandArgs(e.getMessage())[0]);
+        return commandArgs(e.getMessage()).length > 0 && commandName().equalsIgnoreCase(commandArgs(e.getMessage())[0]);
     }
 }
