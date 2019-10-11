@@ -2,7 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import com.sun.management.OperatingSystemMXBean;
 import io.banditoz.mchelper.MCHelper;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;

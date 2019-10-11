@@ -3,8 +3,8 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 import okhttp3.OkHttpClient;
 
 import javax.security.auth.login.LoginException;

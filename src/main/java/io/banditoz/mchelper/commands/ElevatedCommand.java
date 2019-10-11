@@ -1,7 +1,7 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.permissions.CommandPermissions;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public abstract class ElevatedCommand extends Command {
     @Override

@@ -2,7 +2,7 @@ package io.banditoz.mchelper.commands.permissions;
 
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.User;
 
 public class CommandPermissions {
     public static boolean isBotOwner(User attempter){
