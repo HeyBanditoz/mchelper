@@ -3,15 +3,6 @@ package io.banditoz.mchelper.utils;
 public class Settings {
     private String discordToken;
     private String[] botOwners;
-    private String coinMarketCapAPIKey;
-
-    public String getCoinMarketCapAPIKey() {
-        return coinMarketCapAPIKey;
-    }
-
-    public void setCoinMarketCapAPIKey(String coinMarketCapAPIKey) {
-        this.coinMarketCapAPIKey = coinMarketCapAPIKey;
-    }
 
     public String[] getBotOwners() {
         return botOwners;
