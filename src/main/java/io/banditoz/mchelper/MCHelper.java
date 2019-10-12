@@ -32,5 +32,7 @@ public class MCHelper {
         jda.addEventListener(new TeXListener());
         jda.addEventListener(new RedditListener());
         jda.addEventListener(new PickCommand());
+        jda.addEventListener(new ToMorseCommand());
+        jda.addEventListener(new FromMorseCommand());
     }
 }
