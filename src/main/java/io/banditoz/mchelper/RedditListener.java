@@ -19,6 +19,7 @@ public class RedditListener extends ListenerAdapter {
         Matcher m = pattern.matcher(e.getMessage().getContentDisplay());
         try {
             if (m.find()) {
+                e.getChannel().sendTyping().queue();
                 CommandUtils.sendReply(ExtractRedditLink.extractFromRedditAppLink(m.group()), e);
             }
         } catch (Exception ex) {
