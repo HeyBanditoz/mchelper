@@ -40,14 +40,19 @@ public class CommandUtils {
     }
 
     /**
-     * Sends a reply.
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
      * @param msg The reply.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        Queue<Message> toSend = new MessageBuilder()
-                .append(msg)
-                .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
-        toSend.forEach(message -> e.getChannel().sendMessage(msg).queue());
+        if (msg.isEmpty()) {
+            e.getChannel().sendMessage("<no output>").queue();
+        }
+        else {
+            Queue<Message> toSend = new MessageBuilder()
+                    .append(msg)
+                    .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
+            toSend.forEach(message -> e.getChannel().sendMessage(msg).queue());
+        }
     }
 
     public static String[] commandArgs(String string) {
