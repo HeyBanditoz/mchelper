@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.permissions.CommandPermissions;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -7,6 +8,7 @@ public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         if (containsCommand(e)) {
+            if (MCHelper.jda.getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);
             try {
                 if (CommandPermissions.isBotOwner(e.getAuthor())) {
