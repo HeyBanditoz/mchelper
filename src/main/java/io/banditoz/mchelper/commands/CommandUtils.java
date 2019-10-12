@@ -1,7 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommandUtils {
     private static final boolean SEND_FULL_STACK_TRACE = false;
@@ -29,5 +37,39 @@ public class CommandUtils {
             }
         }
         e.getChannel().sendMessage(reply.toString()).queue();
+    }
+
+    /**
+     * Sends a reply.
+     * @param msg The reply.
+     */
+    public static void sendReply(String msg, MessageReceivedEvent e) {
+        Queue<Message> toSend = new MessageBuilder()
+                .append(msg)
+                .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
+        toSend.forEach(message -> e.getChannel().sendMessage(msg).queue());
+    }
+
+    public static String[] commandArgs(String string) {
+        String message = string.replaceAll("\\*\\*<.*>\\*\\*", "");
+        List<String> matches = new ArrayList<>();
+
+        Matcher matcher = Pattern.compile("\\S+").matcher(message);
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        return matches.toArray(new String[0]);
+    }
+
+    public static String generateCommandArgsString(MessageReceivedEvent e) {
+        StringBuilder commandArgsBuilder = new StringBuilder();
+        for (int i = 1; i < commandArgs(e.getMessage()).length; i++) {
+            commandArgsBuilder.append(commandArgs(e.getMessage())[i]).append(" ");
+        }
+        return commandArgsBuilder.toString();
+    }
+
+    public static String[] commandArgs(Message message) {
+        return commandArgs(message.getContentDisplay());
     }
 }

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.commands.CommandUtils;
 import io.banditoz.mchelper.utils.ExtractRedditLink;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,11 +15,11 @@ public class RedditListener extends ListenerAdapter {
     private static Pattern pattern = Pattern.compile("https://reddit.app.link/\\w.*");
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        Matcher m = pattern.matcher(event.getMessage().getContentDisplay());
+    public void onMessageReceived(MessageReceivedEvent e) {
+        Matcher m = pattern.matcher(e.getMessage().getContentDisplay());
         try {
             if (m.find()) {
-                event.getChannel().sendMessage(ExtractRedditLink.extractFromRedditAppLink(m.group())).queue();
+                CommandUtils.sendReply(ExtractRedditLink.extractFromRedditAppLink(m.group()), e);
             }
         } catch (Exception ex) {
             logger.error("Exception on converting Reddit link!", ex);

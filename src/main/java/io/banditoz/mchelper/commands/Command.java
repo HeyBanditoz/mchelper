@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 public abstract class Command extends ListenerAdapter {
     protected abstract void onCommand();
     public abstract String commandName();
-    protected static final String REGEX = "\\S+";
     protected String commandArgsString;
     protected String[] commandArgs;
     protected MessageReceivedEvent e;
@@ -43,13 +42,9 @@ public abstract class Command extends ListenerAdapter {
      * Initialize variables.
      */
     protected void initialize(MessageReceivedEvent e) {
-        StringBuilder commandArgsBuilder = new StringBuilder();
         this.e = e;
-        this.commandArgs = commandArgs(e.getMessage());
-        for (int i = 1; i < commandArgs(e.getMessage()).length; i++) {
-            commandArgsBuilder.append(commandArgs(e.getMessage())[i]).append(" ");
-        }
-        commandArgsString = commandArgsBuilder.toString();
+        this.commandArgs = CommandUtils.commandArgs(e.getMessage());
+        this.commandArgsString = CommandUtils.generateCommandArgsString(e);
         logger = LoggerFactory.getLogger(getClass());
     }
 
@@ -74,10 +69,7 @@ public abstract class Command extends ListenerAdapter {
      * @param msg The reply.
      */
     public void sendReply(String msg) {
-        Queue<Message> toSend = new MessageBuilder()
-                .append(msg)
-                .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
-        toSend.forEach(message -> this.e.getChannel().sendMessage(msg).queue());
+        CommandUtils.sendReply(msg, e);
     }
 
     /**
@@ -88,22 +80,7 @@ public abstract class Command extends ListenerAdapter {
         e.getChannel().sendMessage(me).queue();
     }
 
-    protected String[] commandArgs(String string) {
-        String message = string.replaceAll("\\*\\*<.*>\\*\\*", "");
-        List<String> matches = new ArrayList<>();
-
-        Matcher matcher = Pattern.compile(REGEX).matcher(message);
-        while (matcher.find()) {
-            matches.add(matcher.group());
-        }
-        return matches.toArray(new String[0]);
-    }
-
-    protected String[] commandArgs(Message message) {
-        return commandArgs(message.getContentDisplay());
-    }
-
     protected boolean containsCommand(MessageReceivedEvent e) {
-        return commandArgs(e.getMessage()).length > 0 && commandName().equalsIgnoreCase(commandArgs(e.getMessage())[0]);
+        return CommandUtils.commandArgs(e.getMessage()).length > 0 && commandName().equalsIgnoreCase(CommandUtils.commandArgs(e.getMessage())[0]);
     }
 }
