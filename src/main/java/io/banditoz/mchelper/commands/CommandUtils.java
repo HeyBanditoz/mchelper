@@ -68,8 +68,15 @@ public class CommandUtils {
 
     public static String generateCommandArgsString(MessageReceivedEvent e) {
         StringBuilder commandArgsBuilder = new StringBuilder();
-        for (int i = 1; i < commandArgs(e.getMessage()).length; i++) {
-            commandArgsBuilder.append(commandArgs(e.getMessage())[i]).append(" ");
+        String[] args = commandArgs(e.getMessage());
+        for (int i = 1; i < args.length; i++) {
+            if (i == args.length - 1) {
+                commandArgsBuilder.append(args[i]);
+            }
+            else {
+                commandArgsBuilder.append(args[i]).append(" ");
+            }
+
         }
         return commandArgsBuilder.toString();
     }
