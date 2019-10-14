@@ -42,11 +42,14 @@ public class MorseUtils {
         morseMap.put('8', "---..");
         morseMap.put('9', "----.");
         morseMap.put('0', "-----");
+        morseMap.put(',', "--..--");
+        morseMap.put('.', ".-.-.-");
+        morseMap.put('?', "..--..");
         morseMap.put(' ', "/");
     }
 
     public static String toMorse(String message) {
-        String toMorse = message.toUpperCase().replaceAll("[^A-Z0-9 ]", "");
+        String toMorse = message.toUpperCase().replaceAll("[^A-Z0-9?., ]", "");
         StringBuilder morse = new StringBuilder();
 
         for (Character c : toMorse.toCharArray()) {
