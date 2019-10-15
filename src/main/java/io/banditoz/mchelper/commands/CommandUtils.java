@@ -44,7 +44,10 @@ public class CommandUtils {
      * @param msg The reply.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        if (msg.isEmpty()) {
+        if (msg == null) {
+            e.getChannel().sendMessage("<null output>").queue();
+        }
+        else if (msg.isEmpty()) {
             e.getChannel().sendMessage("<no output>").queue();
         }
         else {
