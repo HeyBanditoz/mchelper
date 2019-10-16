@@ -34,5 +34,6 @@ public class MCHelper {
         jda.addEventListener(new PickCommand());
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
+        jda.addEventListener(new JSEvalCommand());
     }
 }

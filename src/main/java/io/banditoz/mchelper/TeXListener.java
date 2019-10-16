@@ -23,7 +23,7 @@ public class TeXListener extends ListenerAdapter {
             try {
                 TeXRenderer.sendTeXToChannel(event, latexString);
             } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(event, ex, logger, true);
+                CommandUtils.sendExceptionMessage(event, ex, logger, true, false);
             }
         }
     }

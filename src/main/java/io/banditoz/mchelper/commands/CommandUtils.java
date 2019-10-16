@@ -18,8 +18,8 @@ public class CommandUtils {
      * Sends a reply containing the exception message.
      * @param ex The exception.
      */
-    public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l, boolean caught) {
-        StringBuilder reply = new StringBuilder("**Exception thrown:** " + ex.toString()); // bold for Discord, and code blocks
+    public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l, boolean caught, boolean blocked) {
+        StringBuilder reply = new StringBuilder("**Exception thrown:** " + (blocked ? "```" : "") + ex.toString() + (blocked ? "```" : "")); // ternary abuse out the wazoo
         if (SEND_FULL_STACK_TRACE) {
             reply.append("\n```");
             for (int i = 0; i < ex.getStackTrace().length; i++) {

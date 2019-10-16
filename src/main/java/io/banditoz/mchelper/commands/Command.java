@@ -47,7 +47,7 @@ public abstract class Command extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex, boolean caught) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, caught);
+        CommandUtils.sendExceptionMessage(this.e, ex, logger, caught, false);
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class Command extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, true);
+        CommandUtils.sendExceptionMessage(this.e, ex, logger, true, false);
     }
 
     /**
