@@ -20,8 +20,10 @@ public class JSEvalCommand extends ElevatedCommand {
     // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java
     @Override
     protected void onCommand() {
+        boolean blocked = false;
         if (commandArgsString.startsWith("```js")) {
             commandArgsString = commandArgsString.replace("```js", "").replace("```", "");
+            blocked = true;
         }
         try {
             engine.eval("var imports = new JavaImporter(" +
@@ -34,22 +36,19 @@ public class JSEvalCommand extends ElevatedCommand {
                     "Packages.net.dv8tion.jda.api.managers," +
                     "Packages.net.dv8tion.jda.api.managers.impl," +
                     "Packages.net.dv8tion.jda.api.utils);");
-            engine.put("event", e);
-            engine.put("message", e.getMessage());
-            engine.put("channel", e.getChannel());
+            engine.put("e", e);
             engine.put("args", commandArgs);
-            engine.put("api", e.getJDA());
+            engine.put("jda", e.getJDA());
             if (e.isFromType(ChannelType.TEXT))
             {
                 engine.put("guild", e.getGuild());
                 engine.put("member", e.getMember());
             }
-            Object out = engine.eval(
-                    "(function() {" +
-                            "with (imports) {" +
-                            (commandArgsString) +
-                            "}" +
-                            "})();");
+            Object out = engine.eval("(function() {" +
+                                            "with (imports) {" + (blocked ? "" : "return ") +
+                                            (commandArgsString) +
+                                            "}" +
+                                            "})();");
             if (out == null) {
                 sendReply(null); // checked in CommandUtils
             }
