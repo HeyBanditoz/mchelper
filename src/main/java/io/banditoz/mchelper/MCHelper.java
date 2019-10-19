@@ -35,5 +35,6 @@ public class MCHelper {
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new JSEvalCommand());
+        jda.addEventListener(new WeatherCommand());
     }
 }

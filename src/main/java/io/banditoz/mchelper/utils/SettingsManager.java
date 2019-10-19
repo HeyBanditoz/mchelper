@@ -69,6 +69,7 @@ public class SettingsManager {
         Settings defaultSettings = new Settings();
         defaultSettings.setDiscordToken("Bot Token Here");
         defaultSettings.setBotOwners(new String[]{"ID Here"});
+        defaultSettings.setDarkSkyAPI("Dark Sky API key here.");
         return defaultSettings;
     }
 }
