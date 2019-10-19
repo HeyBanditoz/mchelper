@@ -17,10 +17,11 @@ public class RedditListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         Matcher m = pattern.matcher(e.getMessage().getContentDisplay());
+        ExtractRedditLink extractor = new ExtractRedditLink(MCHelper.client);
         try {
             if (m.find()) {
                 e.getChannel().sendTyping().queue();
-                CommandUtils.sendReply(ExtractRedditLink.extractFromRedditAppLink(m.group()), e);
+                CommandUtils.sendReply(extractor.extractFromRedditAppLink(m.group()), e);
             }
         } catch (Exception ex) {
             logger.error("Exception on converting Reddit link!", ex);
