@@ -29,10 +29,8 @@ dependencies {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'org.apache.httpcomponents:httpclient:4.5'
     implementation 'com.udojava:EvalEx:2.1'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
-    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.okhttp3:okhttp:3.13.0'
     implementation 'org.apache.commons:commons-collections4:4.1'
     implementation ('ch.rasc:darksky:2.0.0') {
