@@ -6,9 +6,10 @@ import ch.rasc.darksky.model.DsForecastRequest;
 import ch.rasc.darksky.model.DsResponse;
 import ch.rasc.darksky.model.DsUnit;
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.utils.GeoCoordinates;
-import io.banditoz.mchelper.utils.ReverseGeocoder;
-import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.*;
+import io.banditoz.mchelper.utils.weather.GeoCoordinates;
+import io.banditoz.mchelper.utils.weather.ReverseGeocoder;
+import io.banditoz.mchelper.utils.weather.WeatherDeserializer;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.io.IOException;
@@ -21,14 +22,14 @@ public class WeatherCommand extends Command {
 
     @Override
     public void onCommand() {
-        ReverseGeocoder g = new ReverseGeocoder(MCHelper.client);
+        ReverseGeocoder g = new ReverseGeocoder(MCHelper.client, new WeatherDeserializer());
         GeoCoordinates c = null;
         try {
             c = g.reverse(commandArgsString);
         } catch (IOException ex) {
             sendExceptionMessage(ex, true);
         }
-        DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), MCHelper.client);
+        DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), new WeatherDeserializer(), MCHelper.client);
         DsForecastRequest request = DsForecastRequest.builder()
                 .latitude(String.valueOf(c.getLatitude()))
                 .longitude(String.valueOf(c.getLongitude()))
@@ -55,3 +56,4 @@ public class WeatherCommand extends Command {
         sendEmbedReply(b.build());
     }
 }
+

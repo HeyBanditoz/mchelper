@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils;
+package io.banditoz.mchelper.utils.weather;
 
 public class GeoCoordinates {
     private double latitude;
