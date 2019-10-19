@@ -1,7 +1,7 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.CommandUtils;
-import io.banditoz.mchelper.utils.ExtractRedditLink;
+import io.banditoz.mchelper.utils.RedditLinkExtractor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ public class RedditListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         Matcher m = pattern.matcher(e.getMessage().getContentDisplay());
-        ExtractRedditLink extractor = new ExtractRedditLink(MCHelper.client);
+        RedditLinkExtractor extractor = new RedditLinkExtractor(MCHelper.client);
         try {
             if (m.find()) {
                 e.getChannel().sendTyping().queue();

@@ -7,9 +7,10 @@ import org.apache.http.client.HttpResponseException;
 
 import java.io.IOException;
 
-public class ExtractRedditLink {
+public class RedditLinkExtractor {
     private OkHttpClient client;
-    public ExtractRedditLink(OkHttpClient client) {
+
+    public RedditLinkExtractor(OkHttpClient client) {
         this.client = client;
     }
 
