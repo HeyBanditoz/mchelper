@@ -23,8 +23,8 @@ public class InfoCommand extends Command {
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
                 .addField("Threads", String.format("%d/%d", Thread.activeCount(), Thread.getAllStackTraces().size()), true)
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
-                .addField("Guilds", Integer.toString(MCHelper.jda.getGuilds().size()), true)
-                .addField("Users", Integer.toString(MCHelper.jda.getGuilds().size()), true);
+                .addField("Guilds", Integer.toString(e.getJDA().getGuilds().size()), true)
+                .addField("Users", Integer.toString(e.getJDA().getGuilds().size()), true);
         sendEmbedReply(eb.build());
     }
 }

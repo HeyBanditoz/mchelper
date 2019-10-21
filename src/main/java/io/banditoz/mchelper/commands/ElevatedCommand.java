@@ -8,7 +8,7 @@ public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         if (containsCommand(e)) {
-            if (MCHelper.jda.getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
+            if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);
             try {
                 if (CommandPermissions.isBotOwner(e.getAuthor())) {

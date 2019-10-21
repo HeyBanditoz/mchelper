@@ -18,7 +18,7 @@ public abstract class Command extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         if (containsCommand(e)) {
-            if (MCHelper.jda.getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
+            if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);
             try {
                 this.e.getChannel().sendTyping().queue();

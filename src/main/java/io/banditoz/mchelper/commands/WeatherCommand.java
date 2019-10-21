@@ -22,14 +22,14 @@ public class WeatherCommand extends Command {
 
     @Override
     public void onCommand() {
-        ReverseGeocoder g = new ReverseGeocoder(MCHelper.client, new WeatherDeserializer());
+        ReverseGeocoder g = new ReverseGeocoder(MCHelper.getOkHttpClient(), new WeatherDeserializer());
         GeoCoordinates c = null;
         try {
             c = g.reverse(commandArgsString);
         } catch (IOException ex) {
             sendExceptionMessage(ex, true);
         }
-        DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), new WeatherDeserializer(), MCHelper.client);
+        DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), new WeatherDeserializer(), MCHelper.getOkHttpClient());
         DsForecastRequest request = DsForecastRequest.builder()
                 .latitude(String.valueOf(c.getLatitude()))
                 .longitude(String.valueOf(c.getLongitude()))

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -10,11 +11,12 @@ import okhttp3.OkHttpClient;
 import javax.security.auth.login.LoginException;
 
 public class MCHelper {
-    public static JDA jda;
-    public static OkHttpClient client = new OkHttpClient.Builder()
+    private static JDA jda;
+    private static OkHttpClient client = new OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false) // for reddit.app.link fetching
             .build(); // singleton http client
+    private static ObjectMapper om = new ObjectMapper();
 
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
@@ -36,5 +38,17 @@ public class MCHelper {
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new JSEvalCommand());
         jda.addEventListener(new WeatherCommand());
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        return om;
+    }
+
+    public static OkHttpClient getOkHttpClient() {
+        return client;
+    }
+
+    public static JDA getJDA() {
+        return jda;
     }
 }

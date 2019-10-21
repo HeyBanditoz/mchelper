@@ -17,7 +17,7 @@ public class RedditListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         Matcher m = pattern.matcher(e.getMessage().getContentDisplay());
-        RedditLinkExtractor extractor = new RedditLinkExtractor(MCHelper.client);
+        RedditLinkExtractor extractor = new RedditLinkExtractor(MCHelper.getOkHttpClient());
         try {
             if (m.find()) {
                 e.getChannel().sendTyping().queue();
