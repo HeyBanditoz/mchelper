@@ -22,6 +22,10 @@ public class WeatherCommand extends Command {
 
     @Override
     public void onCommand() {
+        if (SettingsManager.getInstance().getSettings().getDarkSkyAPI() == null) {
+            sendReply("Your Dark Sky token is not configured. It is required to look up the weather. Head to https://darksky.net/dev to get one.");
+            return;
+        }
         ReverseGeocoder g = new ReverseGeocoder(MCHelper.getOkHttpClient(), new WeatherDeserializer());
         GeoCoordinates c = null;
         try {
