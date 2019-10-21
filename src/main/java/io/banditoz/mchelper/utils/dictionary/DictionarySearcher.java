@@ -5,7 +5,6 @@ import io.banditoz.mchelper.utils.SettingsManager;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.client.HttpResponseException;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -19,8 +18,6 @@ public class DictionarySearcher {
         if (response.code() >= 400) {
             throw new HttpResponseException(response.code(), "Response was not successful! Status code: " + response.code());
         }
-        String result = response.body().string();
-        LoggerFactory.getLogger(DictionarySearcher.class).info(result);
-        return MCHelper.getObjectMapper().readValue(result, DictionaryResult.class);
+        return MCHelper.getObjectMapper().readValue(response.body().string(), DictionaryResult.class);
     }
 }
