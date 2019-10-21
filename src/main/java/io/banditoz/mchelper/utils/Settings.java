@@ -11,6 +11,8 @@ public class Settings {
     private List<String> botOwners = null;
     @JsonProperty("darkSkyAPI")
     private String darkSkyAPI;
+    @JsonProperty("owlBotToken")
+    private String owlBotToken;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -40,5 +42,15 @@ public class Settings {
     @JsonProperty("darkSkyAPI")
     public void setDarkSkyAPI(String darkSkyAPI) {
         this.darkSkyAPI = darkSkyAPI;
+    }
+
+    @JsonProperty("owlBotToken")
+    public String getOwlBotToken() {
+        return owlBotToken;
+    }
+
+    @JsonProperty("owlBotToken")
+    public void setOwlBotToken(String owlBotToken) {
+        this.owlBotToken = owlBotToken;
     }
 }

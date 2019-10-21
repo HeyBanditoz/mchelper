@@ -38,6 +38,7 @@ public class MCHelper {
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new JSEvalCommand());
         jda.addEventListener(new WeatherCommand());
+        jda.addEventListener(new DictionaryCommand());
     }
 
     public static ObjectMapper getObjectMapper() {
