@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.permissions.CommandPermissions;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
