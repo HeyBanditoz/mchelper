@@ -26,7 +26,7 @@ public class WeatherCommand extends Command {
             sendReply("Your Dark Sky token is not configured. It is required to look up the weather. Head to https://darksky.net/dev to get one.");
             return;
         }
-        ReverseGeocoder g = new ReverseGeocoder(MCHelper.getOkHttpClient(), new WeatherDeserializer());
+        ReverseGeocoder g = new ReverseGeocoder(new WeatherDeserializer());
         GeoCoordinates c = null;
         try {
             c = g.reverse(commandArgsString);

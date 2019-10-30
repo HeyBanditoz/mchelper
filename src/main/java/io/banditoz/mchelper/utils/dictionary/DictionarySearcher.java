@@ -4,7 +4,7 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.SettingsManager;
 import okhttp3.Request;
-import okhttp3.Response;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -14,10 +14,8 @@ public class DictionarySearcher {
                 .url("https://owlbot.info/api/v3/dictionary/" + word)
                 .addHeader("Authorization", "Token " + SettingsManager.getInstance().getSettings().getOwlBotToken())
                 .build();
-        Response response = MCHelper.getOkHttpClient().newCall(request).execute();
-        if (response.code() >= 400) {
-            throw new HttpResponseException(response.code());
-        }
-        return MCHelper.getObjectMapper().readValue(response.body().string(), DictionaryResult.class);
+        String json = MCHelper.performHttpRequest(request);
+        LoggerFactory.getLogger(DictionarySearcher.class).debug(json);
+        return MCHelper.getObjectMapper().readValue(json, DictionaryResult.class);
     }
 }

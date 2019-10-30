@@ -2,18 +2,15 @@ package io.banditoz.mchelper.utils.weather;
 
 import java.io.IOException;
 
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 public class ReverseGeocoder {
-    private OkHttpClient c;
     private GeocoderResult[] result;
     private WeatherDeserializer ws;
 
-    public ReverseGeocoder(OkHttpClient c, WeatherDeserializer ws) {
-        this.c = c;
+    public ReverseGeocoder(WeatherDeserializer ws) {
         this.ws = ws;
     }
 
@@ -21,11 +18,7 @@ public class ReverseGeocoder {
         Request request = new Request.Builder()
                 .url("https://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1")
                 .build();
-        Response response = c.newCall(request).execute();
-        if (response.code() >= 400) {
-            throw new HttpResponseException(response.code());
-        }
-        String responseString = response.body().string();
+        String responseString = MCHelper.performHttpRequest(request);
         if (responseString.equals("[]")) {
             throw new IllegalArgumentException("Could not find location \"" + location + "\"");
         }

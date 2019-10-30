@@ -2,21 +2,28 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.*;
+import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
 
 public class MCHelper {
     private static JDA jda;
-    private static OkHttpClient client = new OkHttpClient.Builder()
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false) // for reddit.app.link fetching
             .build(); // singleton http client
-    private static ObjectMapper om = new ObjectMapper();
+    private static final ObjectMapper OM = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
 
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
@@ -42,14 +49,32 @@ public class MCHelper {
     }
 
     public static ObjectMapper getObjectMapper() {
-        return om;
+        return OM;
     }
 
     public static OkHttpClient getOkHttpClient() {
-        return client;
+        return CLIENT;
     }
 
     public static JDA getJDA() {
         return jda;
+    }
+
+    public static String performHttpRequest(Request request) throws HttpResponseException, IOException {
+        LOGGER.debug(request.toString());
+        Response response = CLIENT.newCall(request).execute();
+        if (response.code() >= 400) {
+            throw new HttpResponseException(response.code());
+        }
+        return response.body().string();
+    }
+
+    public static Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
+        LOGGER.debug(request.toString());
+        Response response = CLIENT.newCall(request).execute();
+        if (response.code() >= 400) {
+            throw new HttpResponseException(response.code());
+        }
+        return response;
     }
 }
