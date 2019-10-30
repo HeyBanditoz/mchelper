@@ -5,8 +5,6 @@ import io.banditoz.mchelper.utils.dictionary.Definition;
 import io.banditoz.mchelper.utils.dictionary.DictionaryResult;
 import io.banditoz.mchelper.utils.dictionary.DictionarySearcher;
 
-import java.io.IOException;
-
 public class DictionaryCommand extends Command {
     @Override
     public String commandName() {
@@ -29,7 +27,7 @@ public class DictionaryCommand extends Command {
             else {
                 result = DictionarySearcher.search(commandArgs[1]);
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             sendExceptionMessage(ex);
             return;
         }

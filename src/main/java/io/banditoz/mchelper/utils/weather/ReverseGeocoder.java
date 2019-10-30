@@ -2,10 +2,10 @@ package io.banditoz.mchelper.utils.weather;
 
 import java.io.IOException;
 
+import io.banditoz.mchelper.utils.HttpResponseException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.http.client.HttpResponseException;
 
 public class ReverseGeocoder {
     private OkHttpClient c;
@@ -17,13 +17,13 @@ public class ReverseGeocoder {
         this.ws = ws;
     }
 
-    public GeoCoordinates reverse(String location) throws IOException {
+    public GeoCoordinates reverse(String location) throws IOException, HttpResponseException {
         Request request = new Request.Builder()
                 .url("https://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1")
                 .build();
         Response response = c.newCall(request).execute();
         if (response.code() >= 400) {
-            throw new HttpResponseException(response.code(), "Response was not successful! Status code: " + response.code());
+            throw new HttpResponseException(response.code());
         }
         String responseString = response.body().string();
         if (responseString.equals("[]")) {

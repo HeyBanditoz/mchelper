@@ -30,7 +30,7 @@ public class WeatherCommand extends Command {
         GeoCoordinates c = null;
         try {
             c = g.reverse(commandArgsString);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             sendExceptionMessage(ex, true);
         }
         DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), new WeatherDeserializer(), MCHelper.getOkHttpClient());

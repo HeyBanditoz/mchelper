@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.utils;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
@@ -12,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
+import java.security.MessageDigest;
 
 public class TeXRenderer {
     /**
@@ -47,7 +46,7 @@ public class TeXRenderer {
     }
 
     public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
-        String imageName = Base64.getEncoder().encodeToString(DigestUtils.md5(args)) + ".png";
+        String imageName = new String(MessageDigest.getInstance("md5").digest(args.getBytes())) + ".png";
         long before = System.currentTimeMillis();
         ByteArrayOutputStream latex = TeXRenderer.renderTeX(args);
         long after = System.currentTimeMillis() - before;
