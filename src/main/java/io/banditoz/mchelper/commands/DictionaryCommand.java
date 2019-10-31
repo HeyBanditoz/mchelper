@@ -33,7 +33,7 @@ public class DictionaryCommand extends Command {
         }
         Definition d = result.getDefinitions().get(toLookup);
         String reply = result.getWord() + ", " +
-                d.getType() +
+                ((d.getType() == null) ? "unkn" : d.getType()) +
                 ": " +
                 d.getDefinition() +
                 ((d.getExample() == null) ? "" : " *\"" + d.getExample() + "\"*") +
