@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.utils.TeXRenderer;
 
 public class TeXListener extends RegexListener {
+    @Override
     protected String regex() {
         return "\\$\\$(.*?)\\$\\$";
     }
