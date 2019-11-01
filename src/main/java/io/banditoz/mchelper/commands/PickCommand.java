@@ -15,12 +15,16 @@ public class PickCommand extends Command {
         if (commandArgsString.contains(" or ")) {
             List<String> options = Arrays.asList(commandArgsString.split("\\s+or\\s+"));
             logger.debug("Options (matches or): " + options.toString());
-            sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
+            int pos = ThreadLocalRandom.current().nextInt(options.size());
+            logger.debug("\"" + options.get(pos) + "\" won! (" + pos + ")");
+            sendReply(options.get(pos));
         }
         else {
             List<String> options = Arrays.asList(commandArgsString.split("\\s+"));
             logger.debug("Options (matches whitespace): " + options.toString());
-            sendReply(options.get(ThreadLocalRandom.current().nextInt(options.size())));
+            int pos = ThreadLocalRandom.current().nextInt(options.size());
+            logger.debug("\"" + options.get(pos) + "\" won! (" + pos + ")");
+            sendReply(options.get(pos));
         }
     }
 }
