@@ -1,27 +1,39 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.CommandUtils;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class Listener extends ListenerAdapter {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public abstract class RegexListener extends ListenerAdapter {
     protected abstract void onMessage();
+    protected abstract String regex();
     protected MessageReceivedEvent e;
     protected Logger logger;
     protected String message;
+    protected Matcher m;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        this.e = e;
-        this.message = e.getMessage().getContentDisplay();
-        logger = LoggerFactory.getLogger(getClass());
+        initialize(e);
         try {
             onMessage();
         } catch (Exception ex) {
             CommandUtils.sendExceptionMessage(this.e, ex, logger, false, false);
         }
+    }
+
+    private void initialize(MessageReceivedEvent e) {
+        this.e = e;
+        this.message = this.e.getMessage().getContentDisplay();
+        Pattern p = Pattern.compile(regex());
+        m = p.matcher(message);
+        logger = LoggerFactory.getLogger(getClass());
     }
 
     /**
