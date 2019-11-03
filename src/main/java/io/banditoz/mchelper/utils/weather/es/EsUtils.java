@@ -9,6 +9,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 public class EsUtils {
     public static String getLatestFormattedWeather() throws IOException {
@@ -18,7 +20,14 @@ public class EsUtils {
                 .build();
         Response response = MCHelper.getOkHttpClient().newCall(request).execute();
         JsonNode jn = MCHelper.getObjectMapper().readTree(response.body().string());
-        return returnValue(jn, "fahrenheit") + " °F, " + returnValue(jn, "humidity") + " %H, " + returnValue(jn, "hpa") + " hPa";
+
+        MathContext m = new MathContext(4);
+        BigDecimal currentFahrenheit = new BigDecimal(returnValue(jn, "fahrenheit"));
+        BigDecimal currentCelsius = new BigDecimal(returnValue(jn, "celsius"));
+        BigDecimal currentHumidity = new BigDecimal(returnValue(jn, "humidity"));
+        BigDecimal currenthPa = new BigDecimal(returnValue(jn, "hpa"));
+
+        return currentFahrenheit + " °F, " + currentCelsius + " °C, " + currentHumidity+ " %H, " + currenthPa + " hPa (" + currenthPa.divide(new BigDecimal("1013.25"), m) + " atm, " + currenthPa.divide(new BigDecimal("68.9475729318"), m) + " psi)";
     }
 
     private static String returnValue(JsonNode jn, String value) {

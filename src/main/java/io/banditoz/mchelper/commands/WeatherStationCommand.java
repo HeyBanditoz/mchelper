@@ -18,7 +18,7 @@ public class WeatherStationCommand extends Command {
             hourSince = Integer.parseInt(commandArgsString);
         }
         try {
-            e.getChannel().sendMessage(EsUtils.getLatestFormattedWeather())
+            e.getChannel().sendMessage(EsUtils.getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
                     .addFile(GrafanaImageFetcher.fetchFahrenheit(hourSince), "graph.png")
                     .queue();
         } catch (IOException ex) {
