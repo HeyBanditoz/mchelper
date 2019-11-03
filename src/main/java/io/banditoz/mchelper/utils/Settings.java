@@ -13,6 +13,12 @@ public class Settings {
     private String darkSkyAPI;
     @JsonProperty("owlBotToken")
     private String owlBotToken;
+    @JsonProperty("grafanaUrl")
+    private String grafanaUrl;
+    @JsonProperty("esUrl")
+    private String esUrl;
+    @JsonProperty("grafanaToken")
+    private String grafanaToken;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -52,5 +58,35 @@ public class Settings {
     @JsonProperty("owlBotToken")
     public void setOwlBotToken(String owlBotToken) {
         this.owlBotToken = owlBotToken;
+    }
+
+    @JsonProperty("grafanaUrl")
+    public String getGrafanaUrl() {
+        return grafanaUrl;
+    }
+
+    @JsonProperty("grafanaUrl")
+    public void setGrafanaUrl(String grafanaUrl) {
+        this.grafanaUrl = grafanaUrl;
+    }
+
+    @JsonProperty("esUrl")
+    public String getEsUrl() {
+        return esUrl;
+    }
+
+    @JsonProperty("esUrl")
+    public void setEsUrl(String esUrl) {
+        this.esUrl = esUrl;
+    }
+
+    @JsonProperty("grafanaToken")
+    public String getGrafanaToken() {
+        return grafanaToken;
+    }
+
+    @JsonProperty("grafanaToken")
+    public void setGrafanaToken(String grafanaToken) {
+        this.grafanaToken = grafanaToken;
     }
 }
