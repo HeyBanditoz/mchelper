@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.utils.weather.es;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.SettingsManager;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -12,7 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class GrafanaImageFetcher {
-    public static ByteArrayInputStream fetchFahrenheit(int hourSince) throws IOException {
+    public static ByteArrayInputStream fetchFahrenheit(int hourSince) throws IOException, HttpResponseException {
         hourSince = hourSince * -1;
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, hourSince);
@@ -22,7 +23,7 @@ public class GrafanaImageFetcher {
                 .url(url)
                 .addHeader("Authorization", "Bearer " + SettingsManager.getInstance().getSettings().getGrafanaToken())
                 .build();
-        Response response = MCHelper.getOkHttpClient().newCall(request).execute();
+        Response response = MCHelper.performHttpRequestGetResponse(request);
         return new ByteArrayInputStream(response.body().bytes());
     }
 }

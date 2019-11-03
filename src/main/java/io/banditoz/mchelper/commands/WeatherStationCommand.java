@@ -3,8 +3,6 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.utils.weather.es.EsUtils;
 import io.banditoz.mchelper.utils.weather.es.GrafanaImageFetcher;
 
-import java.io.IOException;
-
 public class WeatherStationCommand extends Command {
     @Override
     public String commandName() {
@@ -21,7 +19,7 @@ public class WeatherStationCommand extends Command {
             e.getChannel().sendMessage(EsUtils.getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
                     .addFile(GrafanaImageFetcher.fetchFahrenheit(hourSince), "graph.png")
                     .queue();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             sendExceptionMessage(ex, true);
         }
     }
