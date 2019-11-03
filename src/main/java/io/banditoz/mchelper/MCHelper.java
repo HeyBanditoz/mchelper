@@ -52,6 +52,7 @@ public class MCHelper {
         else {
             jda.addEventListener(new WeatherStationCommand());
         }
+        jda.addEventListener(new ReverseGeocoderCommand());
     }
 
     public static ObjectMapper getObjectMapper() {

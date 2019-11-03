@@ -14,10 +14,7 @@ public class GeoCoordinates {
 
     @Override
     public String toString() {
-        return "GeoCoordinates{" +
-                "latitude=" + latitude +
-                ", longitude=" + longitude +
-                '}';
+        return latitude + ", " + longitude;
     }
 
     public double getLatitude() {
