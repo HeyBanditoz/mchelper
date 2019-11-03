@@ -1,27 +1,31 @@
 package io.banditoz.mchelper.utils.weather;
 
-public class GeoCoordinates {
-    private double latitude;
-    private double longitude;
+import java.math.BigDecimal;
 
-    public GeoCoordinates(double latitude, double longitude) {
-        if ((latitude < -180 || latitude > 180) || (longitude < -180 || longitude > 180)) {
+public class GeoCoordinates {
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+    private static BigDecimal MIN = new BigDecimal("-180");
+    private static BigDecimal MAX = new BigDecimal("180");
+
+    public GeoCoordinates(String latitude, String longitude) {
+        this.latitude = new BigDecimal(latitude);
+        this.longitude = new BigDecimal(longitude);
+        if ((this.latitude.compareTo(MIN) == -1 || this.latitude.compareTo(MAX) == 1) || this.longitude.compareTo(MIN) == -1|| this.longitude.compareTo(MAX) == 1) {
             throw new IllegalArgumentException("Bad geographic coordinates!");
         }
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     @Override
     public String toString() {
-        return latitude + ", " + longitude;
+        return latitude + ", " + longitude + " https://maps.google.com/maps?q=" + latitude + "," + longitude;
     }
 
-    public double getLatitude() {
+    public BigDecimal getLatitude() {
         return latitude;
     }
 
-    public double getLongitude() {
+    public BigDecimal getLongitude() {
         return longitude;
     }
 }

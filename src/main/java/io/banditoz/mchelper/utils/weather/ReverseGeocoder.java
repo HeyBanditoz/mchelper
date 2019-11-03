@@ -23,7 +23,7 @@ public class ReverseGeocoder {
             throw new IllegalArgumentException("Could not find location \"" + location + "\"");
         }
         result = ws.deserializeReverseGeocoder(responseString);
-        return new GeoCoordinates(Double.parseDouble(result[0].getLat()), Double.parseDouble(result[0].getLon()));
+        return new GeoCoordinates(result[0].getLat(), result[0].getLon());
     }
 
     public String getDisplayName() {
