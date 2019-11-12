@@ -15,6 +15,7 @@ public abstract class ElevatedCommand extends Command {
                     long before = System.nanoTime();
                     onCommand();
                     long after = System.nanoTime() - before;
+                    logger.info("Executing elevated command with args \"" + commandArgsString + "\" from user " + e.getAuthor().getName() + "...");
                     logger.debug("Command with class " + getClass().getCanonicalName() + " ran in " + (after / 1000000) + " ms.");
                 }
                 else {
