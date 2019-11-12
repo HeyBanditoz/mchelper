@@ -1,6 +1,5 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.weather.es.EsUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
@@ -21,9 +20,7 @@ public class FahrenheitStatus extends TimerTask {
         catch (Exception ex) {
             Activity a = Activity.playing("Error!");
             jda.getPresence().setActivity(a);
-            if (!(SettingsManager.getInstance().getSettings().getEsUrl() == null)) {
-                LoggerFactory.getLogger(FahrenheitStatus.class).error("Error on getting temperature!", ex);
-            }
+            LoggerFactory.getLogger(FahrenheitStatus.class).error("Error on getting temperature!", ex);
         }
     }
 }

@@ -55,8 +55,10 @@ public class MCHelper {
             jda.addEventListener(new WeatherStationCommand());
         }
         jda.addEventListener(new ReverseGeocoderCommand());
-        Timer pingMeasurementTimer = new Timer();
-        pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+        if (!(settings.getEsUrl() == null)) {
+            Timer pingMeasurementTimer = new Timer();
+            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+        }
     }
 
     public static ObjectMapper getObjectMapper() {
