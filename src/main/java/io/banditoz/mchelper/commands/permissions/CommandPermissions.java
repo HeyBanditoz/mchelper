@@ -11,7 +11,7 @@ public class CommandPermissions {
         Settings settings = SettingsManager.getInstance().getSettings();
         List<String> botOwners = settings.getBotOwners();
         for (String owner : botOwners) {
-            if (owner.compareTo(attempter.getId()) == 0) {
+            if (owner.equals(attempter.getId())) {
                 return true;
             }
         }
