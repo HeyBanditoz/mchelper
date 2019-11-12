@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 public class MCHelper {
     private static JDA jda;
@@ -53,6 +55,8 @@ public class MCHelper {
             jda.addEventListener(new WeatherStationCommand());
         }
         jda.addEventListener(new ReverseGeocoderCommand());
+        Timer pingMeasurementTimer = new Timer();
+        pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
     }
 
     public static ObjectMapper getObjectMapper() {

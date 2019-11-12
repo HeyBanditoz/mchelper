@@ -31,6 +31,17 @@ public class EsUtils {
         return currentFahrenheit + " °F, " + currentCelsius + " °C, " + currentHumidity+ " %H, " + currenthPa + " hPa (" + currenthPa.divide(new BigDecimal("1013.25"), m) + " atm, " + currenthPa.divide(new BigDecimal("68.9475729318"), m) + " psi)";
     }
 
+    public static double getFahrenheit() throws IOException, HttpResponseException {
+        Request request = new Request.Builder()
+                .url(SettingsManager.getInstance().getSettings().getEsUrl() + "weather/_search")
+                .post(RequestBody.create(MediaType.get("application/json"), "{\"query\":{\"match_all\":{}},\"size\":1,\"sort\":[{\"@timestamp\":{\"order\":\"desc\"}}]}"))
+                .build();
+        Response response = MCHelper.performHttpRequestGetResponse(request);
+        JsonNode jn = MCHelper.getObjectMapper().readTree(response.body().string());
+
+        return Double.parseDouble(returnValue(jn, "fahrenheit"));
+    }
+
     private static String returnValue(JsonNode jn, String value) {
         return jn.get("hits").get("hits").get(0).get("_source").get(value).toString();
     }
