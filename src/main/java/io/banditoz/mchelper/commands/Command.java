@@ -27,7 +27,6 @@ public abstract class Command extends ListenerAdapter {
                     long after = System.nanoTime() - before;
                     logger.debug("Command ran in " + (after / 1000000) + " ms.");
                 });
-                thread.setName(this.getClass().toString());
                 thread.start();
             } catch (Exception ex) {
                 sendExceptionMessage(ex, false);
