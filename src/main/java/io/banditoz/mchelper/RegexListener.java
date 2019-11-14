@@ -1,7 +1,6 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.CommandUtils;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -21,17 +20,17 @@ public abstract class RegexListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         initialize(e);
-        try {
             Thread thread = new Thread(() -> {
-                long before = System.nanoTime();
-                onMessage();
-                long after = System.nanoTime() - before;
-                logger.debug("Listener ran in " + (after / 1000000) + " ms.");
+                try {
+                    long before = System.nanoTime();
+                    onMessage();
+                    long after = System.nanoTime() - before;
+                    logger.debug("Listener ran in " + (after / 1000000) + " ms.");
+                } catch (Exception ex) {
+                    CommandUtils.sendExceptionMessage(this.e, ex, logger, false, false);
+                }
             });
             thread.start();
-        } catch (Exception ex) {
-            CommandUtils.sendExceptionMessage(this.e, ex, logger, false, false);
-        }
     }
 
     private void initialize(MessageReceivedEvent e) {

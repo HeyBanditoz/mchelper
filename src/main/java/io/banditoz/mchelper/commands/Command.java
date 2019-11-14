@@ -19,18 +19,18 @@ public abstract class Command extends ListenerAdapter {
         if (containsCommand(e)) {
             if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);
-            try {
                 this.e.getChannel().sendTyping().queue();
                 Thread thread = new Thread(() -> {
-                    long before = System.nanoTime();
-                    onCommand();
-                    long after = System.nanoTime() - before;
-                    logger.debug("Command ran in " + (after / 1000000) + " ms.");
+                    try {
+                        long before = System.nanoTime();
+                        onCommand();
+                        long after = System.nanoTime() - before;
+                        logger.debug("Command ran in " + (after / 1000000) + " ms.");
+                    } catch (Exception ex) {
+                        sendExceptionMessage(ex, false);
+                    }
                 });
                 thread.start();
-            } catch (Exception ex) {
-                sendExceptionMessage(ex, false);
-            }
         }
     }
 
