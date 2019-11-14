@@ -48,7 +48,7 @@ public class MCHelper {
         jda.addEventListener(new JSEvalCommand());
         jda.addEventListener(new WeatherCommand());
         jda.addEventListener(new DictionaryCommand());
-	jda.addEventListener(new TTT());
+	jda.addEventListener(new TTTCommand());
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.warn("No weather station configs defined! Not enabling the weather station command...");
         }

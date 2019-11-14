@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public class TTT extends Command {
+public class TTTCommand extends Command {
     Random random = new Random();
 
     @Override
