@@ -11,12 +11,16 @@ public abstract class ElevatedCommand extends Command {
             initialize(e);
             try {
                 if (CommandPermissions.isBotOwner(e.getAuthor())) {
-                    e.getChannel().sendTyping().queue();
-                    long before = System.nanoTime();
-                    onCommand();
-                    long after = System.nanoTime() - before;
+                    this.e.getChannel().sendTyping().queue(); // TODO remove duplicated code here and in Command
+                    Thread thread = new Thread(() -> {
+                        long before = System.nanoTime();
+                        onCommand();
+                        long after = System.nanoTime() - before;
+                        logger.debug("Command ran in " + (after / 1000000) + " ms.");
+                    });
+                    thread.setName(this.getClass().toString());
+                    thread.start();
                     logger.info("Executing elevated command with args \"" + commandArgsString + "\" from user " + e.getAuthor().getName() + "...");
-                    logger.debug("Command with class " + getClass().getCanonicalName() + " ran in " + (after / 1000000) + " ms.");
                 }
                 else {
                     sendReply(String.format("User %s (ID: %s) does not have permission to run this command!", e.getAuthor().getAsTag(), e.getAuthor().getId()));

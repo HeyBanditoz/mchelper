@@ -22,7 +22,15 @@ public abstract class RegexListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         initialize(e);
         try {
-            onMessage();
+            this.e.getChannel().sendTyping().queue();
+            Thread thread = new Thread(() -> {
+                long before = System.nanoTime();
+                onMessage();
+                long after = System.nanoTime() - before;
+                logger.debug("Listener ran in " + (after / 1000000) + " ms.");
+            });
+            thread.setName(this.getClass().toString());
+            thread.start();
         } catch (Exception ex) {
             CommandUtils.sendExceptionMessage(this.e, ex, logger, false, false);
         }

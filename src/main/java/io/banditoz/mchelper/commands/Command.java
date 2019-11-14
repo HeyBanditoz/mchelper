@@ -21,15 +21,11 @@ public abstract class Command extends ListenerAdapter {
             initialize(e);
             try {
                 this.e.getChannel().sendTyping().queue();
-                Thread thread = new Thread(new Runnable()
-                {
-                    public void run()
-                    {
-                        long before = System.nanoTime();
-                        onCommand();
-                        long after = System.nanoTime() - before;
-                        logger.debug("Command ran in " + (after / 1000000) + " ms.");
-                    }
+                Thread thread = new Thread(() -> {
+                    long before = System.nanoTime();
+                    onCommand();
+                    long after = System.nanoTime() - before;
+                    logger.debug("Command ran in " + (after / 1000000) + " ms.");
                 });
                 thread.setName(this.getClass().toString());
                 thread.start();
