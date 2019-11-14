@@ -48,9 +48,9 @@ public class MCHelper {
         jda.addEventListener(new JSEvalCommand());
         jda.addEventListener(new WeatherCommand());
         jda.addEventListener(new DictionaryCommand());
-	jda.addEventListener(new TTTCommand());
+	    jda.addEventListener(new TTTCommand());
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
-            LOGGER.warn("No weather station configs defined! Not enabling the weather station command...");
+            LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
         }
         else {
             jda.addEventListener(new WeatherStationCommand());
@@ -59,6 +59,9 @@ public class MCHelper {
         if (!(settings.getEsUrl() == null)) {
             Timer pingMeasurementTimer = new Timer();
             pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+        }
+        else {
+            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
         }
     }
 
