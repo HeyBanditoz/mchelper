@@ -50,6 +50,7 @@ public class MCHelper {
         jda.addEventListener(new DictionaryCommand());
         jda.addEventListener(new TTTCommand());
         jda.addEventListener(new ReverseGeocoderCommand());
+        jda.addEventListener(new DiceRollerCommand());
         
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
