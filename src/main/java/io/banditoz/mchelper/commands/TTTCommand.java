@@ -1,14 +1,14 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.ListUtils;
 import net.dv8tion.jda.api.entities.User;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
-
 
 public class TTTCommand extends Command {
-    Random random = new Random();
+    private SecureRandom random = new SecureRandom();
 
     @Override
     public String commandName() {
@@ -22,59 +22,46 @@ public class TTTCommand extends Command {
             howMany++;
         if (commandArgsString.contains(",")) {
             ArrayList<String> options = new ArrayList<>(Arrays.asList(commandArgsString.split("\\s+,\\s+")));
-            String players = extractNumRandomly(howMany, options);
-            if (players.contains("walker") == true || players.contains("Taylor") == true || players.contains("taylor") == true)
+            String players = ListUtils.extractNumRandomly(howMany, options);
+            if (players.contains("walker") || players.contains("Taylor") || players.contains("taylor"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("440702753380237312"),"TRAITOR!!");
             }
-            if (players.contains("bandit") == true || players.contains("Hayden") == true || players.contains("hayden"))
+            if (players.contains("bandit") || players.contains("Hayden") || players.contains("hayden"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("163094867910590464"),"TRAITOR!!");
                 sendReply("<@163094867910590464>");
             }
-            if (players.contains("josh") == true || players.contains("Superskish") == true || players.contains("superskish") == true)
+            if (players.contains("josh") || players.contains("Superskish") || players.contains("superskish"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("375040836829839360"),"TRAITOR!!");
                 sendReply("<@375040836829839360>");
             }
-            if (players.contains("Kadin") == true || players.contains("kanislupus") == true || players.contains("Kanislupus") == true || players.contains("kadin") == true)
+            if (players.contains("Kadin") || players.contains("kanislupus") || players.contains("Kanislupus") || players.contains("kadin"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("384834373012160523"),"TRAITOR!!");
                 sendReply("<@384834373012160523>");
             }
-            if (players.contains("ashton") == true || players.contains("Ashton") == true || players.contains("xradusa") == true || players.contains("Xradiusa") == true)
+            if (players.contains("ashton") || players.contains("Ashton") || players.contains("xradusa") || players.contains("Xradiusa"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("226880247692394496"),"TRAITOR!!");
                 sendReply("<@226880247692394496>");
             }
-            if (players.contains("mccord") == true || players.contains("McCord") == true || players.contains("xradusm") == true || players.contains("Xradiusm") == true)
+            if (players.contains("mccord") || players.contains("McCord") || players.contains("xradusm") || players.contains("Xradiusm"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("339820351376850944"),"TRAITOR!!");
                 sendReply("<@339820351376850944>");
             }
-            if (players.contains("kyler") == true || players.contains("Kyler") == true || players.contains("EvelerKyvans") || players.contains("Eveler Kyvans"))
+            if (players.contains("kyler") || players.contains("Kyler") || players.contains("EvelerKyvans") || players.contains("Eveler Kyvans"))
             {
                 sendPrivateMessage(e.getJDA().getUserById("404837963697225729"),"TRAITOR!!");
                 sendReply("<@404837963697225729>");
             }
         } else
-            sendReply("**Unknown error.... Exiting**");
+            sendReply("No valid users found");
     }
 
-    private String extractNumRandomly(int num, ArrayList<String> l) {
-        StringBuilder results = new StringBuilder();
-        for (int i = 0; i < num; i++) {
-            int pos = random.nextInt(l.size());
-            results.append(l.get(pos));
-            if (i < num - 1) {
-                results.append(", ");
-            }
-            l.remove(pos);
-        }
-        String s = results.toString();
-        return s;
-    }
-    public void sendPrivateMessage(User user, String content) {
+    private void sendPrivateMessage(User user, String content) {
         // openPrivateChannel provides a RestAction<PrivateChannel>
         // which means it supplies you with the resulting channel
         user.openPrivateChannel().queue((channel) ->

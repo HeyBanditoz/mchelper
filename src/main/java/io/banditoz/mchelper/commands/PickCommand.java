@@ -4,9 +4,9 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PickCommand extends Command {
-    private SecureRandom random = new SecureRandom();
+import static io.banditoz.mchelper.utils.ListUtils.extractNumRandomly;
 
+public class PickCommand extends Command {
     @Override
     public String commandName() {
         return "!pick";
@@ -27,18 +27,5 @@ public class PickCommand extends Command {
             ArrayList<String> options = new ArrayList<>(Arrays.asList(commandArgsString.split("\\s+")));
             sendReply(extractNumRandomly(howMany, options));
         }
-    }
-    
-    private String extractNumRandomly(int num, ArrayList<String> l) {
-        StringBuilder results = new StringBuilder();
-        for (int i = 0; i < num; i++) {
-            int pos = random.nextInt(l.size());
-            results.append(l.get(pos));
-            if (i < num - 1) {
-                results.append(", ");
-            }
-            l.remove(pos);
-        }
-        return results.toString();
     }
 }
