@@ -48,14 +48,15 @@ public class MCHelper {
         jda.addEventListener(new JSEvalCommand());
         jda.addEventListener(new WeatherCommand());
         jda.addEventListener(new DictionaryCommand());
-	    jda.addEventListener(new TTTCommand());
+        jda.addEventListener(new TTTCommand());
+        jda.addEventListener(new ReverseGeocoderCommand());
+        
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
         }
         else {
             jda.addEventListener(new WeatherStationCommand());
         }
-        jda.addEventListener(new ReverseGeocoderCommand());
         if (!(settings.getEsUrl() == null)) {
             Timer pingMeasurementTimer = new Timer();
             pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
