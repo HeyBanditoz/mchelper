@@ -3,6 +3,11 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.permissions.CommandPermissions;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+/**
+ * Represents the abstract class for any command that only bot maintainers can run.
+ *
+ * @see io.banditoz.mchelper.commands.Command
+ */
 public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {

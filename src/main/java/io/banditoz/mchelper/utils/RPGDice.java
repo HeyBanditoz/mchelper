@@ -4,6 +4,12 @@ import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a set of dice meant for role-playing games. Offers a constructor and a static one that can parse
+ * basic dice notation. See {@link #parse(String)}
+ *
+ * @author Ulises (Stack Overflow)
+ */
 public class RPGDice {
     private static final Pattern DICE_PATTERN = Pattern.compile("(?<A>\\d*)d(?<B>\\d+)(?>(?<MULT>[x/])(?<C>\\d+))?(?>(?<ADD>[+-])(?<D>\\d+))?");
     private static final SecureRandom random = new SecureRandom();
@@ -28,14 +34,22 @@ public class RPGDice {
         }
     }
 
+    /**
+     * Rolls this RPGDice, using SecureRandom to generate numbers.
+     *
+     * @return A String containing the results of the dice roll. If the String exceeds 2000 characters, it will only
+     * show the final total, adhering to Discord's character limit.
+     */
     public String roll() {
         int[] rolls = new int[this.rolls];
         int total = 0;
+        // roll the dice, then store the results in rolls[]
         for (int i = 0; i < this.rolls; i++) {
             rolls[i] = random.nextInt(faces)+1;
             rolls[i] = rolls[i] * multiplier + additive;
             total += rolls[i];
         }
+        // get each roll, then store the individual result in a StringBuilder
         StringBuilder rollsStringBuilder = new StringBuilder();
         for (int i = 0; i < rolls.length; i++) {
             rollsStringBuilder.append(rolls[i]);
@@ -43,12 +57,13 @@ public class RPGDice {
                 rollsStringBuilder.append(", ");
             }
         }
+        // put total at the end
         if (rolls.length != 1) {
             rollsStringBuilder.append(" -> ");
             rollsStringBuilder.append(total);
         }
+        // just show total if too big
         if (rollsStringBuilder.length() >= 2000) {
-            // just show total
             rollsStringBuilder = new StringBuilder()
                     .append(total);
         }
@@ -78,11 +93,15 @@ public class RPGDice {
         return isEmpty(groupValue) || groupValue.equals(positiveValue) ? 1 : -1;
     }
 
-    @Override
-    public String toString() {
-        return String.format("{\"rolls\": %s, \"faces\": %s, \"multiplier\": %s, \"additive\": %s}", rolls, faces, multiplier, additive);
-    }
-
+    /**
+     * Static method that returns an initialized RPGDice class
+     *
+     * For example: "2d20" will roll two dice with 20 faces, "1d6" will roll one die with six faces.
+     * At the end of the string, "+6" will add six to the final value, while "*6" will multiply the final value by six.
+     * @param str The dice notation to parse
+     * @return A built RPGDice class.
+     * @throws IllegalArgumentException If the dice notation is bad.
+     */
     public static RPGDice parse(String str) {
         Matcher matcher = DICE_PATTERN.matcher(str);
         if (matcher.matches()) {

@@ -6,6 +6,26 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the abstract class for any Command the bot may have. Note any command you implement
+ * you must register in MCHelper.java. All commands will be multithreaded. All exceptions will be caught,
+ * and a message sent to Discord showing the classpath and description of the exception.
+ *
+ * An example command could be
+ * <pre>
+ *     public class PingCommand extends Command {
+ *          public String CommandName() {
+ *              return "!ping";
+ *          }
+ *
+ *          protected void onCommand() {
+ *              sendReply("Pong!");
+ *          }
+ *     }
+ * </pre>
+ *
+ * @see io.banditoz.mchelper.MCHelper
+ */
 public abstract class Command extends ListenerAdapter {
     protected abstract void onCommand();
     public abstract String commandName();
