@@ -18,22 +18,14 @@ public class RPGDice {
         this.faces = faces;
         this.multiplier = multiplier;
         this.additive = additive;
-    }
 
-    public int getRolls() {
-        return rolls;
-    }
-
-    public int getFaces() {
-        return faces;
-    }
-
-    public int getMultiplier() {
-        return multiplier;
-    }
-
-    public int getAdditive() {
-        return additive;
+        // bounds
+        if (rolls >= 1000) {
+            throw new IllegalArgumentException("Number of rolls must be less than 1000!");
+        }
+        if (faces >= 1000) {
+            throw new IllegalArgumentException("Number of faces must be less than 1000!");
+        }
     }
 
     public String roll() {
@@ -54,6 +46,11 @@ public class RPGDice {
         if (rolls.length != 1) {
             rollsStringBuilder.append(" -> ");
             rollsStringBuilder.append(total);
+        }
+        if (rollsStringBuilder.length() >= 2000) {
+            // just show total
+            rollsStringBuilder = new StringBuilder()
+                    .append(total);
         }
         // TODO Do this not at the end of the string
         if (multiplier != 1) {
