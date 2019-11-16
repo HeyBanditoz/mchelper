@@ -35,7 +35,7 @@ public class GeocoderResult {
     @JsonProperty("icon")
     private String icon;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("lat")
     public String getLat() {

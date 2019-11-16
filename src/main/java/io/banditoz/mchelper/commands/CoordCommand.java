@@ -60,7 +60,7 @@ public class CoordCommand extends Command {
                     }
                 } else {
                     StringBuilder s = new StringBuilder();
-                    map.forEach((k, p) -> s.append(p.toString() + "\n"));
+                    map.forEach((k, p) -> s.append(p.toString()).append("\n"));
                     sendReply(s.toString());
                 }
             } else if (commandArgs[1].equalsIgnoreCase("delete") || commandArgs[1].equalsIgnoreCase("remove")) {

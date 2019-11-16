@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public abstract class Command extends ListenerAdapter {
     protected Logger logger;
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         if (containsCommand(e)) {
             if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);

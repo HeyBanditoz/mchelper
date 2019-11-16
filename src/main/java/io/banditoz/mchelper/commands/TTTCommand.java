@@ -64,9 +64,6 @@ public class TTTCommand extends Command {
     private void sendPrivateMessage(User user, String content) {
         // openPrivateChannel provides a RestAction<PrivateChannel>
         // which means it supplies you with the resulting channel
-        user.openPrivateChannel().queue((channel) ->
-        {
-            channel.sendMessage(content).queue();
-        });
+        user.openPrivateChannel().queue((channel) -> channel.sendMessage(content).queue());
     }
 }

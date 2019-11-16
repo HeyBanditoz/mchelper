@@ -11,7 +11,7 @@ public class GeoCoordinates {
     public GeoCoordinates(String latitude, String longitude) {
         this.latitude = new BigDecimal(latitude);
         this.longitude = new BigDecimal(longitude);
-        if ((this.latitude.compareTo(MIN) == -1 || this.latitude.compareTo(MAX) == 1) || this.longitude.compareTo(MIN) == -1|| this.longitude.compareTo(MAX) == 1) {
+        if (((this.latitude.compareTo(MIN) < 0) || (this.latitude.compareTo(MAX) > 0)) || (this.longitude.compareTo(MIN) < 0) || (this.longitude.compareTo(MAX) > 0)) {
             throw new IllegalArgumentException("Bad geographic coordinates!");
         }
     }
