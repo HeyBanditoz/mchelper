@@ -29,6 +29,11 @@ public class MCHelper {
 
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
+        if (settings.getDiscordToken() == null || settings.getDiscordToken().equals("Bot token here...")) {
+            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Settings.json file.");
+            System.exit(1);
+        }
+
         jda = new JDABuilder(settings.getDiscordToken()).build();
         jda.awaitReady();
         jda.addEventListener(new BashCommand());
@@ -46,24 +51,38 @@ public class MCHelper {
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new JSEvalCommand());
-        jda.addEventListener(new WeatherCommand());
         jda.addEventListener(new DictionaryCommand());
         jda.addEventListener(new TTTCommand());
         jda.addEventListener(new ReverseGeocoderCommand());
         jda.addEventListener(new DiceRollerCommand());
-        
+
+        if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
+            LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
+        }
+        else {
+            jda.addEventListener(new DictionaryCommand());
+        }
+
+        if (settings.getDarkSkyAPI() == null || settings.getDarkSkyAPI().equals("Dark Sky API key here.")) {
+            LOGGER.info("No dark sky API key defined! Not enabling the weather command...");
+        }
+        else {
+            jda.addEventListener(new WeatherCommand());
+        }
+
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
         }
         else {
             jda.addEventListener(new WeatherStationCommand());
         }
-        if (!(settings.getEsUrl() == null)) {
-            Timer pingMeasurementTimer = new Timer();
-            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+
+        if (settings.getEsUrl() == null) {
+            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
         }
         else {
-            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
+            Timer pingMeasurementTimer = new Timer();
+            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
         }
     }
 

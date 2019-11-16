@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.dictionary.Definition;
 import io.banditoz.mchelper.utils.dictionary.DictionaryResult;
 import io.banditoz.mchelper.utils.dictionary.DictionarySearcher;
@@ -13,10 +12,6 @@ public class DictionaryCommand extends Command {
 
     @Override
     protected void onCommand() {
-        if (SettingsManager.getInstance().getSettings().getOwlBotToken() == null) {
-            sendReply("Your OwlBot token is not configured. It is required to look up dictionary definitions. Head to https://owlbot.info/ to get one.");
-            return;
-        }
         DictionaryResult result = null;
         int toLookup = 0;
         try {
