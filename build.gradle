@@ -15,6 +15,20 @@ plugins {
 
     // Fat JARs for easier distribution to places
     id 'com.github.johnrengelman.shadow' version '5.0.0'
+
+    // Distribute latest git information in jar
+    id 'com.peterabeles.gversion' version '1.5.2'
+}
+
+gversion {
+    srcDir       = "src/main/java/"
+    classPackage = "io.banditoz.mchelper"
+    className    = "Version"
+    dateFormat   = "yyyy-MM-dd HH:mm:ss"
+    timeZone     = "UTC"
+    debug        = false
+    language     = "java"
+    explicitType = false
 }
 
 repositories {
@@ -48,3 +62,4 @@ dependencies {
 // Define the main class for the application
 mainClassName = 'io.banditoz.mchelper.Bot'
 compileJava.options.encoding = 'UTF-8'
+project.compileJava.dependsOn(createVersionFile)

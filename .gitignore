@@ -73,3 +73,6 @@ fabric.properties
 
 # Profiler
 .attach*
+
+# Version file
+src/main/java/io/banditoz/mchelper/Version.java
