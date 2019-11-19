@@ -51,7 +51,6 @@ public class MCHelper {
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new JSEvalCommand());
-        jda.addEventListener(new DictionaryCommand());
         jda.addEventListener(new TTTCommand());
         jda.addEventListener(new ReverseGeocoderCommand());
         jda.addEventListener(new DiceRollerCommand());
