@@ -8,9 +8,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class TeXRenderer {
     /**
@@ -47,12 +45,26 @@ public class TeXRenderer {
     public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
         String imageName = MD5.computeMD5(args) + ".png";
         long before = System.currentTimeMillis();
+        File f = new File(imageName);
+
         ByteArrayOutputStream latex = TeXRenderer.renderTeX(args);
-        long after = System.currentTimeMillis() - before;
-        e.getMessage().getChannel()
-                .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
-                .addFile(new ByteArrayInputStream(latex.toByteArray()), imageName)
-                .queue();
-        latex.close();
+        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            latex.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            long after = System.currentTimeMillis() - before;
+
+            e.getMessage().getChannel()
+                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
+                    .addFile(f)
+                    .queue();
+            latex.close();
+        }
+        finally {
+            f.delete();
+        }
     }
 }
