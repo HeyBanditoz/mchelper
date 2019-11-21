@@ -1,31 +1,70 @@
 package io.banditoz.mchelper.commands;
 
-import com.udojava.evalex.Expression;
 import io.banditoz.mchelper.utils.Help;
+import net.dv8tion.jda.api.entities.ChannelType;
 
-import java.math.BigDecimal;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
-public class EvalCommand extends Command {
-    @Override
-    public String commandName() {
-        return "!math";
+public class EvalCommand extends ElevatedCommand {
+    private ScriptEngine engine;
+    public EvalCommand() {
+        engine = new ScriptEngineManager().getEngineByName("nashorn");
+
     }
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<math>")
-                .withDescription("Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.");
+        return new Help(commandName(), true).withParameters("\\`\\`\\`js<newline>\\`\\`\\`")
+                .withDescription("Evaluates JavaScript. If you don't use code blocks, a return is added to the beginning of the code," +
+                        "otherwise, if you are using code blocks, you should return something.");
     }
 
     @Override
+    public String commandName() {
+        return "!eval";
+    }
+
+    // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java
+    @Override
     protected void onCommand() {
-        BigDecimal result;
-        result = new Expression(commandArgsString).eval();
-        if (result.toPlainString().length() >= 256) {
-            sendReply(result.toEngineeringString());
+        boolean blocked = false;
+        if (commandArgsString.startsWith("```js")) {
+            commandArgsString = commandArgsString.replace("```js", "").replace("```", "");
+            blocked = true;
         }
-        else {
-            sendReply(result.toPlainString());
+        try {
+            engine.eval("var imports = new JavaImporter(" +
+                    "java.io," +
+                    "java.lang," +
+                    "java.util," +
+                    "Packages.net.dv8tion.jda.api," +
+                    "Packages.net.dv8tion.jda.api.entities," +
+                    "Packages.net.dv8tion.jda.api.entities.impl," +
+                    "Packages.net.dv8tion.jda.api.managers," +
+                    "Packages.net.dv8tion.jda.api.managers.impl," +
+                    "Packages.net.dv8tion.jda.api.utils);");
+            engine.put("e", e);
+            engine.put("args", commandArgs);
+            engine.put("jda", e.getJDA());
+            if (e.isFromType(ChannelType.TEXT))
+            {
+                engine.put("guild", e.getGuild());
+                engine.put("member", e.getMember());
+            }
+            Object out = engine.eval("(function() {" +
+                                            "with (imports) {" + (blocked ? "" : "return ") +
+                                            (commandArgsString) +
+                                            "}" +
+                                            "})();");
+            if (out == null) {
+                sendReply(null); // checked in CommandUtils
+            }
+            else {
+                sendReply(out.toString());
+            }
+        } catch (Exception ex) {
+            CommandUtils.sendExceptionMessage(e, ex, logger, true, true);
         }
     }
 }

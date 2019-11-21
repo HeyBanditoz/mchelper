@@ -38,7 +38,7 @@ public class MCHelper {
         jda.awaitReady();
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
-        jda.addEventListener(new EvalCommand());
+        jda.addEventListener(new MathCommand());
         jda.addEventListener(new EangleCommand());
         jda.addEventListener(new NetherCommand());
         jda.addEventListener(new OverworldCommand());
@@ -50,7 +50,7 @@ public class MCHelper {
         jda.addEventListener(new PickCommand());
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
-        jda.addEventListener(new JSEvalCommand());
+        jda.addEventListener(new EvalCommand());
         jda.addEventListener(new TTTCommand());
         jda.addEventListener(new ReverseGeocoderCommand());
         jda.addEventListener(new DiceRollerCommand());
