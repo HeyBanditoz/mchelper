@@ -1,11 +1,18 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.Version;
+import io.banditoz.mchelper.utils.Help;
 
 public class VersionCommand extends Command {
     @Override
     public String commandName() {
         return "!version";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters(null)
+                .withDescription("Returns the bot's version.");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.ChannelType;
 
 import javax.script.ScriptEngine;
@@ -10,6 +11,13 @@ public class JSEvalCommand extends ElevatedCommand {
     public JSEvalCommand() {
         engine = new ScriptEngineManager().getEngineByName("nashorn");
 
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), true).withParameters("\\`\\`\\`js<newline>\\`\\`\\`")
+                .withDescription("Evaluates JavaScript. If you don't use code blocks, a return is added to the beginning of the code," +
+                        "otherwise, if you are using code blocks, you should return something.");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -30,10 +31,12 @@ import org.slf4j.LoggerFactory;
 public abstract class Command extends ListenerAdapter {
     protected abstract void onCommand();
     public abstract String commandName();
+    public abstract Help getHelp();
+
     protected String commandArgsString;
     protected String[] commandArgs;
     protected MessageReceivedEvent e;
-    protected Logger logger;
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
@@ -62,7 +65,6 @@ public abstract class Command extends ListenerAdapter {
         this.e = e;
         this.commandArgs = CommandUtils.commandArgs(e.getMessage());
         this.commandArgsString = CommandUtils.generateCommandArgsString(e);
-        logger = LoggerFactory.getLogger(getClass());
     }
 
     /**

@@ -21,6 +21,12 @@ public class WeatherCommand extends Command {
     }
 
     @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("<location>")
+                .withDescription("Returns the current weather of a location.");
+    }
+
+    @Override
     public void onCommand() {
         ReverseGeocoder g = new ReverseGeocoder(new WeatherDeserializer());
         GeoCoordinates c = null;

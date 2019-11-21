@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +10,12 @@ public class UnitsCommand extends Command {
     @Override
     public String commandName() {
         return "!units";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("<conversion>")
+                .withDescription("Launches a conversion between two units separated by 'to'.");
     }
 
     @Override

@@ -85,6 +85,7 @@ public class MCHelper {
             Timer pingMeasurementTimer = new Timer();
             pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
         }
+        jda.addEventListener(new HelpCommand()); // this must be registered last
     }
 
     public static ObjectMapper getObjectMapper() {

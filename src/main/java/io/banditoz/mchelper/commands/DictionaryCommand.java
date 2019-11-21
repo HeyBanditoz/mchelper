@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.dictionary.Definition;
 import io.banditoz.mchelper.utils.dictionary.DictionaryResult;
 import io.banditoz.mchelper.utils.dictionary.DictionarySearcher;
@@ -8,6 +9,12 @@ public class DictionaryCommand extends Command {
     @Override
     public String commandName() {
         return "!define";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("[num] <word>")
+                .withDescription("Finds the definition of a word using Owlbot's API.");
     }
 
     @Override

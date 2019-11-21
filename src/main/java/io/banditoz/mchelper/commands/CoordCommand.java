@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.NamedCoordinatePoint;
 
 import java.io.*;
@@ -10,6 +11,12 @@ public class CoordCommand extends Command {
     @Override
     public String commandName() {
         return "!coords";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("<save|add,show|list,delete|remove,help>")
+                .withDescription("Saves coordinates to a file. See !coords help");
     }
 
     @Override

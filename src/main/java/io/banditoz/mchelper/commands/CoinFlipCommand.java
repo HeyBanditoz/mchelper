@@ -1,11 +1,18 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.RPGDice;
 
 public class CoinFlipCommand extends Command {
     @Override
     public String commandName() {
         return "!flip";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters(null)
+                .withDescription("Flips a coin.");
     }
 
     @Override

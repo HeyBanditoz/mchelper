@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ListUtils;
 import net.dv8tion.jda.api.entities.User;
 
@@ -13,6 +14,12 @@ public class TTTCommand extends Command {
     @Override
     public String commandName() {
         return "!ttt";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("???")
+                .withDescription("???");
     }
 
     @Override

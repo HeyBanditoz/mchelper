@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +10,12 @@ public class BashCommand extends ElevatedCommand {
     @Override
     public String commandName() {
         return "!bash";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), true).withParameters("<bash>")
+                .withDescription("Executes bash if it is installed on system.");
     }
 
     @Override

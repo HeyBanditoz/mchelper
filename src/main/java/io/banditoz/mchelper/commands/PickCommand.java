@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.Help;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -9,6 +11,13 @@ public class PickCommand extends Command {
     @Override
     public String commandName() {
         return "!pick";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("[num] <options...>")
+                .withDescription("Picks num from a list of options. If num is not specified, it will only pick one. " +
+                        "Separate your words with 'or' or a space.");
     }
 
     @Override

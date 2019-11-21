@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands;
 
 import com.sun.management.OperatingSystemMXBean;
+import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.lang.management.ManagementFactory;
@@ -10,6 +11,12 @@ public class InfoCommand extends Command {
     @Override
     public String commandName() {
         return "!info";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters(null)
+                .withDescription("Returns various bot statistics.");
     }
 
     @Override

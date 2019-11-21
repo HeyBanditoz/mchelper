@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands;
 
 import com.udojava.evalex.Expression;
+import io.banditoz.mchelper.utils.Help;
 
 import java.math.BigDecimal;
 
@@ -8,6 +9,12 @@ public class EvalCommand extends Command {
     @Override
     public String commandName() {
         return "!math";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withParameters("<math>")
+                .withDescription("Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.");
     }
 
     @Override
