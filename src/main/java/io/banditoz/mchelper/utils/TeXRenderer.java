@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
 
 public class TeXRenderer {
     /**
@@ -46,7 +45,7 @@ public class TeXRenderer {
     }
 
     public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
-        String imageName = new String(MessageDigest.getInstance("md5").digest(args.getBytes())) + ".png";
+        String imageName = MD5.computeMD5(args) + ".png";
         long before = System.currentTimeMillis();
         ByteArrayOutputStream latex = TeXRenderer.renderTeX(args);
         long after = System.currentTimeMillis() - before;
