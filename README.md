@@ -36,6 +36,7 @@ is not specified, it will only pick one.
 Check their docs for more information.
 * !weather \<location> - Looks up the weather for any given location
 using the DarkSky API.
+* !flip - Flips a coin. Call it in the air.
 
 ### Commands requiring elevated permissions
 Don't give these to any old regular person, they could steal your token
