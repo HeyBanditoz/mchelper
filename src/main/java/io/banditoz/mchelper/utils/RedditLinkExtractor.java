@@ -13,6 +13,8 @@ public class RedditLinkExtractor {
                 .url(url)
                 .build();
         Response response = MCHelper.performHttpRequestGetResponse(request);
-        return response.header("Location").replaceAll("\\?utm_source.*", "");
+        String header = response.header("Location").replaceAll("\\?utm_source.*", "");
+        response.close();
+        return header;
     }
 }

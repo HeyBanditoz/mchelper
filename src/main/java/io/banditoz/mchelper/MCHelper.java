@@ -99,15 +99,37 @@ public class MCHelper {
         return jda;
     }
 
+    /**
+     * Performs an HTTP request and returns the String. This is preferable to use over making your own
+     * OkHttpClient or implementing one.
+     *
+     * @param request The Request object to use.
+     * @return A String containing the body
+     * @throws HttpResponseException If the response code is >=400
+     * @throws IOException If there was an issue performing the HTTP request
+     * @see MCHelper#performHttpRequestGetResponse(Request)
+     */
     public static String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {
             throw new HttpResponseException(response.code());
         }
-        return response.body().string();
+        String body = response.body().string();
+        response.close();
+        return body;
     }
 
+    /**
+     * Performs an HTTP request and returns the String. This is preferable to use over making your own
+     * OkHttpClient or implementing one. <b>You must close the response body once you are done with it.</b>
+     *
+     * @param request The Request object to use.
+     * @return A Response object. If you just need the response body, use MCHelper#performHttpRequest instead.
+     * @throws HttpResponseException If the response code is >=400
+     * @throws IOException If there was an issue performing the HTTP request
+     * @see MCHelper#performHttpRequest(Request) 
+     */
     public static Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();

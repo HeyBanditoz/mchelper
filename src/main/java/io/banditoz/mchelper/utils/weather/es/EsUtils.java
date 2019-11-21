@@ -27,6 +27,7 @@ public class EsUtils {
         BigDecimal currentCelsius = new BigDecimal(returnValue(jn, "celsius"));
         BigDecimal currentHumidity = new BigDecimal(returnValue(jn, "humidity"));
         BigDecimal currenthPa = new BigDecimal(returnValue(jn, "hpa"));
+        response.close();
 
         return currentFahrenheit + " °F, " + currentCelsius + " °C, " + currentHumidity+ " %H, " + currenthPa + " hPa (" + currenthPa.divide(new BigDecimal("1013.25"), m) + " atm, " + currenthPa.divide(new BigDecimal("68.9475729318"), m) + " psi)";
     }
@@ -38,6 +39,7 @@ public class EsUtils {
                 .build();
         Response response = MCHelper.performHttpRequestGetResponse(request);
         JsonNode jn = MCHelper.getObjectMapper().readTree(response.body().string());
+        response.close();
 
         return Double.parseDouble(returnValue(jn, "fahrenheit"));
     }

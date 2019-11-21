@@ -24,6 +24,8 @@ public class GrafanaImageFetcher {
                 .addHeader("Authorization", "Bearer " + SettingsManager.getInstance().getSettings().getGrafanaToken())
                 .build();
         Response response = MCHelper.performHttpRequestGetResponse(request);
-        return new ByteArrayInputStream(response.body().bytes());
+        ByteArrayInputStream bytes = new ByteArrayInputStream(response.body().bytes());
+        response.close();
+        return bytes;
     }
 }
