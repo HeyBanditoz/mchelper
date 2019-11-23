@@ -19,7 +19,7 @@ public class BashCommand extends ElevatedCommand {
     }
 
     @Override
-    public void onCommand() {
+    protected void onCommand() {
         try {
             Process p = new ProcessBuilder("bash", "-c", commandArgsString).start();
             p.waitFor(); // hacky for right now, but this is dangerous! make sure your bash commands won't hang

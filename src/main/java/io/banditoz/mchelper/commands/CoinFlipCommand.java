@@ -16,7 +16,7 @@ public class CoinFlipCommand extends Command {
     }
 
     @Override
-    public void onCommand() {
+    protected void onCommand() {
         RPGDice r = new RPGDice(1, 2, 1, 0); // meh probably don't have to use
         String result = r.roll(); // RPGDice for this, but it has a static SecureRandom we can use.
         if (result.equals("1")) {

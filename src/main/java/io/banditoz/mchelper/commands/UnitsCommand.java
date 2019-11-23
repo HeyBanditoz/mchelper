@@ -19,7 +19,7 @@ public class UnitsCommand extends Command {
     }
 
     @Override
-    public void onCommand() {
+    protected void onCommand() {
         try {
             if (!commandArgsString.contains("to")) {
                 throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + commandArgsString);

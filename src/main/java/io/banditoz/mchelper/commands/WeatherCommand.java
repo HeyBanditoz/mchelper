@@ -27,7 +27,7 @@ public class WeatherCommand extends Command {
     }
 
     @Override
-    public void onCommand() {
+    protected void onCommand() {
         ReverseGeocoder g = new ReverseGeocoder(new WeatherDeserializer());
         GeoCoordinates c = null;
         try {

@@ -17,7 +17,7 @@ public class WeatherStationCommand extends Command {
     }
 
     @Override
-    public void onCommand() {
+    protected void onCommand() {
         int hourSince = 24;
         if (commandArgs.length > 1) {
             hourSince = Integer.parseInt(commandArgsString);
