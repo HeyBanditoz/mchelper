@@ -30,7 +30,8 @@ public class InfoCommand extends Command {
                 .addField("Threads", String.format("%d/%d", Thread.activeCount(), Thread.getAllStackTraces().size()), true)
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
                 .addField("Guilds", Integer.toString(e.getJDA().getGuilds().size()), true)
-                .addField("Users", Integer.toString(e.getJDA().getGuilds().size()), true);
+                .addField("Users", Integer.toString(e.getJDA().getUsers().size()), true)
+                .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true);
         sendEmbedReply(eb.build());
     }
 }

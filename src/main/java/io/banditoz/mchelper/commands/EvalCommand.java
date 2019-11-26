@@ -64,7 +64,7 @@ public class EvalCommand extends ElevatedCommand {
                 sendReply(out.toString());
             }
         } catch (Exception ex) {
-            CommandUtils.sendExceptionMessage(e, ex, logger, true, true);
+            CommandUtils.sendExceptionMessage(e, ex, LOGGER, true, true);
         }
     }
 }

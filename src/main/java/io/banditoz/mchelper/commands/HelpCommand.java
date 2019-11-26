@@ -23,7 +23,7 @@ public class HelpCommand extends Command {
             }
         }
         commands.sort(Comparator.comparing(Command::commandName)); // sort alphabetically by command name
-        logger.info(commands.size() + " commands registered.");
+        LOGGER.info(commands.size() + " commands registered.");
     }
 
     @Override

@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.*;
+
 /**
  * Represents the abstract class for any Command the bot may have. Note any command you implement
  * you must register in MCHelper.java. All commands will be multithreaded. All exceptions will be caught,
@@ -36,25 +38,18 @@ public abstract class Command extends ListenerAdapter {
     protected String commandArgsString;
     protected String[] commandArgs;
     protected MessageReceivedEvent e;
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
+    protected final static ThreadPoolExecutor ES = new ThreadPoolExecutor(4, 4,
+            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         if (containsCommand(e)) {
-            if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
             initialize(e);
-                this.e.getChannel().sendTyping().queue();
-                Thread thread = new Thread(() -> {
-                    try {
-                        long before = System.nanoTime();
-                        onCommand();
-                        long after = System.nanoTime() - before;
-                        logger.debug("Command ran in " + (after / 1000000) + " ms.");
-                    } catch (Exception ex) {
-                        sendExceptionMessage(ex, false);
-                    }
-                });
-                thread.start();
+            go();
+
         }
     }
 
@@ -68,11 +63,30 @@ public abstract class Command extends ListenerAdapter {
     }
 
     /**
+     * Runs onCommand() in parallel.
+     */
+    protected void go() {
+        if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
+        this.e.getChannel().sendTyping().queue();
+        ES.execute(() -> {
+            try {
+                long before = System.nanoTime();
+                onCommand();
+                long after = System.nanoTime() - before;
+                LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
+            } catch (Exception ex) {
+                sendExceptionMessage(ex, false);
+            }
+        });
+        LOGGER.debug(ES.toString());
+    }
+
+    /**
      * Sends a reply containing the exception message.
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex, boolean caught) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, caught, false);
+        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, caught, false);
     }
 
     /**
@@ -80,7 +94,7 @@ public abstract class Command extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, true, false);
+        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, true, false);
     }
 
     /**

@@ -16,7 +16,7 @@ public class RedditListener extends RegexListener {
                 sendReply(RedditLinkExtractor.extractFromRedditAppLink(m.group()));
             }
         } catch (Exception ex) {
-            logger.error("Exception on converting Reddit link!", ex);
+            LOGGER.error("Exception on converting Reddit link!", ex);
         }
     }
 }

@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,24 +16,24 @@ public abstract class RegexListener extends ListenerAdapter {
     protected abstract void onMessage();
     protected abstract String regex();
     protected MessageReceivedEvent e;
-    protected Logger logger;
     protected String message;
     protected Matcher m;
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    protected static final ExecutorService ES = Executors.newFixedThreadPool(2);
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         initialize(e);
-            Thread thread = new Thread(() -> {
-                try {
-                    long before = System.nanoTime();
-                    onMessage();
-                    long after = System.nanoTime() - before;
-                    logger.debug("Listener ran in " + (after / 1000000) + " ms.");
-                } catch (Exception ex) {
-                    CommandUtils.sendExceptionMessage(this.e, ex, logger, false, false);
-                }
-            });
-            thread.start();
+        ES.execute(() -> {
+            try {
+                long before = System.nanoTime();
+                onMessage();
+                long after = System.nanoTime() - before;
+                LOGGER.debug("Listener ran in " + (after / 1000000) + " ms.");
+            } catch (Exception ex) {
+                CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, false, false);
+            }});
+            LOGGER.debug(ES.toString());
     }
 
     private void initialize(MessageReceivedEvent e) {
@@ -39,7 +41,6 @@ public abstract class RegexListener extends ListenerAdapter {
         this.message = this.e.getMessage().getContentDisplay();
         Pattern p = Pattern.compile(regex());
         m = p.matcher(message);
-        logger = LoggerFactory.getLogger(getClass());
     }
 
     /**
@@ -55,6 +56,6 @@ public abstract class RegexListener extends ListenerAdapter {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, true, false);
+        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, true, false);
     }
 }
