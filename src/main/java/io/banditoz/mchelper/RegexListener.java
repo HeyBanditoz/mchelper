@@ -39,7 +39,7 @@ public abstract class RegexListener extends ListenerAdapter {
     private void initialize(MessageReceivedEvent e) {
         this.e = e;
         this.message = this.e.getMessage().getContentDisplay();
-        Pattern p = Pattern.compile(regex());
+        Pattern p = Pattern.compile(regex(), Pattern.DOTALL);
         m = p.matcher(message);
     }
 
