@@ -22,6 +22,11 @@ import java.util.concurrent.*;
  *              return "!ping";
  *          }
  *
+ *          public Help getHelp() {
+ *              return new Help(commandName(), false).withParameters(null)
+ *                 .withDescription("Returns \"Pong!\"");
+ *          }
+ *
  *          protected void onCommand() {
  *              sendReply("Pong!");
  *          }
