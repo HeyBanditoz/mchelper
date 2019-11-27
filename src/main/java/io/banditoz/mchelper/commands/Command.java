@@ -54,7 +54,6 @@ public abstract class Command extends ListenerAdapter {
         if (containsCommand(e)) {
             initialize(e);
             go();
-
         }
     }
 
