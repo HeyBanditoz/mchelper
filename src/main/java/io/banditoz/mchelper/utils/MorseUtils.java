@@ -45,11 +45,14 @@ public class MorseUtils {
         morseMap.put(',', "--..--");
         morseMap.put('.', ".-.-.-");
         morseMap.put('?', "..--..");
+        morseMap.put('\'', ".----.");
+        //morseMap.put('\"', ".-..-.");
+        morseMap.put('@', ".--.-.");
         morseMap.put(' ', "/");
     }
 
     public static String toMorse(String message) {
-        String toMorse = message.toUpperCase().replaceAll("[^A-Z0-9?., ]", "");
+        String toMorse = message.toUpperCase().replaceAll("[^A-Z0-9?.,\"@ ]", "");
         StringBuilder morse = new StringBuilder();
 
         for (Character c : toMorse.toCharArray()) {
@@ -64,9 +67,12 @@ public class MorseUtils {
         StringBuilder text = new StringBuilder();
 
         for (String letter : letters) {
-            text.append(morseMap.inverseBidiMap().get(letter));
+            if (morseMap.inverseBidiMap().get(letter) == null) {
+                text.append("■");
+            } else {
+                text.append(morseMap.inverseBidiMap().get(letter));
+            }
         }
-
         return text.toString();
     }
 }
