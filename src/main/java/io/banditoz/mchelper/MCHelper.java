@@ -56,6 +56,7 @@ public class MCHelper {
         jda.addEventListener(new DiceRollerCommand());
         jda.addEventListener(new CoinFlipCommand());
         jda.addEventListener(new VersionCommand());
+        jda.addEventListener(new PingCommand());
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
