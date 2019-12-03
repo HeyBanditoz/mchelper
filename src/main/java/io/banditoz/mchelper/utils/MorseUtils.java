@@ -46,7 +46,7 @@ public class MorseUtils {
         morseMap.put('.', ".-.-.-");
         morseMap.put('?', "..--..");
         morseMap.put('\'', ".----.");
-        //morseMap.put('\"', ".-..-.");
+        morseMap.put('\"', ".-..-.");
         morseMap.put('@', ".--.-.");
         morseMap.put(' ', "/");
     }
