@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class RegexListener extends ListenerAdapter {
-    protected abstract void onMessage();
+    protected abstract void onMessage(CommandEvent ce);
     protected abstract String regex();
     protected MessageReceivedEvent e;
     protected String message;
@@ -27,7 +28,7 @@ public abstract class RegexListener extends ListenerAdapter {
         ES.execute(() -> {
             try {
                 long before = System.nanoTime();
-                onMessage();
+                onMessage(new CommandEvent(e, LOGGER));
                 long after = System.nanoTime() - before;
                 LOGGER.debug("Listener ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
@@ -41,21 +42,5 @@ public abstract class RegexListener extends ListenerAdapter {
         this.message = this.e.getMessage().getContentDisplay();
         Pattern p = Pattern.compile(regex(), Pattern.DOTALL);
         m = p.matcher(message);
-    }
-
-    /**
-     * Sends a reply.
-     * @param msg The reply.
-     */
-    public void sendReply(String msg) {
-        CommandUtils.sendReply(msg, e);
-    }
-
-    /**
-     * Sends a reply containing the exception message.
-     * @param ex The exception.
-     */
-    public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, true, false);
     }
 }

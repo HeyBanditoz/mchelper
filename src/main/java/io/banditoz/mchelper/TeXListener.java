@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.TeXRenderer;
 
 public class TeXListener extends RegexListener {
@@ -9,14 +10,14 @@ public class TeXListener extends RegexListener {
     }
 
     @Override
-    public void onMessage() {
+    public void onMessage(CommandEvent ce) {
         if (m.find()) {
             e.getChannel().sendTyping().queue();
             String latexString = m.group(1);
             try {
                 TeXRenderer.sendTeXToChannel(e, latexString);
             } catch (Exception ex) {
-                sendExceptionMessage(ex);
+                ce.sendExceptionMessage(ex);
             }
         }
     }
