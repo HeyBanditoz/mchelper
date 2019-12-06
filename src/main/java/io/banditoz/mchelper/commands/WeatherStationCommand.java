@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.weather.es.EsUtils;
 import io.banditoz.mchelper.utils.weather.es.GrafanaImageFetcher;
@@ -17,17 +19,17 @@ public class WeatherStationCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         int hourSince = 24;
-        if (commandArgs.length > 1) {
-            hourSince = Integer.parseInt(commandArgsString);
+        if (ce.getCommandArgs().length > 1) {
+            hourSince = Integer.parseInt(ce.getCommandArgsString());
         }
         try {
-            e.getChannel().sendMessage(EsUtils.getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
+            ce.getEvent().getChannel().sendMessage(EsUtils.getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
                     .addFile(GrafanaImageFetcher.fetchFahrenheit(hourSince), "graph.png")
                     .queue();
         } catch (Exception ex) {
-            sendExceptionMessage(ex, true);
+            ce.sendExceptionMessage(ex, true);
         }
     }
 }

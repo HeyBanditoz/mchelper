@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 import java.io.BufferedReader;
@@ -19,12 +21,12 @@ public class UnitsCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         try {
-            if (!commandArgsString.contains("to")) {
-                throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + commandArgsString);
+            if (!ce.getCommandArgsString().contains("to")) {
+                throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + ce.getCommandArgsString());
             }
-            String[] argsSplit = commandArgsString.split(" to ");
+            String[] argsSplit = ce.getCommandArgsString().split(" to ");
 
             Process p = new ProcessBuilder("units", "-t", argsSplit[0], argsSplit[1]).start();
 
@@ -38,9 +40,9 @@ public class UnitsCommand extends Command {
             }
 
             reader.close();
-            sendReply(output.toString());
+            ce.sendReply(output.toString());
         } catch (IOException | InterruptedException ex) {
-            sendExceptionMessage(ex);
+            ce.sendExceptionMessage(ex);
         }
     }
 }

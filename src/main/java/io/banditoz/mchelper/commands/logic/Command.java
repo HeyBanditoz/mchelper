@@ -1,7 +1,6 @@
-package io.banditoz.mchelper.commands;
+package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +14,9 @@ import java.util.concurrent.*;
  * you must register in MCHelper.java. All commands will be multithreaded. All exceptions will be caught,
  * and a message sent to Discord showing the classpath and description of the exception.
  *
+ * To send replies, you must leverage the CommandEvent class that should be passed with the onCommand() method.
+ *
+ *
  * An example command could be
  * <pre>
  *     public class PingCommand extends Command {
@@ -27,8 +29,8 @@ import java.util.concurrent.*;
  *                 .withDescription("Returns \"Pong!\"");
  *          }
  *
- *          protected void onCommand() {
- *              sendReply("Pong!");
+ *          protected void onCommand(CommandEvent ce) {
+ *              ce.sendReply("Pong!");
  *          }
  *     }
  * </pre>
@@ -36,13 +38,11 @@ import java.util.concurrent.*;
  * @see io.banditoz.mchelper.MCHelper
  */
 public abstract class Command extends ListenerAdapter {
-    protected abstract void onCommand();
+    protected abstract void onCommand(CommandEvent ce);
     public abstract String commandName();
     public abstract Help getHelp();
-
-    protected String commandArgsString;
-    protected String[] commandArgs;
     protected MessageReceivedEvent e;
+
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
@@ -52,18 +52,9 @@ public abstract class Command extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         if (containsCommand(e)) {
-            initialize(e);
+            this.e = e;
             go();
         }
-    }
-
-    /**
-     * Initialize variables.
-     */
-    protected void initialize(MessageReceivedEvent e) {
-        this.e = e;
-        this.commandArgs = CommandUtils.commandArgs(e.getMessage());
-        this.commandArgsString = CommandUtils.generateCommandArgsString(e);
     }
 
     /**
@@ -75,46 +66,14 @@ public abstract class Command extends ListenerAdapter {
         ES.execute(() -> {
             try {
                 long before = System.nanoTime();
-                onCommand();
+                onCommand(new CommandEvent(e, LOGGER));
                 long after = System.nanoTime() - before;
                 LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
-                sendExceptionMessage(ex, false);
+                CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
             }
         });
         LOGGER.debug(ES.toString());
-    }
-
-    /**
-     * Sends a reply containing the exception message.
-     * @param ex The exception.
-     */
-    public void sendExceptionMessage(Exception ex, boolean caught) {
-        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, caught, false);
-    }
-
-    /**
-     * Sends a reply containing the exception message.
-     * @param ex The exception.
-     */
-    public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, true, false);
-    }
-
-    /**
-     * Sends a reply.
-     * @param msg The reply.
-     */
-    public void sendReply(String msg) {
-        CommandUtils.sendReply(msg, e);
-    }
-
-    /**
-     * Sends an EmbedReply.
-     * @param me The reply.
-     */
-    public void sendEmbedReply(MessageEmbed me) {
-        e.getChannel().sendMessage(me).queue();
     }
 
     protected boolean containsCommand(MessageReceivedEvent e) {

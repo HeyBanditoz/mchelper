@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.weather.GeoCoordinates;
 import io.banditoz.mchelper.utils.weather.ReverseGeocoder;
@@ -18,15 +20,15 @@ public class ReverseGeocoderCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         ReverseGeocoder rg = new ReverseGeocoder(new WeatherDeserializer());
         GeoCoordinates g = null;
         try {
-            g = rg.reverse(commandArgsString);
+            g = rg.reverse(ce.getCommandArgsString());
         } catch (Exception ex) {
-            sendExceptionMessage(ex, true);
+            ce.sendExceptionMessage(ex, true);
             return; //  we can't go any further, don't get an extra NPE
         }
-        sendReply(g.toString());
+        ce.sendReply(g.toString());
     }
 }

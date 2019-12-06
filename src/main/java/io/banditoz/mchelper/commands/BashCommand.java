@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 import java.io.BufferedReader;
@@ -19,9 +20,9 @@ public class BashCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         try {
-            Process p = new ProcessBuilder("bash", "-c", commandArgsString).start();
+            Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
             p.waitFor(); // hacky for right now, but this is dangerous! make sure your bash commands won't hang
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
@@ -37,10 +38,10 @@ public class BashCommand extends ElevatedCommand {
             if (output.toString().compareTo("``````") == 0) { // bash gave us empty output, clarify this
                 output = new StringBuilder("<no output>");
             }
-            sendReply(output.toString());
+            ce.sendReply(output.toString());
         }
         catch (InterruptedException | IOException ex) {
-            sendExceptionMessage(ex);
+            ce.sendExceptionMessage(ex);
         }
     }
 }

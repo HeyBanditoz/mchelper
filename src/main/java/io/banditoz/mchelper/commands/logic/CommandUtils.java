@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.commands;
+package io.banditoz.mchelper.commands.logic;
 
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;

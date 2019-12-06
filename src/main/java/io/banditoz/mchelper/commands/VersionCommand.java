@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.Version;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 public class VersionCommand extends Command {
@@ -16,11 +18,11 @@ public class VersionCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         String reply = "MCHelper, a Discord bot.\n" +
                 "https://gitlab.com/HeyBanditoz/mchelper/commit/" + Version.GIT_SHA + "\n" +
                 "Git revision date: " + Version.GIT_DATE + "\n" +
                 "Build date: " + Version.BUILD_DATE;
-        sendReply(reply);
+        ce.sendReply(reply);
     }
 }

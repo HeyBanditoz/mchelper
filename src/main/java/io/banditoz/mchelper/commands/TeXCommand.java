@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.TeXRenderer;
 
@@ -16,11 +18,11 @@ public class TeXCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         try {
-            TeXRenderer.sendTeXToChannel(e, commandArgsString);
+            TeXRenderer.sendTeXToChannel(ce.getEvent(), ce.getCommandArgsString());
         } catch (Exception ex) {
-            sendExceptionMessage(ex);
+            ce.sendExceptionMessage(ex);
         }
     }
 }

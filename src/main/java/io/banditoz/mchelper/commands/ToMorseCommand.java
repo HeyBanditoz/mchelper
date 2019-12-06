@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.MorseUtils;
 
@@ -16,7 +18,7 @@ public class ToMorseCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
-        sendReply(MorseUtils.toMorse(commandArgsString));
+    protected void onCommand(CommandEvent ce) {
+        ce.sendReply(MorseUtils.toMorse(ce.getCommandArgsString()));
     }
 }

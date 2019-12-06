@@ -6,6 +6,8 @@ import ch.rasc.darksky.model.DsForecastRequest;
 import ch.rasc.darksky.model.DsResponse;
 import ch.rasc.darksky.model.DsUnit;
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.*;
 import io.banditoz.mchelper.utils.weather.GeoCoordinates;
 import io.banditoz.mchelper.utils.weather.ReverseGeocoder;
@@ -27,13 +29,13 @@ public class WeatherCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         ReverseGeocoder g = new ReverseGeocoder(new WeatherDeserializer());
         GeoCoordinates c = null;
         try {
-            c = g.reverse(commandArgsString);
+            c = g.reverse(ce.getCommandArgsString());
         } catch (Exception ex) {
-            sendExceptionMessage(ex, true);
+            ce.sendExceptionMessage(ex, true);
         }
         DsClient client = new DsClient(SettingsManager.getInstance().getSettings().getDarkSkyAPI(), new WeatherDeserializer(), MCHelper.getOkHttpClient());
         DsForecastRequest request = DsForecastRequest.builder()
@@ -46,7 +48,7 @@ public class WeatherCommand extends Command {
         try {
             response = client.sendForecastRequest(request);
         } catch (IOException ex) {
-            sendExceptionMessage(ex, true);
+            ce.sendExceptionMessage(ex, true);
         }
         EmbedBuilder b = new EmbedBuilder()
                 .setTitle("Current Weather • " + response.currently().summary(),
@@ -59,7 +61,7 @@ public class WeatherCommand extends Command {
                 .addField("Precipitation", response.currently().precipProbability().doubleValue() * 100 + "%", true)
                 .addField("Pressure", response.currently().pressure().toString() + " mb", true)
                 .setFooter(g.getDisplayName() + " • Powered by Dark Sky");
-        sendEmbedReply(b.build());
+        ce.sendEmbedReply(b.build());
     }
 }
 

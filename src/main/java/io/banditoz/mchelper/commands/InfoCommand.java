@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands;
 
 import com.sun.management.OperatingSystemMXBean;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -20,7 +22,7 @@ public class InfoCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
         long totalJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() >> 20;
@@ -29,9 +31,9 @@ public class InfoCommand extends Command {
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
                 .addField("Threads", String.format("%d/%d", Thread.activeCount(), Thread.getAllStackTraces().size()), true)
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
-                .addField("Guilds", Integer.toString(e.getJDA().getGuilds().size()), true)
-                .addField("Users", Integer.toString(e.getJDA().getUsers().size()), true)
+                .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
+                .addField("Users", Integer.toString(ce.getEvent().getJDA().getUsers().size()), true)
                 .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true);
-        sendEmbedReply(eb.build());
+        ce.sendEmbedReply(eb.build());
     }
 }

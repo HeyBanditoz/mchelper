@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.commands.permissions;
+package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;

@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.NamedCoordinatePoint;
 
@@ -20,7 +22,7 @@ public class CoordCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         if (map.isEmpty()) {
             try {
                 FileInputStream fi = new FileInputStream(new File("coords.txt"));
@@ -37,78 +39,86 @@ public class CoordCommand extends Command {
                 fi.close();
                 oi.close();
             } catch (ClassNotFoundException | IOException ex) {
-                sendExceptionMessage(ex);
+                ce.sendExceptionMessage(ex);
             }
         }
-        if (commandArgs.length>1) {
-            if (commandArgs[1].equalsIgnoreCase("save") || commandArgs[1].equalsIgnoreCase("add")) {
-                if (!map.containsKey(commandArgs[2])) {
+        if (ce.getCommandArgs().length>1) {
+            if (ce.getCommandArgs()[1].equalsIgnoreCase("save") || ce.getCommandArgs()[1].equalsIgnoreCase("add")) {
+                if (!map.containsKey(ce.getCommandArgs()[2])) {
                     try {
-                        NamedCoordinatePoint n = new NamedCoordinatePoint(commandArgs[2], commandArgs[3], commandArgs[4]);
+                        NamedCoordinatePoint n = new NamedCoordinatePoint(ce.getCommandArgs()[2], ce.getCommandArgs()[3], ce.getCommandArgs()[4]);
                         map.put(n.getName(), n);
                         FileOutputStream f = new FileOutputStream(new File("coords.txt"));
                         ObjectOutputStream o = new ObjectOutputStream(f);
-                        map.forEach((k, p) -> write(p, o));
+                        map.forEach((k, p) -> {
+                            try {
+                                write(p, o);
+                            } catch (IOException e) {
+                                ce.sendExceptionMessage(e);
+                            }
+                        });
                         o.close();
                         f.close();
-                        sendReply("Added.");
+                        ce.sendReply("Added.");
                     } catch (IOException ex) {
-                        sendExceptionMessage(ex);
+                        ce.sendExceptionMessage(ex);
                     }
                 } else {
-                    sendReply("\"" + commandArgs[2] + "\" already exists.");
+                    ce.sendReply("\"" + ce.getCommandArgs()[2] + "\" already exists.");
                 }
-            } else if (commandArgs[1].equalsIgnoreCase("show") || commandArgs[1].equalsIgnoreCase("list")) {
-                if (commandArgs.length > 2) {
-                    if (map.containsKey(commandArgs[2])) {
-                        sendReply(map.get(commandArgs[2]).toString());
+            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("show") || ce.getCommandArgs()[1].equalsIgnoreCase("list")) {
+                if (ce.getCommandArgs().length > 2) {
+                    if (map.containsKey(ce.getCommandArgs()[2])) {
+                        ce.sendReply(map.get(ce.getCommandArgs()[2]).toString());
                     } else {
-                        sendReply("Point \"" + commandArgs[2] + "\" does not exist.");
+                        ce.sendReply("Point \"" + ce.getCommandArgs()[2] + "\" does not exist.");
                     }
                 } else {
                     StringBuilder s = new StringBuilder();
                     map.forEach((k, p) -> s.append(p.toString()).append("\n"));
-                    sendReply(s.toString());
+                    ce.sendReply(s.toString());
                 }
-            } else if (commandArgs[1].equalsIgnoreCase("delete") || commandArgs[1].equalsIgnoreCase("remove")) {
+            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("delete") || ce.getCommandArgs()[1].equalsIgnoreCase("remove")) {
                 try {
-                    if (map.containsKey(commandArgs[2])) {
-                        map.remove(commandArgs[2]);
+                    if (map.containsKey(ce.getCommandArgs()[2])) {
+                        map.remove(ce.getCommandArgs()[2]);
                         FileOutputStream f = new FileOutputStream(new File("coords.txt"));
                         ObjectOutputStream o = new ObjectOutputStream(f);
-                        map.forEach((k, p) -> write(p, o));
+                        map.forEach((k, p) -> {
+                            try {
+                                write(p, o);
+                            } catch (IOException e) {
+                                ce.sendExceptionMessage(e);
+                            }
+                        });
                         f.close();
                         o.close();
-                        sendReply("Deleted.");
+                        ce.sendReply("Deleted.");
                     } else {
-                        sendReply("Point \"" + commandArgs[2] + "\" does not exist.");
+                        ce.sendReply("Point \"" + ce.getCommandArgs()[2] + "\" does not exist.");
                     }
                 } catch (IOException ex) {
-                    sendExceptionMessage(ex);
+                    ce.sendExceptionMessage(ex);
                 }
-            } else if (commandArgs[1].equalsIgnoreCase("help")) {
-                help();
+            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("help")) {
+                help(ce);
             } else {
-                sendReply("Unrecognized operator " + commandArgs[1] + ".");
+                ce.sendReply("Unrecognized operator " + ce.getCommandArgs()[1] + ".");
             }
         } else {
-            help();
+            help(ce);
         }
     }
 
-    protected void write(NamedCoordinatePoint p, ObjectOutputStream o) {
-        try {
-            o.writeObject(p);
-        } catch (IOException ex) {
-            sendExceptionMessage(ex);
-        }
+    private void write(NamedCoordinatePoint p, ObjectOutputStream o) throws IOException {
+        o.writeObject(p);
     }
 
-    protected void help() {
+    private void help(CommandEvent ce) {
         String s = "save or add: adds new coord to list. \n" +
                 "show or list: display all coords \n" +
                 "show <name> or list <name>: display coord with <name>.\n" +
                 "delete or remove: remove an item";
-        sendReply(s);
+        ce.sendReply(s);
     }
 }

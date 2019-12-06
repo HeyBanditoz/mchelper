@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 import java.util.ArrayList;
@@ -33,11 +35,11 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         StringBuilder sb = new StringBuilder("Current list of commands:\n");
         for (Command c : commands) {
-            sb.append(c.getHelp()).append("\n"); // TODO split this into multiple messages in sendReply somehow, this could grow too large in the future!
+            sb.append(c.getHelp()).append("\n"); // TODO split this into multiple messages in ce.sendReply somehow, this could grow too large in the future!
         }
-        sendReply(sb.toString());
+        ce.sendReply(sb.toString());
     }
 }

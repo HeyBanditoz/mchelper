@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.dictionary.Definition;
 import io.banditoz.mchelper.utils.dictionary.DictionaryResult;
@@ -18,18 +20,18 @@ public class DictionaryCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
+    protected void onCommand(CommandEvent ce) {
         DictionaryResult result = null;
         int toLookup = 0;
         try {
-            if (commandArgs[1].matches("\\d+")) {
-                toLookup = Integer.parseInt(commandArgs[1]) - 1; // zero indexed
-                result = DictionarySearcher.search(commandArgs[2]);
+            if (ce.getCommandArgs()[1].matches("\\d+")) {
+                toLookup = Integer.parseInt(ce.getCommandArgs()[1]) - 1; // zero indexed
+                result = DictionarySearcher.search(ce.getCommandArgs()[2]);
             } else {
-                result = DictionarySearcher.search(commandArgsString);
+                result = DictionarySearcher.search(ce.getCommandArgsString());
             }
         } catch (Exception ex) {
-            sendExceptionMessage(ex);
+            ce.sendExceptionMessage(ex);
             return;
         }
         Definition d = result.getDefinitions().get(toLookup);
@@ -43,6 +45,6 @@ public class DictionaryCommand extends Command {
                 " of " +
                 result.getDefinitions().size() +
                 ")"; // now this is a work of beauty
-        sendReply(reply);
+        ce.sendReply(reply);
     }
 }

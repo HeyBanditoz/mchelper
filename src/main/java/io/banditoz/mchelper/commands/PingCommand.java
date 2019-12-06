@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 public class PingCommand extends Command {
@@ -15,7 +17,7 @@ public class PingCommand extends Command {
     }
 
     @Override
-    protected void onCommand() {
-        e.getJDA().getRestPing().queue( (p) -> sendReply("Pong! Websocket: " + e.getJDA().getGatewayPing() + "ms, REST: " + p + " ms."));
+    protected void onCommand(CommandEvent ce) {
+        ce.getEvent().getJDA().getRestPing().queue( (p) -> ce.sendReply("Pong! Websocket: " + ce.getEvent().getJDA().getGatewayPing() + "ms, REST: " + p + " ms."));
     }
 }
