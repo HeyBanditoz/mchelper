@@ -1,6 +1,5 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.RedditLinkExtractor;
 
 public class RedditListener extends RegexListener {
@@ -10,11 +9,11 @@ public class RedditListener extends RegexListener {
     }
 
     @Override
-    protected void onMessage(CommandEvent ce) {
+    protected void onMessage(RegexEvent re) {
         try {
-            if (m.find()) {
-                e.getChannel().sendTyping().queue();
-                ce.sendReply(RedditLinkExtractor.extractFromRedditAppLink(m.group()));
+            if (re.getMatcher().find()) {
+                re.getEvent().getChannel().sendTyping().queue();
+                re.sendReply(RedditLinkExtractor.extractFromRedditAppLink(re.getMatcher().group()));
             }
         } catch (Exception ex) {
             LOGGER.error("Exception on converting Reddit link!", ex);
