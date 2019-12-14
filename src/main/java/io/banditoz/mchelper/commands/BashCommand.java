@@ -2,6 +2,10 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.utils.HttpResponseException;
+import io.banditoz.mchelper.utils.ProcessUtils;
+import io.banditoz.mchelper.utils.paste.Paste;
+import io.banditoz.mchelper.utils.paste.PasteggUploader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,24 +27,14 @@ public class BashCommand extends ElevatedCommand {
     protected void onCommand(CommandEvent ce) {
         try {
             Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
-            p.waitFor(); // hacky for right now, but this is dangerous! make sure your bash commands won't hang
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            StringBuilder output = new StringBuilder("```");
-
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+            String output = ProcessUtils.runProcess(p);
+            if (output.length() > 2000) {
+                ce.sendReply(PasteggUploader.uploadToPastegg(new Paste(output, 24)));
+                return;
             }
-
-            reader.close();
-            output.append("```");
-
-            if (output.toString().compareTo("``````") == 0) { // bash gave us empty output, clarify this
-                output = new StringBuilder("<no output>");
-            }
-            ce.sendReply(output.toString());
+            ce.sendReply(output);
         }
-        catch (InterruptedException | IOException ex) {
+        catch (InterruptedException | IOException | HttpResponseException ex) {
             ce.sendExceptionMessage(ex);
         }
     }
