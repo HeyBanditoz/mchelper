@@ -8,6 +8,7 @@ import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +37,9 @@ public class MCHelper {
             System.exit(1);
         }
         new Database(); // initialize the database
-        jda = new JDABuilder(settings.getDiscordToken()).build();
+        jda = new JDABuilder(settings.getDiscordToken())
+                .setDisabledCacheFlags(EnumSet.allOf(CacheFlag.class)) // we don't use (activity, voice state, emote, client status) so disable their caches.
+                .build();
         jda.awaitReady();
         jda.addEventListener(new GuildJoinLeaveListener());
         jda.addEventListener(new BashCommand());
