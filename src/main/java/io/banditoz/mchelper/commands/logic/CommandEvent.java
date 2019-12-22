@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -13,12 +14,14 @@ public class CommandEvent {
     private final String[] commandArgs;
     private final MessageReceivedEvent e;
     private final Logger logger;
+    private final Guild guild;
 
     public CommandEvent(@NotNull MessageReceivedEvent e, Logger logger) {
         this.e = e;
         this.commandArgsString = CommandUtils.generateCommandArgsString(e);
         this.commandArgs = CommandUtils.commandArgs(e.getMessage());
         this.logger = logger;
+        this.guild = e.getGuild();
     }
 
     /**
@@ -43,6 +46,10 @@ public class CommandEvent {
      */
     public MessageReceivedEvent getEvent() {
         return e;
+    }
+
+    public Guild getGuild() {
+        return guild;
     }
 
     /**

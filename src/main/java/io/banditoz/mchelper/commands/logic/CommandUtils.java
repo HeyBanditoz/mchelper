@@ -2,6 +2,9 @@ package io.banditoz.mchelper.commands.logic;
 
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 
@@ -42,19 +45,37 @@ public class CommandUtils {
     /**
      * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
      * @param msg The reply.
+     * @param e The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
+        _sendReply(msg, e.getChannel());
+    }
+
+    /**
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
+     * @param msg The reply.
+     */
+    public static void sendReply(String msg, TextChannel chan) {
+        _sendReply(msg, chan);
+    }
+
+    /**
+     * Internal method for sending a reply. Named differently to prevent infinite recursion.
+     * @param msg The reply.
+     * @param c The MessageChannel to send to.
+     */
+    private static void _sendReply(String msg, MessageChannel c) {
         if (msg == null) {
-            e.getChannel().sendMessage("<null output>").queue();
+            c.sendMessage("<null output>").queue();
         }
         else if (msg.isEmpty()) {
-            e.getChannel().sendMessage("<no output>").queue();
+            c.sendMessage("<no output>").queue();
         }
         else {
             Queue<Message> toSend = new MessageBuilder()
                     .append(msg)
                     .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
-            toSend.forEach(message -> e.getChannel().sendMessage(msg).queue());
+            toSend.forEach(message -> c.sendMessage(msg).queue());
         }
     }
 

@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import okhttp3.OkHttpClient;
@@ -33,9 +34,10 @@ public class MCHelper {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Settings.json file.");
             System.exit(1);
         }
-
+        new Database(); // initialize the database
         jda = new JDABuilder(settings.getDiscordToken()).build();
         jda.awaitReady();
+        jda.addEventListener(new GuildJoinLeaveListener());
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
         jda.addEventListener(new MathCommand());
@@ -57,6 +59,7 @@ public class MCHelper {
         jda.addEventListener(new CoinFlipCommand());
         jda.addEventListener(new VersionCommand());
         jda.addEventListener(new PingCommand());
+        jda.addEventListener(new DefaultChannelCommand());
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");

@@ -6,6 +6,7 @@ build
 
 # Ignore the settings file
 Config.json*
+database.json*
 
 # I give up.
 .idea/
