@@ -21,7 +21,7 @@ public class CommandEvent {
         this.commandArgsString = CommandUtils.generateCommandArgsString(e);
         this.commandArgs = CommandUtils.commandArgs(e.getMessage());
         this.logger = logger;
-        this.guild = e.getGuild();
+        this.guild = (e.isFromGuild()) ? e.getGuild() : null;
     }
 
     /**
@@ -48,6 +48,10 @@ public class CommandEvent {
         return e;
     }
 
+    /**
+     * Gets the guild. This could be null if the command didn't come from a guild.
+     * @return The Guild, or null if the command didn't happen in one.
+     */
     public Guild getGuild() {
         return guild;
     }
