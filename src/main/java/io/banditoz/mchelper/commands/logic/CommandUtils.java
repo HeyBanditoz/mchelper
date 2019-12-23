@@ -74,8 +74,8 @@ public class CommandUtils {
         else {
             Queue<Message> toSend = new MessageBuilder()
                     .append(msg)
-                    .buildAll(MessageBuilder.SplitPolicy.ANYWHERE);
-            toSend.forEach(message -> c.sendMessage(msg).queue());
+                    .buildAll(MessageBuilder.SplitPolicy.NEWLINE);
+            toSend.forEach(message -> c.sendMessage(message).queue());
         }
     }
 
