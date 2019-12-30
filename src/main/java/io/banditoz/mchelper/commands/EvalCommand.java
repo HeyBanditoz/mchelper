@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.ChannelType;
 

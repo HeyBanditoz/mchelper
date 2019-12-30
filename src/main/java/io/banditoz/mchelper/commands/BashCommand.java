@@ -1,15 +1,14 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.ProcessUtils;
 import io.banditoz.mchelper.utils.paste.Paste;
 import io.banditoz.mchelper.utils.paste.PasteggUploader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class BashCommand extends ElevatedCommand {
     @Override
