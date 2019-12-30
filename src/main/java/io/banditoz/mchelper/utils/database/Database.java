@@ -41,7 +41,8 @@ public class Database {
             int numOfGuilds = this.guilds.getGuilds().size();
             logger.info("Database loaded. We have " + numOfGuilds + " guilds.");
         } catch (Exception e) {
-            logger.error("Error loading the database.", e);
+            logger.error("Error loading the database. The bot will now exit.", e);
+            System.exit(1);
         }
     }
 
