@@ -8,28 +8,28 @@ import net.dv8tion.jda.api.utils.MiscUtil;
 
 import static io.banditoz.mchelper.commands.logic.CommandPermissions.*;
 
-public class DefaultChannelCommand extends Command {
+public class PrefixCommand extends Command {
     @Override
     public String commandName() {
-        return "defaultchannel";
+        return "prefix";
     }
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("(channel ID)")
-                .withDescription("Gets or sets the default channel for this guild.");
+        return new Help(commandName(), false).withParameters("(prefix)")
+                .withDescription("Gets or sets the prefix for this guild. (By default, it is a '!' and must be a char.");
     }
 
     @Override
     protected void onCommand(CommandEvent ce) {
         if (ce.getCommandArgs().length == 1) {
-            ce.sendReply(Database.getInstance().getGuildDataById(ce.getGuild()).getDefaultChannel() + " is the default channel.");
+            ce.sendReply(Database.getInstance().getGuildDataById(ce.getGuild()).getPrefix() + " is this guild's prefix.");
         }
         else if (isBotOwner(ce.getEvent().getAuthor()) || isGuildOwner(ce.getEvent().getAuthor(), ce.getGuild())) {
-            MiscUtil.parseSnowflake(ce.getCommandArgs()[1]); // check if it is a valid discord snowflake (I think)
-            Database.getInstance().getGuildDataById(ce.getGuild()).setDefaultChannel(ce.getCommandArgs()[1]);
+            char desiredPrefix = ce.getCommandArgs()[1].charAt(0);
+            Database.getInstance().getGuildDataById(ce.getGuild()).setPrefix(desiredPrefix);
             Database.getInstance().saveDatabase();
-            ce.sendReply(ce.getCommandArgs()[1] + " is now the default channel.");
+            ce.sendReply(ce.getCommandArgs()[1].charAt(0) + " is now this guild's prefix.");
         }
         else {
             ce.sendReply("You are not the guild owner.");

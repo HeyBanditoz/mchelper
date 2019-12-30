@@ -10,7 +10,7 @@ import io.banditoz.mchelper.utils.dictionary.DictionarySearcher;
 public class DictionaryCommand extends Command {
     @Override
     public String commandName() {
-        return "!define";
+        return "define";
     }
 
     @Override

@@ -7,7 +7,7 @@ import io.banditoz.mchelper.utils.Help;
 public class PingCommand extends Command {
     @Override
     public String commandName() {
-        return "!ping";
+        return "ping";
     }
 
     @Override

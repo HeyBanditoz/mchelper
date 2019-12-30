@@ -19,7 +19,7 @@ public class CommandEvent {
     public CommandEvent(@NotNull MessageReceivedEvent e, Logger logger) {
         this.e = e;
         this.commandArgsString = CommandUtils.generateCommandArgsString(e);
-        this.commandArgs = CommandUtils.commandArgs(e.getMessage());
+        this.commandArgs = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
         this.logger = logger;
         this.guild = (e.isFromGuild()) ? e.getGuild() : null;
     }

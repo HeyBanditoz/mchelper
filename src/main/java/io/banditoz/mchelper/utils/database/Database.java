@@ -51,6 +51,7 @@ public class Database {
             gd = new GuildData();
             instance.guilds.getGuilds().put(g.getId(), gd);
             logger.info("Initialized data for " + g.getId());
+            saveDatabase();
         }
         else {
             gd = instance.guilds.getGuilds().get(g.getId());

@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.MorseUtils;
 public class FromMorseCommand extends Command {
     @Override
     public String commandName() {
-        return "!frommorse";
+        return "frommorse";
     }
 
     @Override

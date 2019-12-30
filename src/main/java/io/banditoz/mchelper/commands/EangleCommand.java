@@ -9,7 +9,7 @@ import io.banditoz.mchelper.utils.TwoDimensionalPoint;
 public class EangleCommand extends Command {
     @Override
     public String commandName() {
-        return "!eangle";
+        return "eangle";
     }
 
     @Override

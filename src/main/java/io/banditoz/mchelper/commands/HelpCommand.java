@@ -14,7 +14,7 @@ public class HelpCommand extends Command {
 
     @Override
     public String commandName() {
-        return "!help";
+        return "help";
     }
 
     public HelpCommand() {

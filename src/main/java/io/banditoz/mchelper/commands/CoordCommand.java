@@ -10,7 +10,7 @@ import io.banditoz.mchelper.utils.database.GuildData;
 public class CoordCommand extends Command {
     @Override
     public String commandName() {
-        return "!coords";
+        return "coords";
     }
 
     @Override

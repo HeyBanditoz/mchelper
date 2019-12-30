@@ -92,7 +92,7 @@ public class CommandUtils {
 
     public static String generateCommandArgsString(MessageReceivedEvent e) {
         StringBuilder commandArgsBuilder = new StringBuilder();
-        String[] args = commandArgs(e.getMessage());
+        String[] args = commandArgs(e.getMessage().getContentDisplay());
         for (int i = 1; i < args.length; i++) {
             if (i == args.length - 1) {
                 commandArgsBuilder.append(args[i]);
@@ -103,9 +103,5 @@ public class CommandUtils {
 
         }
         return commandArgsBuilder.toString();
-    }
-
-    public static String[] commandArgs(Message message) {
-        return commandArgs(message.getContentDisplay());
     }
 }

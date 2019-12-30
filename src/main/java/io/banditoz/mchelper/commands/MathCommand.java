@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class MathCommand extends Command {
     @Override
     public String commandName() {
-        return "!math";
+        return "math";
     }
 
     @Override

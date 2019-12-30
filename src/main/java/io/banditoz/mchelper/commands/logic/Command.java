@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -77,6 +78,9 @@ public abstract class Command extends ListenerAdapter {
     }
 
     protected boolean containsCommand(MessageReceivedEvent e) {
-        return CommandUtils.commandArgs(e.getMessage()).length > 0 && commandName().equalsIgnoreCase(CommandUtils.commandArgs(e.getMessage())[0]);
+        String[] args = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
+        char prefix = Database.getInstance().getGuildDataById(e.getGuild()).getPrefix();
+        String expected = prefix + commandName();
+        return expected.equals(args[0]);
     }
 }

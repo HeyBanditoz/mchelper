@@ -9,7 +9,7 @@ import io.banditoz.mchelper.utils.weather.es.GrafanaImageFetcher;
 public class WeatherStationCommand extends Command {
     @Override
     public String commandName() {
-        return "!ws";
+        return "ws";
     }
 
     @Override

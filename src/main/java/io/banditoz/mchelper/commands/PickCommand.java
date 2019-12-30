@@ -12,7 +12,7 @@ import static io.banditoz.mchelper.utils.ListUtils.extractNumRandomly;
 public class PickCommand extends Command {
     @Override
     public String commandName() {
-        return "!pick";
+        return "pick";
     }
 
     @Override

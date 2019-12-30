@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.TwoDimensionalPoint;
 public class NetherCommand extends Command {
     @Override
     public String commandName() {
-        return "!nether";
+        return "nether";
     }
 
     @Override

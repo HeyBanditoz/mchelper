@@ -16,7 +16,7 @@ public class TTTCommand extends Command {
 
     @Override
     public String commandName() {
-        return "!ttt";
+        return "ttt";
     }
 
     @Override

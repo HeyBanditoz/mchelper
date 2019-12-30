@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.TwoDimensionalPoint;
 public class OverworldCommand extends Command {
     @Override
     public String commandName() {
-        return "!overworld";
+        return "overworld";
     }
 
     @Override

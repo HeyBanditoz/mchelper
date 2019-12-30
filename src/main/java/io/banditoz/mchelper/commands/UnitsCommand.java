@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public class UnitsCommand extends Command {
     @Override
     public String commandName() {
-        return "!units";
+        return "units";
     }
 
     @Override

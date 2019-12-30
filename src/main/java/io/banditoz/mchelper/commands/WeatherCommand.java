@@ -19,7 +19,7 @@ import java.io.IOException;
 public class WeatherCommand extends Command {
     @Override
     public String commandName() {
-        return "!w";
+        return "w";
     }
 
     @Override

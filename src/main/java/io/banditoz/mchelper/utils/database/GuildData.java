@@ -12,9 +12,13 @@ public class GuildData {
     @JsonProperty("defaultChannel")
     private String defaultChannel;
 
+    @JsonProperty("prefix")
+    private Character prefix;
+
     public GuildData() {
         this.coordinates = new HashMap<>();
         this.defaultChannel = "";
+        this.prefix = '!';
     }
 
     public HashMap<String, TwoDimensionalPoint> getCoordinates() {
@@ -31,5 +35,13 @@ public class GuildData {
 
     public void setDefaultChannel(String defaultChannel) {
         this.defaultChannel = defaultChannel;
+    }
+
+    public char getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(char prefix) {
+        this.prefix = prefix;
     }
 }

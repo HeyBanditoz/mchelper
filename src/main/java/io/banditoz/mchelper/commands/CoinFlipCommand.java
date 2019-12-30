@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.RPGDice;
 public class CoinFlipCommand extends Command {
     @Override
     public String commandName() {
-        return "!flip";
+        return "flip";
     }
 
     @Override

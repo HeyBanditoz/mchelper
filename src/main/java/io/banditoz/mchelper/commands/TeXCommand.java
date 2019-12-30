@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.TeXRenderer;
 public class TeXCommand extends Command {
     @Override
     public String commandName() {
-        return "!tex";
+        return "tex";
     }
 
     @Override

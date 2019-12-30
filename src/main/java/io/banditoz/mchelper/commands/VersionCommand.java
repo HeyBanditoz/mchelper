@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.Help;
 public class VersionCommand extends Command {
     @Override
     public String commandName() {
-        return "!version";
+        return "version";
     }
 
     @Override

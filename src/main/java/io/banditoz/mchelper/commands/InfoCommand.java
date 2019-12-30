@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 public class InfoCommand extends Command {
     @Override
     public String commandName() {
-        return "!info";
+        return "info";
     }
 
     @Override

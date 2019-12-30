@@ -10,7 +10,7 @@ import io.banditoz.mchelper.utils.weather.WeatherDeserializer;
 public class ReverseGeocoderCommand extends Command {
     @Override
     public String commandName() {
-        return "!rg";
+        return "rg";
     }
 
     @Override

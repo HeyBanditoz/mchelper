@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.RPGDice;
 public class DiceRollerCommand extends Command {
     @Override
     public String commandName() {
-        return "!roll";
+        return "roll";
     }
 
     @Override

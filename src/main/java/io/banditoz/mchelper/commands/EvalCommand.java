@@ -24,7 +24,7 @@ public class EvalCommand extends ElevatedCommand {
 
     @Override
     public String commandName() {
-        return "!eval";
+        return "eval";
     }
 
     // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java

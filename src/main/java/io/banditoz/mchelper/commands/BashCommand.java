@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 public class BashCommand extends ElevatedCommand {
     @Override
     public String commandName() {
-        return "!bash";
+        return "bash";
     }
 
     @Override
