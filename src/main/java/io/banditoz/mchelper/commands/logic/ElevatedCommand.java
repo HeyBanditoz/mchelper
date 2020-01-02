@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
+        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
         if (containsCommand(e)) {
             if (CommandPermissions.isBotOwner(e.getAuthor())) {
                 this.e = e;

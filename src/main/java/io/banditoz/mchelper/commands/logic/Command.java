@@ -59,6 +59,7 @@ public abstract class Command extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
+        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
         if (containsCommand(e)) {
             this.e = e;
             go();
