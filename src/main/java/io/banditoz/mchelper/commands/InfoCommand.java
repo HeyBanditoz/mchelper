@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
+import java.time.Duration;
 
 public class InfoCommand extends Command {
     @Override
@@ -26,6 +27,10 @@ public class InfoCommand extends Command {
         OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
         long totalJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() >> 20;
+        String uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase(); // https://stackoverflow.com/a/40487511
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Bot Statistics")
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
@@ -33,7 +38,8 @@ public class InfoCommand extends Command {
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
                 .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
                 .addField("Users", Integer.toString(ce.getEvent().getJDA().getUsers().size()), true)
-                .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true);
+                .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true)
+                .addField("Uptime", uptime, true);
         ce.sendEmbedReply(eb.build());
     }
 }
