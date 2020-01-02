@@ -86,6 +86,9 @@ public abstract class Command extends ListenerAdapter {
 
     protected boolean containsCommand(MessageReceivedEvent e) {
         String[] args = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
+        if (args.length == 0) {
+            return false;
+        }
         char prefix = Database.getInstance().getGuildDataById(e.getGuild()).getPrefix();
         String expected = prefix + commandName();
         return expected.equals(args[0]);
