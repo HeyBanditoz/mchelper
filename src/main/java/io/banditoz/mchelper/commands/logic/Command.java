@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -46,9 +48,14 @@ public abstract class Command extends ListenerAdapter {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
-    protected final static ThreadPoolExecutor ES = new ThreadPoolExecutor(4, 4,
-            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+    protected final static ThreadPoolExecutor ES;
+
+    static {
+        Settings s = SettingsManager.getInstance().getSettings();
+        // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
+        ES = new ThreadPoolExecutor(s.getCommandThreads(), s.getCommandThreads(),
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+    }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {

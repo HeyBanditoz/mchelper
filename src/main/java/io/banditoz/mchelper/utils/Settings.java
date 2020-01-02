@@ -19,6 +19,10 @@ public class Settings {
     private String esUrl;
     @JsonProperty("grafanaToken")
     private String grafanaToken;
+    @JsonProperty("commandThreads")
+    private Integer commandThreads;
+    @JsonProperty("regexListenerThreads")
+    private Integer regexListenerThreads;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -88,5 +92,25 @@ public class Settings {
     @JsonProperty("grafanaToken")
     public void setGrafanaToken(String grafanaToken) {
         this.grafanaToken = grafanaToken;
+    }
+
+    @JsonProperty("commandThreads")
+    public int getCommandThreads() {
+        return commandThreads;
+    }
+
+    @JsonProperty("commandThreads")
+    public void setCommandThreads(int commandThreads) {
+        this.commandThreads = commandThreads;
+    }
+
+    @JsonProperty("regexListenerThreads")
+    public int getRegexListenerThreads() {
+        return regexListenerThreads;
+    }
+
+    @JsonProperty("regexListenerThreads")
+    public void setRegexListenerThreads(Integer regexListenerThreads) {
+        this.regexListenerThreads = regexListenerThreads;
     }
 }

@@ -45,6 +45,7 @@ public class SettingsManager {
         try {
             this.settings = om.readValue(configFile.toFile(), Settings.class);
             logger.info("Settings loaded");
+            checkSettings();
         } catch (Exception e) {
             logger.error("Error Loading Settings", e);
         }
@@ -66,6 +67,19 @@ public class SettingsManager {
         defaultSettings.setBotOwners(defaultOwners);
         defaultSettings.setDarkSkyAPI("Dark Sky API key here.");
         defaultSettings.setOwlBotToken("OwlBot API key here.");
+        defaultSettings.setCommandThreads(2);
+        defaultSettings.setRegexListenerThreads(2);
         return defaultSettings;
+    }
+
+    private void checkSettings() {
+        if (this.settings.getCommandThreads() < 1) {
+            logger.warn("Command threads must be greater than or equal to one! Setting to one for the time being. Check your settings file.");
+            this.settings.setCommandThreads(1);
+        }
+        if (this.settings.getRegexListenerThreads() < 1) {
+            logger.warn("Regex listener threads must be greater than or equal to one! Setting to one for the time being. Check your settings file.");
+            this.settings.setRegexListenerThreads(1);
+        }
     }
 }
