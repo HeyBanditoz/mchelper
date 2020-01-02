@@ -36,7 +36,7 @@ public class MCHelper {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Settings.json file.");
             System.exit(1);
         }
-        new Database(); // initialize the database
+        Database.getInstance(); // initialize the database first, so if something is wrong we'll exit
         jda = new JDABuilder(settings.getDiscordToken())
                 .setDisabledCacheFlags(EnumSet.allOf(CacheFlag.class)) // we don't use (activity, voice state, emote, client status) so disable their caches.
                 .build();
