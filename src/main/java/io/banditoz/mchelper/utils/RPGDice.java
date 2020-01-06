@@ -14,10 +14,10 @@ public class RPGDice {
     private static final Pattern DICE_PATTERN = Pattern.compile("(?<A>\\d*)d(?<B>\\d+)(?>(?<MULT>[x/])(?<C>\\d+))?(?>(?<ADD>[+-])(?<D>\\d+))?");
     private static final SecureRandom random = new SecureRandom();
 
-    private int rolls = 0;
-    private int faces = 0;
-    private int multiplier = 1;
-    private int additive = 0;
+    private int rolls;
+    private int faces;
+    private int multiplier;
+    private int additive;
 
     public RPGDice(int rolls, int faces, int multiplier, int additive) {
         this.rolls = rolls;

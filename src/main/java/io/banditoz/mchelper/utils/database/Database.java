@@ -79,7 +79,6 @@ public class Database {
     }
 
     private Guilds initializeEmptyDatabase() {
-        Guilds g = new Guilds();
-        return g;
+        return new Guilds();
     }
 }

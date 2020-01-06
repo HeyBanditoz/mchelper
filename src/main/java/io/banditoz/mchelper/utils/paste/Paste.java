@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.utils.paste;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
