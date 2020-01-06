@@ -46,19 +46,29 @@ public class RPGDice {
         // roll the dice, then store the results in rolls[]
         for (int i = 0; i < this.rolls; i++) {
             rolls[i] = random.nextInt(faces)+1;
-            rolls[i] = rolls[i] * multiplier + additive;
             total += rolls[i];
         }
+        total *= multiplier;
+        total += additive;
         // get each roll, then store the individual result in a StringBuilder
-        StringBuilder rollsStringBuilder = new StringBuilder();
+        StringBuilder rollsStringBuilder = new StringBuilder("[");
         for (int i = 0; i < rolls.length; i++) {
             rollsStringBuilder.append(rolls[i]);
             if (i < rolls.length - 1) {
-                rollsStringBuilder.append(", ");
+                rollsStringBuilder.append(",");
             }
         }
+        rollsStringBuilder.append("]");
+        if (multiplier != 1) {
+            rollsStringBuilder.append("*");
+            rollsStringBuilder.append(multiplier);
+        }
+        if (additive != 0) {
+            rollsStringBuilder.append("+");
+            rollsStringBuilder.append(additive);
+        }
         // put total at the end
-        if (rolls.length != 1) {
+        if (rolls.length > 1 || (multiplier != 1 || additive != 0)) {
             rollsStringBuilder.append(" -> ");
             rollsStringBuilder.append(total);
         }
@@ -66,15 +76,6 @@ public class RPGDice {
         if (rollsStringBuilder.length() >= 2000) {
             rollsStringBuilder = new StringBuilder()
                     .append(total);
-        }
-        // TODO Do this not at the end of the string
-        if (multiplier != 1) {
-            rollsStringBuilder.append(" Multiplier: ");
-            rollsStringBuilder.append(multiplier);
-        }
-        if (additive != 0) {
-            rollsStringBuilder.append(" Additive: ");
-            rollsStringBuilder.append(additive);
         }
         return rollsStringBuilder.toString();
     }
