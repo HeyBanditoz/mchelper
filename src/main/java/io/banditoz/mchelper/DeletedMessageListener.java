@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
+import java.time.format.DateTimeFormatter;
 
 public class DeletedMessageListener extends ListenerAdapter {
     @Override
@@ -16,6 +17,8 @@ public class DeletedMessageListener extends ListenerAdapter {
                     .append(m.getAuthor().getName())
                     .append("#")
                     .append(m.getAuthor().getDiscriminator())
+                    .append(" at ")
+                    .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     .append("> ")
                     .append(m.getContentDisplay());
             for (Message.Attachment a : m.getAttachments()) {
