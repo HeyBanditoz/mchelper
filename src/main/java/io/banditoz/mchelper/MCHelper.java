@@ -29,6 +29,7 @@ public class MCHelper {
             .build(); // singleton http client
     private static final ObjectMapper OM = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
+    private static MessageCache CACHE;
 
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
@@ -41,6 +42,7 @@ public class MCHelper {
                 .setDisabledCacheFlags(EnumSet.allOf(CacheFlag.class)) // we don't use (activity, voice state, emote, client status) so disable their caches.
                 .build();
         jda.awaitReady();
+        jda.addEventListener(new DeletedMessageListener());
         jda.addEventListener(new GuildJoinLeaveListener());
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
@@ -65,6 +67,13 @@ public class MCHelper {
         jda.addEventListener(new PingCommand());
         jda.addEventListener(new DefaultChannelCommand());
         jda.addEventListener(new PrefixCommand());
+        if (settings.getWatchDeletedMessages()) {
+            CACHE = new MessageCache(jda);
+            jda.addEventListener(CACHE);
+        }
+        else {
+            LOGGER.info("Message cache disabled.");
+        }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
@@ -107,6 +116,10 @@ public class MCHelper {
 
     public static JDA getJDA() {
         return jda;
+    }
+
+    public static MessageCache getMessageCache() {
+        return CACHE;
     }
 
     /**

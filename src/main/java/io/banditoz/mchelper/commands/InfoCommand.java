@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands;
 
 import com.sun.management.OperatingSystemMXBean;
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
@@ -39,7 +40,8 @@ public class InfoCommand extends Command {
                 .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
                 .addField("Users", Integer.toString(ce.getEvent().getJDA().getUsers().size()), true)
                 .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true)
-                .addField("Uptime", uptime, true);
+                .addField("Uptime", uptime, true)
+                .addField("Message Cache Size", Integer.toString(MCHelper.getMessageCache().getSize()), true);
         ce.sendEmbedReply(eb.build());
     }
 }

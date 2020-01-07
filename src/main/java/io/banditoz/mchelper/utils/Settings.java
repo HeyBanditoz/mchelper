@@ -23,6 +23,8 @@ public class Settings {
     private Integer commandThreads;
     @JsonProperty("regexListenerThreads")
     private Integer regexListenerThreads;
+    @JsonProperty("watchDeletedMessages")
+    private Boolean watchDeletedMessages;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -112,5 +114,10 @@ public class Settings {
     @JsonProperty("regexListenerThreads")
     public void setRegexListenerThreads(Integer regexListenerThreads) {
         this.regexListenerThreads = regexListenerThreads;
+    }
+
+    @JsonProperty("watchDeletedMessages")
+    public Boolean getWatchDeletedMessages() {
+        return watchDeletedMessages;
     }
 }
