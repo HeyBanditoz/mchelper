@@ -32,6 +32,10 @@ public class InfoCommand extends Command {
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")
                 .toLowerCase(); // https://stackoverflow.com/a/40487511
+        String messageCacheSize = "null";
+        if (MCHelper.getMessageCache() != null) {
+            messageCacheSize = Integer.toString(MCHelper.getMessageCache().getSize());
+        }
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Bot Statistics")
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
@@ -41,7 +45,7 @@ public class InfoCommand extends Command {
                 .addField("Users", Integer.toString(ce.getEvent().getJDA().getUsers().size()), true)
                 .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true)
                 .addField("Uptime", uptime, true)
-                .addField("Message Cache Size", Integer.toString(MCHelper.getMessageCache().getSize()), true);
+                .addField("Message Cache Size", messageCacheSize, true);
         ce.sendEmbedReply(eb.build());
     }
 }
