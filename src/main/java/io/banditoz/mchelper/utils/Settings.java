@@ -120,4 +120,9 @@ public class Settings {
     public Boolean getWatchDeletedMessages() {
         return watchDeletedMessages;
     }
+
+    @JsonProperty("watchDeletedMessages")
+    public void setWatchDeletedMessages(final Boolean watchDeletedMessages) {
+        this.watchDeletedMessages = watchDeletedMessages;
+    }
 }

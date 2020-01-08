@@ -69,6 +69,7 @@ public class SettingsManager {
         defaultSettings.setOwlBotToken("OwlBot API key here.");
         defaultSettings.setCommandThreads(2);
         defaultSettings.setRegexListenerThreads(2);
+        defaultSettings.setWatchDeletedMessages(false);
         return defaultSettings;
     }
 
