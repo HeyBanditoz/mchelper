@@ -67,6 +67,7 @@ public class MCHelper {
         jda.addEventListener(new PingCommand());
         jda.addEventListener(new DefaultChannelCommand());
         jda.addEventListener(new PrefixCommand());
+        jda.addEventListener(new HeapDumpCommand());
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);
             jda.addEventListener(CACHE);

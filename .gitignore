@@ -77,3 +77,6 @@ fabric.properties
 
 # Version file
 src/main/java/io/banditoz/mchelper/Version.java
+
+# Heap dumps
+heapdump-*
