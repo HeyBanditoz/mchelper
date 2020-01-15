@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation ('net.dv8tion:JDA:4.1.0_95') {
+    implementation ('net.dv8tion:JDA:4.1.0_98') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -52,11 +52,11 @@ dependencies {
         exclude module: 'jackson-annotations'
         exclude module: 'jackson-databind'
     }
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
     implementation 'org.cache2k:cache2k-api:1.2.4.Final'
-    runtimeOnly "org.cache2k:cache2k-core:1.2.4.Final"
+    runtimeOnly 'org.cache2k:cache2k-core:1.2.4.Final'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
