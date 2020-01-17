@@ -88,6 +88,7 @@ public class MCHelper {
         }
         else {
             jda.addEventListener(new WeatherCommand());
+            jda.addEventListener(new WeatherForecastCommand());
         }
 
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
