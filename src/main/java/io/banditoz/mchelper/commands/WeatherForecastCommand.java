@@ -58,7 +58,7 @@ public class WeatherForecastCommand extends Command {
         } catch (IOException ex) {
             ce.sendExceptionMessage(ex, true);
         }
-        StringBuilder weather = new StringBuilder("Current Weather • " + response.currently().summary() + "\n");
+        StringBuilder weather = new StringBuilder("Current Weather • " + response.currently().summary() + "\nDate-Time • Icon • Temp • Percip. Chance\n");
         for (DsDataPoint data : response.hourly().data()) {
             weather.append(formatter.format(Instant.ofEpochSecond(data.time())))
                     .append(" • ")
