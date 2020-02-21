@@ -15,7 +15,6 @@ public class QotdFetcher {
         Request request = new Request.Builder()
                 .url("https://quotes.rest/qod.json")
                 .build();
-        QuoteItem quoteItem = MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), Quote.class).getContents().getQuotes().get(0);
-        return quoteItem;
+        return MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), Quote.class).getContents().getQuotes().get(0);
     }
 }

@@ -70,6 +70,7 @@ public class SettingsManager {
         defaultSettings.setCommandThreads(2);
         defaultSettings.setRegexListenerThreads(2);
         defaultSettings.setWatchDeletedMessages(false);
+        defaultSettings.setAlphaVantageKey("Alpha Vantage API key here");
         return defaultSettings;
     }
 

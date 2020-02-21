@@ -1,12 +1,12 @@
 package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.quotes.QotdFetcher;
 import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -31,7 +31,7 @@ public class MCHelper {
             .followRedirects(false)
             .followSslRedirects(false) // for reddit.app.link fetching
             .build(); // singleton http client
-    private static final ObjectMapper OM = new ObjectMapper();
+    private static final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
     private static final ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
     private static MessageCache CACHE;
@@ -109,6 +109,12 @@ public class MCHelper {
         else {
             Timer pingMeasurementTimer = new Timer();
             pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+        }
+        if (settings.getAlphaVantageKey() == null || settings.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
+            LOGGER.info("Alpha Vantage API key not defined! Not enabling financial commands.");
+        }
+        else {
+            jda.addEventListener(new CurrencyConversionCommand());
         }
         jda.addEventListener(new HelpCommand()); // this must be registered last
 

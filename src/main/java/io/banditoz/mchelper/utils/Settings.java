@@ -25,6 +25,8 @@ public class Settings {
     private Integer regexListenerThreads;
     @JsonProperty("watchDeletedMessages")
     private Boolean watchDeletedMessages;
+    @JsonProperty("alphaVantageKey")
+    private String alphaVantageKey;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -124,5 +126,15 @@ public class Settings {
     @JsonProperty("watchDeletedMessages")
     public void setWatchDeletedMessages(Boolean watchDeletedMessages) {
         this.watchDeletedMessages = watchDeletedMessages;
+    }
+
+    @JsonProperty("alphaVantageKey")
+    public String getAlphaVantageKey() {
+        return alphaVantageKey;
+    }
+
+    @JsonProperty("alphaVantageKey")
+    public void setAlphaVantageKey(String alphaVantageKey) {
+        this.alphaVantageKey = alphaVantageKey;
     }
 }
