@@ -15,10 +15,14 @@ public class GuildData {
     @JsonProperty("prefix")
     private Character prefix;
 
+    @JsonProperty("postQotdToDefaultChannel")
+    private Boolean postQotdToDefaultChannel;
+
     public GuildData() {
         this.coordinates = new HashMap<>();
         this.defaultChannel = "";
         this.prefix = '!';
+        this.postQotdToDefaultChannel = false;
     }
 
     public HashMap<String, TwoDimensionalPoint> getCoordinates() {
@@ -43,5 +47,13 @@ public class GuildData {
 
     public void setPrefix(char prefix) {
         this.prefix = prefix;
+    }
+
+    public Boolean getPostQotdToDefaultChannel() {
+        return postQotdToDefaultChannel;
+    }
+
+    public void setPostQotdToDefaultChannel(Boolean postQotdToDefaultChannel) {
+        this.postQotdToDefaultChannel = postQotdToDefaultChannel;
     }
 }

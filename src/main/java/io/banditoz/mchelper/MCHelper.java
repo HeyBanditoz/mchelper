@@ -6,6 +6,8 @@ import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.quotes.QotdFetcher;
+import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -19,6 +21,8 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MCHelper {
@@ -29,6 +33,7 @@ public class MCHelper {
             .build(); // singleton http client
     private static final ObjectMapper OM = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
+    private static final ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
     private static MessageCache CACHE;
 
     public static void setupBot() throws LoginException, InterruptedException {
@@ -106,6 +111,12 @@ public class MCHelper {
             pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
         }
         jda.addEventListener(new HelpCommand()); // this must be registered last
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(new QotdRunnable(),
+                QotdRunnable.getDelay().getSeconds(),
+                TimeUnit.DAYS.toSeconds(1),
+                TimeUnit.SECONDS);
     }
 
     public static ObjectMapper getObjectMapper() {

@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database {
     private static Database instance;
@@ -67,6 +69,10 @@ public class Database {
         else {
             return instance.guilds.getGuilds().get(g.getId());
         }
+    }
+
+    public List<GuildData> getAllGuildData() {
+        return new ArrayList<>(instance.guilds.getGuilds().values());
     }
 
     public void saveDatabase() {
