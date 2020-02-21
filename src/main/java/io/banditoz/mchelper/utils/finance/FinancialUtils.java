@@ -21,7 +21,6 @@ public class FinancialUtils {
                 .addQueryParameter("to_currency", to)
                 .addQueryParameter("apikey", API_KEY)
                 .build();
-        System.out.println(url);
         Request request = new Request.Builder()
                 .url(url)
                 .build();

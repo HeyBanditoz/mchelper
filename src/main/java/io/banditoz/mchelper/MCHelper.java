@@ -118,8 +118,7 @@ public class MCHelper {
         }
         jda.addEventListener(new HelpCommand()); // this must be registered last
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(new QotdRunnable(),
+        SES.scheduleAtFixedRate(new QotdRunnable(),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);

@@ -41,7 +41,6 @@ public class QotdRunnable implements Runnable {
         if (now.compareTo(nextRun) > 0) {
             nextRun = nextRun.plusDays(1);
         }
-        logger.info(nextRun.toString());
         return Duration.between(now, nextRun);
     }
 }
