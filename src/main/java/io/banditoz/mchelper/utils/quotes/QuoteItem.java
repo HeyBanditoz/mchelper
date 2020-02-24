@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.utils.quotes;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -36,10 +37,10 @@ public class QuoteItem {
     private String title;
 
     @JsonProperty("tags")
-    private HashMap<String, String> tags;
+    private List<String> tags;
 
     public QuoteItem() {
-        tags = new HashMap<>();
+        tags = new ArrayList<>();
     }
 
     public void setDate(String date) {
@@ -122,11 +123,11 @@ public class QuoteItem {
         return title;
     }
 
-    public void setTags(HashMap<String, String> tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
-    public HashMap<String, String> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 }
