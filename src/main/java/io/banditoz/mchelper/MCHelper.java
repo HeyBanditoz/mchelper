@@ -47,7 +47,6 @@ public class MCHelper {
                 .setDisabledCacheFlags(EnumSet.allOf(CacheFlag.class)) // we don't use (activity, voice state, emote, client status) so disable their caches.
                 .build();
         jda.awaitReady();
-        jda.addEventListener(new DeletedMessageListener());
         jda.addEventListener(new GuildJoinLeaveListener());
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
@@ -76,6 +75,7 @@ public class MCHelper {
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);
             jda.addEventListener(CACHE);
+            jda.addEventListener(new DeletedMessageListener());
         }
         else {
             LOGGER.info("Message cache disabled.");
