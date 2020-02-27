@@ -3,7 +3,6 @@ package io.banditoz.mchelper.utils.finance;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.banditoz.mchelper.utils.BigDecimalMonetaryDeserializer;
 import io.banditoz.mchelper.utils.DateUtils;
 
 import java.math.BigDecimal;

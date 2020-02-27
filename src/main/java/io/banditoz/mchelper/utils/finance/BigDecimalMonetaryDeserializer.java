@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils;
+package io.banditoz.mchelper.utils.finance;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,5 +12,6 @@ public class BigDecimalMonetaryDeserializer extends NumberDeserializers.BigDecim
     @Override
     public BigDecimal deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
         return super.deserialize(p, ctx).setScale(2, RoundingMode.HALF_UP); // round up from two decimals
+
     }
 }

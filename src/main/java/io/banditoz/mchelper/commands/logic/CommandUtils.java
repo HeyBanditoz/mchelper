@@ -64,18 +64,21 @@ public class CommandUtils {
      * @param c The MessageChannel to send to.
      */
     private static void _sendReply(String msg, MessageChannel c) {
+        msg = formatMessage(msg);
+        Queue<Message> toSend = new MessageBuilder()
+                .append(msg)
+                .buildAll(MessageBuilder.SplitPolicy.NEWLINE);
+        toSend.forEach(message -> c.sendMessage(message).queue());
+    }
+
+    public static String formatMessage(String msg) {
         if (msg == null) {
-            c.sendMessage("<null output>").queue();
+            msg = "<null output>";
         }
         else if (msg.isEmpty()) {
-            c.sendMessage("<no output>").queue();
+            msg = "<no output>";
         }
-        else {
-            Queue<Message> toSend = new MessageBuilder()
-                    .append(msg)
-                    .buildAll(MessageBuilder.SplitPolicy.NEWLINE);
-            toSend.forEach(message -> c.sendMessage(message).queue());
-        }
+        return msg;
     }
 
     public static String[] commandArgs(String string) {

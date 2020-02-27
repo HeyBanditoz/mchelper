@@ -115,6 +115,7 @@ public class MCHelper {
         }
         else {
             jda.addEventListener(new CurrencyConversionCommand());
+            jda.addEventListener(new StockCommand());
         }
         jda.addEventListener(new HelpCommand()); // this must be registered last
 

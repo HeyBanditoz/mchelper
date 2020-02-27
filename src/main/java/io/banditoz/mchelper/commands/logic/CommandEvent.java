@@ -1,10 +1,18 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.utils.MD5;
+import io.banditoz.mchelper.utils.TeXRenderer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.UUID;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -86,5 +94,49 @@ public class CommandEvent {
      */
     public void sendEmbedReply(MessageEmbed me) {
         e.getChannel().sendMessage(me).queue();
+    }
+
+    public void sendImagedReply(String msg, ByteArrayOutputStream image) throws Exception {
+        String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
+        File f = new File(imageName);
+
+        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            image.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            this.e.getMessage().getChannel()
+                    .sendMessage(CommandUtils.formatMessage(msg))
+                    .addFile(f)
+                    .queue();
+            image.close();
+        }
+        finally {
+            f.delete();
+        }
+    }
+
+    public void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image) throws Exception {
+        String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
+        File f = new File(imageName);
+
+        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            image.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            this.e.getMessage().getChannel()
+                    .sendMessage(me)
+                    .addFile(f)
+                    .queue();
+            image.close();
+        }
+        finally {
+            f.delete();
+        }
     }
 }
