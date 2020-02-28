@@ -62,6 +62,8 @@ dependencies {
     runtimeOnly 'org.cache2k:cache2k-core:1.2.4.Final'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    implementation "com.merakianalytics.orianna:orianna:4.0.0-rc5"
 }
 
 // Define the main class for the application
