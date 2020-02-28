@@ -27,6 +27,8 @@ public class Settings {
     private Boolean watchDeletedMessages;
     @JsonProperty("alphaVantageKey")
     private String alphaVantageKey;
+    @JsonProperty("riotApiKey")
+    private String riotApiKey;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -136,5 +138,15 @@ public class Settings {
     @JsonProperty("alphaVantageKey")
     public void setAlphaVantageKey(String alphaVantageKey) {
         this.alphaVantageKey = alphaVantageKey;
+    }
+
+    @JsonProperty("riotApiKey")
+    public String getRiotApiKey() {
+        return riotApiKey;
+    }
+
+    @JsonProperty("riotApiKey")
+    public void setRiotApiKey(String riotApiKey) {
+        this.riotApiKey = riotApiKey;
     }
 }

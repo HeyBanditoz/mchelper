@@ -2,6 +2,8 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.common.Region;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
@@ -117,6 +119,17 @@ public class MCHelper {
             jda.addEventListener(new CurrencyConversionCommand());
             jda.addEventListener(new StockCommand());
         }
+
+        if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
+            LOGGER.info("Riot API key not defined! Not enabling Orianna.");
+        } else {
+            Orianna.setRiotAPIKey(settings.getRiotApiKey());
+            Orianna.setDefaultRegion(Region.NORTH_AMERICA);
+            Thread thread = new Thread(LoadoutCommand::createData);
+            thread.start();
+            jda.addEventListener(new LoadoutCommand());
+        }
+
         jda.addEventListener(new HelpCommand()); // this must be registered last
 
         SES.scheduleAtFixedRate(new QotdRunnable(),

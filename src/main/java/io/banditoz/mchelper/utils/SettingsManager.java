@@ -71,6 +71,7 @@ public class SettingsManager {
         defaultSettings.setRegexListenerThreads(2);
         defaultSettings.setWatchDeletedMessages(false);
         defaultSettings.setAlphaVantageKey("Alpha Vantage API key here");
+        defaultSettings.setRiotApiKey("Riot Api Key here");
         return defaultSettings;
     }
 
