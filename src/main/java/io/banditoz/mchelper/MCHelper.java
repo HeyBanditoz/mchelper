@@ -126,6 +126,7 @@ public class MCHelper {
             Orianna.setRiotAPIKey(settings.getRiotApiKey());
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
             Thread thread = new Thread(LoadoutCommand::createData);
+            thread.setName("Orianna");
             thread.start();
             jda.addEventListener(new LoadoutCommand());
         }
