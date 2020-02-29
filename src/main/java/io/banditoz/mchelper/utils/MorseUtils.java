@@ -1,9 +1,10 @@
 package io.banditoz.mchelper.utils;
 
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 public class MorseUtils {
-    private static DualHashBidiMap<Character, String> morseMap = new DualHashBidiMap<>();
+    private static BiMap<Character, String> morseMap = HashBiMap.create(42); // values in morse
 
     static {
         morseMap.put('A', ".-");
@@ -65,12 +66,11 @@ public class MorseUtils {
     public static String fromMorse(String morse) {
         String[] letters = morse.split("\\s");
         StringBuilder text = new StringBuilder();
-
         for (String letter : letters) {
-            if (morseMap.inverseBidiMap().get(letter) == null) {
+            if (morseMap.inverse().get(letter) == null) {
                 text.append("■");
             } else {
-                text.append(morseMap.inverseBidiMap().get(letter));
+                text.append(morseMap.inverse().get(letter));
             }
         }
         return text.toString();
