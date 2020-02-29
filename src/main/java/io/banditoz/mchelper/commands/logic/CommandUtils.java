@@ -3,13 +3,16 @@ package io.banditoz.mchelper.commands.logic;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +72,50 @@ public class CommandUtils {
                 .append(msg)
                 .buildAll(MessageBuilder.SplitPolicy.NEWLINE);
         toSend.forEach(message -> c.sendMessage(message).queue());
+    }
+
+    public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e) throws Exception {
+        String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
+        File f = new File(imageName);
+
+        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            image.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            e.getMessage().getChannel()
+                    .sendMessage(CommandUtils.formatMessage(msg))
+                    .addFile(f)
+                    .queue();
+            image.close();
+        }
+        finally {
+            f.delete();
+        }
+    }
+
+    public static void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image, MessageReceivedEvent e) throws Exception {
+        String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
+        File f = new File(imageName);
+
+        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            image.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            e.getMessage().getChannel()
+                    .sendMessage(me)
+                    .addFile(f)
+                    .queue();
+            image.close();
+        }
+        finally {
+            f.delete();
+        }
     }
 
     public static String formatMessage(String msg) {

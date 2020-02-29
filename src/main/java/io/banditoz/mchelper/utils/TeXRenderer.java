@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils;
 
+import io.banditoz.mchelper.commands.logic.CommandUtils;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
@@ -11,10 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class TeXRenderer {
     /**
@@ -49,28 +47,7 @@ public class TeXRenderer {
     }
 
     public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
-        String imageName = MD5.computeMD5(args) + ".png";
-        long before = System.currentTimeMillis();
-        File f = new File(imageName);
-
-        ByteArrayOutputStream latex = TeXRenderer.renderTeX(args);
-        // compress image to oxipng (https://github.com/shssoichiro/oxipng)
-        try (OutputStream outputStream = new FileOutputStream(imageName)) {
-            latex.writeTo(outputStream);
-
-            Process p = new ProcessBuilder("oxipng", imageName).start();
-            p.waitFor();
-
-            long after = System.currentTimeMillis() - before;
-
-            e.getMessage().getChannel()
-                    .sendMessage("TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (took " + after + " ms to generate)")
-                    .addFile(f)
-                    .queue();
-            latex.close();
-        }
-        finally {
-            f.delete();
-        }
+        String message = "TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator();
+        CommandUtils.sendImageReply(message, renderTeX(args), e);
     }
 }
