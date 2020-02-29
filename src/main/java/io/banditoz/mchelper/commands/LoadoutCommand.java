@@ -1,27 +1,15 @@
 package io.banditoz.mchelper.commands;
 
-import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Map;
-import com.merakianalytics.orianna.types.common.Platform;
 import com.merakianalytics.orianna.types.common.Region;
-import com.merakianalytics.orianna.types.core.champion.ChampionRotation;
 import com.merakianalytics.orianna.types.core.staticdata.*;
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.TwoDimensionalPoint;
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.GuildData;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.Predicate;
 
 public class LoadoutCommand extends Command {
     private static ArrayList<Champion> championArrayList;
@@ -30,6 +18,7 @@ public class LoadoutCommand extends Command {
     private static ArrayList<ReforgedRuneSlot> domination, inspiration, precision, resolve, sorcery;
     private static LocalDateTime lastUpdate;
     private static boolean canRun = true;
+
     @Override
     public String commandName() {
         return "loadout";
@@ -37,7 +26,7 @@ public class LoadoutCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<save|add,show|list,delete|remove,help>")
+        return new Help(commandName(), false).withParameters(null)
                 .withDescription("Gives a random league champ and loadout.");
     }
 
@@ -70,7 +59,7 @@ public class LoadoutCommand extends Command {
             sorcery = new ArrayList<>();
             sorcery.addAll(runes.getTree().getSorcery());
             lastUpdate = LocalDateTime.now();
-        } catch (Exception ex ) {
+        } catch (Exception ex) {
             canRun = false;
             return;
         }
@@ -88,12 +77,12 @@ public class LoadoutCommand extends Command {
         int itemCount = 5;
         StringBuilder builder = new StringBuilder();
         builder.append("You will be playing ***");
-        Champion champ = championArrayList.get((int)(Math.random() * (championArrayList.size())));
+        Champion champ = championArrayList.get((int) (Math.random() * (championArrayList.size())));
         builder.append(champ.getName());
         builder.append("*** and building: \n");
         ArrayList<String> done = new ArrayList<>();
         while (true) {
-            Item item = itemArrayList.get((int)(Math.random() * (itemArrayList.size())));
+            Item item = itemArrayList.get((int) (Math.random() * (itemArrayList.size())));
             if (!item.exists()
                     || item.getBuildsInto() != null
                     || !item.getMaps().contains(Map.SUMMONERS_RIFT)
@@ -101,17 +90,15 @@ public class LoadoutCommand extends Command {
             ) {
                 continue;
             }
-            builder.append("***");
-            builder.append(item.getName());
-            builder.append("***\n");
+            builder.append("\\* ").append(item.getName()).append('\n');
             break;
         }
         if (champ.getName().contains("Viktor")) {
             itemCount = 4;
             builder.append("Hex Core Upgrades***\n");
         }
-        for (int i = 0; i<5; i++) {
-            Item item = itemArrayList.get((int)(Math.random() * (itemArrayList.size())));
+        for (int i = 0; i < 5; i++) {
+            Item item = itemArrayList.get((int) (Math.random() * (itemArrayList.size())));
             if (!item.exists()
                     || item.getBuildsInto() != null
                     || !item.getMaps().contains(Map.SUMMONERS_RIFT)
@@ -142,24 +129,19 @@ public class LoadoutCommand extends Command {
                 continue;
             }
             done.add(item.getName());
-            builder.append("\\****");
-            builder.append(item.getName());
-            builder.append("***\n");
+            builder.append("\\* ").append(item.getName()).append("\n");
         }
-        ce.sendReply(builder.toString());
-
-        builder = new StringBuilder();
         builder.append("Your runes will be:\n");
 
-        int primaryInt = (int)(Math.random() * (5)), secondaryInt;
+        int primaryInt = (int) (Math.random() * (5)), secondaryInt;
         do {
-            secondaryInt = (int)(Math.random() * (5));
+            secondaryInt = (int) (Math.random() * (5));
         } while (secondaryInt == primaryInt);
         ArrayList<ReforgedRuneSlot> primary = precision, secondary = domination;
         int keystone = 0, slot1 = 0, slot2 = 0, slot3 = 0;
         switch (primaryInt) {
             case 0:
-                builder.append("***Precision*** with ***");
+                builder.append("***Precision*** with ");
                 primary = precision;
                 keystone = 4;
                 slot1 = 3;
@@ -167,7 +149,7 @@ public class LoadoutCommand extends Command {
                 slot3 = 3;
                 break;
             case 1:
-                builder.append("***Domination*** with ***");
+                builder.append("***Domination*** with ");
                 primary = domination;
                 keystone = 4;
                 slot1 = 3;
@@ -175,7 +157,7 @@ public class LoadoutCommand extends Command {
                 slot3 = 4;
                 break;
             case 2:
-                builder.append("***Sorcery*** with ***");
+                builder.append("***Sorcery*** with ");
                 primary = sorcery;
                 keystone = 3;
                 slot1 = 3;
@@ -183,7 +165,7 @@ public class LoadoutCommand extends Command {
                 slot3 = 3;
                 break;
             case 3:
-                builder.append("***Resolve*** with ***");
+                builder.append("***Resolve*** with ");
                 primary = resolve;
                 keystone = 3;
                 slot1 = 3;
@@ -191,7 +173,7 @@ public class LoadoutCommand extends Command {
                 slot3 = 3;
                 break;
             case 4:
-                builder.append("***Inspiration*** with ***");
+                builder.append("***Inspiration*** with ");
                 primary = inspiration;
                 keystone = 3;
                 slot1 = 3;
@@ -199,39 +181,40 @@ public class LoadoutCommand extends Command {
                 slot3 = 3;
                 break;
         }
-        builder.append(primary.get(0).get((int)(Math.random() * (keystone))).getName() + "***, ***");
-        builder.append(primary.get(1).get((int)(Math.random() * (slot1))).getName() + "***, ***");
-        builder.append(primary.get(2).get((int)(Math.random() * (slot2))).getName() + "***, ***");
-        builder.append(primary.get(3).get((int)(Math.random() * (slot3))).getName() + "***.\n Your secondary will be ");
+        builder.append(primary.get(0).get((int) (Math.random() * (keystone))).getName()).append(", ");
+        builder.append(primary.get(1).get((int) (Math.random() * (slot1))).getName()).append(", ");
+        builder.append(primary.get(2).get((int) (Math.random() * (slot2))).getName()).append(", ");
+        builder.append(primary.get(3).get((int) (Math.random() * (slot3))).getName()).append(".\n Your secondary will be ");
 
         switch (secondaryInt) {
             case 0:
-                builder.append("***Precision*** with ***");
+                builder.append("***Precision*** with ");
                 secondary = precision;
                 break;
             case 1:
-                builder.append("***Domination*** with ***");
+                builder.append("***Domination*** with ");
                 secondary = domination;
                 break;
             case 2:
-                builder.append("***Sorcery*** with ***");
+                builder.append("***Sorcery*** with ");
                 secondary = sorcery;
                 break;
             case 3:
-                builder.append("***Resolve*** with ***");
+                builder.append("***Resolve*** with ");
                 secondary = resolve;
                 break;
             case 4:
-                builder.append("***Inspiration*** with ***");
+                builder.append("***Inspiration*** with ");
                 secondary = inspiration;
                 break;
         }
-        builder.append(secondary.get(1).get((int)(Math.random() * (3))).getName() + "*** and ***");
-        builder.append(secondary.get(2).get((int)(Math.random() * (3))).getName() + "***.");
+        builder.append(secondary.get(1).get((int) (Math.random() * (3))).getName()).append(" and ");
+        builder.append(secondary.get(2).get((int) (Math.random() * (3))).getName()).append(".");
         ce.sendReply(builder.toString());
         LocalDateTime localDateTime = LocalDateTime.now().minus(Duration.ofHours(5));
         if (lastUpdate == null || lastUpdate.isBefore(LocalDateTime.now().minus(Duration.ofMinutes(1)))) {
             Thread thread = new Thread(LoadoutCommand::createData);
+            thread.setName("Orianna");
             thread.start();
         }
     }
