@@ -21,13 +21,13 @@ plugins {
 }
 
 gversion {
-    srcDir       = "src/main/java/"
+    srcDir = "src/main/java/"
     classPackage = "io.banditoz.mchelper"
-    className    = "Version"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss"
-    timeZone     = "UTC"
-    debug        = false
-    language     = "java"
+    className = "Version"
+    dateFormat = "yyyy-MM-dd HH:mm:ss"
+    timeZone = "UTC"
+    debug = false
+    language = "java"
     explicitType = false
 }
 
@@ -39,15 +39,15 @@ repositories {
 }
 
 dependencies {
-    implementation ('net.dv8tion:JDA:4.1.1_104') {
+    implementation('net.dv8tion:JDA:4.1.1_109') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'com.udojava:EvalEx:2.4'
+    implementation 'com.udojava:EvalEx:2.5'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:3.13.0'
     implementation 'org.apache.commons:commons-collections4:4.1'
-    implementation ('ch.rasc:darksky:2.0.0') {
+    implementation('ch.rasc:darksky:2.0.0') {
         exclude module: 'jackson-core'
         exclude module: 'jackson-annotations'
         exclude module: 'jackson-databind'
@@ -57,13 +57,12 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
     implementation 'org.jfree:jfreechart:1.5.0'
+    implementation 'com.merakianalytics.orianna:orianna:4.0.0-rc5'
 
-    implementation 'org.cache2k:cache2k-api:1.2.4.Final'
-    runtimeOnly 'org.cache2k:cache2k-core:1.2.4.Final'
+    implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
+    runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-
-    implementation "com.merakianalytics.orianna:orianna:4.0.0-rc5"
 }
 
 // Define the main class for the application
