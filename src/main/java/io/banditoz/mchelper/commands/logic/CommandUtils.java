@@ -35,10 +35,10 @@ public class CommandUtils {
         }
         else {
             if (caught) {
-                l.error("Exception!", ex);
+                l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
             }
             else {
-                l.error("Uncaught exception!", ex);
+                l.error("Uncaught exception! Offending message: " + buildMessageAndAuthor(e), ex);
             }
         }
         e.getChannel().sendMessage(reply.toString()).queue();
@@ -152,5 +152,13 @@ public class CommandUtils {
 
         }
         return commandArgsBuilder.toString();
+    }
+
+    private static String buildMessageAndAuthor(MessageReceivedEvent e) {
+        return "<" + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + "> " + e.getMessage().getContentRaw();
+    }
+
+    public static void sendFile(String msg, File f, MessageReceivedEvent e) {
+        e.getChannel().sendMessage(msg).addFile(f).queue();
     }
 }

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -54,7 +55,8 @@ public abstract class Command extends ListenerAdapter {
         Settings s = SettingsManager.getInstance().getSettings();
         // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
         ES = new ThreadPoolExecutor(s.getCommandThreads(), s.getCommandThreads(),
-                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
     }
 
     @Override

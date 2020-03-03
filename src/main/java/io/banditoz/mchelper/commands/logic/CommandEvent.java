@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -96,5 +97,9 @@ public class CommandEvent {
 
     public void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image) throws Exception {
         CommandUtils.sendEmbedImageReply(me, image, this.e);
+    }
+
+    public void sendFile(String msg, File f) {
+        CommandUtils.sendFile(msg, f, this.e);
     }
 }

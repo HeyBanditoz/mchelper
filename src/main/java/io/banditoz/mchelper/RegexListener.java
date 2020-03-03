@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.SettingsManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -8,15 +9,18 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public abstract class RegexListener extends ListenerAdapter {
     protected abstract void onMessage(RegexEvent re);
     protected abstract String regex();
     private MessageReceivedEvent e;
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-    protected static final ExecutorService ES = Executors.newFixedThreadPool(SettingsManager.getInstance().getSettings().getRegexListenerThreads());
+    protected static final ExecutorService ES = new ThreadPoolExecutor(
+            SettingsManager.getInstance().getSettings().getRegexListenerThreads(),
+            SettingsManager.getInstance().getSettings().getRegexListenerThreads(),
+            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+            new ThreadFactoryBuilder().setNameFormat("RegexListener-%d").build());
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
