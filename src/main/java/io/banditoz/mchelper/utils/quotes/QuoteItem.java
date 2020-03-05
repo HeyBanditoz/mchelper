@@ -1,10 +1,9 @@
 package io.banditoz.mchelper.utils.quotes;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties("tags")
 public class QuoteItem {
     @JsonProperty("date")
     private String date;
@@ -35,13 +34,6 @@ public class QuoteItem {
 
     @JsonProperty("title")
     private String title;
-
-    @JsonProperty("tags")
-    private List<String> tags;
-
-    public QuoteItem() {
-        tags = new ArrayList<>();
-    }
 
     public void setDate(String date) {
         this.date = date;
@@ -121,13 +113,5 @@ public class QuoteItem {
 
     public String getTitle() {
         return title;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public List<String> getTags() {
-        return tags;
     }
 }
