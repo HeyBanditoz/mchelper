@@ -75,6 +75,7 @@ public class MCHelper {
         jda.addEventListener(new PrefixCommand());
         jda.addEventListener(new HeapDumpCommand());
         jda.addEventListener(new UploadLogsCommand());
+        jda.addEventListener(new FloodCommand());
 
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);

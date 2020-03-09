@@ -18,6 +18,7 @@ public class CommandEvent {
     private final MessageReceivedEvent e;
     private final Logger logger;
     private final Guild guild;
+    private final boolean isElevated;
 
     public CommandEvent(@NotNull MessageReceivedEvent e, Logger logger) {
         this.e = e;
@@ -25,6 +26,7 @@ public class CommandEvent {
         this.commandArgs = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
         this.logger = logger;
         this.guild = (e.isFromGuild()) ? e.getGuild() : null;
+        this.isElevated = CommandPermissions.isBotOwner(e.getAuthor());
     }
 
     /**
@@ -101,5 +103,9 @@ public class CommandEvent {
 
     public void sendFile(String msg, File f) {
         CommandUtils.sendFile(msg, f, this.e);
+    }
+
+    public boolean isElevated() {
+        return isElevated;
     }
 }
