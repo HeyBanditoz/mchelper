@@ -37,7 +37,7 @@ public class QotdRunnable implements Runnable {
     public static Duration getDelay() {
         // TODO Make this a config instead of hardcoded timezones and times. Perhaps per guild?
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Denver"));
-        ZonedDateTime nextRun = now.withHour(7).withMinute(0).withSecond(0);
+        ZonedDateTime nextRun = now.withHour(9).withMinute(0).withSecond(0);
         if (now.compareTo(nextRun) > 0) {
             nextRun = nextRun.plusDays(1);
         }
