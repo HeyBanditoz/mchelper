@@ -10,6 +10,7 @@ import io.banditoz.mchelper.utils.Help;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class LoadoutCommand extends Command {
     private static ArrayList<Champion> championArrayList;
@@ -26,8 +27,8 @@ public class LoadoutCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters(null)
-                .withDescription("Gives a random league champ and loadout.");
+        return new Help(commandName(), false).withParameters("[stats]")
+                .withDescription("Gives a random league champ and loadout. [stats](must be lowercase): ap = Ability Power, ad = Attack Damage, as = Attack Speed, mana = Mana, ar = Armour, crit = Critical damage or chance, hp = Health, mr = Magic Resist, ms = Movement Speed.");
     }
 
     public static void createData() {
@@ -74,6 +75,22 @@ public class LoadoutCommand extends Command {
             thread.start();
             return;
         }
+        ArrayList<String> strings = new ArrayList<>();
+        if (ce.getCommandArgs().length > 1) {
+            ArrayList<String> stats = new ArrayList<>(Arrays.asList("ap", "ad", "as", "mana", "ar", "crit", "hp", "mr", "ms"));
+            strings.addAll(Arrays.asList(ce.getCommandArgs()[1].split(",")));
+            ArrayList<String> removable = new ArrayList<>();
+            for (String s : strings) {
+                if (!stats.contains(s)) {
+                    removable.add(s);
+                    ce.sendReply("Your parameter " + s + " has been removed because it was not found as a valid stat, use !help.");
+                }
+            }
+            strings.removeAll(removable);
+            if (strings.isEmpty()) {
+                strings = new ArrayList<>();
+            }
+        }
         int itemCount = 5;
         StringBuilder builder = new StringBuilder();
         builder.append("You will be playing ***");
@@ -81,7 +98,9 @@ public class LoadoutCommand extends Command {
         builder.append(champ.getName());
         builder.append("*** and building: \n");
         ArrayList<String> done = new ArrayList<>();
+        int count = 0;
         while (true) {
+            count++;
             Item item = itemArrayList.get((int) (Math.random() * (itemArrayList.size())));
             if (!item.exists()
                     || item.getBuildsInto() != null
@@ -124,12 +143,52 @@ public class LoadoutCommand extends Command {
                     || item.getName().contains("Black Spear")
                     || item.getName().contains("Control Ward")
                     || item.getName().contains("(Quick Charge)")
+                    || item.getName().contains("Mikael's Crucible")
+                    || item.getName().contains("Fire at Will")
             ) {
                 i--;
                 continue;
             }
+            if (!strings.isEmpty()) {
+                boolean breakout = true;
+                if (strings.contains("ap") && item.getStats().getAbilityPower() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("ad") && item.getStats().getAttackDamage() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("as") && item.getStats().getPercentAttackSpeed() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("mana") && item.getStats().getMana() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("ar") && item.getStats().getArmor() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("crit") && (item.getStats().getCriticalStrikeDamage() > 0.0 || item.getStats().getCriticalStrikeChance() > 0.0)) {
+                    breakout = false;
+                }
+                if (strings.contains("hp") && item.getStats().getHealth() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("mr") && item.getStats().getMagicResist() > 0.0) {
+                    breakout = false;
+                }
+                if (strings.contains("ms") && item.getStats().getPercentMovespeed() > 0.0) {
+                    breakout = false;
+                }
+                if (breakout) {
+                    i--;
+                    continue;
+                }
+            }
             done.add(item.getName());
             builder.append("\\* ").append(item.getName()).append("\n");
+            if (count>=1000) {
+                ce.sendReply("Items could not be found for you selected filters, please try again.");
+                return;
+            }
         }
         builder.append("Your runes will be:\n");
 
