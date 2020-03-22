@@ -5,11 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.NamedQuote;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.GuildData;
 
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +17,7 @@ public class AddquoteCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("\"<name>\" quote")
+        return new Help(commandName(), false).withParameters("<\"quote\" name>")
                 .withDescription("Adds a quote to the database.");
     }
 
@@ -34,8 +30,7 @@ public class AddquoteCommand extends Command {
         if (m.find()) {
             quote = m.group().replace("\"", "");
             name = m.replaceFirst("");
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Bad arguments.");
         }
         Database.getInstance().getGuildDataById(ce.getGuild()).getQuotes().add(new NamedQuote(name, quote));
