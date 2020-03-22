@@ -65,7 +65,6 @@ public class MCHelper {
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new EvalCommand());
-        jda.addEventListener(new TTTCommand());
         jda.addEventListener(new ReverseGeocoderCommand());
         jda.addEventListener(new DiceRollerCommand());
         jda.addEventListener(new CoinFlipCommand());
@@ -76,6 +75,8 @@ public class MCHelper {
         jda.addEventListener(new HeapDumpCommand());
         jda.addEventListener(new UploadLogsCommand());
         jda.addEventListener(new FloodCommand());
+        jda.addEventListener(new QuoteCommand());
+        jda.addEventListener(new AddquoteCommand());
 
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);

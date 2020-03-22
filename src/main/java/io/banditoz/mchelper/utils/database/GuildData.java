@@ -1,9 +1,12 @@
 package io.banditoz.mchelper.utils.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.banditoz.mchelper.utils.NamedQuote;
 import io.banditoz.mchelper.utils.TwoDimensionalPoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GuildData {
     @JsonProperty("coordinates")
@@ -12,6 +15,9 @@ public class GuildData {
     @JsonProperty("defaultChannel")
     private String defaultChannel;
 
+    @JsonProperty("quote")
+    private List<NamedQuote> quotes;
+
     @JsonProperty("prefix")
     private Character prefix;
 
@@ -19,6 +25,7 @@ public class GuildData {
     private Boolean postQotdToDefaultChannel;
 
     public GuildData() {
+        this.quotes = new ArrayList<>();
         this.coordinates = new HashMap<>();
         this.defaultChannel = "";
         this.prefix = '!';
@@ -27,6 +34,14 @@ public class GuildData {
 
     public HashMap<String, TwoDimensionalPoint> getCoordinates() {
         return coordinates;
+    }
+
+    public void setQuotes(List<NamedQuote> quotes) {
+        this.quotes = quotes;
+    }
+
+    public List<NamedQuote> getQuotes() {
+        return quotes;
     }
 
     public void setCoordinates(HashMap<String, TwoDimensionalPoint> coordinates) {
