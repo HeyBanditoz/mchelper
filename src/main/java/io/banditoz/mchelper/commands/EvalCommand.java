@@ -13,7 +13,6 @@ public class EvalCommand extends ElevatedCommand {
     private ScriptEngine engine;
     public EvalCommand() {
         engine = new ScriptEngineManager().getEngineByName("groovy");
-
     }
 
     @Override
@@ -39,7 +38,10 @@ public class EvalCommand extends ElevatedCommand {
             args = ce.getCommandArgsString();
         }
         try {
-            String imports = "import net.dv8tion.jda.*;\n";
+            String imports = "import net.dv8tion.jda.*;\n" +
+                    "import java.util.*;\n" +
+                    "import io.banditoz.mchelper.utils.database.Database;\n" +
+                    "import io.banditoz.mchelper.utils.database.GuildData;";
             engine.put("ce", ce);
             engine.put("args", ce.getCommandArgs());
             engine.put("jda", ce.getEvent().getJDA());
