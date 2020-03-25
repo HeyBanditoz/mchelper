@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.NamedQuote;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.database.GuildData;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,8 +34,20 @@ public class AddquoteCommand extends Command {
         } else {
             throw new IllegalArgumentException("Bad arguments.");
         }
-        Database.getInstance().getGuildDataById(ce.getGuild()).getQuotes().add(new NamedQuote(name, quote));
-        Database.getInstance().saveDatabase();
-        ce.sendReply("Quote added.");
+        NamedQuote nq = new NamedQuote(name, quote);
+        boolean contains = false;
+        for (GuildData gd : Database.getInstance().getAllGuildData()) {
+            if (gd.getQuotes().contains(nq)) {
+                contains = true;
+                break;
+            }
+        }
+        if (contains) {
+            ce.sendReply("Quote already exists.");
+        } else {
+            Database.getInstance().getGuildDataById(ce.getGuild()).getQuotes().add(nq);
+            Database.getInstance().saveDatabase();
+            ce.sendReply("Quote added.");
+        }
     }
 }

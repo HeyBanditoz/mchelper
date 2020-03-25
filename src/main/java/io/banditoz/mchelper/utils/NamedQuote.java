@@ -2,6 +2,8 @@ package io.banditoz.mchelper.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class NamedQuote {
     @JsonProperty("name")
     private String name;
@@ -33,5 +35,14 @@ public class NamedQuote {
 
     public void setQuote(String quote) {
         this.quote = quote;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NamedQuote that = (NamedQuote) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(quote, that.quote);
     }
 }
