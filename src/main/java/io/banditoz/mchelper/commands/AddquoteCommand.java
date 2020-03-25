@@ -34,7 +34,7 @@ public class AddquoteCommand extends Command {
         } else {
             throw new IllegalArgumentException("Bad arguments.");
         }
-        NamedQuote nq = new NamedQuote(name, quote);
+        NamedQuote nq = new NamedQuote(name, quote, ce.getEvent().getAuthor().getId());
         boolean contains = false;
         for (GuildData gd : Database.getInstance().getAllGuildData()) {
             if (gd.getQuotes().contains(nq)) {
