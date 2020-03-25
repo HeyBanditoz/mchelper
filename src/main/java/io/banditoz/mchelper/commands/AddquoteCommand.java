@@ -28,7 +28,7 @@ public class AddquoteCommand extends Command {
         Pattern p = Pattern.compile("\"(.*?)\"\\s+");
         Matcher m = p.matcher(ce.getCommandArgsString());
         if (m.find()) {
-            quote = m.group().replace("\"", "");
+            quote = m.group().replace("\"", "").trim();
             name = m.replaceFirst("");
         } else {
             throw new IllegalArgumentException("Bad arguments.");
