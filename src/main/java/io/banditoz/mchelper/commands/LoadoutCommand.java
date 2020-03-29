@@ -131,7 +131,7 @@ public class LoadoutCommand extends Command {
                     || item.getName().contains("Elixir")
                     || item.getName().contains("Snax")
                     || item.getKeywords().contains("yellow")
-                    || item.getName().equalsIgnoreCase("\'Your Cut\'")
+                    || item.getName().equalsIgnoreCase("'Your Cut'")
                     || item.getSource() != 0
                     || item.getName().contains("Total Biscuit")
                     || item.getName().contains("Death's Daughter")

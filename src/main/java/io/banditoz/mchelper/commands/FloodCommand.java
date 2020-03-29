@@ -31,7 +31,6 @@ public class FloodCommand extends Command {
         if (ce.isElevated()) {
             if (howMany > 50) {
                 ce.sendReply("You can't send more than 50 messages as an elevated user.");
-                return;
             }
             else {
                 flood(howMany, args, ce);
@@ -40,7 +39,6 @@ public class FloodCommand extends Command {
         else {
             if (howMany > 5) {
                 ce.sendReply("You can't send more than 5 messages as a non-elevated user.");
-                return;
             }
             else {
                 flood(howMany, args, ce);

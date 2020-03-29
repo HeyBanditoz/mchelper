@@ -6,7 +6,6 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.NamedQuote;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.GuildData;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.security.SecureRandom;
 import java.util.*;
