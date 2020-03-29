@@ -1,8 +1,5 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandUtils;
-import io.banditoz.mchelper.commands.logic.CommandPermissions;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,11 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ElevatedCommand extends Command {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
         if (containsCommand(e)) {
             if (CommandPermissions.isBotOwner(e.getAuthor())) {
-                this.e = e;
-                go();
+                go(e);
             }
             else {
                 CommandUtils.sendReply(String.format("User %s (ID: %s) does not have permission to run this command!", e.getAuthor().getAsTag(), e.getAuthor().getId()), e);

@@ -17,6 +17,11 @@ public class FloodCommand extends Command {
     }
 
     @Override
+    protected int getCooldown() {
+        return 10;
+    }
+
+    @Override
     protected void onCommand(CommandEvent ce) {
         int howMany = Integer.parseInt(ce.getCommandArgs()[1]);
         if (howMany < 1) {

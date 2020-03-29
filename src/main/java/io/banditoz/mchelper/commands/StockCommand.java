@@ -21,6 +21,11 @@ public class StockCommand extends Command {
     }
 
     @Override
+    protected int getCooldown() {
+        return 25; // long, because we are limited to 5 calls/minute
+    }
+
+    @Override
     protected void onCommand(CommandEvent ce) {
         try {
             String ticker = ce.getCommandArgs()[1];

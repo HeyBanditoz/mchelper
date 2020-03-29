@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 /**
@@ -45,7 +48,15 @@ public abstract class Command extends ListenerAdapter {
     protected abstract void onCommand(CommandEvent ce);
     public abstract String commandName();
     public abstract Help getHelp();
-    protected MessageReceivedEvent e;
+
+    /**
+     * Return this command's cooldown in seconds. Override and return what you want the cooldown to be.
+     * @return The cooldown.
+     */
+    protected int getCooldown() {
+        return 0;
+    }
+    protected HashMap<String, Instant> cooldowns = getCooldown() > 0 ? new HashMap<>() : null;
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -61,30 +72,34 @@ public abstract class Command extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
         if (containsCommand(e)) {
-            this.e = e;
-            go();
+            go(e);
         }
     }
 
     /**
      * Runs onCommand() in parallel.
      */
-    protected void go() {
+    protected void go(MessageReceivedEvent e) {
+        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
         if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
-        this.e.getChannel().sendTyping().queue();
-        ES.execute(() -> {
-            try {
-                long before = System.nanoTime();
-                onCommand(new CommandEvent(e, LOGGER));
-                long after = System.nanoTime() - before;
-                LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
-            } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
-            }
-        });
-        LOGGER.debug(ES.toString());
+        if (handleCooldown(e.getAuthor().getId())) {
+            e.getChannel().sendTyping().queue();
+            ES.execute(() -> {
+                try {
+                    long before = System.nanoTime();
+                    onCommand(new CommandEvent(e, LOGGER));
+                    long after = System.nanoTime() - before;
+                    LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
+                } catch (Exception ex) {
+                    CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
+                }
+            });
+            LOGGER.debug(ES.toString());
+        }
+        else {
+            e.getMessage().addReaction("⏲️").queue();
+        }
     }
 
     protected boolean containsCommand(MessageReceivedEvent e) {
@@ -95,5 +110,29 @@ public abstract class Command extends ListenerAdapter {
         char prefix = Database.getInstance().getGuildDataById(e.getGuild()).getPrefix();
         String expected = prefix + commandName();
         return expected.equals(args[0]);
+    }
+
+    /**
+     * Checks if the user is on cooldown.
+     * @param id The ID to check.
+     * @return true if they are allowed to run the command, false if they are still on cooldown.
+     */
+    private boolean handleCooldown(String id) {
+        if (getCooldown() > 0) {
+            Instant cooldown = cooldowns.get(id);
+            if (cooldown == null) {
+                Instant instant = Instant.now().plus(getCooldown(), ChronoUnit.SECONDS);
+                cooldowns.put(id, instant);
+                return true;
+            } else if (Instant.now().isAfter(cooldown)) {
+                cooldowns.replace(id, Instant.now().plus(getCooldown(), ChronoUnit.SECONDS));
+                return true;
+            } else {
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
     }
 }
