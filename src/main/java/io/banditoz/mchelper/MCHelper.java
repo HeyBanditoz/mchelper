@@ -12,6 +12,7 @@ import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -45,11 +46,8 @@ public class MCHelper {
             System.exit(1);
         }
         Database.getInstance(); // initialize the database first, so if something is wrong we'll exit
-        jda = new JDABuilder(settings.getDiscordToken())
-                .setDisabledCacheFlags(EnumSet.allOf(CacheFlag.class)) // we don't use (activity, voice state, emote, client status) so disable their caches.
-                .build();
+        jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
         jda.awaitReady();
-        jda.addEventListener(new GuildJoinLeaveListener());
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
         jda.addEventListener(new MathCommand());
@@ -77,6 +75,13 @@ public class MCHelper {
         jda.addEventListener(new FloodCommand());
         jda.addEventListener(new QuoteCommand());
         jda.addEventListener(new AddquoteCommand());
+
+        if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
+            jda.addEventListener(new GuildJoinLeaveListener());
+        }
+        else {
+            LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
+        }
 
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);

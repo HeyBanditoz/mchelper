@@ -8,6 +8,11 @@ use it, you can build the bot with `./gradlew shadowJar` assuming you
 have a Java development environment set up. Or, you can check the
 CI/CD and see if there are any built.
 
+## NOTE ON GATEWAY INTENTS
+By default, the bot will assume you have the server members intent
+checked. If not, it will fail to start (for now.) It is required for
+the guild leave/join listener to function.
+
 ## Listeners
 The bot also implements a set of a few Regex listeners, for making
 lives easier. This includes
@@ -19,13 +24,4 @@ reddit.app.link.
 Should be mostly self-explanatory. On first run the bot will generate
 one for you.
 
-```json
-{
-  "discordToken": "Discord token goes here",
-  "botOwners": [
-    "These can run elevated commands, be careful! Put their ID here."
-  ],
-  "darkSkyAPI": "Dark Sky API key.",
-  "owlBotToken": "OwlBot API key."
-}
-```
+
