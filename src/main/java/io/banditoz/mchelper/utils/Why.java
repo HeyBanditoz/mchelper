@@ -29,7 +29,7 @@ public class Why {
                     .replaceAll("N([AEIOU])", "NY$1")
                     .replaceAll("th", "d")
                     .replaceAll("ove", "uv")
-                    + ' ' + ListUtils.extractNumRandomly(1, FACES);
+                    + ' ' + FACES.get(random.nextInt(FACES.size()));
         }
         else {
             return s;
