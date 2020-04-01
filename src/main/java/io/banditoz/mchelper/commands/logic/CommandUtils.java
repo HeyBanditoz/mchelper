@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.utils.Why;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -41,7 +42,7 @@ public class CommandUtils {
                 l.error("Uncaught exception! Offending message: " + buildMessageAndAuthor(e), ex);
             }
         }
-        e.getChannel().sendMessage(reply.toString()).queue();
+        e.getChannel().sendMessage(Why.owoify(reply.toString())).queue();
     }
 
     /**
@@ -125,7 +126,7 @@ public class CommandUtils {
         else if (msg.isEmpty()) {
             msg = "<no output>";
         }
-        return msg;
+        return Why.owoify(msg);
     }
 
     public static String[] commandArgs(String string) {
