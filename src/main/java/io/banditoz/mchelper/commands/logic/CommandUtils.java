@@ -41,7 +41,7 @@ public class CommandUtils {
                 l.error("Uncaught exception! Offending message: " + buildMessageAndAuthor(e), ex);
             }
         }
-        e.getChannel().sendMessage(reply.toString()).queue();
+        _sendReply(reply.toString(), e.getChannel());
     }
 
     /**
@@ -86,7 +86,7 @@ public class CommandUtils {
             p.waitFor();
 
             e.getMessage().getChannel()
-                    .sendMessage(CommandUtils.formatMessage(msg))
+                    .sendMessage(formatMessage(msg))
                     .addFile(f)
                     .queue();
             image.close();
@@ -118,6 +118,11 @@ public class CommandUtils {
         }
     }
 
+    /**
+     * Checks the message for abnormalities, (null, empty) and formats it accordingly.
+     * @param msg The string to check.
+     * @return The formatted messaeg.
+     */
     public static String formatMessage(String msg) {
         if (msg == null) {
             msg = "<null output>";
@@ -155,10 +160,10 @@ public class CommandUtils {
     }
 
     private static String buildMessageAndAuthor(MessageReceivedEvent e) {
-        return "<" + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + "> " + e.getMessage().getContentRaw();
+        return "<" + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + "> " + formatMessage(e.getMessage().getContentRaw());
     }
 
     public static void sendFile(String msg, File f, MessageReceivedEvent e) {
-        e.getChannel().sendMessage(msg).addFile(f).queue();
+        e.getChannel().sendMessage(formatMessage(msg)).addFile(f).queue();
     }
 }
