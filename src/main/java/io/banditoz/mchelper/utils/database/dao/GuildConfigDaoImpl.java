@@ -69,6 +69,18 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
         return guilds;
     }
 
+    @Override
+    public int getGuildCount() {
+        try (Connection c = Database.getConnection()) {
+            ResultSet rs = c.prepareStatement("SELECT COUNT(*) FROM guild_config").executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            LOGGER.error("Error while counting the guilds!", e);
+        }
+        return -1;
+    }
+
     private GuildConfig buildGuildConfigFromResultSet(ResultSet rs) throws SQLException {
         GuildConfig gc = new GuildConfig();
         gc.setId(rs.getLong("guild_id"));

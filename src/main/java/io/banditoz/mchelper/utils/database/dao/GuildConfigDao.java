@@ -9,4 +9,5 @@ public interface GuildConfigDao {
     void saveConfig(GuildConfig config);
     GuildConfig getConfig(Guild g);
     List<GuildConfig> getAllGuildConfigs();
+    int getGuildCount();
 }

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -34,7 +33,7 @@ public class Database {
         for (Dao dao : daos) {
             dao.generateTable();
         }
-        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl().getAllGuildConfigs().size() + " guilds.");
+        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl().getGuildCount() + " guilds.");
     }
 
 
