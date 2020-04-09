@@ -1,6 +1,7 @@
 [Unit]
 Description=MCHelper
-After=network.target 
+After=network.target
+Require=mariadb.service
 
 [Service]
 User=discord

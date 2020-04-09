@@ -59,6 +59,8 @@ dependencies {
     implementation 'com.merakianalytics.orianna:orianna:4.0.0-rc5'
     implementation 'org.codehaus.groovy:groovy-jsr223:3.0.1'
 
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
+
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
 

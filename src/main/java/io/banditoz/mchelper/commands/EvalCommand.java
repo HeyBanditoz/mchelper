@@ -40,8 +40,7 @@ public class EvalCommand extends ElevatedCommand {
         try {
             String imports = "import net.dv8tion.jda.*;\n" +
                     "import java.util.*;\n" +
-                    "import io.banditoz.mchelper.utils.database.Database;\n" +
-                    "import io.banditoz.mchelper.utils.database.GuildData;";
+                    "import io.banditoz.mchelper.utils.database.*;\n";
             engine.put("ce", ce);
             engine.put("args", ce.getCommandArgs());
             engine.put("jda", ce.getEvent().getJDA());

@@ -43,7 +43,7 @@ public class MCHelper {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Settings.json file.");
             System.exit(1);
         }
-        Database.getInstance(); // initialize the database first, so if something is wrong we'll exit
+        Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
         jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
         jda.awaitReady();
         jda.addEventListener(new BashCommand());
@@ -71,8 +71,9 @@ public class MCHelper {
         jda.addEventListener(new HeapDumpCommand());
         jda.addEventListener(new UploadLogsCommand());
         jda.addEventListener(new FloodCommand());
-        jda.addEventListener(new QuoteCommand());
-        jda.addEventListener(new AddquoteCommand());
+        //jda.addEventListener(new QuoteCommand());
+        //jda.addEventListener(new AddquoteCommand());
+        jda.addEventListener(new SqlCommand());
 
         if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             jda.addEventListener(new GuildJoinLeaveListener());

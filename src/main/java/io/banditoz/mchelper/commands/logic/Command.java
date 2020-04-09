@@ -5,6 +5,7 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -107,7 +108,7 @@ public abstract class Command extends ListenerAdapter {
         if (args.length == 0) {
             return false;
         }
-        char prefix = Database.getInstance().getGuildDataById(e.getGuild()).getPrefix();
+        char prefix = new GuildConfigDaoImpl().getConfig(e.getGuild()).getPrefix();
         String expected = prefix + commandName();
         return expected.equals(args[0]);
     }

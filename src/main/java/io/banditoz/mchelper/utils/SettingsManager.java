@@ -70,8 +70,12 @@ public class SettingsManager {
         defaultSettings.setCommandThreads(2);
         defaultSettings.setRegexListenerThreads(2);
         defaultSettings.setWatchDeletedMessages(false);
-        defaultSettings.setAlphaVantageKey("Alpha Vantage API key here");
-        defaultSettings.setRiotApiKey("Riot Api Key here");
+        defaultSettings.setAlphaVantageKey("Alpha Vantage API key here.");
+        defaultSettings.setRiotApiKey("Riot Api Key here.");
+        defaultSettings.setDatabaseName("Name of the database.");
+        defaultSettings.setDatabaseHostAndPort("Host and port of the database.");
+        defaultSettings.setDatabaseUsername("Database username.");
+        defaultSettings.setDatabasePassword("Database password.");
         return defaultSettings;
     }
 

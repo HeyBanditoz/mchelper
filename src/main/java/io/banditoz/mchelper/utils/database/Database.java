@@ -1,90 +1,45 @@
 package io.banditoz.mchelper.utils.database;
 
-import io.banditoz.mchelper.MCHelper;
-import net.dv8tion.jda.api.entities.Guild;
+import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.database.dao.Dao;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Database {
-    private static Database instance;
-    private Guilds guilds;
-    private final Path databaseFile = new File(".").toPath().resolve("database.json");
-    private final Logger logger = LoggerFactory.getLogger(Database.class);
+    private static Connection connection;
+    private static Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
-    public static Database getInstance() {
-        if (instance == null) {
-            instance = new Database();
-        }
-        return instance;
-    }
-
-    public Database() {
-        if (!databaseFile.toFile().exists()) {
-            logger.info("Initializing empty database.");
-            this.guilds = initializeEmptyDatabase();
-            try {
-                saveDatabase();
-            } catch (Exception e) {
-                logger.error("Error writing default database!", e);
-            }
-        }
-        loadDatabase();
-    }
-
-    public void loadDatabase() {
+    public static void initializeDatabase() {
+        Settings settings = SettingsManager.getInstance().getSettings();
+        String url = "jdbc:mariadb://" + settings.getDatabaseHostAndPort() +
+                "/" + settings.getDatabaseName() +
+                "?user=" + settings.getDatabaseUsername() +
+                "&password=" + settings.getDatabasePassword() + "" +
+                "&useUnicode=true";
         try {
-            this.guilds = MCHelper.getObjectMapper().readValue(databaseFile.toFile(), Guilds.class);
-            int numOfGuilds = this.guilds.getGuilds().size();
-            logger.info("Database loaded. We have " + numOfGuilds + " guilds.");
-        } catch (Exception e) {
-            logger.error("Error loading the database. The bot will now exit.", e);
-            System.exit(1);
+            connection = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            LOGGER.error("Could not initialize a SQL connection! Things will most likely be broken.", e);
         }
+
+        // we have a connection, generate tables!
+        ArrayList<Dao> daos = new ArrayList<>();
+        daos.add(new GuildConfigDaoImpl());
+        for (Dao dao : daos) {
+            dao.generateTable();
+        }
+        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl().getAllGuildConfigs().size() + " guilds.");
     }
 
-    public GuildData getGuildDataById(Guild g) throws IllegalStateException {
-        GuildData gd;
-        if (instance.guilds.getGuilds().get(g.getId()) == null) {
-            gd = new GuildData();
-            instance.guilds.getGuilds().put(g.getId(), gd);
-            logger.info("Initialized data for " + g.getId());
-            saveDatabase();
-        }
-        else {
-            gd = instance.guilds.getGuilds().get(g.getId());
-        }
-        return gd;
-    }
 
-    public GuildData getGuildDataNull(Guild g) throws IllegalStateException {
-        if (instance.guilds.getGuilds().get(g.getId()) == null) {
-            return null;
-        }
-        else {
-            return instance.guilds.getGuilds().get(g.getId());
-        }
-    }
-
-    public List<GuildData> getAllGuildData() {
-        return new ArrayList<>(instance.guilds.getGuilds().values());
-    }
-
-    public void saveDatabase() {
-        try {
-            MCHelper.getObjectMapper().writeValue(databaseFile.toFile(), this.guilds);
-            logger.debug("Database saved.");
-        } catch (IOException e) {
-            logger.error("Error saving the database! ", e);
-        }
-    }
-
-    private Guilds initializeEmptyDatabase() {
-        return new Guilds();
+    public static Connection getConnection() {
+        return connection;
     }
 }

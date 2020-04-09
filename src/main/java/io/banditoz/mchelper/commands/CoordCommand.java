@@ -3,9 +3,12 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.TwoDimensionalPoint;
+import io.banditoz.mchelper.utils.database.CoordinatePoint;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.GuildData;
+import io.banditoz.mchelper.utils.database.dao.CoordsDao;
+import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
+
+import java.sql.SQLException;
 
 public class CoordCommand extends Command {
     @Override
@@ -21,44 +24,35 @@ public class CoordCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
-        GuildData gd = Database.getInstance().getGuildDataById(ce.getGuild());
-        if (ce.getCommandArgs().length > 1) {
-            if (ce.getCommandArgs()[1].equalsIgnoreCase("save") || ce.getCommandArgs()[1].equalsIgnoreCase("add")) {
-                if (!gd.getCoordinates().containsKey(ce.getCommandArgs()[2])) {
-                    TwoDimensionalPoint point = new TwoDimensionalPoint(ce.getCommandArgs()[3], ce.getCommandArgs()[4]);
-                    gd.getCoordinates().put(ce.getCommandArgs()[2], point);
-                    Database.getInstance().saveDatabase();
+        CoordsDao dao = new CoordsDaoImpl();
+        try {
+            if (ce.getCommandArgs().length > 1) {
+                if (ce.getCommandArgs()[1].equalsIgnoreCase("save") || ce.getCommandArgs()[1].equalsIgnoreCase("add")) {
+                    CoordinatePoint point = new CoordinatePoint(ce.getCommandArgs()[3], ce.getCommandArgs()[4],
+                            ce.getCommandArgs()[2], ce.getEvent().getAuthor().getIdLong(), ce.getGuild().getIdLong());
+                    dao.savePoint(point);
                     ce.sendReply(point + " saved.");
-                } else {
-                    ce.sendReply("\"" + ce.getCommandArgs()[2] + "\" already exists.");
-                }
-            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("show") || ce.getCommandArgs()[1].equalsIgnoreCase("list")) {
-                if (ce.getCommandArgs().length > 2) {
-                    if (gd.getCoordinates().containsKey(ce.getCommandArgs()[2])) {
-                        ce.sendReply(gd.getCoordinates().get(ce.getCommandArgs()[2]).toString());
+                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("show") || ce.getCommandArgs()[1].equalsIgnoreCase("list")) {
+                    if (ce.getCommandArgs().length > 2) {
+                        ce.sendReply(dao.getPointByName(ce.getCommandArgs()[2], ce.getGuild()).toString());
                     } else {
-                        ce.sendReply("Point \"" + ce.getCommandArgs()[2] + "\" does not exist.");
+                        StringBuilder s = new StringBuilder("Coordinates:\n");
+                        dao.getAllPointsForGuild(ce.getGuild()).forEach(p -> s.append(p.getName()).append(": ").append(p.toString()).append('\n'));
+                        ce.sendReply(s.toString());
                     }
+                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("delete") || ce.getCommandArgs()[1].equalsIgnoreCase("remove")) {
+                        dao.deletePointByName(ce.getCommandArgs()[2], ce.getGuild());
+                        ce.sendReply("Deleted.");
+                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("help")) {
+                    help(ce);
                 } else {
-                    StringBuilder s = new StringBuilder("Coordinates:\n");
-                    gd.getCoordinates().forEach((k, p) -> s.append(k).append(": ").append(p.toString()).append("\n"));
-                    ce.sendReply(s.toString());
+                    ce.sendReply("Unrecognized operator " + ce.getCommandArgs()[1] + ".");
                 }
-            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("delete") || ce.getCommandArgs()[1].equalsIgnoreCase("remove")) {
-                if (gd.getCoordinates().containsKey(ce.getCommandArgs()[2])) {
-                    gd.getCoordinates().remove(ce.getCommandArgs()[2]);
-                    Database.getInstance().saveDatabase();
-                    ce.sendReply("Deleted.");
-                } else {
-                    ce.sendReply("Point \"" + ce.getCommandArgs()[2] + "\" does not exist.");
-                }
-            } else if (ce.getCommandArgs()[1].equalsIgnoreCase("help")) {
-                help(ce);
             } else {
-                ce.sendReply("Unrecognized operator " + ce.getCommandArgs()[1] + ".");
+                help(ce);
             }
-        } else {
-            help(ce);
+        } catch (SQLException e) {
+            ce.sendExceptionMessage(e);
         }
     }
 

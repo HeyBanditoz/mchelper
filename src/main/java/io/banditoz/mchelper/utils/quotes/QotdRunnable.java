@@ -2,8 +2,8 @@ package io.banditoz.mchelper.utils.quotes;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.GuildData;
+import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public class QotdRunnable implements Runnable {
         } catch (Exception e) {
             logger.error("Could not fetch the quote of the day!", e);
         }
-        for (GuildData guild : Database.getInstance().getAllGuildData()) {
+        for (GuildConfig guild : new GuildConfigDaoImpl().getAllGuildConfigs()) {
             if (guild.getPostQotdToDefaultChannel()) {
                 CommandUtils.sendReply("Here is your quote of the day:\n" + quoteOfTheDay, MCHelper.getJDA().getTextChannelById(guild.getDefaultChannel()));
             }

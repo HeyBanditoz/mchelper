@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +39,7 @@ public class HelpCommand extends Command {
     @Override
     protected void onCommand(CommandEvent ce) {
         StringBuilder sb = new StringBuilder("Current list of commands (prefix with `")
-                .append(Database.getInstance().getGuildDataById(ce.getGuild()).getPrefix()).append("`):\n");
+                .append(new GuildConfigDaoImpl().getConfig(ce.getGuild()).getPrefix()).append("`):\n");
         for (Command c : commands) {
             sb.append(c.getHelp()).append("\n"); // TODO split this into multiple messages in ce.sendReply somehow, this could grow too large in the future!
         }

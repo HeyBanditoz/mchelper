@@ -29,6 +29,14 @@ public class Settings {
     private String alphaVantageKey;
     @JsonProperty("riotApiKey")
     private String riotApiKey;
+    @JsonProperty("databaseUsername")
+    private String databaseUsername;
+    @JsonProperty("databasePassword")
+    private String databasePassword;
+    @JsonProperty("databaseHostAndPort")
+    private String databaseHostAndPort;
+    @JsonProperty("databaseName")
+    private String databaseName;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -148,5 +156,45 @@ public class Settings {
     @JsonProperty("riotApiKey")
     public void setRiotApiKey(String riotApiKey) {
         this.riotApiKey = riotApiKey;
+    }
+
+    @JsonProperty("databaseUsername")
+    public String getDatabaseUsername() {
+        return databaseUsername;
+    }
+
+    @JsonProperty("databaseUsername")
+    public void setDatabaseUsername(String databaseUsername) {
+        this.databaseUsername = databaseUsername;
+    }
+
+    @JsonProperty("databasePassword")
+    public String getDatabasePassword() {
+        return databasePassword;
+    }
+
+    @JsonProperty("databasePassword")
+    public void setDatabasePassword(String databasePassword) {
+        this.databasePassword = databasePassword;
+    }
+
+    @JsonProperty("databaseHostAndPort")
+    public String getDatabaseHostAndPort() {
+        return databaseHostAndPort;
+    }
+
+    @JsonProperty("databaseHostAndPort")
+    public void setDatabaseHostAndPort(String databaseHostAndPort) {
+        this.databaseHostAndPort = databaseHostAndPort;
+    }
+
+    @JsonProperty("databaseName")
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    @JsonProperty("databaseName")
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 }

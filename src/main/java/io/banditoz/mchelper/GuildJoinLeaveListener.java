@@ -1,7 +1,7 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.GuildData;
+import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -18,8 +18,8 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        GuildData gd = Database.getInstance().getGuildDataNull(event.getGuild());
-        if (!(gd == null)) {
+        GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
+        if (gc.getDefaultChannel() == 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
@@ -28,14 +28,14 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
-            event.getGuild().getTextChannelById(gd.getDefaultChannel()).sendMessage(me).queue();
+            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessage(me).queue();
         }
     }
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        GuildData gd = Database.getInstance().getGuildDataNull(event.getGuild());
-        if (!(gd == null)) {
+        GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
+        if (gc.getDefaultChannel() == 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
@@ -44,7 +44,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
-            event.getGuild().getTextChannelById(gd.getDefaultChannel()).sendMessage(me).queue();
+            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessage(me).queue();
         }
     }
 

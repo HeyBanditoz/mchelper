@@ -4,6 +4,9 @@ import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.utils.MiscUtil;
 
 import static io.banditoz.mchelper.commands.logic.CommandPermissions.*;
@@ -22,13 +25,14 @@ public class DefaultChannelCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
+        GuildConfigDao dao = new GuildConfigDaoImpl();
+        GuildConfig gc = dao.getConfig(ce.getGuild());
         if (ce.getCommandArgs().length == 1) {
-            ce.sendReply(Database.getInstance().getGuildDataById(ce.getGuild()).getDefaultChannel() + " is the default channel.");
+            ce.sendReply(gc.getDefaultChannel() + " is the default channel.");
         }
         else if (isBotOwner(ce.getEvent().getAuthor()) || isGuildOwner(ce.getEvent().getAuthor(), ce.getGuild())) {
-            MiscUtil.parseSnowflake(ce.getCommandArgs()[1]); // check if it is a valid discord snowflake (I think)
-            Database.getInstance().getGuildDataById(ce.getGuild()).setDefaultChannel(ce.getCommandArgs()[1]);
-            Database.getInstance().saveDatabase();
+            gc.setDefaultChannel(MiscUtil.parseSnowflake(ce.getCommandArgs()[1]));
+            dao.saveConfig(gc);
             ce.sendReply(ce.getCommandArgs()[1] + " is now the default channel.");
         }
         else {
