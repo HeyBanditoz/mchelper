@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils.database.dao;
 
+import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -16,7 +17,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public void saveConfig(GuildConfig config) {
         try {
-            PreparedStatement ps = connection.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
+            PreparedStatement ps = Database.getConnection().prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, config.getId());
             ps.setString(2, String.valueOf(config.getPrefix()));
             if (config.getDefaultChannel() == 0) {
@@ -37,7 +38,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     public GuildConfig getConfig(Guild g) {
         GuildConfig gc = new GuildConfig(g.getIdLong());
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
+            PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
             ps.setLong(1, g.getIdLong());
             ResultSet rs = ps.executeQuery();
 
@@ -56,7 +57,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     public List<GuildConfig> getAllGuildConfigs() {
         ArrayList<GuildConfig> guilds = new ArrayList<>();
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM `guild_config`");
+            PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM `guild_config`");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 guilds.add(buildGuildConfigFromResultSet(rs));

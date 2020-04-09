@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.utils.database.CoordinatePoint;
+import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
 
     @Override
     public void savePoint(CoordinatePoint point) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement("INSERT INTO coordinates VALUES (?, ?, ?, ?, ?, (SELECT NOW()))");
+        PreparedStatement ps = Database.getConnection().prepareStatement("INSERT INTO coordinates VALUES (?, ?, ?, ?, ?, (SELECT NOW()))");
         ps.setLong(1, point.getGuildId());
         ps.setLong(2, point.getAuthorId());
         ps.setString(3, point.getName());
@@ -29,7 +30,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
 
     @Override
     public CoordinatePoint getPointByName(String name, Guild g) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement("SELECT * FROM coordinates WHERE name=(?) AND guild_id=(?)");
+        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM coordinates WHERE name=(?) AND guild_id=(?)");
         ps.setString(1, name);
         ps.setLong(2, g.getIdLong());
         CoordinatePoint point = buildPointFromResultSet(ps.executeQuery());
@@ -39,7 +40,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
 
     @Override
     public void deletePointByName(String name, Guild g) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement("DELETE FROM coordinates WHERE name=(?) AND guild_id=(?)");
+        PreparedStatement ps = Database.getConnection().prepareStatement("DELETE FROM coordinates WHERE name=(?) AND guild_id=(?)");
         ps.setString(1, name);
         ps.setLong(2, g.getIdLong());
         ps.execute();
@@ -49,7 +50,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     @Override
     public List<CoordinatePoint> getAllPointsForGuild(Guild g) throws SQLException {
         ArrayList<CoordinatePoint> points = new ArrayList<>();
-        PreparedStatement ps = connection.prepareStatement("SELECT * FROM coordinates WHERE guild_id=(?)");
+        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM coordinates WHERE guild_id=(?)");
         ps.setLong(1, g.getIdLong());
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {

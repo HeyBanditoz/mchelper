@@ -5,6 +5,7 @@ import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.Dao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import org.mariadb.jdbc.MariaDbPoolDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Database {
-    private static Connection connection;
+    private static MariaDbPoolDataSource pool;
     private static Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
     public static void initializeDatabase() {
@@ -24,11 +25,7 @@ public class Database {
                 "?user=" + settings.getDatabaseUsername() +
                 "&password=" + settings.getDatabasePassword() + "" +
                 "&useUnicode=true";
-        try {
-            connection = DriverManager.getConnection(url);
-        } catch (SQLException e) {
-            LOGGER.error("Could not initialize a SQL connection! Things will most likely be broken.", e);
-        }
+        pool = new MariaDbPoolDataSource(url);
 
         // we have a connection, generate tables!
         ArrayList<Dao> daos = new ArrayList<>();
@@ -41,7 +38,7 @@ public class Database {
     }
 
 
-    public static Connection getConnection() {
-        return connection;
+    public static Connection getConnection() throws SQLException {
+        return pool.getConnection();
     }
 }
