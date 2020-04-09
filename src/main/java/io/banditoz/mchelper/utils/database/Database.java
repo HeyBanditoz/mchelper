@@ -24,7 +24,7 @@ public class Database {
                 "/" + settings.getDatabaseName() +
                 "?user=" + settings.getDatabaseUsername() +
                 "&password=" + settings.getDatabasePassword() + "" +
-                "&useUnicode=true";
+                "&useUnicode=true&pool";
         pool = new MariaDbPoolDataSource(url);
 
         // we have a connection, generate tables!

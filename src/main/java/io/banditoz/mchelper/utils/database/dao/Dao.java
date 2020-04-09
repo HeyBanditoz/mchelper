@@ -12,8 +12,8 @@ public abstract class Dao {
     protected final Logger LOGGER = LoggerFactory.getLogger(Dao.class);
 
     public void generateTable() {
-        try {
-            Database.getConnection().prepareStatement(getSqlTableGenerator()).execute();
+        try (Connection c = Database.getConnection()) {
+            c.prepareStatement(getSqlTableGenerator()).execute();
         } catch (SQLException e) {
             LOGGER.error("Failed to create table!", e);
         }

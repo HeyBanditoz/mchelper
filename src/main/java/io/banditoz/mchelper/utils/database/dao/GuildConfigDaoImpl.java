@@ -16,8 +16,8 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public void saveConfig(GuildConfig config) {
-        try {
-            PreparedStatement ps = Database.getConnection().prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
+        try (Connection c = Database.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, config.getId());
             ps.setString(2, String.valueOf(config.getPrefix()));
             if (config.getDefaultChannel() == 0) {
@@ -37,8 +37,8 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public GuildConfig getConfig(Guild g) {
         GuildConfig gc = new GuildConfig(g.getIdLong());
-        try {
-            PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
+        try (Connection c = Database.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
             ps.setLong(1, g.getIdLong());
             ResultSet rs = ps.executeQuery();
 
@@ -56,8 +56,8 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public List<GuildConfig> getAllGuildConfigs() {
         ArrayList<GuildConfig> guilds = new ArrayList<>();
-        try {
-            PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM `guild_config`");
+        try (Connection c = Database.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config`");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 guilds.add(buildGuildConfigFromResultSet(rs));
