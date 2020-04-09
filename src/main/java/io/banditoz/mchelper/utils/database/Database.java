@@ -2,6 +2,7 @@ package io.banditoz.mchelper.utils.database;
 
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.Dao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ public class Database {
         // we have a connection, generate tables!
         ArrayList<Dao> daos = new ArrayList<>();
         daos.add(new GuildConfigDaoImpl());
+        daos.add(new CoordsDaoImpl());
         for (Dao dao : daos) {
             dao.generateTable();
         }
