@@ -71,8 +71,8 @@ public class MCHelper {
         jda.addEventListener(new HeapDumpCommand());
         jda.addEventListener(new UploadLogsCommand());
         jda.addEventListener(new FloodCommand());
-        //jda.addEventListener(new QuoteCommand());
-        //jda.addEventListener(new AddquoteCommand());
+        jda.addEventListener(new QuoteCommand());
+        jda.addEventListener(new AddquoteCommand());
         jda.addEventListener(new SqlCommand());
 
         if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
