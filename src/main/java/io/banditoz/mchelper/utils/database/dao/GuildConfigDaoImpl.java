@@ -3,12 +3,20 @@ package io.banditoz.mchelper.utils.database.dao;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import org.cache2k.Cache;
+import org.cache2k.Cache2kBuilder;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
+    private static Cache<Long, GuildConfig> cache = new Cache2kBuilder<Long, GuildConfig>() {}
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .disableStatistics(true)
+            .build();
+
     @Override
     public String getSqlTableGenerator() {
         return "CREATE TABLE IF NOT EXISTS `guild_config`( `guild_id` bigint(18) NOT NULL, `prefix` varchar(1) COLLATE utf8mb4_unicode_ci NOT NULL, `default_channel` bigint(18) DEFAULT NULL, `post_qotd_to_default_channel` tinyint(1) DEFAULT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), PRIMARY KEY (`guild_id`), UNIQUE KEY `default_channel` (`default_channel`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ";
@@ -29,6 +37,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
             ps.setBoolean(4, config.getPostQotdToDefaultChannel());
             ps.execute();
             ps.close();
+            cache.put(config.getId(), config);
         } catch (SQLException e) {
             LOGGER.error("Error while saving guild configuration for " + config.getId() + "!", e);
         }
@@ -36,19 +45,26 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public GuildConfig getConfig(Guild g) {
-        GuildConfig gc = new GuildConfig(g.getIdLong());
-        try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
-            ps.setLong(1, g.getIdLong());
-            ResultSet rs = ps.executeQuery();
+        GuildConfig gc = cache.get(g.getIdLong());
+        if (gc == null) {
+            try (Connection c = Database.getConnection()) {
+                PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
+                ps.setLong(1, g.getIdLong());
+                ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                gc = buildGuildConfigFromResultSet(rs);
+                if (rs.next()) {
+                    gc = buildGuildConfigFromResultSet(rs);
+                }
+                ps.close();
+                cache.put(gc.getId(), gc);
+                return gc;
+            } catch (SQLException e) {
+                LOGGER.error("Error while fetching guild configuration for " + g.getId() + "!", e);
             }
-            ps.close();
-            return gc;
-        } catch (SQLException e) {
-            LOGGER.error("Error while fetching guild configuration for " + g.getId() + "!", e);
+
+        }
+        else {
+            cache.put(gc.getId(), gc); // refresh expiry times
         }
         return gc;
     }
@@ -60,7 +76,9 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config`");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                guilds.add(buildGuildConfigFromResultSet(rs));
+                GuildConfig gc = buildGuildConfigFromResultSet(rs);
+                guilds.add(gc);
+                cache.put(gc.getId(), gc);
             }
             ps.close();
         } catch (SQLException e) {
