@@ -31,38 +31,32 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public List<NamedQuote> getQuotesByMatch(String search, Guild g) throws SQLException {
-        ArrayList<NamedQuote> quotes = new ArrayList<>();
+    public NamedQuote getRandomQuoteByMatch(String search, Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? AND quote LIKE ? OR quote_author LIKE ?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? AND quote LIKE ? OR quote_author LIKE ? ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
             ps.setString(3, search);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                quotes.add(buildQuoteFromResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                ps.close();
+                return buildQuoteFromResultSet(rs);
             }
-            rs.close();
-            ps.close();
         }
-        return quotes;
     }
 
     @Override
-    public List<NamedQuote> getQuotes(Guild g) throws SQLException {
-        ArrayList<NamedQuote> quotes = new ArrayList<>();
+    public NamedQuote getRandomQuote(Guild g) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                quotes.add(buildQuoteFromResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                ps.close();
+                return buildQuoteFromResultSet(rs);
             }
-            rs.close();
-            ps.close();
         }
-        return quotes;
     }
 
     private NamedQuote buildQuoteFromResultSet(ResultSet rs) throws SQLException {
