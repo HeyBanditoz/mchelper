@@ -19,7 +19,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
-        if (gc.getDefaultChannel() == 0) {
+        if (gc.getDefaultChannel() != 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
@@ -35,7 +35,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
-        if (gc.getDefaultChannel() == 0) {
+        if (gc.getDefaultChannel() != 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
