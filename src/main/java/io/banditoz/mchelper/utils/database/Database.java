@@ -5,6 +5,7 @@ import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.Dao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
 import org.mariadb.jdbc.MariaDbPoolDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class Database {
         ArrayList<Dao> daos = new ArrayList<>();
         daos.add(new GuildConfigDaoImpl());
         daos.add(new CoordsDaoImpl());
+        daos.add(new RemindersDaoImpl());
         for (Dao dao : daos) {
             dao.generateTable();
         }

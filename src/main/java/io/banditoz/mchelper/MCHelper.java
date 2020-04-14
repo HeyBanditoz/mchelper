@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -74,6 +75,8 @@ public class MCHelper {
         jda.addEventListener(new QuoteCommand());
         jda.addEventListener(new AddquoteCommand());
         jda.addEventListener(new SqlCommand());
+        jda.addEventListener(new RemindmeCommand());
+        jda.addEventListener(new DeleteReminderCommand());
 
         if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             jda.addEventListener(new GuildJoinLeaveListener());
@@ -138,6 +141,8 @@ public class MCHelper {
             thread.start();
             jda.addEventListener(new LoadoutCommand());
         }
+
+        ReminderService.initialize();
 
         jda.addEventListener(new HelpCommand()); // this must be registered last
 
