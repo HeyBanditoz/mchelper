@@ -51,17 +51,21 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
                 ps.setLong(1, g.getIdLong());
                 ResultSet rs = ps.executeQuery();
-
                 if (rs.next()) {
                     gc = buildGuildConfigFromResultSet(rs);
                 }
                 ps.close();
-                cache.put(gc.getId(), gc);
-                return gc;
+
+                if (gc != null) {
+                    cache.put(gc.getId(), gc);
+                    return gc;
+                }
+                else {
+                    return new GuildConfig(g.getIdLong());
+                }
             } catch (SQLException e) {
                 LOGGER.error("Error while fetching guild configuration for " + g.getId() + "!", e);
             }
-
         }
         else {
             cache.put(gc.getId(), gc); // refresh expiry times
