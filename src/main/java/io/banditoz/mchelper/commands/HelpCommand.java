@@ -4,7 +4,6 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
 import java.util.ArrayList;
