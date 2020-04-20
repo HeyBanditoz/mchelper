@@ -16,7 +16,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public void markReminded(int id) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET reminded = 1 WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("UPDATE `reminders` SET reminded = 1 WHERE id=?");
             ps.setInt(1, id);
             ps.execute();
             ps.close();
@@ -26,7 +26,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public void markDeleted(int id) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET deleted = 1 WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("UPDATE `reminders` SET deleted = 1 WHERE id=?");
             ps.setInt(1, id);
             ps.execute();
             ps.close();
@@ -36,7 +36,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public int schedule(Reminder r) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO reminders VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = c.prepareStatement("INSERT INTO `reminders` VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setNull(1, Types.INTEGER);
             ps.setLong(2, r.getChannelId());
             ps.setLong(3, r.getAuthorId());
@@ -59,7 +59,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     public List<Reminder> getAllActiveReminders() throws SQLException {
         try (Connection c = Database.getConnection()) {
             ArrayList<Reminder> reminders = new ArrayList<>();
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE !(reminded || deleted)");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `reminders` WHERE !(reminded || deleted)");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 reminders.add(buildReminderFromResultSet(rs));
@@ -73,7 +73,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public boolean isStillActiveOrNotDeleted(int id) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT !(deleted || reminded) AS active FROM reminders WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT !(deleted || reminded) AS active FROM `reminders` WHERE id=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             rs.next();
@@ -86,7 +86,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public Reminder getReminderById(int id) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `reminders` WHERE id=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             rs.next();

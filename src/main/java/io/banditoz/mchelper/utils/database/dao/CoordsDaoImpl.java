@@ -20,7 +20,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     @Override
     public void savePoint(CoordinatePoint point) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO coordinates VALUES (?, ?, ?, ?, ?, (SELECT NOW()))");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO `coordinates` VALUES (?, ?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, point.getGuildId());
             ps.setLong(2, point.getAuthorId());
             ps.setString(3, point.getName());
@@ -34,7 +34,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     @Override
     public CoordinatePoint getPointByName(String name, Guild g) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM coordinates WHERE name=(?) AND guild_id=(?)");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `coordinates` WHERE name=? AND guild_id=?");
             ps.setString(1, name);
             ps.setLong(2, g.getIdLong());
             CoordinatePoint point = buildPointFromResultSet(ps.executeQuery());
@@ -46,7 +46,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     @Override
     public void deletePointByName(String name, Guild g) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("DELETE FROM coordinates WHERE name=(?) AND guild_id=(?)");
+            PreparedStatement ps = c.prepareStatement("DELETE FROM `coordinates` WHERE name=? AND guild_id=?");
             ps.setString(1, name);
             ps.setLong(2, g.getIdLong());
             ps.execute();
@@ -58,7 +58,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     public List<CoordinatePoint> getAllPointsForGuild(Guild g) throws SQLException {
         try (Connection c = Database.getConnection()) {
             ArrayList<CoordinatePoint> points = new ArrayList<>();
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM coordinates WHERE guild_id=(?)");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `coordinates` WHERE guild_id=(?)");
             ps.setLong(1, g.getIdLong());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
