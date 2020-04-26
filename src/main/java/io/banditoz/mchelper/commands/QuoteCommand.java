@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 
@@ -22,11 +23,13 @@ public class QuoteCommand extends Command {
     protected void onCommand(CommandEvent ce) {
         QuotesDao dao = new QuotesDaoImpl();
         try {
+            NamedQuote nq;
             if (ce.getCommandArgsString().isEmpty()) {
-                ce.sendReply(dao.getRandomQuote(ce.getGuild()).format());
+                nq = dao.getRandomQuote(ce.getGuild());
             } else {
-                ce.sendReply(dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild()).format());
+                nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
             }
+            ce.sendReply(nq == null ? "No quote found." : nq.format());
         } catch (Exception ex) {
             ce.sendExceptionMessage(ex);
         }

@@ -3,6 +3,7 @@ package io.banditoz.mchelper.utils.database.dao;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import net.dv8tion.jda.api.entities.Guild;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +30,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public NamedQuote getRandomQuoteByMatch(String search, Guild g) throws SQLException {
+    public NamedQuote getRandomQuoteByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = Database.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND() LIMIT 1");
@@ -37,7 +38,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             ps.setString(2, search);
             ps.setString(3, search);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
+                if (!rs.next()) return null;
                 ps.close();
                 return buildQuoteFromResultSet(rs);
             }
@@ -50,7 +51,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
+                if (!rs.next()) return null;
                 ps.close();
                 return buildQuoteFromResultSet(rs);
             }
