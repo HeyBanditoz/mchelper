@@ -52,6 +52,9 @@ public class NamedQuote {
     }
 
     public static NamedQuote parseString(String s) {
+        // fuck you, apple!
+        s = s.replace('“', '"').replace('”', '"');
+
         NamedQuote nq = new NamedQuote();
         Pattern p = Pattern.compile("\"(.*?)\"\\s+");
         Matcher m = p.matcher(s);
