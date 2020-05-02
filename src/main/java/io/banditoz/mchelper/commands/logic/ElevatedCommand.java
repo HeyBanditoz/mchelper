@@ -13,10 +13,13 @@ public abstract class ElevatedCommand extends Command {
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
         if (containsCommand(e)) {
             if (CommandPermissions.isBotOwner(e.getAuthor())) {
+                LOGGER.info(String.format("Executing elevated command: <%s#%s> %s",
+                        e.getAuthor().getAsTag(), e.getAuthor().getId(), e.getMessage().getContentDisplay()));
                 go(e);
             }
             else {
-                CommandUtils.sendReply(String.format("User %s (ID: %s) does not have permission to run this command!", e.getAuthor().getAsTag(), e.getAuthor().getId()), e);
+                CommandUtils.sendReply(String.format("User %s (ID: %s) does not have permission to run this command!",
+                        e.getAuthor().getAsTag(), e.getAuthor().getId()), e);
             }
         }
     }
