@@ -76,6 +76,7 @@ public class MCHelper {
         jda.addEventListener(new SqlCommand());
         jda.addEventListener(new RemindmeCommand());
         jda.addEventListener(new DeleteReminderCommand());
+        jda.addEventListener(new SnowflakeCommand());
 
         if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             jda.addEventListener(new GuildJoinLeaveListener());
