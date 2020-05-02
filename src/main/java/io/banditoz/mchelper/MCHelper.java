@@ -45,7 +45,7 @@ public class MCHelper {
         }
         Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
         jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
-        jda.awaitReady();
+        LOGGER.info("Registering commands and listeners...");
         jda.addEventListener(new BashCommand());
         jda.addEventListener(new InfoCommand());
         jda.addEventListener(new MathCommand());
@@ -116,13 +116,6 @@ public class MCHelper {
             jda.addEventListener(new WeatherStationCommand());
         }
 
-        if (settings.getEsUrl() == null) {
-            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
-        }
-        else {
-            Timer pingMeasurementTimer = new Timer();
-            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
-        }
         if (settings.getAlphaVantageKey() == null || settings.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
             LOGGER.info("Alpha Vantage API key not defined! Not enabling financial commands.");
         }
@@ -141,15 +134,26 @@ public class MCHelper {
             thread.start();
             jda.addEventListener(new LoadoutCommand());
         }
+        jda.addEventListener(new HelpCommand()); // this must be registered last
+        jda.awaitReady();
+
+        // now that JDA is done loading, we can initialize things
+        // that could have used it before initialization completes below.
 
         ReminderService.initialize();
-
-        jda.addEventListener(new HelpCommand()); // this must be registered last
 
         SES.scheduleAtFixedRate(new QotdRunnable(),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
+
+        if (settings.getEsUrl() == null) {
+            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
+        }
+        else {
+            Timer pingMeasurementTimer = new Timer();
+            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+        }
     }
 
     public static ObjectMapper getObjectMapper() {
@@ -197,7 +201,7 @@ public class MCHelper {
      * @return A Response object. If you just need the response body, use MCHelper#performHttpRequest instead.
      * @throws HttpResponseException If the response code is >=400
      * @throws IOException If there was an issue performing the HTTP request
-     * @see MCHelper#performHttpRequest(Request) 
+     * @see MCHelper#performHttpRequest(Request)
      */
     public static Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
