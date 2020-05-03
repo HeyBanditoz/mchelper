@@ -109,7 +109,7 @@ public abstract class Command extends ListenerAdapter {
         }
         char prefix = new GuildConfigDaoImpl().getConfig(e.getGuild()).getPrefix();
         String expected = prefix + commandName();
-        return expected.equals(args[0]);
+        return expected.equalsIgnoreCase(args[0]);
     }
 
     /**
