@@ -31,6 +31,7 @@ public class CommandEvent {
 
     /**
      * Grabs the command arguments formatted as a String.
+     *
      * @return The arguments.
      */
     public String getCommandArgsString() {
@@ -39,6 +40,7 @@ public class CommandEvent {
 
     /**
      * Grabs the command arguments as an array.
+     *
      * @return The arguments.
      */
     public String[] getCommandArgs() {
@@ -47,6 +49,7 @@ public class CommandEvent {
 
     /**
      * Grabs the MessageReceivedEvent.
+     *
      * @return the MessageReceivedEvent.
      */
     public MessageReceivedEvent getEvent() {
@@ -55,6 +58,7 @@ public class CommandEvent {
 
     /**
      * Gets the guild. This could be null if the command didn't come from a guild.
+     *
      * @return The Guild, or null if the command didn't happen in one.
      */
     public Guild getGuild() {
@@ -63,6 +67,7 @@ public class CommandEvent {
 
     /**
      * Sends a reply containing the exception message.
+     *
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex, boolean caught) {
@@ -71,6 +76,7 @@ public class CommandEvent {
 
     /**
      * Sends a reply containing the exception message.
+     *
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
@@ -79,6 +85,7 @@ public class CommandEvent {
 
     /**
      * Sends a reply.
+     *
      * @param msg The reply.
      */
     public void sendReply(String msg) {
@@ -87,6 +94,7 @@ public class CommandEvent {
 
     /**
      * Sends an EmbedReply.
+     *
      * @param me The reply.
      */
     public void sendEmbedReply(MessageEmbed me) {

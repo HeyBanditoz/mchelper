@@ -22,11 +22,13 @@ public class MessageCache implements EventListener {
      * Message Caching for JDA v4. Adapted from
      * https://gist.github.com/Almighty-Alpaca/32629893e9cd305f1165652c80726b41 Used
      * for deleted message caching :)
+     *
      * @author https://gist.github.com/Jg99/86f026fbc4dba80408e5e2c915d62b67/04bb8985b3a75faa13813fc73660d123b2469ed5
      */
     public MessageCache(final JDA api) {
         this.api = api;
-        this.messageMap = new Cache2kBuilder<String, Message>() {}
+        this.messageMap = new Cache2kBuilder<String, Message>() {
+        }
                 .expireAfterWrite(1, TimeUnit.DAYS)
                 .suppressExceptions(false)
                 .build();

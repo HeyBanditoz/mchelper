@@ -10,7 +10,7 @@ public class ListUtils {
      * Pulls num random entries from the ArrayList (l) and builds a String from it.
      *
      * @param num The number of random entries to pull
-     * @param l The ArrayList containing Strings to extract from
+     * @param l   The ArrayList containing Strings to extract from
      * @return A built String containing the entry(s) pulled from the list.
      */
     public static String extractNumRandomly(int num, ArrayList<String> l) {

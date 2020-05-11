@@ -9,6 +9,7 @@ import java.io.IOException;
 public class QotdFetcher {
     /**
      * Gets the current quote of the day.
+     *
      * @return The quote item
      */
     public static QuoteItem getQotd() throws IOException, HttpResponseException {

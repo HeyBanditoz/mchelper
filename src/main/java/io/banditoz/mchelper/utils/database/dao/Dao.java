@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 public abstract class Dao {
     public abstract String getSqlTableGenerator();
+
     protected final Logger LOGGER = LoggerFactory.getLogger(Dao.class);
 
     public void generateTable() {

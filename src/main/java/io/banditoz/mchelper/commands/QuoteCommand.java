@@ -26,7 +26,8 @@ public class QuoteCommand extends Command {
             NamedQuote nq;
             if (ce.getCommandArgsString().isEmpty()) {
                 nq = dao.getRandomQuote(ce.getGuild());
-            } else {
+            }
+            else {
                 nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
             }
             ce.sendReply(nq == null ? "No quote found." : nq.format());

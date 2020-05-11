@@ -55,7 +55,7 @@ public class WeatherCommand extends Command {
                         "https://darksky.net/forecast/" + response.latitude().toString() + "," + response.longitude().toString())
                 .setDescription(response.daily().summary())
                 .addField("Temperature", response.currently().temperature().toString() +
-                        "°F (feels like " + response.currently().apparentTemperature().toString() + "°F)" ,true)
+                        "°F (feels like " + response.currently().apparentTemperature().toString() + "°F)", true)
                 .addField("Humidity", response.currently().humidity().doubleValue() * 100 + "%", true)
                 .addField("Wind", response.currently().windSpeed().toString() + " mph", true)
                 .addField("Precipitation", response.currently().precipProbability().doubleValue() * 100 + "%", true)

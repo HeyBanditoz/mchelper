@@ -11,6 +11,7 @@ import javax.script.ScriptEngineManager;
 
 public class EvalCommand extends ElevatedCommand {
     private ScriptEngine engine;
+
     public EvalCommand() {
         engine = new ScriptEngineManager().getEngineByName("groovy");
     }
@@ -44,8 +45,7 @@ public class EvalCommand extends ElevatedCommand {
             engine.put("ce", ce);
             engine.put("args", ce.getCommandArgs());
             engine.put("jda", ce.getEvent().getJDA());
-            if (ce.getEvent().isFromType(ChannelType.TEXT))
-            {
+            if (ce.getEvent().isFromType(ChannelType.TEXT)) {
                 engine.put("guild", ce.getEvent().getGuild());
                 engine.put("member", ce.getEvent().getMember());
             }

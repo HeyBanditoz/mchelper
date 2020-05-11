@@ -185,7 +185,7 @@ public class LoadoutCommand extends Command {
             }
             done.add(item.getName());
             builder.append("\\* ").append(item.getName()).append("\n");
-            if (count>=1000) {
+            if (count >= 1000) {
                 ce.sendReply("Items could not be found for you selected filters, please try again.");
                 return;
             }

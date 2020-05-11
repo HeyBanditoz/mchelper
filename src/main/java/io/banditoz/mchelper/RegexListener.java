@@ -14,6 +14,7 @@ import java.util.concurrent.*;
 public abstract class RegexListener extends ListenerAdapter {
     protected abstract void onMessage(RegexEvent re);
     protected abstract String regex();
+
     private MessageReceivedEvent e;
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
     protected static final ExecutorService ES = new ThreadPoolExecutor(
@@ -33,8 +34,9 @@ public abstract class RegexListener extends ListenerAdapter {
                 LOGGER.debug("Listener ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
                 CommandUtils.sendExceptionMessage(this.e, ex, LOGGER, false, false);
-            }});
-            LOGGER.debug(ES.toString());
+            }
+        });
+        LOGGER.debug(ES.toString());
     }
 
     private void initialize(MessageReceivedEvent e) {

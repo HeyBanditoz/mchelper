@@ -18,6 +18,7 @@ public class ReminderService {
 
     /**
      * Schedules a new reminder, and adding it to the database.
+     *
      * @param r The ReminderRunnable to schedule.
      * @return The id of the newly added reminder in the database.
      * @throws SQLException
@@ -31,9 +32,10 @@ public class ReminderService {
 
     /**
      * Grabs all "active" reminders (those which haven't been reminded or deleted) and schedules them.
+     *
      * @throws SQLException If something went wrong with fetching all active reminders.
      */
-    public static void initialize()  {
+    public static void initialize() {
         try {
             ArrayList<Reminder> reminders = new ArrayList<>(new RemindersDaoImpl().getAllActiveReminders());
             for (Reminder reminder : reminders) {
@@ -47,6 +49,7 @@ public class ReminderService {
 
     /**
      * Add a new Reminder to be fired to the ScheduledExecutorService without adding it to the database
+     *
      * @param r The ReminderRunnable containing the Reminder to add.
      */
     private static void scheduleWithoutCreation(ReminderRunnable r) {

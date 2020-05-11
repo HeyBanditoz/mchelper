@@ -20,10 +20,10 @@ import java.util.concurrent.*;
  * Represents the abstract class for any Command the bot may have. Note any command you implement
  * you must register in MCHelper.java. All commands will be multithreaded. All exceptions will be caught,
  * and a message sent to Discord showing the classpath and description of the exception.
- *
+ * <p>
  * To send replies, you must leverage the CommandEvent class that should be passed with the onCommand() method.
- *
- *
+ * <p>
+ * <p>
  * An example command could be
  * <pre>
  *     public class PingCommand extends Command {
@@ -51,11 +51,13 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * Return this command's cooldown in seconds. Override and return what you want the cooldown to be.
+     *
      * @return The cooldown.
      */
     protected int getCooldown() {
         return 0;
     }
+
     protected HashMap<String, Instant> cooldowns = getCooldown() > 0 ? new HashMap<>() : null;
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
@@ -114,6 +116,7 @@ public abstract class Command extends ListenerAdapter {
 
     /**
      * Checks if the user is on cooldown.
+     *
      * @param id The ID to check.
      * @return true if they are allowed to run the command, false if they are still on cooldown.
      */
@@ -124,10 +127,12 @@ public abstract class Command extends ListenerAdapter {
                 Instant instant = Instant.now().plus(getCooldown(), ChronoUnit.SECONDS);
                 cooldowns.put(id, instant);
                 return true;
-            } else if (Instant.now().isAfter(cooldown)) {
+            }
+            else if (Instant.now().isAfter(cooldown)) {
                 cooldowns.replace(id, Instant.now().plus(getCooldown(), ChronoUnit.SECONDS));
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }

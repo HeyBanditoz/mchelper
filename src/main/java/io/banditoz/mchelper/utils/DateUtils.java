@@ -14,6 +14,7 @@ public class DateUtils {
     }
 
     // Everything below is lifted from http://www.java2s.com/Code/Java/Data-Type/Checksiftwocalendarsrepresentthesamedayignoringtime.htm
+
     /**
      * <p>Checks if two dates are on the same day ignoring time.</p>
      *

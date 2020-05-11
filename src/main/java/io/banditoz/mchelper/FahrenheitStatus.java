@@ -16,8 +16,7 @@ public class FahrenheitStatus extends TimerTask {
             double f = EsUtils.getFahrenheit();
             Activity a = Activity.playing(f + "°F");
             jda.getPresence().setActivity(a);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Activity a = Activity.playing("Error!");
             jda.getPresence().setActivity(a);
             LoggerFactory.getLogger(FahrenheitStatus.class).error("Error on getting temperature!", ex);

@@ -24,7 +24,7 @@ public class Help {
     @Override
     public String toString() {
         return "`" + commandName + "` - " +
-                ((parameters == null)? "<no parameters> " : parameters) + " - " +
+                ((parameters == null) ? "<no parameters> " : parameters) + " - " +
                 description + ((isElevated) ? " (ELEVATED)" : "");
     }
 }

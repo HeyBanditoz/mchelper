@@ -27,7 +27,8 @@ public class DictionaryCommand extends Command {
             if (ce.getCommandArgs()[1].matches("\\d+")) {
                 toLookup = Integer.parseInt(ce.getCommandArgs()[1]) - 1; // zero indexed
                 result = DictionarySearcher.search(ce.getCommandArgs()[2]);
-            } else {
+            }
+            else {
                 result = DictionarySearcher.search(ce.getCommandArgsString());
             }
         } catch (Exception ex) {

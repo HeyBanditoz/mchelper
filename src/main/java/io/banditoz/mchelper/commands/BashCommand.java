@@ -32,8 +32,7 @@ public class BashCommand extends ElevatedCommand {
                 return;
             }
             ce.sendReply(output);
-        }
-        catch (InterruptedException | IOException | HttpResponseException ex) {
+        } catch (InterruptedException | IOException | HttpResponseException ex) {
             ce.sendExceptionMessage(ex);
         }
     }

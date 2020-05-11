@@ -17,6 +17,7 @@ import java.io.IOException;
 public class TeXRenderer {
     /**
      * Render a TeX equation.
+     *
      * @param tex The TeX to render.
      * @return A BufferedImage of the equation.
      */
@@ -39,7 +40,7 @@ public class TeXRenderer {
         g2.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
         g2.drawImage(image, null, 0, 0);
 
-        icon.paintIcon(null, g2, 0,0);
+        icon.paintIcon(null, g2, 0, 0);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(image, "png", os);

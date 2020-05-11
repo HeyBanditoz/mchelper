@@ -98,7 +98,7 @@ public class CoordinatePoint {
         double a = (this.x - point.x);
         double b = (this.z - point.z);
 
-        return Math.sqrt((a*a) + (b*b));
+        return Math.sqrt((a * a) + (b * b));
     }
 
     public CoordinatePoint getNetherCoordinates() {

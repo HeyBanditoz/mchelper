@@ -131,6 +131,7 @@ class Result {
         this.files = files;
     }
 }
+
 class FileResponse {
     @JsonProperty("highlight_language")
     private Object highlightLanguage;

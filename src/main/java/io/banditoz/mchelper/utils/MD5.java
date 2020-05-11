@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 public class MD5 {
     /**
      * Computes the MD5 hash given a string. See
+     *
      * @param toHash The String to be hashed.
      * @return The MD5 hash of the string.
      * @see <a href="https://stackoverflow.com/a/30119004">https://stackoverflow.com/a/30119004</a>

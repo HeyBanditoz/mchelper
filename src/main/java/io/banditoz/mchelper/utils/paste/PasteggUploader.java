@@ -11,8 +11,10 @@ import java.io.IOException;
 public class PasteggUploader {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final Logger logger = LoggerFactory.getLogger(PasteggUploader.class);
+
     /**
      * Uploads a message to paste.gg.
+     *
      * @return The URL of the paste.
      */
     public static String uploadToPastegg(Paste paste) throws IOException, HttpResponseException {

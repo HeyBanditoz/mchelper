@@ -31,23 +31,29 @@ public class CoordCommand extends Command {
                             ce.getCommandArgs()[2], ce.getEvent().getAuthor().getIdLong(), ce.getGuild().getIdLong());
                     dao.savePoint(point);
                     ce.sendReply(point + " saved.");
-                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("show") || ce.getCommandArgs()[1].equalsIgnoreCase("list")) {
+                }
+                else if (ce.getCommandArgs()[1].equalsIgnoreCase("show") || ce.getCommandArgs()[1].equalsIgnoreCase("list")) {
                     if (ce.getCommandArgs().length > 2) {
                         ce.sendReply(dao.getPointByName(ce.getCommandArgs()[2], ce.getGuild()).toString());
-                    } else {
+                    }
+                    else {
                         StringBuilder s = new StringBuilder("Coordinates:\n");
                         dao.getAllPointsForGuild(ce.getGuild()).forEach(p -> s.append(p.getName()).append(": ").append(p.toString()).append('\n'));
                         ce.sendReply(s.toString());
                     }
-                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("delete") || ce.getCommandArgs()[1].equalsIgnoreCase("remove")) {
-                        dao.deletePointByName(ce.getCommandArgs()[2], ce.getGuild());
-                        ce.sendReply("Deleted.");
-                } else if (ce.getCommandArgs()[1].equalsIgnoreCase("help")) {
+                }
+                else if (ce.getCommandArgs()[1].equalsIgnoreCase("delete") || ce.getCommandArgs()[1].equalsIgnoreCase("remove")) {
+                    dao.deletePointByName(ce.getCommandArgs()[2], ce.getGuild());
+                    ce.sendReply("Deleted.");
+                }
+                else if (ce.getCommandArgs()[1].equalsIgnoreCase("help")) {
                     help(ce);
-                } else {
+                }
+                else {
                     ce.sendReply("Unrecognized operator " + ce.getCommandArgs()[1] + ".");
                 }
-            } else {
+            }
+            else {
                 help(ce);
             }
         } catch (SQLException e) {

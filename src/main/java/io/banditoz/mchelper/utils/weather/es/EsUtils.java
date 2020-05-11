@@ -29,7 +29,7 @@ public class EsUtils {
         BigDecimal currenthPa = new BigDecimal(returnValue(jn, "hpa"));
         response.close();
 
-        return currentFahrenheit + " °F, " + currentCelsius + " °C, " + currentHumidity+ " %H, " + currenthPa + " hPa (" + currenthPa.divide(new BigDecimal("1013.25"), m) + " atm, " + currenthPa.divide(new BigDecimal("68.9475729318"), m) + " psi)";
+        return currentFahrenheit + " °F, " + currentCelsius + " °C, " + currentHumidity + " %H, " + currenthPa + " hPa (" + currenthPa.divide(new BigDecimal("1013.25"), m) + " atm, " + currenthPa.divide(new BigDecimal("68.9475729318"), m) + " psi)";
     }
 
     public static double getFahrenheit() throws IOException, HttpResponseException {

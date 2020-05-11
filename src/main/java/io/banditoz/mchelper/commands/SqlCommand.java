@@ -35,6 +35,7 @@ public class SqlCommand extends ElevatedCommand {
 
     /**
      * Builds a pretty(ish) printed String of the current ResultSet.
+     *
      * @param rs The ResultSet to build to a String.
      * @return The built String
      * @throws SQLException If something went wrong while fetching SQL data.

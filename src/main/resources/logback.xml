@@ -21,7 +21,7 @@
     <logger name="com.merakianalytics.orianna.datapipeline.common.HTTPClient" level="OFF"/>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="HTML" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="HTML"/>
     </root>
 </configuration>

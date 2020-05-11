@@ -126,7 +126,8 @@ public class MCHelper {
 
         if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
             LOGGER.info("Riot API key not defined! Not enabling Orianna.");
-        } else {
+        }
+        else {
             Orianna.setRiotAPIKey(settings.getRiotApiKey());
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
             Thread thread = new Thread(LoadoutCommand::createData);
@@ -179,7 +180,7 @@ public class MCHelper {
      * @param request The Request object to use.
      * @return A String containing the body
      * @throws HttpResponseException If the response code is >=400
-     * @throws IOException If there was an issue performing the HTTP request
+     * @throws IOException           If there was an issue performing the HTTP request
      * @see MCHelper#performHttpRequestGetResponse(Request)
      */
     public static String performHttpRequest(Request request) throws HttpResponseException, IOException {
@@ -200,7 +201,7 @@ public class MCHelper {
      * @param request The Request object to use.
      * @return A Response object. If you just need the response body, use MCHelper#performHttpRequest instead.
      * @throws HttpResponseException If the response code is >=400
-     * @throws IOException If there was an issue performing the HTTP request
+     * @throws IOException           If there was an issue performing the HTTP request
      * @see MCHelper#performHttpRequest(Request)
      */
     public static Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {

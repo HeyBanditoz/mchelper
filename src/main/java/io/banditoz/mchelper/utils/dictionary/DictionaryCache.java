@@ -7,7 +7,8 @@ public class DictionaryCache {
     private final Cache<String, DictionaryResult> cache;
 
     public DictionaryCache() {
-        this.cache = new Cache2kBuilder<String, DictionaryResult>() {}
+        this.cache = new Cache2kBuilder<String, DictionaryResult>() {
+        }
                 .eternal(true) // i doubt the english language will change during the bot's uptime
                 .suppressExceptions(false)
                 .build();

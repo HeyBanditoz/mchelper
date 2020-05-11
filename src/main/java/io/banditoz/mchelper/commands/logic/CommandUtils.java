@@ -21,6 +21,7 @@ public class CommandUtils {
 
     /**
      * Sends a reply containing the exception message.
+     *
      * @param ex The exception.
      */
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l, boolean caught, boolean blocked) {
@@ -46,8 +47,9 @@ public class CommandUtils {
 
     /**
      * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
+     *
      * @param msg The reply.
-     * @param e The MessageReceivedEvent to reply to.
+     * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
         _sendReply(msg, e.getChannel());
@@ -55,6 +57,7 @@ public class CommandUtils {
 
     /**
      * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
+     *
      * @param msg The reply.
      */
     public static void sendReply(String msg, TextChannel chan) {
@@ -63,8 +66,9 @@ public class CommandUtils {
 
     /**
      * Internal method for sending a reply. Named differently to prevent infinite recursion.
+     *
      * @param msg The reply.
-     * @param c The MessageChannel to send to.
+     * @param c   The MessageChannel to send to.
      */
     private static void _sendReply(String msg, MessageChannel c) {
         msg = formatMessage(msg);
@@ -90,8 +94,7 @@ public class CommandUtils {
                     .addFile(f)
                     .queue();
             image.close();
-        }
-        finally {
+        } finally {
             f.delete();
         }
     }
@@ -112,14 +115,14 @@ public class CommandUtils {
                     .addFile(f)
                     .queue();
             image.close();
-        }
-        finally {
+        } finally {
             f.delete();
         }
     }
 
     /**
      * Checks the message for abnormalities, (null, empty) and formats it accordingly.
+     *
      * @param msg The string to check.
      * @return The formatted messaeg.
      */

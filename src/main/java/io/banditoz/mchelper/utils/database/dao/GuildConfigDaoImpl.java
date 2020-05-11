@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
-    private static Cache<Long, GuildConfig> cache = new Cache2kBuilder<Long, GuildConfig>() {}
+    private static Cache<Long, GuildConfig> cache = new Cache2kBuilder<Long, GuildConfig>() {
+    }
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .disableStatistics(true)
             .build();
