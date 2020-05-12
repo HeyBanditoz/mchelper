@@ -1,5 +1,9 @@
 package io.banditoz.mchelper.utils.database;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +69,15 @@ public class NamedQuote {
         else {
             throw new IllegalArgumentException("Could not create named quote from string!");
         }
+        return nq;
+    }
+
+    public static NamedQuote parseMessageId(long id, TextChannel c) {
+        Message m = c.retrieveMessageById(id).complete();
+        NamedQuote nq = new NamedQuote();
+        nq.setQuote(m.getContentDisplay());
+        nq.setQuoteAuthor(m.getAuthor().getName());
+        nq.setGuildId(c.getGuild().getIdLong());
         return nq;
     }
 
