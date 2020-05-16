@@ -61,7 +61,6 @@ public class MCHelper {
         jda.addEventListener(new ToMorseCommand());
         jda.addEventListener(new FromMorseCommand());
         jda.addEventListener(new EvalCommand());
-        jda.addEventListener(new ReverseGeocoderCommand());
         jda.addEventListener(new DiceRollerCommand());
         jda.addEventListener(new CoinFlipCommand());
         jda.addEventListener(new VersionCommand());
@@ -99,14 +98,6 @@ public class MCHelper {
         }
         else {
             jda.addEventListener(new DictionaryCommand());
-        }
-
-        if (settings.getDarkSkyAPI() == null || settings.getDarkSkyAPI().equals("Dark Sky API key here.")) {
-            LOGGER.info("No dark sky API key defined! Not enabling the weather command...");
-        }
-        else {
-            jda.addEventListener(new WeatherCommand());
-            jda.addEventListener(new WeatherForecastCommand());
         }
 
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {

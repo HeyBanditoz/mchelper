@@ -65,7 +65,6 @@ public class SettingsManager {
         defaultOwners.add("Bot ID here");
         defaultSettings.setDiscordToken("Bot token here...");
         defaultSettings.setBotOwners(defaultOwners);
-        defaultSettings.setDarkSkyAPI("Dark Sky API key here.");
         defaultSettings.setOwlBotToken("OwlBot API key here.");
         defaultSettings.setCommandThreads(2);
         defaultSettings.setRegexListenerThreads(2);

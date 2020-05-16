@@ -9,8 +9,6 @@ public class Settings {
     private String discordToken;
     @JsonProperty("botOwners")
     private List<String> botOwners = null;
-    @JsonProperty("darkSkyAPI")
-    private String darkSkyAPI;
     @JsonProperty("owlBotToken")
     private String owlBotToken;
     @JsonProperty("grafanaUrl")
@@ -56,16 +54,6 @@ public class Settings {
     @JsonProperty("botOwners")
     public void setBotOwners(List<String> botOwners) {
         this.botOwners = botOwners;
-    }
-
-    @JsonProperty("darkSkyAPI")
-    public String getDarkSkyAPI() {
-        return darkSkyAPI;
-    }
-
-    @JsonProperty("darkSkyAPI")
-    public void setDarkSkyAPI(String darkSkyAPI) {
-        this.darkSkyAPI = darkSkyAPI;
     }
 
     @JsonProperty("owlBotToken")
