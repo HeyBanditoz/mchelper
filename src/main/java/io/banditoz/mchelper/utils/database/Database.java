@@ -2,15 +2,14 @@ package io.banditoz.mchelper.utils.database;
 
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
-import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
-import io.banditoz.mchelper.utils.database.dao.Dao;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
-import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
+import io.banditoz.mchelper.utils.database.dao.*;
 import org.mariadb.jdbc.MariaDbPoolDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -32,9 +31,8 @@ public class Database {
         daos.add(new GuildConfigDaoImpl());
         daos.add(new CoordsDaoImpl());
         daos.add(new RemindersDaoImpl());
-        for (Dao dao : daos) {
-            dao.generateTable();
-        }
+        daos.add(new QuotesDaoImpl());
+        daos.forEach(Dao::generateTable);
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl().getGuildCount() + " guilds.");
     }
 
