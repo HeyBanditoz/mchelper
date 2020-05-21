@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
@@ -16,15 +15,9 @@ public class HelpCommand extends Command {
         return "help";
     }
 
-    public HelpCommand() {
+    public HelpCommand(List<Command> commands) {
         helps.put(this.commandName(), getHelp()); // let's add ourselves into the mix, eh?
-        for (Object registeredListener : MCHelper.getJDA().getRegisteredListeners()) {
-            if (registeredListener instanceof Command) { // don't add the regex listeners
-                Command c = (Command) registeredListener;
-                helps.put(c.commandName(), c.getHelp());
-            }
-        }
-        LOGGER.info(helps.size() + " commands registered.");
+        commands.forEach(c -> helps.put(c.commandName(), c.getHelp()));
     }
 
     @Override

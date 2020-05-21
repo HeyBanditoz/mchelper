@@ -2,9 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.merakianalytics.orianna.Orianna;
-import com.merakianalytics.orianna.types.common.Region;
-import io.banditoz.mchelper.commands.*;
+import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -35,6 +33,7 @@ public class MCHelper {
     private static final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
     private static final ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
+    private static final CommandHandler commandHandler = new CommandHandler();
     private static MessageCache CACHE;
 
     public static void setupBot() throws LoginException, InterruptedException {
@@ -45,46 +44,15 @@ public class MCHelper {
         }
         Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
         jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
-        LOGGER.info("Registering commands and listeners...");
-        jda.addEventListener(new BashCommand());
-        jda.addEventListener(new InfoCommand());
-        jda.addEventListener(new MathCommand());
-        jda.addEventListener(new EangleCommand());
-        jda.addEventListener(new NetherCommand());
-        jda.addEventListener(new OverworldCommand());
-        jda.addEventListener(new UnitsCommand());
-        jda.addEventListener(new CoordCommand());
-        jda.addEventListener(new TeXCommand());
+        jda.addEventListener(commandHandler);
         jda.addEventListener(new TeXListener());
         jda.addEventListener(new RedditListener());
-        jda.addEventListener(new PickCommand());
-        jda.addEventListener(new ToMorseCommand());
-        jda.addEventListener(new FromMorseCommand());
-        jda.addEventListener(new EvalCommand());
-        jda.addEventListener(new ReverseGeocoderCommand());
-        jda.addEventListener(new DiceRollerCommand());
-        jda.addEventListener(new CoinFlipCommand());
-        jda.addEventListener(new VersionCommand());
-        jda.addEventListener(new PingCommand());
-        jda.addEventListener(new DefaultChannelCommand());
-        jda.addEventListener(new PrefixCommand());
-        jda.addEventListener(new HeapDumpCommand());
-        jda.addEventListener(new UploadLogsCommand());
-        jda.addEventListener(new FloodCommand());
-        jda.addEventListener(new QuoteCommand());
-        jda.addEventListener(new AddquoteCommand());
-        jda.addEventListener(new SqlCommand());
-        jda.addEventListener(new RemindmeCommand());
-        jda.addEventListener(new DeleteReminderCommand());
-        jda.addEventListener(new SnowflakeCommand());
-
         if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             jda.addEventListener(new GuildJoinLeaveListener());
         }
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
-
         if (settings.getWatchDeletedMessages()) {
             CACHE = new MessageCache(jda);
             jda.addEventListener(CACHE);
@@ -93,49 +61,6 @@ public class MCHelper {
         else {
             LOGGER.info("Message cache disabled.");
         }
-
-        if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
-            LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
-        }
-        else {
-            jda.addEventListener(new DictionaryCommand());
-        }
-
-        if (settings.getDarkSkyAPI() == null || settings.getDarkSkyAPI().equals("Dark Sky API key here.")) {
-            LOGGER.info("No dark sky API key defined! Not enabling the weather command...");
-        }
-        else {
-            jda.addEventListener(new WeatherCommand());
-            jda.addEventListener(new WeatherForecastCommand());
-        }
-
-        if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
-            LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
-        }
-        else {
-            jda.addEventListener(new WeatherStationCommand());
-        }
-
-        if (settings.getAlphaVantageKey() == null || settings.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
-            LOGGER.info("Alpha Vantage API key not defined! Not enabling financial commands.");
-        }
-        else {
-            jda.addEventListener(new CurrencyConversionCommand());
-            jda.addEventListener(new StockCommand());
-        }
-
-        if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
-            LOGGER.info("Riot API key not defined! Not enabling Orianna.");
-        }
-        else {
-            Orianna.setRiotAPIKey(settings.getRiotApiKey());
-            Orianna.setDefaultRegion(Region.NORTH_AMERICA);
-            Thread thread = new Thread(LoadoutCommand::createData);
-            thread.setName("Orianna");
-            thread.start();
-            jda.addEventListener(new LoadoutCommand());
-        }
-        jda.addEventListener(new HelpCommand()); // this must be registered last
         jda.awaitReady();
 
         // now that JDA is done loading, we can initialize things
@@ -171,6 +96,10 @@ public class MCHelper {
 
     public static MessageCache getMessageCache() {
         return CACHE;
+    }
+
+    public static CommandHandler getCommandHandler() {
+        return commandHandler;
     }
 
     /**

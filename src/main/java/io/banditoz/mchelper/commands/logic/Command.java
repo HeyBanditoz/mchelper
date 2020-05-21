@@ -26,25 +26,25 @@ import java.util.concurrent.*;
  * <p>
  * An example command could be
  * <pre>
- *     public class PingCommand extends Command {
- *          public String CommandName() {
- *              return "!ping";
- *          }
+ * public class PingCommand extends Command {
+ *      public String CommandName() {
+ *          return "!ping";
+ *      }
  *
- *          public Help getHelp() {
- *              return new Help(commandName(), false).withParameters(null)
- *                 .withDescription("Returns \"Pong!\"");
- *          }
+ *      public Help getHelp() {
+ *          return new Help(commandName(), false).withParameters(null)
+ *             .withDescription("Returns \"Pong!\"");
+ *      }
  *
- *          protected void onCommand(CommandEvent ce) {
- *              ce.sendReply("Pong!");
- *          }
- *     }
+ *      protected void onCommand(CommandEvent ce) {
+ *          ce.sendReply("Pong!");
+ *      }
+ * }
  * </pre>
  *
  * @see io.banditoz.mchelper.MCHelper
  */
-public abstract class Command extends ListenerAdapter {
+public abstract class Command {
     protected abstract void onCommand(CommandEvent ce);
     public abstract String commandName();
     public abstract Help getHelp();
@@ -72,19 +72,20 @@ public abstract class Command extends ListenerAdapter {
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
     }
 
-    @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        if (containsCommand(e)) {
-            go(e);
-        }
+    /**
+     * Method that can be overridden in subclasses to check conditions before execution
+     *
+     * @param e The MessageReceivedEvent to execute
+     * @see ElevatedCommand
+     */
+    protected void tryToExecute(MessageReceivedEvent e) {
+        execute(e);
     }
 
     /**
      * Runs onCommand() in parallel.
      */
-    protected void go(MessageReceivedEvent e) {
-        if (!e.isFromGuild()) return; // TODO I'm incredibly lazy and should actually fix this sometime.
-        if (e.getJDA().getSelfUser().getId().equals(e.getAuthor().getId())) return; // don't execute own commands.
+    protected void execute(MessageReceivedEvent e) {
         if (handleCooldown(e.getAuthor().getId())) {
             e.getChannel().sendTyping().queue();
             ES.execute(() -> {

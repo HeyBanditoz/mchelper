@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the abstract class for any command that only bot maintainers can run.
@@ -10,17 +9,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class ElevatedCommand extends Command {
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        if (containsCommand(e)) {
-            if (CommandPermissions.isBotOwner(e.getAuthor())) {
-                LOGGER.info(String.format("Executing elevated command: <%s#%s> %s",
-                        e.getAuthor().getAsTag(), e.getAuthor().getId(), e.getMessage().getContentDisplay()));
-                go(e);
-            }
-            else {
-                CommandUtils.sendReply(String.format("User %s (ID: %s) does not have permission to run this command!",
-                        e.getAuthor().getAsTag(), e.getAuthor().getId()), e);
-            }
+    protected void tryToExecute(MessageReceivedEvent e) {
+        if (CommandPermissions.isBotOwner(e.getAuthor())) {
+            LOGGER.info(String.format("Executing elevated command: <%s#%s> %s",
+                    e.getAuthor().getAsTag(), e.getAuthor().getId(), e.getMessage().getContentDisplay()));
+            execute(e);
+        }
+        else {
+            CommandUtils.sendReply(String.format("User %s (ID: %s) does not have permission to run this command!",
+                    e.getAuthor().getAsTag(), e.getAuthor().getId()), e);
         }
     }
 }
