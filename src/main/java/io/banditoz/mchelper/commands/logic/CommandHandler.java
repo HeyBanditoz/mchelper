@@ -53,7 +53,6 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new ToMorseCommand());
         commands.add(new FromMorseCommand());
         commands.add(new EvalCommand());
-        commands.add(new ReverseGeocoderCommand());
         commands.add(new DiceRollerCommand());
         commands.add(new CoinFlipCommand());
         commands.add(new VersionCommand());
@@ -75,14 +74,6 @@ public class CommandHandler extends ListenerAdapter {
         }
         else {
             commands.add(new DictionaryCommand());
-        }
-
-        if (SETTINGS.getDarkSkyAPI() == null || SETTINGS.getDarkSkyAPI().equals("Dark Sky API key here.")) {
-            LOGGER.info("No dark sky API key defined! Not enabling the weather command...");
-        }
-        else {
-            commands.add(new WeatherCommand());
-            commands.add(new WeatherForecastCommand());
         }
 
         if (SETTINGS.getEsUrl() == null || SETTINGS.getGrafanaToken() == null || SETTINGS.getGrafanaUrl() == null) {
