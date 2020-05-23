@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.1.1_141') {
+    implementation('net.dv8tion:JDA:4.1.1_154') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -52,9 +52,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
     implementation 'org.jfree:jfreechart:1.5.0'
     implementation 'com.merakianalytics.orianna:orianna:4.0.0-rc5'
-    implementation 'org.codehaus.groovy:groovy-jsr223:3.0.1'
+    implementation 'org.codehaus.groovy:groovy-jsr223:3.0.4'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
-
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
 
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
