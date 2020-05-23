@@ -33,10 +33,6 @@ public class InfoCommand extends Command {
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")
                 .toLowerCase(); // https://stackoverflow.com/a/40487511
-        String messageCacheSize = "null";
-        if (MCHelper.getMessageCache() != null) {
-            messageCacheSize = Integer.toString(MCHelper.getMessageCache().getSize());
-        }
         AtomicInteger users = new AtomicInteger();
         ce.getEvent().getJDA().getGuilds().forEach(guild -> users.addAndGet(guild.getMemberCount()));
         EmbedBuilder eb = new EmbedBuilder()
@@ -47,8 +43,7 @@ public class InfoCommand extends Command {
                 .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
                 .addField("Users", Integer.toString(users.get()), true)
                 .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true)
-                .addField("Uptime", uptime, true)
-                .addField("Message Cache Size", messageCacheSize, true);
+                .addField("Uptime", uptime, true);
         ce.sendEmbedReply(eb.build());
     }
 }

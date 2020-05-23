@@ -34,7 +34,6 @@ public class MCHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
     private static final ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
     private static final CommandHandler commandHandler = new CommandHandler();
-    private static MessageCache CACHE;
 
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
@@ -53,14 +52,7 @@ public class MCHelper {
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
-        if (settings.getWatchDeletedMessages()) {
-            CACHE = new MessageCache(jda);
-            jda.addEventListener(CACHE);
-            jda.addEventListener(new DeletedMessageListener());
-        }
-        else {
-            LOGGER.info("Message cache disabled.");
-        }
+
         jda.awaitReady();
 
         // now that JDA is done loading, we can initialize things
@@ -92,10 +84,6 @@ public class MCHelper {
 
     public static JDA getJDA() {
         return jda;
-    }
-
-    public static MessageCache getMessageCache() {
-        return CACHE;
     }
 
     public static CommandHandler getCommandHandler() {
