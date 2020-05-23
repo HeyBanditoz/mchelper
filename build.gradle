@@ -46,11 +46,6 @@ dependencies {
     implementation 'com.udojava:EvalEx:2.5'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:3.13.0'
-    implementation('ch.rasc:darksky:2.0.0') {
-        exclude module: 'jackson-core'
-        exclude module: 'jackson-annotations'
-        exclude module: 'jackson-databind'
-    }
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.10.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'

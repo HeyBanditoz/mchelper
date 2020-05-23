@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.utils.StringUtils;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -25,7 +26,9 @@ public class CommandUtils {
      * @param ex The exception.
      */
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l, boolean caught, boolean blocked) {
-        StringBuilder reply = new StringBuilder("**Exception thrown:** " + (blocked ? "```" : "") + ex.toString() + (blocked ? "```" : "")); // ternary abuse out the wazoo
+        StringBuilder reply = new StringBuilder("**Exception thrown:** " + (blocked ? "```" : "")
+                + StringUtils.truncate(ex.toString(), 300, true)
+                + (blocked ? "```" : "")); // ternary abuse out the wazoo
         if (SEND_FULL_STACK_TRACE) {
             reply.append("\n```");
             for (int i = 0; i < ex.getStackTrace().length; i++) {
