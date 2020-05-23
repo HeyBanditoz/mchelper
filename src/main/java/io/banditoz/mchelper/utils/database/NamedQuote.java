@@ -1,9 +1,9 @@
 package io.banditoz.mchelper.utils.database;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,6 +82,21 @@ public class NamedQuote {
     }
 
     public String format() {
-        return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
+        if (isUrl(this.getQuote())) {
+            return "“" + this.getQuote() + " ” --" + this.getQuoteAuthor(); // space at end so link doesnt add quotation mark at the end
+        }
+        else {
+            return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
+        }
+    }
+
+    private boolean isUrl(String url) {
+        // hack hack hack
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
