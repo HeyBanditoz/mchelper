@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
@@ -30,7 +31,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public NamedQuote getRandomQuoteByMatch(String search, @NotNull Guild g) throws SQLException {
+    public Optional<NamedQuote> getRandomQuoteByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = Database.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND() LIMIT 1");
@@ -38,7 +39,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             ps.setString(2, search);
             ps.setString(3, search);
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
+                if (!rs.next()) return Optional.empty();
                 ps.close();
                 return buildQuoteFromResultSet(rs);
             }
@@ -46,25 +47,25 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public NamedQuote getRandomQuote(Guild g) throws SQLException {
+    public Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException {
         try (Connection c = Database.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
+                if (!rs.next()) return Optional.empty();
                 ps.close();
                 return buildQuoteFromResultSet(rs);
             }
         }
     }
 
-    private NamedQuote buildQuoteFromResultSet(ResultSet rs) throws SQLException {
+    private Optional<NamedQuote> buildQuoteFromResultSet(ResultSet rs) throws SQLException {
         NamedQuote nq = new NamedQuote();
         nq.setGuildId(rs.getLong("guild_id"));
         nq.setAuthorId(rs.getLong("author_id"));
         nq.setQuote(rs.getString("quote"));
         nq.setQuoteAuthor(rs.getString("quote_author"));
         nq.setLastModified(rs.getTimestamp("last_modified"));
-        return nq;
+        return Optional.of(nq);
     }
 }

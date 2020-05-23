@@ -7,6 +7,8 @@ import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 
+import java.util.Optional;
+
 public class QuoteCommand extends Command {
     @Override
     public String commandName() {
@@ -23,14 +25,14 @@ public class QuoteCommand extends Command {
     protected void onCommand(CommandEvent ce) {
         QuotesDao dao = new QuotesDaoImpl();
         try {
-            NamedQuote nq;
+            Optional<NamedQuote> nq;
             if (ce.getCommandArgsString().isEmpty()) {
                 nq = dao.getRandomQuote(ce.getGuild());
             }
             else {
                 nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
             }
-            ce.sendReply(nq == null ? "No quote found." : nq.format());
+            nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
         } catch (Exception ex) {
             ce.sendExceptionMessage(ex);
         }
