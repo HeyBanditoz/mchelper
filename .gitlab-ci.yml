@@ -14,7 +14,7 @@ package:
         - gradle shadowJar
     artifacts:
         paths:
-            - build/libs/*.jar
+            - build/libs/*.jarget
         expire_in: 1 week
 
 deploy_production:
