@@ -38,7 +38,7 @@ public class MCHelper {
     public static void setupBot() throws LoginException, InterruptedException {
         Settings settings = SettingsManager.getInstance().getSettings();
         if (settings.getDiscordToken() == null || settings.getDiscordToken().equals("Bot token here...")) {
-            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Settings.json file.");
+            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
             System.exit(1);
         }
         Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
