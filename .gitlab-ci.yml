@@ -14,7 +14,7 @@ package:
         - gradle shadowJar
     artifacts:
         paths:
-            - build/libs/*.jar
+            - build/libs/*.jarget
         expire_in: 1 week
 
 deploy_production:
@@ -27,3 +27,5 @@ deploy_production:
         - ssh -i $KEY -p $PORT -o StrictHostKeyChecking=no discord@$IP 'echo test' &> /dev/null # prevent dumping IP on next command
         - rsync -Pav -e "ssh -i $KEY -p $PORT -o StrictHostKeyChecking=no" build/libs/io.banditoz.mchelper-all.jar discord@$IP:/opt/mchelper/io.banditoz.mchelper-all.jar
         - ssh -i $KEY -p $PORT -o StrictHostKeyChecking=no discord@$IP 'sudo /bin/systemctl restart mchelper.service'
+    only:
+        - master
