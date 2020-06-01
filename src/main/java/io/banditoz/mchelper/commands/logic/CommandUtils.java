@@ -140,7 +140,7 @@ public class CommandUtils {
     }
 
     public static String[] commandArgs(String string) {
-        String message = string.replaceAll("(\\*\\*<.*>\\*\\*)|(^<.*> )", "").trim();
+        String message = string.replaceAll("\\*\\*<.*>\\*\\*", "");
         List<String> matches = new ArrayList<>();
 
         Matcher matcher = Pattern.compile("\\S+").matcher(message);
