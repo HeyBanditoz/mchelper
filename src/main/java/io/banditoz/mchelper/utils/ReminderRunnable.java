@@ -23,12 +23,20 @@ public class ReminderRunnable implements Runnable {
         try {
             RemindersDao dao = new RemindersDaoImpl();
             if (dao.isStillActiveOrNotDeleted(r.getId())) {
-                MCHelper.getJDA().getTextChannelById(r.getChannelId()).sendMessage(
-                        CommandUtils.formatMessage("*Buzz* <@" + r.getAuthorId() + "> " + r.getReminder())).queue();
+                if (!r.isFromDm()) {
+                    MCHelper.getJDA().getTextChannelById(r.getChannelId()).sendMessage(format(r)).queue();
+                }
+                else {
+                    MCHelper.getJDA().retrieveUserById(r.getAuthorId()).complete().openPrivateChannel().complete().sendMessage(format(r)).queue();
+                }
                 dao.markReminded(r.getId());
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(ReminderRunnable.class).error("Error while sending/marking the reminder.", e);
         }
+    }
+
+    private String format(Reminder r) {
+        return CommandUtils.formatMessage("*Buzz* <@" + r.getAuthorId() + "> " + r.getReminder());
     }
 }

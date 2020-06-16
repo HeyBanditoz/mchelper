@@ -79,6 +79,8 @@ public abstract class Command {
      * @see ElevatedCommand
      */
     protected void tryToExecute(MessageReceivedEvent e) {
+        LOGGER.info(String.format("Executing command: <%s@%s> %s",
+                e.getAuthor().toString(), e.getChannel().toString(), e.getMessage().getContentDisplay()));
         execute(e);
     }
 
@@ -110,7 +112,10 @@ public abstract class Command {
         if (args.length == 0) {
             return false;
         }
-        char prefix = new GuildConfigDaoImpl().getConfig(e.getGuild()).getPrefix();
+        char prefix = '!';
+        if (e.isFromGuild()) {
+            prefix = new GuildConfigDaoImpl().getConfig(e.getGuild()).getPrefix();
+        }
         String expected = prefix + commandName();
         return expected.equalsIgnoreCase(args[0]);
     }

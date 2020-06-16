@@ -46,6 +46,9 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public GuildConfig getConfig(Guild g) {
+        if (g == null) {
+            return new GuildConfig();
+        }
         GuildConfig gc = cache.get(g.getIdLong());
         if (gc == null) {
             try (Connection c = Database.getConnection()) {

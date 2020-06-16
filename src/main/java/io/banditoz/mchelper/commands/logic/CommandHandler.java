@@ -23,7 +23,6 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (!event.isFromGuild()) return;
         getCommandByEvent(event).ifPresent(c -> c.tryToExecute(event));
     }
 

@@ -9,6 +9,7 @@ public class Reminder {
     private String reminder;
     private Timestamp remindWhen;
     private boolean reminded;
+    private boolean isFromDm;
     private boolean deleted;
 
     public int getId() {
@@ -57,6 +58,14 @@ public class Reminder {
 
     public void setReminded(boolean reminded) {
         this.reminded = reminded;
+    }
+
+    public boolean isFromDm() {
+        return isFromDm;
+    }
+
+    public void setIsFromDm(boolean fromDm) {
+        isFromDm = fromDm;
     }
 
     public boolean isDeleted() {

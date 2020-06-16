@@ -41,9 +41,10 @@ public class RemindmeCommand extends Command {
         }
         Reminder r = new Reminder();
         r.setAuthorId(ce.getEvent().getAuthor().getIdLong());
-        r.setChannelId(ce.getEvent().getChannel().getIdLong());
+        r.setChannelId(ce.getEvent().isFromGuild() ? ce.getEvent().getChannel().getIdLong() : ce.getEvent().getPrivateChannel().getIdLong());
         r.setReminder(ce.getCommandArgsString().replaceFirst("\\S+\\s+", ""));
         r.setRemindWhen(new Timestamp(Instant.now().toEpochMilli() + (d.getSeconds() * 1000)));
+        r.setIsFromDm(!ce.getEvent().isFromGuild());
         try {
             int id = ReminderService.schedule(new ReminderRunnable(r));
             ce.sendReply("Reminder " + id + " coming at you in duration " + d + ".");

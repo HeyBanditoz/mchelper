@@ -16,9 +16,13 @@ public class GuildConfig {
     }
 
     public GuildConfig() {
+        prefix = '!'; // for sanity
     }
 
     public long getId() {
+        if (id == 0) {
+            throw new IllegalStateException("Cannot get a null guild ID!");
+        }
         return id;
     }
 

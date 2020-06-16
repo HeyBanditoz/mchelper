@@ -10,7 +10,7 @@ import java.util.List;
 public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `reminders`( `id` int AUTO_INCREMENT PRIMARY KEY, `channel_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `reminder` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `remind_when` datetime NOT NULL, `reminded` boolean DEFAULT 0 NOT NULL, `deleted` boolean DEFAULT 0 NOT NULL) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
+        return "CREATE TABLE IF NOT EXISTS `reminders`( `id` int(11) AUTO_INCREMENT PRIMARY KEY, `channel_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `reminder` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `remind_when` datetime NOT NULL, `reminded` tinyint(1) NOT NULL DEFAULT 0, `is_dm` tinyint(1) NOT NULL, `deleted` tinyint(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
     @Override
@@ -36,14 +36,15 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public int schedule(Reminder r) throws SQLException {
         try (Connection c = Database.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `reminders` VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = c.prepareStatement("INSERT INTO `reminders` VALUES (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setNull(1, Types.INTEGER);
             ps.setLong(2, r.getChannelId());
             ps.setLong(3, r.getAuthorId());
             ps.setString(4, r.getReminder());
             ps.setTimestamp(5, r.getRemindWhen());
             ps.setInt(6, 0);
-            ps.setInt(7, 0);
+            ps.setInt(7, r.isFromDm() ? 1 : 0);
+            ps.setInt(8, 0);
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             rs.next();
@@ -51,7 +52,6 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
             ps.close();
             rs.close();
             return id;
-
         }
     }
 
@@ -105,6 +105,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
         r.setReminder(rs.getString("reminder"));
         r.setRemindWhen(rs.getTimestamp("remind_when"));
         r.setReminded(rs.getBoolean("reminded"));
+        r.setIsFromDm(rs.getBoolean("is_dm"));
         r.setDeleted(rs.getBoolean("deleted"));
         return r;
     }
