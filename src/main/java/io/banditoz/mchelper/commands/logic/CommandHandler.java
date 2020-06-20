@@ -46,7 +46,6 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new NetherCommand());
         commands.add(new OverworldCommand());
         commands.add(new UnitsCommand());
-        commands.add(new CoordCommand());
         commands.add(new TeXCommand());
         commands.add(new PickCommand());
         commands.add(new ToMorseCommand());
@@ -56,20 +55,26 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new CoinFlipCommand());
         commands.add(new VersionCommand());
         commands.add(new PingCommand());
-        commands.add(new DefaultChannelCommand());
-        commands.add(new PrefixCommand());
         commands.add(new HeapDumpCommand());
         commands.add(new UploadLogsCommand());
         commands.add(new FloodCommand());
-        commands.add(new QuoteCommand());
-        commands.add(new AddquoteCommand());
-        commands.add(new SqlCommand());
-        commands.add(new RemindmeCommand());
-        commands.add(new DeleteReminderCommand());
         commands.add(new SnowflakeCommand());
         commands.add(new InviteBotCommand());
         commands.add(new RockPaperScissorsCommand());
 
+        if (SETTINGS.getDatabaseHostAndPort() == null || SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
+            LOGGER.warn("The database is not configured correctly! All database functionality is disabled.");
+        }
+        else {
+            commands.add(new CoordCommand());
+            commands.add(new QuoteCommand());
+            commands.add(new AddquoteCommand());
+            commands.add(new SqlCommand());
+            commands.add(new RemindmeCommand());
+            commands.add(new DeleteReminderCommand());
+            commands.add(new DefaultChannelCommand());
+            commands.add(new PrefixCommand());
+        }
         if (SETTINGS.getOwlBotToken() == null || SETTINGS.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
         }

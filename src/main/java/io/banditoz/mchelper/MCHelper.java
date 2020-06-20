@@ -41,8 +41,11 @@ public class MCHelper {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
             System.exit(1);
         }
-        Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
         jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
+        if (!(settings.getDatabaseHostAndPort() == null || settings.getDatabaseHostAndPort().equals("Host and port of the database."))) {
+            Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
+            ReminderService.initialize();
+        }
         jda.addEventListener(commandHandler);
         jda.addEventListener(new TeXListener());
         jda.addEventListener(new RedditListener());
@@ -52,14 +55,6 @@ public class MCHelper {
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
-
-        jda.awaitReady();
-
-        // now that JDA is done loading, we can initialize things
-        // that could have used it before initialization completes below.
-
-        ReminderService.initialize();
-
         SES.scheduleAtFixedRate(new QotdRunnable(),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
