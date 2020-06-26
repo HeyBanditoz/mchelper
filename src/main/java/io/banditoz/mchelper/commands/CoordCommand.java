@@ -23,7 +23,7 @@ public class CoordCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
-        CoordsDao dao = new CoordsDaoImpl();
+        CoordsDao dao = new CoordsDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length <= 1) {
             help(ce);
             return;

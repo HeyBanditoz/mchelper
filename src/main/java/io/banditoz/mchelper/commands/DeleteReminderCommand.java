@@ -25,7 +25,7 @@ public class DeleteReminderCommand extends Command {
     protected void onCommand(CommandEvent ce) {
         try {
             int id = Integer.parseInt(ce.getCommandArgsString());
-            RemindersDao dao = new RemindersDaoImpl();
+            RemindersDao dao = new RemindersDaoImpl(ce.getDatabase());
             Reminder r = dao.getReminderById(id);
             if (r == null || r.getAuthorId() != ce.getEvent().getAuthor().getIdLong()) {
                 ce.sendReply("Reminder does not exist or you did not write the reminder.");

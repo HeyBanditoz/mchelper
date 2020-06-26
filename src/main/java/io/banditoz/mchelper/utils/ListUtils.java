@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.List;
 
 public class ListUtils {
-    private static SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
 
     /**
      * Pulls howMany random entries from the List (l) and builds a String from it.

@@ -3,7 +3,6 @@ package io.banditoz.mchelper.utils.finance;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import io.banditoz.mchelper.utils.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
@@ -27,11 +26,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class FinancialUtils {
-    private final static String API_KEY = SettingsManager.getInstance().getSettings().getAlphaVantageKey();
-    private final static DateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+public class Finance {
+    private final MCHelper MCHELPER;
+    private final String API_KEY;
+    private static final DateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    public Finance(MCHelper mcHelper) {
+        this.MCHELPER = mcHelper;
+        this.API_KEY = mcHelper.getSettings().getAlphaVantageKey();
+    }
 
-    public static RealtimeCurrencyExchangeRate getCurrencyExchangeRate(String from, String to) throws IOException, HttpResponseException {
+    public RealtimeCurrencyExchangeRate getCurrencyExchangeRate(String from, String to) throws IOException, HttpResponseException {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host("www.alphavantage.co")
@@ -44,10 +49,10 @@ public class FinancialUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), Currency.class).getRealtimeCurrencyExchangeRate();
+        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), Currency.class).getRealtimeCurrencyExchangeRate();
     }
 
-    private static OHLCDataset getStock(String ticker, String interval) throws IOException, HttpResponseException, ParseException {
+    private OHLCDataset getStock(String ticker, String interval) throws IOException, HttpResponseException, ParseException {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host("www.alphavantage.co")
@@ -62,11 +67,11 @@ public class FinancialUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        String resp = MCHelper.performHttpRequest(request);
+        String resp = MCHELPER.performHttpRequest(request);
         return generateOHLCDatasetFromTicker(resp, ticker);
     }
 
-    public static GlobalQuote getGlobalQuote(String ticker) throws IOException, HttpResponseException {
+    public GlobalQuote getGlobalQuote(String ticker) throws IOException, HttpResponseException {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host("www.alphavantage.co")
@@ -79,10 +84,10 @@ public class FinancialUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), GlobalQuote.class).getGlobalQuote();
+        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), GlobalQuote.class).getGlobalQuote();
     }
 
-    public static BestMatchesItem getTickerBestMatch(String ticker) throws IOException, HttpResponseException {
+    public BestMatchesItem getTickerBestMatch(String ticker) throws IOException, HttpResponseException {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host("www.alphavantage.co")
@@ -94,12 +99,12 @@ public class FinancialUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        List<BestMatchesItem> bestMatches = MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), TickerMatches.class).getBestMatches();
+        List<BestMatchesItem> bestMatches = MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), TickerMatches.class).getBestMatches();
         bestMatches.sort(Comparator.comparing(BestMatchesItem::getMatchScore)); // can never be too sure
         return bestMatches.get(bestMatches.size() - 1); // get last in list, which is best score.
     }
 
-    public static MessageEmbed generateMessagEmbedFromGlobalQuote(GlobalQuote gq, String name) {
+    public MessageEmbed generateMessagEmbedFromGlobalQuote(GlobalQuote gq, String name) {
         Color c;
         if (gq.getChangePercent().signum() == 1) {
             c = Color.GREEN;
@@ -120,7 +125,7 @@ public class FinancialUtils {
                 .build();
     }
 
-    private static OHLCDataset generateOHLCDatasetFromTicker(String s, String ticker) throws ParseException {
+    private OHLCDataset generateOHLCDatasetFromTicker(String s, String ticker) throws ParseException {
         s = s.substring(s.indexOf('\n') + 1); // get rid of the top line
         ArrayList<OHLCDataItem> items = new ArrayList<>();
         Date today = new Date();
@@ -143,8 +148,8 @@ public class FinancialUtils {
         return new DefaultOHLCDataset(ticker, itemsArray);
     }
 
-    public static ByteArrayOutputStream generateStockGraph(String ticker, String interval, String realName) throws IOException, HttpResponseException, ParseException {
-        OHLCDataset dataset = FinancialUtils.getStock(ticker, interval);
+    public ByteArrayOutputStream generateStockGraph(String ticker, String interval, String realName) throws IOException, HttpResponseException, ParseException {
+        OHLCDataset dataset = getStock(ticker, interval);
         JFreeChart chart = ChartFactory.createCandlestickChart(realName, "Time", "Price", dataset, true);
         XYPlot plot = (XYPlot) chart.getPlot();
 

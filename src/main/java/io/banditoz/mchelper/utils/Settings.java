@@ -1,9 +1,11 @@
 package io.banditoz.mchelper.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Settings {
     @JsonProperty("discordToken")
     private String discordToken;
@@ -19,8 +21,6 @@ public class Settings {
     private String grafanaToken;
     @JsonProperty("commandThreads")
     private Integer commandThreads;
-    @JsonProperty("regexListenerThreads")
-    private Integer regexListenerThreads;
     @JsonProperty("watchDeletedMessages")
     private Boolean watchDeletedMessages;
     @JsonProperty("alphaVantageKey")
@@ -104,16 +104,6 @@ public class Settings {
     @JsonProperty("commandThreads")
     public void setCommandThreads(int commandThreads) {
         this.commandThreads = commandThreads;
-    }
-
-    @JsonProperty("regexListenerThreads")
-    public int getRegexListenerThreads() {
-        return regexListenerThreads;
-    }
-
-    @JsonProperty("regexListenerThreads")
-    public void setRegexListenerThreads(Integer regexListenerThreads) {
-        this.regexListenerThreads = regexListenerThreads;
     }
 
     @JsonProperty("watchDeletedMessages")

@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.ReminderService;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
@@ -17,7 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 public class RemindmeCommand extends Command {
-    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Override
     public String commandName() {
@@ -46,7 +45,7 @@ public class RemindmeCommand extends Command {
         r.setRemindWhen(new Timestamp(Instant.now().toEpochMilli() + (d.getSeconds() * 1000)));
         r.setIsFromDm(!ce.getEvent().isFromGuild());
         try {
-            int id = ReminderService.schedule(new ReminderRunnable(r));
+            int id = ce.getMCHelper().getReminderService().schedule(new ReminderRunnable(r, ce.getMCHelper()));
             ce.sendReply("Reminder " + id + " coming at you in duration " + d + ".");
         } catch (SQLException e) {
             ce.sendExceptionMessage(e);

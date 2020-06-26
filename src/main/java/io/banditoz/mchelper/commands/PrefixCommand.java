@@ -23,11 +23,11 @@ public class PrefixCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
-        GuildConfigDao dao = new GuildConfigDaoImpl();
+        GuildConfigDao dao = new GuildConfigDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length == 1) {
             ce.sendReply(dao.getConfig(ce.getGuild()).getPrefix() + " is this guild's prefix.");
         }
-        else if (isBotOwner(ce.getEvent().getAuthor()) || isGuildOwner(ce.getEvent().getAuthor(), ce.getGuild())) {
+        else if (isBotOwner(ce.getEvent().getAuthor(), ce.getSettings()) || isGuildOwner(ce.getEvent().getAuthor(), ce.getGuild())) {
             char desiredPrefix = ce.getCommandArgs()[1].charAt(0);
             GuildConfig gc = dao.getConfig(ce.getGuild());
             gc.setPrefix(desiredPrefix);

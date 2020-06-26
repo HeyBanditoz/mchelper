@@ -23,7 +23,7 @@ public class QuoteCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
-        QuotesDao dao = new QuotesDaoImpl();
+        QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         try {
             Optional<NamedQuote> nq;
             if (ce.getCommandArgsString().isEmpty()) {

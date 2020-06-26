@@ -28,7 +28,7 @@ public class BashCommand extends ElevatedCommand {
             Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
             String output = ProcessUtils.runProcess(p);
             if (output.length() > 2000) {
-                ce.sendReply(PasteggUploader.uploadToPastegg(new Paste(output, 24)));
+                ce.sendReply(new PasteggUploader(ce.getMCHelper()).uploadToPastegg(new Paste(output, 24)));
                 return;
             }
             ce.sendReply(output);

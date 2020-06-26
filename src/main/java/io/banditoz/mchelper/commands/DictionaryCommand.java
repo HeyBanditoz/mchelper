@@ -21,15 +21,16 @@ public class DictionaryCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) {
+        DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = null;
         int toLookup = 0;
         try {
             if (ce.getCommandArgs()[1].matches("\\d+")) {
                 toLookup = Integer.parseInt(ce.getCommandArgs()[1]) - 1; // zero indexed
-                result = DictionarySearcher.search(ce.getCommandArgs()[2]);
+                result = ds.search(ce.getCommandArgs()[2]);
             }
             else {
-                result = DictionarySearcher.search(ce.getCommandArgsString());
+                result = ds.search(ce.getCommandArgsString());
             }
         } catch (Exception ex) {
             ce.sendExceptionMessage(ex);

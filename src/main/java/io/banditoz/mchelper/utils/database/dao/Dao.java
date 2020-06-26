@@ -9,11 +9,15 @@ import java.sql.SQLException;
 
 public abstract class Dao {
     public abstract String getSqlTableGenerator();
-
+    protected final Database DATABASE;
     protected final Logger LOGGER = LoggerFactory.getLogger(Dao.class);
 
+    public Dao(Database database) {
+        this.DATABASE = database;
+    }
+
     public void generateTable() {
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             c.prepareStatement(getSqlTableGenerator()).execute();
         } catch (SQLException e) {
             LOGGER.error("Failed to create table!", e);

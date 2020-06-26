@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
@@ -18,76 +19,95 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
+import java.io.File;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class MCHelper {
-    private static JDA jda;
-    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+    private final JDA JDA;
+    private final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false) // for reddit.app.link fetching
             .build(); // singleton http client
-    private static final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
-    private static final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
-    private static final ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
-    private static final CommandHandler commandHandler = new CommandHandler();
+    private final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final Logger LOGGER = LoggerFactory.getLogger(MCHelper.class);
+    private final ScheduledExecutorService SES;
+    private final ThreadPoolExecutor TPE;
+    private final CommandHandler CH;
+    private final ReminderService RS;
+    private final Database DB;
+    private final Settings SETTINGS;
 
-    public static void setupBot() throws LoginException, InterruptedException {
-        Settings settings = SettingsManager.getInstance().getSettings();
-        if (settings.getDiscordToken() == null || settings.getDiscordToken().equals("Bot token here...")) {
+    public MCHelper() throws LoginException, InterruptedException {
+        this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
+        this.CH = new CommandHandler(this);
+
+        if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
             System.exit(1);
         }
-        Database.initializeDatabase(); // initialize the database first, so if something is wrong we'll exit
-        jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
-        jda.addEventListener(commandHandler);
-        jda.addEventListener(new TeXListener());
-        jda.addEventListener(new RedditListener());
-        if (jda.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-            jda.addEventListener(new GuildJoinLeaveListener());
+
+        JDA = JDABuilder.createLight(SETTINGS.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
+        JDA.addEventListener(CH);
+        JDA.addEventListener(new TeXListener(this));
+        JDA.addEventListener(new RedditListener(this));
+
+        if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
+            JDA.addEventListener(new GuildJoinLeaveListener(this));
         }
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
 
-        jda.awaitReady();
+        TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
+        SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
+                .build());
+        DB = new Database(this);
+
+        JDA.awaitReady();
 
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completes below.
 
-        ReminderService.initialize();
-
-        SES.scheduleAtFixedRate(new QotdRunnable(),
+        RS = new ReminderService(this, SES);
+        SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
 
-        if (settings.getEsUrl() == null) {
+        if (SETTINGS.getEsUrl() == null) {
             LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
         }
         else {
-            Timer pingMeasurementTimer = new Timer();
-            pingMeasurementTimer.schedule(new FahrenheitStatus(), 0L, TimeUnit.MINUTES.toMillis(1));
+            SES.scheduleAtFixedRate(new FahrenheitStatus(this), 0L, 1, TimeUnit.MINUTES);
         }
+        LOGGER.info("MCHelper initialization finished.");
     }
 
-    public static ObjectMapper getObjectMapper() {
+    public ObjectMapper getObjectMapper() {
         return OM;
     }
 
-    public static OkHttpClient getOkHttpClient() {
-        return CLIENT;
+    public JDA getJDA() {
+        return JDA;
     }
 
-    public static JDA getJDA() {
-        return jda;
+    public Database getDatabase() {
+        return DB;
     }
 
-    public static CommandHandler getCommandHandler() {
-        return commandHandler;
+    public ReminderService getReminderService() {
+        return RS;
+    }
+
+    public ThreadPoolExecutor getThreadPoolExecutor() {
+        return TPE;
+    }
+
+    public Settings getSettings() {
+        return SETTINGS;
     }
 
     /**
@@ -100,7 +120,7 @@ public class MCHelper {
      * @throws IOException           If there was an issue performing the HTTP request
      * @see MCHelper#performHttpRequestGetResponse(Request)
      */
-    public static String performHttpRequest(Request request) throws HttpResponseException, IOException {
+    public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {
@@ -121,7 +141,7 @@ public class MCHelper {
      * @throws IOException           If there was an issue performing the HTTP request
      * @see MCHelper#performHttpRequest(Request)
      */
-    public static Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
+    public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {

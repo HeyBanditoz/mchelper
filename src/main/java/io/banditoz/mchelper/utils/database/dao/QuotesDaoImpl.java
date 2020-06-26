@@ -12,6 +12,10 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class QuotesDaoImpl extends Dao implements QuotesDao {
+    public QuotesDaoImpl(Database database) {
+        super(database);
+    }
+
     @Override
     public String getSqlTableGenerator() {
         return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
@@ -19,7 +23,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     @Override
     public void saveQuote(NamedQuote nq) throws SQLException {
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("INSERT INTO `quotes` VALUES (?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, nq.getGuildId());
             ps.setLong(2, nq.getAuthorId());
@@ -33,7 +37,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
     public Optional<NamedQuote> getRandomQuoteByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
@@ -48,7 +52,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     @Override
     public Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException {
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {

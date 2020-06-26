@@ -12,11 +12,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
-    private static Cache<Long, GuildConfig> cache = new Cache2kBuilder<Long, GuildConfig>() {
+    private static final Cache<Long, GuildConfig> cache = new Cache2kBuilder<Long, GuildConfig>() {
     }
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .disableStatistics(true)
             .build();
+
+    public GuildConfigDaoImpl(Database database) {
+        super(database);
+    }
 
     @Override
     public String getSqlTableGenerator() {
@@ -25,7 +29,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public void saveConfig(GuildConfig config) {
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, config.getId());
             ps.setString(2, String.valueOf(config.getPrefix()));
@@ -51,7 +55,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
         }
         GuildConfig gc = cache.get(g.getIdLong());
         if (gc == null) {
-            try (Connection c = Database.getConnection()) {
+            try (Connection c = DATABASE.getConnection()) {
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
                 ps.setLong(1, g.getIdLong());
                 ResultSet rs = ps.executeQuery();
@@ -80,7 +84,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public List<GuildConfig> getAllGuildConfigs() {
         ArrayList<GuildConfig> guilds = new ArrayList<>();
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config`");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -97,7 +101,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public int getGuildCount() {
-        try (Connection c = Database.getConnection()) {
+        try (Connection c = DATABASE.getConnection()) {
             ResultSet rs = c.prepareStatement("SELECT COUNT(*) FROM `guild_config`").executeQuery();
             rs.next();
             return rs.getInt(1);

@@ -75,4 +75,18 @@ public class Reminder {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
+    @Override
+    public String toString() {
+        return "Reminder{" +
+                "id=" + id +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                ", reminder='" + reminder + '\'' +
+                ", remindWhen=" + remindWhen +
+                ", reminded=" + reminded +
+                ", isFromDm=" + isFromDm +
+                ", deleted=" + deleted +
+                '}';
+    }
 }

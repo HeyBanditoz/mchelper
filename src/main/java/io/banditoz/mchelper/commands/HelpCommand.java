@@ -29,7 +29,7 @@ public class HelpCommand extends Command {
     @Override
     protected void onCommand(CommandEvent ce) {
         if (!(ce.getCommandArgs().length > 1)) {
-            char prefix = new GuildConfigDaoImpl().getConfig(ce.getGuild()).getPrefix();
+            char prefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
             StringBuilder sb = new StringBuilder();
             for (String s : helps.keySet()) {
                 sb.append('`').append(prefix).append(s).append("` ");

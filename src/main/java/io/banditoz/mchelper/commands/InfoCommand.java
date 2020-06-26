@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.commands;
 
 import com.sun.management.OperatingSystemMXBean;
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
@@ -10,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.time.Duration;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InfoCommand extends Command {
@@ -35,6 +35,7 @@ public class InfoCommand extends Command {
                 .toLowerCase(); // https://stackoverflow.com/a/40487511
         AtomicInteger users = new AtomicInteger();
         ce.getEvent().getJDA().getGuilds().forEach(guild -> users.addAndGet(guild.getMemberCount()));
+        ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Bot Statistics")
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
@@ -42,7 +43,7 @@ public class InfoCommand extends Command {
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
                 .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
                 .addField("Users", Integer.toString(users.get()), true)
-                .addField("Running Commands", String.format("%d/%d", ES.getActiveCount(), ES.getMaximumPoolSize()), true)
+                .addField("Running Commands", String.format("%d/%d", tpe.getActiveCount(), tpe.getMaximumPoolSize()), true)
                 .addField("Uptime", uptime, true);
         ce.sendEmbedReply(eb.build());
     }

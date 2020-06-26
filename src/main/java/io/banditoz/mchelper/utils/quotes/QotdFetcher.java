@@ -7,15 +7,21 @@ import okhttp3.Request;
 import java.io.IOException;
 
 public class QotdFetcher {
+    private final MCHelper MCHELPER;
+
+    public QotdFetcher(MCHelper mchelper) {
+        this.MCHELPER = mchelper;
+    }
+
     /**
      * Gets the current quote of the day.
      *
      * @return The quote item
      */
-    public static QuoteItem getQotd() throws IOException, HttpResponseException {
+    public QuoteItem getQotd() throws IOException, HttpResponseException {
         Request request = new Request.Builder()
                 .url("https://quotes.rest/qod.json")
                 .build();
-        return MCHelper.getObjectMapper().readValue(MCHelper.performHttpRequest(request), Quote.class).getContents().getQuotes().get(0);
+        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), Quote.class).getContents().getQuotes().get(0);
     }
 }

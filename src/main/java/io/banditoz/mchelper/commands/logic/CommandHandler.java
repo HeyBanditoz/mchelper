@@ -2,9 +2,9 @@ package io.banditoz.mchelper.commands.logic;
 
 import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Region;
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.utils.Settings;
-import io.banditoz.mchelper.utils.SettingsManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -18,17 +18,24 @@ import java.util.Optional;
 
 public class CommandHandler extends ListenerAdapter {
     private final List<Command> commands;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
-    private static final Settings SETTINGS = SettingsManager.getInstance().getSettings();
+    private final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
+    private final MCHelper MCHELPER;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        getCommandByEvent(event).ifPresent(c -> c.tryToExecute(event));
+        if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return; // don't execute own commands
+        getCommandByEvent(event).ifPresent(c -> {
+            if (c.canExecute(event, MCHELPER)) {
+                LOGGER.info(String.format("Executing command: <%s@%s> %s",
+                        event.getAuthor().toString(), event.getChannel().toString(), event.getMessage().getContentDisplay()));
+                MCHELPER.getThreadPoolExecutor().execute(() -> c.execute(event, MCHELPER));
+            }
+        });
     }
 
     protected Optional<Command> getCommandByEvent(MessageReceivedEvent e) {
         return commands.stream()
-                .filter(c -> c.containsCommand(e))
+                .filter(c -> c.containsCommand(e, MCHELPER.getDatabase()))
                 .findAny();
     }
 
@@ -36,7 +43,9 @@ public class CommandHandler extends ListenerAdapter {
         return Collections.unmodifiableList(commands);
     }
 
-    public CommandHandler() {
+    public CommandHandler(MCHelper MCHelper) {
+        this.MCHELPER = MCHelper;
+        Settings settings = MCHelper.getSettings();
         LOGGER.info("Registering commands and listeners...");
         commands = new ArrayList<>();
         commands.add(new BashCommand());
@@ -70,21 +79,21 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new InviteBotCommand());
         commands.add(new RockPaperScissorsCommand());
 
-        if (SETTINGS.getOwlBotToken() == null || SETTINGS.getOwlBotToken().equals("OwlBot API key here.")) {
+        if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
         }
         else {
             commands.add(new DictionaryCommand());
         }
 
-        if (SETTINGS.getEsUrl() == null || SETTINGS.getGrafanaToken() == null || SETTINGS.getGrafanaUrl() == null) {
+        if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
         }
         else {
             commands.add(new WeatherStationCommand());
         }
 
-        if (SETTINGS.getAlphaVantageKey() == null || SETTINGS.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
+        if (settings.getAlphaVantageKey() == null || settings.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
             LOGGER.info("Alpha Vantage API key not defined! Not enabling financial commands.");
         }
         else {
@@ -92,11 +101,11 @@ public class CommandHandler extends ListenerAdapter {
             commands.add(new StockCommand());
         }
 
-        if (SETTINGS.getRiotApiKey() == null || SETTINGS.getRiotApiKey().equals("Riot Api Key here")) {
+        if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
             LOGGER.info("Riot API key not defined! Not enabling Orianna.");
         }
         else {
-            Orianna.setRiotAPIKey(SETTINGS.getRiotApiKey());
+            Orianna.setRiotAPIKey(settings.getRiotApiKey());
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
             Thread thread = new Thread(LoadoutCommand::createData);
             thread.setName("Orianna");

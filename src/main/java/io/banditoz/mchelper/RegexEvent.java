@@ -9,10 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexEvent extends CommandEvent {
-    private Matcher m;
+    private final Matcher m;
 
-    public RegexEvent(@NotNull MessageReceivedEvent e, Logger logger, String regex) {
-        super(e, logger);
+    public RegexEvent(@NotNull MessageReceivedEvent e, Logger logger, String regex, MCHelper mcHelper) {
+        super(e, logger, mcHelper);
         m = Pattern.compile(regex, Pattern.DOTALL).matcher(e.getMessage().getContentDisplay());
     }
 

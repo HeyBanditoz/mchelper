@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.MCHelper;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -9,15 +10,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  */
 public abstract class ElevatedCommand extends Command {
     @Override
-    protected void tryToExecute(MessageReceivedEvent e) {
-        if (CommandPermissions.isBotOwner(e.getAuthor())) {
-            LOGGER.info(String.format("Executing elevated command: <%s@%s> %s",
-                    e.getAuthor().toString(), e.getChannel().toString(), e.getMessage().getContentDisplay()));
-            execute(e);
+    protected boolean canExecute(MessageReceivedEvent e, MCHelper mcHelper) {
+        if (CommandPermissions.isBotOwner(e.getAuthor(), mcHelper.getSettings())) {
+            return true;
         }
         else {
             CommandUtils.sendReply(String.format("User <%s> does not have permission to run this command!",
                     e.getAuthor().toString()), e);
+            return false;
         }
     }
 }

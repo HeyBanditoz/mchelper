@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,11 +15,16 @@ import java.awt.Color;
 import java.time.Instant;
 
 public class GuildJoinLeaveListener extends ListenerAdapter {
-    private static String DEFAULT_AVATAR = "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
+    private static final String DEFAULT_AVATAR = "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
+    private final Database DATABASE;
+
+    public GuildJoinLeaveListener(MCHelper mcHelper) {
+        this.DATABASE = mcHelper.getDatabase();
+    }
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
+        GuildConfig gc = new GuildConfigDaoImpl(DATABASE).getConfig(event.getGuild());
         if (gc.getDefaultChannel() != 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
@@ -34,7 +40,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        GuildConfig gc = new GuildConfigDaoImpl().getConfig(event.getGuild());
+        GuildConfig gc = new GuildConfigDaoImpl(DATABASE).getConfig(event.getGuild());
         if (gc.getDefaultChannel() != 0) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")

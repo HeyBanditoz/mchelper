@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.utils.ReminderRunnable;
 import io.banditoz.mchelper.utils.database.Reminder;
 import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
@@ -10,40 +11,45 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ReminderService {
-    private static final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+    private final ScheduledExecutorService SERVICE;
+    private final MCHelper MCHELPER;
+    private final Logger LOGGER = LoggerFactory.getLogger(ReminderService.class);
+
+    public ReminderService(MCHelper mcHelper, ScheduledExecutorService service) {
+        this.MCHELPER = mcHelper;
+        this.SERVICE = service;
+        initialize();
+    }
 
     /**
      * Schedules a new reminder, and adding it to the database.
      *
      * @param r The ReminderRunnable to schedule.
      * @return The id of the newly added reminder in the database.
-     * @throws SQLException
      */
-    public static int schedule(ReminderRunnable r) throws SQLException {
+    public int schedule(ReminderRunnable r) throws SQLException {
         Duration duration = Duration.between(Instant.now(), r.getReminder().getRemindWhen().toInstant());
-        r.getReminder().setId(new RemindersDaoImpl().schedule(r.getReminder()));
-        service.schedule(r, duration.getSeconds(), TimeUnit.SECONDS);
+        r.getReminder().setId(new RemindersDaoImpl(MCHELPER.getDatabase()).schedule(r.getReminder()));
+        SERVICE.schedule(r, duration.getSeconds(), TimeUnit.SECONDS);
+        LOGGER.debug("Scheduling: " + r.getReminder().toString());
         return r.getReminder().getId();
     }
 
     /**
      * Grabs all "active" reminders (those which haven't been reminded or deleted) and schedules them.
-     *
-     * @throws SQLException If something went wrong with fetching all active reminders.
      */
-    public static void initialize() {
+    private void initialize() {
         try {
-            ArrayList<Reminder> reminders = new ArrayList<>(new RemindersDaoImpl().getAllActiveReminders());
+            ArrayList<Reminder> reminders = new ArrayList<>(new RemindersDaoImpl(MCHELPER.getDatabase()).getAllActiveReminders());
             for (Reminder reminder : reminders) {
-                scheduleWithoutCreation(new ReminderRunnable(reminder));
+                scheduleWithoutCreation(new ReminderRunnable(reminder, MCHELPER));
             }
-            LoggerFactory.getLogger(ReminderService.class).info("Initialized reminders. We have " + reminders.size() + " active reminders.");
+            LOGGER.info("Initialized reminders. We have " + reminders.size() + " active reminders.");
         } catch (SQLException e) {
-            LoggerFactory.getLogger(ReminderService.class).error("Failed to initialize reminders.", e);
+            LOGGER.error("Failed to initialize reminders.", e);
         }
     }
 
@@ -52,8 +58,9 @@ public class ReminderService {
      *
      * @param r The ReminderRunnable containing the Reminder to add.
      */
-    private static void scheduleWithoutCreation(ReminderRunnable r) {
+    private void scheduleWithoutCreation(ReminderRunnable r) {
         Duration duration = Duration.between(Instant.now(), r.getReminder().getRemindWhen().toInstant());
-        service.schedule(r, duration.getSeconds(), TimeUnit.SECONDS);
+        SERVICE.schedule(r, duration.getSeconds(), TimeUnit.SECONDS);
+        LOGGER.debug("Scheduling without creation: " + r.getReminder().toString());
     }
 }

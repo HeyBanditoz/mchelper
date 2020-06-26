@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,20 +16,24 @@ import java.io.File;
  * Class which holds the MessageReceivedEvent and command arguments.
  */
 public class CommandEvent {
-    private final String commandArgsString;
-    private final String[] commandArgs;
-    private final MessageReceivedEvent e;
-    private final Logger logger;
-    private final Guild guild;
-    private final boolean isElevated;
+    private final String COMMAND_ARGS_STRING;
+    private final String[] COMMAND_ARGS;
+    private final MessageReceivedEvent EVENT;
+    private final Logger LOGGER;
+    private final Guild GUILD;
+    private final MCHelper MCHELPER;
+    private final boolean IS_ELEVATED;
+    private final Database DATABASE;
 
-    public CommandEvent(@NotNull MessageReceivedEvent e, Logger logger) {
-        this.e = e;
-        this.commandArgsString = CommandUtils.generateCommandArgsString(e);
-        this.commandArgs = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
-        this.logger = logger;
-        this.guild = (e.isFromGuild()) ? e.getGuild() : null;
-        this.isElevated = CommandPermissions.isBotOwner(e.getAuthor());
+    public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper) {
+        this.EVENT = event;
+        this.COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(event);
+        this.COMMAND_ARGS = CommandUtils.commandArgs(event.getMessage().getContentDisplay());
+        this.LOGGER = logger;
+        this.GUILD = (event.isFromGuild()) ? event.getGuild() : null;
+        this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor(), mcHelper.getSettings());
+        this.MCHELPER = mcHelper;
+        this.DATABASE = mcHelper.getDatabase();
     }
 
     /**
@@ -35,7 +42,7 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String getCommandArgsString() {
-        return commandArgsString;
+        return COMMAND_ARGS_STRING;
     }
 
     /**
@@ -44,7 +51,7 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String[] getCommandArgs() {
-        return commandArgs;
+        return COMMAND_ARGS;
     }
 
     /**
@@ -53,7 +60,7 @@ public class CommandEvent {
      * @return the MessageReceivedEvent.
      */
     public MessageReceivedEvent getEvent() {
-        return e;
+        return EVENT;
     }
 
     /**
@@ -62,7 +69,7 @@ public class CommandEvent {
      * @return The Guild, or null if the command didn't happen in one.
      */
     public Guild getGuild() {
-        return guild;
+        return GUILD;
     }
 
     /**
@@ -71,7 +78,7 @@ public class CommandEvent {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex, boolean caught) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, caught, false);
+        CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER, caught, false);
     }
 
     /**
@@ -80,7 +87,7 @@ public class CommandEvent {
      * @param ex The exception.
      */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.e, ex, logger, true, false);
+        CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER, true, false);
     }
 
     /**
@@ -89,7 +96,7 @@ public class CommandEvent {
      * @param msg The reply.
      */
     public void sendReply(String msg) {
-        CommandUtils.sendReply(msg, e);
+        CommandUtils.sendReply(msg, EVENT);
     }
 
     /**
@@ -98,22 +105,54 @@ public class CommandEvent {
      * @param me The reply.
      */
     public void sendEmbedReply(MessageEmbed me) {
-        e.getChannel().sendMessage(me).queue();
+        EVENT.getChannel().sendMessage(me).queue();
     }
 
     public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {
-        CommandUtils.sendImageReply(msg, image, this.e);
+        CommandUtils.sendImageReply(msg, image, this.EVENT);
     }
 
     public void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image) throws Exception {
-        CommandUtils.sendEmbedImageReply(me, image, this.e);
+        CommandUtils.sendEmbedImageReply(me, image, this.EVENT);
     }
 
     public void sendFile(String msg, File f) {
-        CommandUtils.sendFile(msg, f, this.e);
+        CommandUtils.sendFile(msg, f, this.EVENT);
     }
 
+    /**
+     * Returns whether or not the author of this CommandEvent is a bot owner.
+     *
+     * @return Whether or not the author is elevated.
+     */
     public boolean isElevated() {
-        return isElevated;
+        return IS_ELEVATED;
+    }
+
+    /**
+     * Returns the MCHelper instance the CommandEvent came from.
+     *
+     * @return The MCHelper instance.
+     */
+    public MCHelper getMCHelper() {
+        return MCHELPER;
+    }
+
+    /**
+     * Returns the associated Database with this CommandEvent.
+     *
+     * @return The database.
+     */
+    public Database getDatabase() {
+        return DATABASE;
+    }
+
+    /**
+     * Returns the associated Settings with this CommandEvent.
+     *
+     * @return The settings.
+     */
+    public Settings getSettings() {
+        return MCHELPER.getSettings();
     }
 }

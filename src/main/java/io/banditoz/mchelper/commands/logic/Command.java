@@ -1,20 +1,16 @@
 package io.banditoz.mchelper.commands.logic;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.Settings;
-import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-import java.util.concurrent.*;
 
 /**
  * Represents the abstract class for any Command the bot may have. Note any command you implement
@@ -62,59 +58,44 @@ public abstract class Command {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    protected final static ThreadPoolExecutor ES;
-
-    static {
-        Settings s = SettingsManager.getInstance().getSettings();
-        // we do this instead of Executors.newFixedThreadPool so we can get the current number of waiting threads.
-        ES = new ThreadPoolExecutor(s.getCommandThreads(), s.getCommandThreads(),
-                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
-    }
-
     /**
      * Method that can be overridden in subclasses to check conditions before execution
      *
      * @param e The MessageReceivedEvent to execute
      * @see ElevatedCommand
      */
-    protected void tryToExecute(MessageReceivedEvent e) {
-        LOGGER.info(String.format("Executing command: <%s@%s> %s",
-                e.getAuthor().toString(), e.getChannel().toString(), e.getMessage().getContentDisplay()));
-        execute(e);
+    protected boolean canExecute(MessageReceivedEvent e, MCHelper mcHelper) {
+        return true;
     }
 
     /**
      * Runs onCommand() in parallel.
      */
-    protected void execute(MessageReceivedEvent e) {
+    protected void execute(MessageReceivedEvent e, MCHelper MCHelper) {
         if (handleCooldown(e.getAuthor().getId())) {
             e.getChannel().sendTyping().queue();
-            ES.execute(() -> {
-                try {
-                    long before = System.nanoTime();
-                    onCommand(new CommandEvent(e, LOGGER));
-                    long after = System.nanoTime() - before;
-                    LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
-                } catch (Exception ex) {
-                    CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
-                }
-            });
-            LOGGER.debug(ES.toString());
+            try {
+                long before = System.nanoTime();
+                onCommand(new CommandEvent(e, LOGGER, MCHelper));
+                long after = System.nanoTime() - before;
+                LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
+            } catch (Exception ex) {
+                CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
+            }
         }
         else {
             e.getMessage().addReaction("⏲️").queue();
         }
     }
 
-    protected boolean containsCommand(MessageReceivedEvent e) {
+    protected boolean containsCommand(MessageReceivedEvent e, Database database) {
         String[] args = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
         if (args.length == 0) {
             return false;
         }
         char prefix = '!';
         if (e.isFromGuild()) {
-            prefix = new GuildConfigDaoImpl().getConfig(e.getGuild()).getPrefix();
+            prefix = new GuildConfigDaoImpl(database).getConfig(e.getGuild()).getPrefix();
         }
         String expected = prefix + commandName();
         return expected.equalsIgnoreCase(args[0]);

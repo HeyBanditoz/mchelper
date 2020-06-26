@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,28 +12,22 @@ import java.util.List;
 
 // Thanks https://github.com/DV8FromTheWorld/Yui/blob/e8da929a8f637591e4da53599c39c8161be38746/src/net/dv8tion//SettingsManager.java
 public class SettingsManager {
-    private static SettingsManager instance;
-    private final ObjectMapper om = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private Settings settings;
-    private final Path configFile = new File(".").toPath().resolve("Config.json");
-    private final Logger logger = LoggerFactory.getLogger(SettingsManager.class);
+    private final ObjectMapper OM = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private final Path CONFIG_FILE;
+    private final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
 
-    public static SettingsManager getInstance() {
-        if (instance == null) {
-            instance = new SettingsManager();
-        }
-        return instance;
-    }
 
-    public SettingsManager() {
-        if (!configFile.toFile().exists()) {
-            logger.info("Creating default Settings");
-            logger.info("You will need to edit the Config.json with your login information.");
+    public SettingsManager(Path path) {
+        this.CONFIG_FILE = path;
+        if (!CONFIG_FILE.toFile().exists()) {
+            LOGGER.info("Creating default Settings");
+            LOGGER.info("You will need to edit the " + path.getFileName() + " file with your login information.");
             this.settings = getDefaultSettings();
             try {
                 saveSettings();
             } catch (Exception e) {
-                logger.error("Error writing default settings!", e);
+                LOGGER.error("Error writing default settings!", e);
             }
             System.exit(1);
         }
@@ -43,11 +36,11 @@ public class SettingsManager {
 
     public void loadSettings() {
         try {
-            this.settings = om.readValue(configFile.toFile(), Settings.class);
-            logger.info("Settings loaded");
+            this.settings = OM.readValue(CONFIG_FILE.toFile(), Settings.class);
+            LOGGER.info("Settings loaded");
             checkSettings();
         } catch (Exception e) {
-            logger.error("Error Loading Settings", e);
+            LOGGER.error("Error Loading Settings", e);
         }
     }
 
@@ -56,7 +49,7 @@ public class SettingsManager {
     }
 
     public void saveSettings() throws IOException {
-        om.writeValue(configFile.toFile(), this.settings);
+        OM.writeValue(CONFIG_FILE.toFile(), this.settings);
     }
 
     private Settings getDefaultSettings() {
@@ -67,7 +60,6 @@ public class SettingsManager {
         defaultSettings.setBotOwners(defaultOwners);
         defaultSettings.setOwlBotToken("OwlBot API key here.");
         defaultSettings.setCommandThreads(2);
-        defaultSettings.setRegexListenerThreads(2);
         defaultSettings.setWatchDeletedMessages(false);
         defaultSettings.setAlphaVantageKey("Alpha Vantage API key here.");
         defaultSettings.setRiotApiKey("Riot Api Key here.");
@@ -80,12 +72,8 @@ public class SettingsManager {
 
     private void checkSettings() {
         if (this.settings.getCommandThreads() < 1) {
-            logger.warn("Command threads must be greater than or equal to one! Setting to one for the time being. Check your settings file.");
+            LOGGER.warn("Command threads must be greater than or equal to one! Setting to one for the time being. Check your settings file.");
             this.settings.setCommandThreads(1);
-        }
-        if (this.settings.getRegexListenerThreads() < 1) {
-            logger.warn("Regex listener threads must be greater than or equal to one! Setting to one for the time being. Check your settings file.");
-            this.settings.setRegexListenerThreads(1);
         }
     }
 }
