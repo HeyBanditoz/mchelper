@@ -32,7 +32,7 @@ public class ReminderRunnable implements Runnable {
                 dao.markReminded(r.getId());
             }
         } catch (Exception e) {
-            LoggerFactory.getLogger(ReminderRunnable.class).error("Error while sending/marking reminder #" + r.getId() + ".", e);
+            LoggerFactory.getLogger(ReminderRunnable.class).error("Error while sending/marking the reminder.", e);
         }
     }
 

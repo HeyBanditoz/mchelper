@@ -51,11 +51,6 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
         }
         GuildConfig gc = cache.get(g.getIdLong());
         if (gc == null) {
-            try {
-                Database.getConnection().close();
-            } catch (SQLException ex) {
-                return new GuildConfig(); // hackily return the default GuildConfig if no database is configured
-            }
             try (Connection c = Database.getConnection()) {
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
                 ps.setLong(1, g.getIdLong());
