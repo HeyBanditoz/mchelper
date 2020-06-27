@@ -33,13 +33,13 @@ public class PickCommand extends Command {
         else {
             args = ce.getCommandArgsString();
         }
+        ArrayList<String> options;
         if (ce.getCommandArgsString().contains(" or ")) {
-            ArrayList<String> options = new ArrayList<>(Arrays.asList(args.split("\\s+or\\s+")));
-            ce.sendReply(extractNumRandomly(howMany, options));
+            options = new ArrayList<>(Arrays.asList(args.split("\\s+or\\s+")));
         }
         else {
-            ArrayList<String> options = new ArrayList<>(Arrays.asList(args.split("\\s+")));
-            ce.sendReply(extractNumRandomly(howMany, options));
+            options = new ArrayList<>(Arrays.asList(args.split("\\s+")));
         }
+        ce.sendReply(extractNumRandomly(howMany, options));
     }
 }

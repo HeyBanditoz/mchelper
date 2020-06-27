@@ -70,9 +70,8 @@ public class LoadoutCommand extends Command {
     @Override
     protected void onCommand(CommandEvent ce) {
         if (!canRun) {
-            ce.sendReply("Orianna could not be reached. Try again in a moment.");
-            Thread thread = new Thread(LoadoutCommand::createData);
-            thread.start();
+            ce.sendReply("League's API could not be reached. Please try again in a moment.");
+            ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);
             return;
         }
         ArrayList<String> strings = new ArrayList<>();
@@ -272,9 +271,7 @@ public class LoadoutCommand extends Command {
         ce.sendReply(builder.toString());
         LocalDateTime localDateTime = LocalDateTime.now().minus(Duration.ofHours(5));
         if (lastUpdate == null || lastUpdate.isBefore(LocalDateTime.now().minus(Duration.ofMinutes(1)))) {
-            Thread thread = new Thread(LoadoutCommand::createData);
-            thread.setName("Orianna");
-            thread.start();
+            ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);
         }
     }
 }

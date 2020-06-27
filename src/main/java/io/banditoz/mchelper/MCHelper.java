@@ -40,6 +40,11 @@ public class MCHelper {
 
     public MCHelper() throws LoginException, InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
+        TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
+        SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
+                .build());
         this.CH = new CommandHandler(this);
 
         if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
@@ -58,12 +63,6 @@ public class MCHelper {
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
-
-        TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
-                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
-        SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
-                .build());
         DB = new Database(this);
 
         JDA.awaitReady();

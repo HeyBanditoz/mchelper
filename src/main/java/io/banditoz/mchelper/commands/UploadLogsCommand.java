@@ -24,7 +24,7 @@ public class UploadLogsCommand extends ElevatedCommand {
         File htmlLogFile = new File("log.html");
         if (htmlLogFile.exists()) {
             if (htmlLogFile.canRead()) {
-                ce.sendFile("Here iis this session's log file.", htmlLogFile);
+                ce.sendFile("Here is this session's log file.", htmlLogFile);
             }
             else {
                 ce.sendReply("Cannot read the HTML log file.");

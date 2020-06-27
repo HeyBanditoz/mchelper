@@ -107,9 +107,7 @@ public class CommandHandler extends ListenerAdapter {
         else {
             Orianna.setRiotAPIKey(settings.getRiotApiKey());
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
-            Thread thread = new Thread(LoadoutCommand::createData);
-            thread.setName("Orianna");
-            thread.start();
+            MCHELPER.getThreadPoolExecutor().execute(LoadoutCommand::createData);
             commands.add(new LoadoutCommand());
         }
         commands.add(new HelpCommand(commands)); // this must be registered last

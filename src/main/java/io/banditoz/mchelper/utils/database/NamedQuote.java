@@ -3,7 +3,6 @@ package io.banditoz.mchelper.utils.database;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-import java.net.URL;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
