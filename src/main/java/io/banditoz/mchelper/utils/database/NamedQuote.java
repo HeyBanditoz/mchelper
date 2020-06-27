@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.net.URL;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +15,7 @@ public class NamedQuote {
     private String quote;
     private String quoteAuthor;
     private Timestamp lastModified;
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM uuuu");
 
     public long getGuildId() {
         return guildId;
@@ -82,21 +84,6 @@ public class NamedQuote {
     }
 
     public String format() {
-        if (isUrl(this.getQuote())) {
-            return "“" + this.getQuote() + " ” --" + this.getQuoteAuthor(); // space at end so link doesnt add quotation mark at the end
-        }
-        else {
-            return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
-        }
-    }
-
-    private boolean isUrl(String url) {
-        // hack hack hack
-        try {
-            new URL(url).toURI();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return "\n> " + this.getQuote() + "\n      **" + this.getQuoteAuthor() + "** — " + formatter.format(this.getLastModified().toLocalDateTime());
     }
 }
