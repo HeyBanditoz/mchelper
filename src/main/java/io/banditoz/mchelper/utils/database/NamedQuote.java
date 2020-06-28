@@ -8,11 +8,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class which represents a user added quote from the database.
+ */
 public class NamedQuote {
+    /** The guild this quote came from. Used for filtering the right guild when a user requests a quote. */
     private long guildId;
+    /** The ID of the author who wrote this quote. */
     private long authorId;
+    /** The quote itself. */
     private String quote;
+    /** The author this quote is attributed to. This is not the same as the authorId. */
     private String quoteAuthor;
+    /** The Timestamp of when this quote was created in the database. */
     private Timestamp lastModified;
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM uuuu");
 
@@ -73,6 +81,13 @@ public class NamedQuote {
         return nq;
     }
 
+    /**
+     * Attempts the build a Quote from a given message ID that happened in the given TextChannel..
+     *
+     * @param id The ID of the Message to attempt to parse.
+     * @param c  The TextChannel the message happened in.
+     * @return A NamedQuote object.
+     */
     public static NamedQuote parseMessageId(long id, TextChannel c) {
         Message m = c.retrieveMessageById(id).complete();
         NamedQuote nq = new NamedQuote();
@@ -82,6 +97,11 @@ public class NamedQuote {
         return nq;
     }
 
+    /**
+     * Formats the quote for use in Discord.
+     *
+     * @return The formatted String.
+     */
     public String format() {
         return "\n> " + this.getQuote() + "\n      **" + this.getQuoteAuthor() + "** — " + formatter.format(this.getLastModified().toLocalDateTime());
     }

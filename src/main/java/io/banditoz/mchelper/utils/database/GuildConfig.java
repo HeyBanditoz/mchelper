@@ -3,9 +3,13 @@ package io.banditoz.mchelper.utils.database;
 import java.sql.Timestamp;
 
 public class GuildConfig {
+    /** The ID of the Guild this GuildConfig represents. */
     private long id;
+    /** The prefix for all commands in this Guild. */
     private char prefix;
+    /** The default channel, to send the quote of the day and/or guild leave/join notifications. */
     private long defaultChannel;
+    /** Whether or not we should deliver the quote of the day to the default channel. */
     private boolean postQotdToDefaultChannel;
     private Timestamp lastModified;
 

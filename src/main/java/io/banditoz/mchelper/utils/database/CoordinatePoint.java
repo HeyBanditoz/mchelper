@@ -2,12 +2,21 @@ package io.banditoz.mchelper.utils.database;
 
 import java.sql.Timestamp;
 
+/**
+ * Class which represents a saved point on a Minecraft map.
+ */
 public class CoordinatePoint {
+    /** The X coordinate asscoiated with the saved point. */
     private long x;
+    /** The Z coordinate associated with the saved point. */
     private long z;
+    /** The name of this coordinate point. */
     private String name;
+    /** The ID of the author who made this coordinate point. */
     private long authorId;
+    /** The ID of the guild this coordinate point is in. */
     private long guildId;
+    /** The TImestamp of when this coordinate point was created in the database. */
     private Timestamp lastModified;
 
     public CoordinatePoint(String x, String z, String name, long authorId, long guildId) {
