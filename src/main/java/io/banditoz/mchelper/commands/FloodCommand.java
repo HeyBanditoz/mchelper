@@ -49,7 +49,7 @@ public class FloodCommand extends Command {
     private void flood(int howMany, String message, CommandEvent ce) {
         message = message.replace("USER<", "<@");
         for (int i = 0; i < howMany; i++) {
-            ce.sendReply(message);
+            ce.sendUnsanitizedReply(message);
         }
     }
 }

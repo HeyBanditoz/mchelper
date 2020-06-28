@@ -91,12 +91,21 @@ public class CommandEvent {
     }
 
     /**
-     * Sends a reply.
+     * Sends a reply. All mentions will be sanitized.
      *
      * @param msg The reply.
      */
     public void sendReply(String msg) {
         CommandUtils.sendReply(msg, EVENT);
+    }
+
+    /**
+     * Sends a reply. All mentions will <b>NOT</b> be sanitized.
+     *
+     * @param msg The reply.
+     */
+    public void sendUnsanitizedReply(String msg) {
+        CommandUtils.sendUnsanitizedReply(msg, EVENT);
     }
 
     /**
@@ -109,7 +118,7 @@ public class CommandEvent {
     }
 
     public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {
-        CommandUtils.sendImageReply(msg, image, this.EVENT);
+        CommandUtils.sendImageReply(msg, image, this.EVENT, true);
     }
 
     public void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image) throws Exception {

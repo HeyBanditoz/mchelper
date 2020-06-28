@@ -10,10 +10,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,26 +42,39 @@ public class CommandUtils {
                 l.error("Uncaught exception! Offending message: " + buildMessageAndAuthor(e), ex);
             }
         }
-        _sendReply(reply.toString(), e.getChannel());
+        _sendReply(reply.toString(), e.getChannel(), true);
     }
 
     /**
-     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
+     * will appear as normal but, otherwise not do anything.
      *
      * @param msg The reply.
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e.getChannel());
+        _sendReply(msg, e.getChannel(), true);
     }
 
     /**
-     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead.
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
+     * will appear as normal, but otherwise not do anything.
      *
      * @param msg The reply.
      */
     public static void sendReply(String msg, TextChannel chan) {
-        _sendReply(msg, chan);
+        _sendReply(msg, chan, true);
+    }
+
+    /**
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will <b>NOT</b> be
+     * sanitized, all mentions will function as normal.
+     *
+     * @param msg The reply.
+     * @param e   The MessageReceivedEvent to reply to.
+     */
+    public static void sendUnsanitizedReply(String msg, MessageReceivedEvent e) {
+        _sendReply(msg, e.getChannel(), false);
     }
 
     /**
@@ -73,15 +83,17 @@ public class CommandUtils {
      * @param msg The reply.
      * @param c   The MessageChannel to send to.
      */
-    private static void _sendReply(String msg, MessageChannel c) {
+    private static void _sendReply(String msg, MessageChannel c, boolean sanitizeMentions) {
         msg = formatMessage(msg);
-        Queue<Message> toSend = new MessageBuilder()
-                .append(msg)
-                .buildAll(MessageBuilder.SplitPolicy.NEWLINE);
+        MessageBuilder mb = new MessageBuilder(msg);
+        if (sanitizeMentions) {
+            mb.denyMentions(Message.MentionType.values());
+        }
+        Queue<Message> toSend = mb.buildAll(MessageBuilder.SplitPolicy.NEWLINE);
         toSend.forEach(message -> c.sendMessage(message).queue());
     }
 
-    public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e) throws Exception {
+    public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e, boolean sanitizeMentions) throws Exception {
         String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
         File f = new File(imageName);
 
@@ -92,8 +104,13 @@ public class CommandUtils {
             Process p = new ProcessBuilder("oxipng", imageName).start();
             p.waitFor();
 
+            MessageBuilder m = new MessageBuilder(formatMessage(msg));
+            if (sanitizeMentions) {
+                m.denyMentions(Message.MentionType.values());
+            }
+
             e.getMessage().getChannel()
-                    .sendMessage(formatMessage(msg))
+                    .sendMessage(m.build())
                     .addFile(f)
                     .queue();
             image.close();
