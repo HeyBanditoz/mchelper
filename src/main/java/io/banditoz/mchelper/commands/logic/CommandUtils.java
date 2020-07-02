@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class CommandUtils {
     private static final boolean SEND_FULL_STACK_TRACE = false;
+    private static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
     /**
      * Sends a reply containing the exception message.
@@ -141,10 +142,11 @@ public class CommandUtils {
     }
 
     /**
-     * Checks the message for abnormalities, (null, empty) and formats it accordingly.
+     * Checks the message for abnormalities, (null, empty) and formats it accordingly. It will also take any URLs and
+     * wrap them in brackets, so Discord doesn't embed them.
      *
      * @param msg The string to check.
-     * @return The formatted messaeg.
+     * @return The formatted message.
      */
     public static String formatMessage(String msg) {
         if (msg == null) {
@@ -153,7 +155,7 @@ public class CommandUtils {
         else if (msg.isEmpty()) {
             msg = "<no output>";
         }
-        return msg;
+        return URL_PATTERN.matcher(msg).replaceAll("<$0>"); // wrap String in brackets so discord won't embed it
     }
 
     public static String[] commandArgs(String string) {
