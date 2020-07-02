@@ -5,14 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Quote {
-    @JsonProperty("contents")
-    private Contents contents;
+    @JsonProperty("author")
+    private String author;
 
-    public void setContents(Contents contents) {
-        this.contents = contents;
+    @JsonProperty("body")
+    private String body;
+
+    @JsonProperty("author")
+    public String getAuthor() {
+        return author;
     }
 
-    public Contents getContents() {
-        return contents;
+    @JsonProperty("body")
+    public String getBody() {
+        return body;
     }
 }

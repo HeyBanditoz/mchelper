@@ -1,10 +1,10 @@
 package io.banditoz.mchelper.utils.quotes;
 
- import io.banditoz.mchelper.MCHelper;
- import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
- import org.slf4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
@@ -28,15 +28,18 @@ public class QotdRunnable implements Runnable {
         } catch (Exception e) {
             LOGGER.error("Could not fetch the quote of the day!", e);
         }
+        int i = 0;
         for (GuildConfig guild : new GuildConfigDaoImpl(MCHELPER.getDatabase()).getAllGuildConfigs()) {
             if (guild.getPostQotdToDefaultChannel()) {
+                i++;
                 CommandUtils.sendReply("Here is your quote of the day:\n" + quoteOfTheDay, MCHELPER.getJDA().getTextChannelById(guild.getDefaultChannel()));
             }
         }
+        LOGGER.info("Delivered quote of the day to " + i + " guild(s).");
     }
 
-    private String formatQuote(QuoteItem qi) {
-        return "“" + qi.getQuote() + "” --" + qi.getAuthor();
+    private String formatQuote(Quote qi) {
+        return "“" + qi.getBody() + "” --" + qi.getAuthor();
     }
 
     public static Duration getDelay() {

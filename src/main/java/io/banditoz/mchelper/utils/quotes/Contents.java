@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Contents {
     @JsonProperty("quotes")
-    private List<QuoteItem> quotes;
+    private List<Quote> quotes;
 
-    public void setQuotes(List<QuoteItem> quotes) {
+    public void setQuotes(List<Quote> quotes) {
         this.quotes = quotes;
     }
 
-    public List<QuoteItem> getQuotes() {
+    public List<Quote> getQuotes() {
         return quotes;
     }
 }

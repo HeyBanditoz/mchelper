@@ -18,10 +18,10 @@ public class QotdFetcher {
      *
      * @return The quote item
      */
-    public QuoteItem getQotd() throws IOException, HttpResponseException {
+    public Quote getQotd() throws IOException, HttpResponseException {
         Request request = new Request.Builder()
-                .url("https://quotes.rest/qod.json")
+                .url("https://favqs.com/api/qotd ")
                 .build();
-        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), Quote.class).getContents().getQuotes().get(0);
+        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), QuoteHolder.class).getQuote();
     }
 }
