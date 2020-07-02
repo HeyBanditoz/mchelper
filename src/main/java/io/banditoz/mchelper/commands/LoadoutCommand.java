@@ -18,7 +18,7 @@ public class LoadoutCommand extends Command {
     private static ArrayList<String> role;
     private static ArrayList<ReforgedRuneSlot> domination, inspiration, precision, resolve, sorcery;
     private static LocalDateTime lastUpdate;
-    private static boolean canRun = true;
+    private static boolean canRun = false;
 
     @Override
     public String commandName() {
@@ -70,7 +70,7 @@ public class LoadoutCommand extends Command {
     @Override
     protected void onCommand(CommandEvent ce) {
         if (!canRun) {
-            ce.sendReply("League's API could not be reached. Please try again in a moment.");
+            ce.sendReply("League's API could not be reached or this command has not yet been run before. Please try again in a moment.");
             ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);
             return;
         }
