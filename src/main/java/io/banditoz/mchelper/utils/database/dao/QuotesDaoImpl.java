@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
+import java.util.*;
 
 public class QuotesDaoImpl extends Dao implements QuotesDao {
     public QuotesDaoImpl(Database database) {
@@ -61,6 +61,24 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                 return buildQuoteFromResultSet(rs);
             }
         }
+    }
+
+    @Override
+    public Map<Long, Integer> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT author_id, COUNT(author_id) AS 'count' FROM `quotes` WHERE guild_id=? GROUP BY author_id ORDER BY COUNT(author_id) DESC");
+            ps.setLong(1, g.getIdLong());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.isLast()) {
+                    LinkedHashMap<Long, Integer> stats = new LinkedHashMap<>();
+                    while (rs.next()) {
+                        stats.put(rs.getLong("author_id"), rs.getInt("count"));
+                    }
+                    return stats;
+                }
+            }
+        }
+        return Collections.emptyMap();
     }
 
     private Optional<NamedQuote> buildQuoteFromResultSet(ResultSet rs) throws SQLException {

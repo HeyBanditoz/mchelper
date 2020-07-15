@@ -7,7 +7,9 @@ import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class QuoteCommand extends Command {
     @Override
@@ -25,14 +27,31 @@ public class QuoteCommand extends Command {
     protected void onCommand(CommandEvent ce) {
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         try {
-            Optional<NamedQuote> nq;
-            if (ce.getCommandArgsString().isEmpty()) {
-                nq = dao.getRandomQuote(ce.getGuild());
+            if (ce.getCommandArgs()[1].equals("stats")) {
+                Map<Long, Integer> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+                if (quotes.isEmpty()) {
+                    ce.sendReply("This guild has no quotes to gather statistics for.");
+                    return;
+                }
+                int quoteCount = quotes.values().stream().mapToInt(integer -> integer).sum();
+                AtomicReference<String> reply = new AtomicReference<>("We have " + quoteCount + " quotes for this guild.\n```\n");
+                quotes.forEach((id, count) -> {
+                    String s = reply.get();
+                    s += ce.getMCHelper().getJDA().retrieveUserById(id).complete().getAsTag() + ": " + count + '\n';
+                    reply.set(s);
+                });
+                ce.sendReply(reply.get() + "```");
             }
             else {
-                nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
+                Optional<NamedQuote> nq;
+                if (ce.getCommandArgsString().isEmpty()) {
+                    nq = dao.getRandomQuote(ce.getGuild());
+                }
+                else {
+                    nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
+                }
+                nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
             }
-            nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
         } catch (Exception ex) {
             ce.sendExceptionMessage(ex);
         }

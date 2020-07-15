@@ -4,6 +4,9 @@ import io.banditoz.mchelper.utils.database.NamedQuote;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface QuotesDao {
@@ -31,4 +34,13 @@ public interface QuotesDao {
      * @throws SQLException If there was an error getting the quote.
      */
     Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException;
+    /**
+     * Returns a {@link Map} containing a list of keys of author IDs, that match to values on how many quotes that
+     * author has added. Ideally, this {@link Map} should be ordered, as the command that invokes it expects it to be.
+     *
+     * @param g The {@link Guild} to filter by.
+     * @return A {@link Map} of how many quotes a unique author has added, empty if the guild contains no quotes.
+     * @throws SQLException If there was an error getting the quotes.
+     */
+    Map<Long, Integer> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
 }
