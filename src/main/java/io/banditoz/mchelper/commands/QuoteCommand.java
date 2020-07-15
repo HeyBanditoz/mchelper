@@ -6,9 +6,13 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
+import net.dv8tion.jda.api.entities.User;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class QuoteCommand extends Command {
@@ -28,19 +32,7 @@ public class QuoteCommand extends Command {
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         try {
             if (ce.getCommandArgs()[1].equals("stats")) {
-                Map<Long, Integer> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
-                if (quotes.isEmpty()) {
-                    ce.sendReply("This guild has no quotes to gather statistics for.");
-                    return;
-                }
-                int quoteCount = quotes.values().stream().mapToInt(integer -> integer).sum();
-                AtomicReference<String> reply = new AtomicReference<>("We have " + quoteCount + " quotes for this guild.\n```\n");
-                quotes.forEach((id, count) -> {
-                    String s = reply.get();
-                    s += ce.getMCHelper().getJDA().retrieveUserById(id).complete().getAsTag() + ": " + count + '\n';
-                    reply.set(s);
-                });
-                ce.sendReply(reply.get() + "```");
+                ce.sendReply(getStatsString(ce, dao));
             }
             else {
                 Optional<NamedQuote> nq;
@@ -55,5 +47,33 @@ public class QuoteCommand extends Command {
         } catch (Exception ex) {
             ce.sendExceptionMessage(ex);
         }
+    }
+
+    /**
+     * Formats a String that contains quote statistics for the given {@link net.dv8tion.jda.api.entities.Guild} in the
+     * {@link CommandEvent}.
+     *
+     * @param ce The CommandEvent to work off of.
+     * @param dao The QuotesDao to gather stats from.
+     * @return A formatted String for Discord that contains how many quotes an author has written.
+     * @throws SQLException If there was an error with the database.
+     */
+    private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
+        Map<Long, Integer> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        if (quotes.isEmpty()) {
+            return "This guild has no quotes to gather statistics for.";
+        }
+        int quoteCount = quotes.values().stream().mapToInt(integer -> integer).sum();
+        AtomicReference<String> reply = new AtomicReference<>("We have " + quoteCount + " quotes for this guild.\n```\n");
+        quotes.forEach((id, count) -> {
+            String s = reply.get();
+            try {
+                s += ce.getMCHelper().getJDA().retrieveUserById(id).complete().getAsTag() + ": " + count + '\n';
+            } catch (Exception ex) {
+                s += id + ": " + count + '\n';
+            }
+            reply.set(s);
+        });
+        return reply.get() + "```";
     }
 }
