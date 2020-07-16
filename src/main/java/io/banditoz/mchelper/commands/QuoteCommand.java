@@ -31,7 +31,7 @@ public class QuoteCommand extends Command {
     protected void onCommand(CommandEvent ce) {
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         try {
-            if (ce.getCommandArgs()[1].equals("stats")) {
+            if (ce.getCommandArgs().size > 1 && ce.getCommandArgs()[1].equals("stats")) {
                 ce.sendReply(getStatsString(ce, dao));
             }
             else {
