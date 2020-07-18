@@ -21,7 +21,7 @@ public class ListUtils {
         if (howMany > l.size()) {
             throw new IllegalArgumentException("Cannot pick " + howMany + " elements from a list with a size of " + l.size() + ".");
         }
-        if (howMany == 1) {
+        if (l.size() == 1) {
             return l.get(0);
         }
         StringBuilder results = new StringBuilder();
