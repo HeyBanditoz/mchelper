@@ -18,6 +18,9 @@ plugins {
 
     // Distribute latest git information in jar
     id 'com.peterabeles.gversion' version '1.5.2'
+
+    // Clean testing output
+    id 'com.adarshr.test-logger' version '2.1.0'
 }
 
 gversion {

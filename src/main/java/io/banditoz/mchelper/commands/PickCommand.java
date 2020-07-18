@@ -6,6 +6,7 @@ import io.banditoz.mchelper.utils.Help;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static io.banditoz.mchelper.utils.ListUtils.extractNumRandomly;
 
@@ -40,6 +41,6 @@ public class PickCommand extends Command {
         else {
             options = new ArrayList<>(Arrays.asList(args.split("\\s+")));
         }
-        ce.sendReply(extractNumRandomly(howMany, options));
+        ce.sendReply(extractNumRandomly(howMany, options, ThreadLocalRandom.current()));
     }
 }

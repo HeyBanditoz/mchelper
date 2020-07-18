@@ -17,6 +17,11 @@ package:
             - build/libs/*.jar
         expire_in: 1 week
 
+test:
+    stage: test
+    script:
+        - gradle test
+
 deploy_production:
     stage: deploy
     environment: production
