@@ -61,7 +61,7 @@ public class SettingsManager {
         defaultSettings.setOwlBotToken("OwlBot API key here.");
         defaultSettings.setCommandThreads(2);
         defaultSettings.setWatchDeletedMessages(false);
-        defaultSettings.setAlphaVantageKey("Alpha Vantage API key here.");
+        defaultSettings.setFinnhubKey("Alpha Vantage API key here.");
         defaultSettings.setRiotApiKey("Riot Api Key here.");
         defaultSettings.setDatabaseName("Name of the database.");
         defaultSettings.setDatabaseHostAndPort("Host and port of the database.");

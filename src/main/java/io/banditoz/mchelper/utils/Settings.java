@@ -23,8 +23,8 @@ public class Settings {
     private Integer commandThreads;
     @JsonProperty("watchDeletedMessages")
     private Boolean watchDeletedMessages;
-    @JsonProperty("alphaVantageKey")
-    private String alphaVantageKey;
+    @JsonProperty("finnhubKey")
+    private String finnhubKey;
     @JsonProperty("riotApiKey")
     private String riotApiKey;
     @JsonProperty("databaseUsername")
@@ -116,14 +116,14 @@ public class Settings {
         this.watchDeletedMessages = watchDeletedMessages;
     }
 
-    @JsonProperty("alphaVantageKey")
-    public String getAlphaVantageKey() {
-        return alphaVantageKey;
+    @JsonProperty("finnhubKey")
+    public String getFinnhubKey() {
+        return finnhubKey;
     }
 
-    @JsonProperty("alphaVantageKey")
-    public void setAlphaVantageKey(String alphaVantageKey) {
-        this.alphaVantageKey = alphaVantageKey;
+    @JsonProperty("finnhubKey")
+    public void setFinnhubKey(String finnhubKey) {
+        this.finnhubKey = finnhubKey;
     }
 
     @JsonProperty("riotApiKey")

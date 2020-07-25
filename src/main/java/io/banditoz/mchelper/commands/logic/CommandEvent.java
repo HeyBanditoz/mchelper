@@ -55,6 +55,17 @@ public class CommandEvent {
     }
 
     /**
+     * Grabs the command arguments, without the first element (prefix and command name)
+     *
+     * @return The arguments.
+     */
+    public String[] getCommandArgsWithoutName() {
+        String[] newArgs = new String[COMMAND_ARGS.length - 1];
+        System.arraycopy(COMMAND_ARGS, 1, newArgs, 0, newArgs.length);
+        return newArgs;
+    }
+
+    /**
      * Grabs the MessageReceivedEvent.
      *
      * @return the MessageReceivedEvent.

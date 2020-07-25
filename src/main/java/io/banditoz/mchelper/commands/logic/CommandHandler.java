@@ -93,11 +93,10 @@ public class CommandHandler extends ListenerAdapter {
             commands.add(new WeatherStationCommand());
         }
 
-        if (settings.getAlphaVantageKey() == null || settings.getAlphaVantageKey().equals("Alpha Vantage API key here")) {
-            LOGGER.info("Alpha Vantage API key not defined! Not enabling financial commands.");
+        if (settings.getFinnhubKey() == null || settings.getFinnhubKey().equals("Alpha Vantage API key here")) {
+            LOGGER.info("Finnhub API key not defined! Not enabling financial commands.");
         }
         else {
-            commands.add(new CurrencyConversionCommand());
             commands.add(new StockCommand());
         }
 
