@@ -20,7 +20,7 @@ public class CompanyProfileDaoImpl extends Dao implements CompanyProfileDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE `company_profiles`( `country` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `exchange` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL, `industry` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL, `ipo` date NOT NULL, `logo` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `market_capitalization` float NOT NULL, `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL, `shares_outstanding` float NOT NULL, `ticker` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `weburl` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), UNIQUE KEY `ticker` (`ticker`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return "CREATE TABLE IF NOT EXISTS `company_profiles`( `country` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `exchange` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL, `industry` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL, `ipo` date NOT NULL, `logo` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `market_capitalization` float NOT NULL, `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL, `shares_outstanding` float NOT NULL, `ticker` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `weburl` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), UNIQUE KEY `ticker` (`ticker`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
     @Override
