@@ -75,6 +75,8 @@ public abstract class Command {
         if (handleCooldown(e.getAuthor().getId())) {
             e.getChannel().sendTyping().queue();
             try {
+                LOGGER.info(String.format("Executing command: <%s@%s> %s",
+                        e.getAuthor().toString(), e.getChannel().toString(), e.getMessage().getContentDisplay()));
                 long before = System.nanoTime();
                 onCommand(new CommandEvent(e, LOGGER, MCHelper));
                 long after = System.nanoTime() - before;

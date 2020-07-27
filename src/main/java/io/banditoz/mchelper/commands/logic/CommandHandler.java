@@ -26,8 +26,6 @@ public class CommandHandler extends ListenerAdapter {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return; // don't execute own commands
         getCommandByEvent(event).ifPresent(c -> {
             if (c.canExecute(event, MCHELPER)) {
-                LOGGER.info(String.format("Executing command: <%s@%s> %s",
-                        event.getAuthor().toString(), event.getChannel().toString(), event.getMessage().getContentDisplay()));
                 MCHELPER.getThreadPoolExecutor().execute(() -> c.execute(event, MCHELPER));
             }
         });
