@@ -88,17 +88,8 @@ public class CommandEvent {
      *
      * @param ex The exception.
      */
-    public void sendExceptionMessage(Exception ex, boolean caught) {
-        CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER, caught, false);
-    }
-
-    /**
-     * Sends a reply containing the exception message.
-     *
-     * @param ex The exception.
-     */
     public void sendExceptionMessage(Exception ex) {
-        CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER, true, false);
+        CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER);
     }
 
     /**

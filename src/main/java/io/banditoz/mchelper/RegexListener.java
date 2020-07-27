@@ -27,7 +27,7 @@ public abstract class RegexListener extends ListenerAdapter {
                 long after = System.nanoTime() - before;
                 LOGGER.debug("Listener ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
+                CommandUtils.sendExceptionMessage(e, ex, LOGGER);
             }
         });
     }

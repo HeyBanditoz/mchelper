@@ -80,7 +80,7 @@ public abstract class Command {
                 long after = System.nanoTime() - before;
                 LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(e, ex, LOGGER, false, false);
+                CommandUtils.sendExceptionMessage(e, ex, LOGGER);
             }
         }
         else {

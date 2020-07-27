@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommandUtils {
-    private static final boolean SEND_FULL_STACK_TRACE = false;
     private static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
     /**
@@ -23,27 +22,10 @@ public class CommandUtils {
      *
      * @param ex The exception.
      */
-    public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l, boolean caught, boolean blocked) {
-        StringBuilder reply = new StringBuilder("**Exception thrown:** " + (blocked ? "```" : "")
-                + StringUtils.truncate(ex.toString(), 300, true)
-                + (blocked ? "```" : "")); // ternary abuse out the wazoo
-        if (SEND_FULL_STACK_TRACE) {
-            reply.append("\n```");
-            for (int i = 0; i < ex.getStackTrace().length; i++) {
-                reply.append(ex.getStackTrace()[i]);
-                reply.append("\n");
-            }
-            reply.append("```");
-        }
-        else {
-            if (caught) {
-                l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
-            }
-            else {
-                l.error("Uncaught exception! Offending message: " + buildMessageAndAuthor(e), ex);
-            }
-        }
-        _sendReply(reply.toString(), e.getChannel(), true);
+    public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l) {
+        l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
+        String reply = "**Exception thrown:** " + StringUtils.truncate(ex.toString(), 300, true);
+        _sendReply(reply, e.getChannel(), true);
     }
 
     /**
