@@ -32,7 +32,7 @@ import java.util.HashMap;
  *             .withDescription("Returns \"Pong!\"");
  *      }
  *
- *      protected void onCommand(CommandEvent ce) {
+ *      protected void onCommand(CommandEvent ce) throws Exception {
  *          ce.sendReply("Pong!");
  *      }
  * }
@@ -41,7 +41,7 @@ import java.util.HashMap;
  * @see io.banditoz.mchelper.MCHelper
  */
 public abstract class Command {
-    protected abstract void onCommand(CommandEvent ce);
+    protected abstract void onCommand(CommandEvent ce) throws Exception;
     public abstract String commandName();
     public abstract Help getHelp();
 

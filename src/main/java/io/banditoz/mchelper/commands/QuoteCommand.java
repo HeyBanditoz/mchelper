@@ -6,13 +6,10 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
-import net.dv8tion.jda.api.entities.User;
 
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class QuoteCommand extends Command {
@@ -28,24 +25,20 @@ public class QuoteCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
-        try {
-            if (ce.getCommandArgs().length > 1 && ce.getCommandArgs()[1].equals("stats")) {
-                ce.sendReply(getStatsString(ce, dao));
+        if (ce.getCommandArgs().length > 1 && ce.getCommandArgs()[1].equals("stats")) {
+            ce.sendReply(getStatsString(ce, dao));
+        }
+        else {
+            Optional<NamedQuote> nq;
+            if (ce.getCommandArgsString().isEmpty()) {
+                nq = dao.getRandomQuote(ce.getGuild());
             }
             else {
-                Optional<NamedQuote> nq;
-                if (ce.getCommandArgsString().isEmpty()) {
-                    nq = dao.getRandomQuote(ce.getGuild());
-                }
-                else {
-                    nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
-                }
-                nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
+                nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
             }
-        } catch (Exception ex) {
-            ce.sendExceptionMessage(ex);
+            nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
         }
     }
 
@@ -53,7 +46,7 @@ public class QuoteCommand extends Command {
      * Formats a String that contains quote statistics for the given {@link net.dv8tion.jda.api.entities.Guild} in the
      * {@link CommandEvent}.
      *
-     * @param ce The CommandEvent to work off of.
+     * @param ce  The CommandEvent to work off of.
      * @param dao The QuotesDao to gather stats from.
      * @return A formatted String for Discord that contains how many quotes an author has written.
      * @throws SQLException If there was an error with the database.

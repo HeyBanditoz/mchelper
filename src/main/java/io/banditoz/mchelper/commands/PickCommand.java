@@ -24,7 +24,7 @@ public class PickCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         int howMany = 1;
         String args;
         if (ce.getCommandArgs()[1].matches("\\d+")) {

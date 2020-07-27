@@ -19,17 +19,13 @@ public class WeatherStationCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         int hourSince = 24;
         if (ce.getCommandArgs().length > 1) {
             hourSince = Integer.parseInt(ce.getCommandArgsString());
         }
-        try {
-            ce.getEvent().getChannel().sendMessage(new Weather(ce.getMCHelper()).getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
-                    .addFile(new GrafanaImageFetcher(ce.getMCHelper()).fetchFahrenheit(hourSince), "graph.png")
-                    .queue();
-        } catch (Exception ex) {
-            ce.sendExceptionMessage(ex, true);
-        }
+        ce.getEvent().getChannel().sendMessage(new Weather(ce.getMCHelper()).getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
+                .addFile(new GrafanaImageFetcher(ce.getMCHelper()).fetchFahrenheit(hourSince), "graph.png")
+                .queue();
     }
 }

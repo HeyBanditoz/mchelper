@@ -27,7 +27,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         if (!(ce.getCommandArgs().length > 1)) {
             char prefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
             StringBuilder sb = new StringBuilder();

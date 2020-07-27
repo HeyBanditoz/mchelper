@@ -23,17 +23,13 @@ public class BashCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
-        try {
-            Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
-            String output = ProcessUtils.runProcess(p);
-            if (output.length() > 2000) {
-                ce.sendReply(new PasteggUploader(ce.getMCHelper()).uploadToPastegg(new Paste(output, 24)));
-                return;
-            }
-            ce.sendReply(output);
-        } catch (InterruptedException | IOException | HttpResponseException ex) {
-            ce.sendExceptionMessage(ex);
+    protected void onCommand(CommandEvent ce) throws Exception {
+        Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
+        String output = ProcessUtils.runProcess(p);
+        if (output.length() > 2000) {
+            ce.sendReply(new PasteggUploader(ce.getMCHelper()).uploadToPastegg(new Paste(output, 24)));
+            return;
         }
+        ce.sendReply(output);
     }
 }

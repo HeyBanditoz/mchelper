@@ -18,7 +18,7 @@ public class VersionCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         String reply = "MCHelper, a Discord bot.\n" +
                 "https://gitlab.com/HeyBanditoz/mchelper/commit/" + Version.GIT_SHA + "\n" +
                 "Git revision date: " + Version.GIT_DATE + "\n" +

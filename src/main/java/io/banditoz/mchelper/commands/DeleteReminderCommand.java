@@ -22,20 +22,16 @@ public class DeleteReminderCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
-        try {
-            int id = Integer.parseInt(ce.getCommandArgsString());
-            RemindersDao dao = new RemindersDaoImpl(ce.getDatabase());
-            Reminder r = dao.getReminderById(id);
-            if (r == null || r.getAuthorId() != ce.getEvent().getAuthor().getIdLong()) {
-                ce.sendReply("Reminder does not exist or you did not write the reminder.");
-            }
-            else {
-                dao.markDeleted(id);
-                ce.sendReply("Reminder " + id + " marked for deletion.");
-            }
-        } catch (SQLException e) {
-            ce.sendExceptionMessage(e);
+    protected void onCommand(CommandEvent ce) throws Exception {
+        int id = Integer.parseInt(ce.getCommandArgsString());
+        RemindersDao dao = new RemindersDaoImpl(ce.getDatabase());
+        Reminder r = dao.getReminderById(id);
+        if (r == null || r.getAuthorId() != ce.getEvent().getAuthor().getIdLong()) {
+            ce.sendReply("Reminder does not exist or you did not write the reminder.");
+        }
+        else {
+            dao.markDeleted(id);
+            ce.sendReply("Reminder " + id + " marked for deletion.");
         }
     }
 }

@@ -22,13 +22,11 @@ public class SqlCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         try (Connection c = ce.getDatabase().getConnection()) {
             ResultSet rs = c.prepareStatement(ce.getCommandArgsString()).executeQuery();
             ce.sendReply(formatTable(rs));
             rs.close();
-        } catch (SQLException ex) {
-            ce.sendExceptionMessage(ex);
         }
     }
 

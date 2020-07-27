@@ -23,7 +23,7 @@ public class DefaultChannelCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         GuildConfigDao dao = new GuildConfigDaoImpl(ce.getDatabase());
         GuildConfig gc = dao.getConfig(ce.getGuild());
         if (ce.getCommandArgs().length == 1) {

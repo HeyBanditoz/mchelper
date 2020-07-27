@@ -19,7 +19,7 @@ public class CoinFlipCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         if (new Random().nextBoolean()) {
             ce.sendReply("Heads!");
         }

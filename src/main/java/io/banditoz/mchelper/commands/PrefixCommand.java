@@ -22,7 +22,7 @@ public class PrefixCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         GuildConfigDao dao = new GuildConfigDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length == 1) {
             ce.sendReply(dao.getConfig(ce.getGuild()).getPrefix() + " is this guild's prefix.");

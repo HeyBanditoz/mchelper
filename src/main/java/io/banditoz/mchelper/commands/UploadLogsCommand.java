@@ -20,7 +20,7 @@ public class UploadLogsCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         File htmlLogFile = new File("log.html");
         if (htmlLogFile.exists()) {
             if (htmlLogFile.canRead()) {

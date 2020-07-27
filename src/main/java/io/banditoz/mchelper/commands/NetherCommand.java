@@ -18,7 +18,7 @@ public class NetherCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         CoordinatePoint point1 = new CoordinatePoint(ce.getCommandArgs()[1], ce.getCommandArgs()[2]);
         CoordinatePoint nether = point1.getNetherCoordinates();
         ce.sendReply(nether.toIntegerString());

@@ -21,28 +21,24 @@ public class UnitsCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
-        try {
-            if (!ce.getCommandArgsString().contains("to")) {
-                throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + ce.getCommandArgsString());
-            }
-            String[] argsSplit = ce.getCommandArgsString().split(" to ");
-
-            Process p = new ProcessBuilder("units", "-t", argsSplit[0], argsSplit[1]).start();
-
-            p.waitFor(); // hacky for right now, but this is dangerous! make sure your bash commands won't hang
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            StringBuilder output = new StringBuilder();
-
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
-
-            reader.close();
-            ce.sendReply(output.toString());
-        } catch (IOException | InterruptedException ex) {
-            ce.sendExceptionMessage(ex);
+    protected void onCommand(CommandEvent ce) throws Exception {
+        if (!ce.getCommandArgsString().contains("to")) {
+            throw new IllegalArgumentException("Your units command must contain \"to\" to properly split your command to convert! Offending command: " + ce.getCommandArgsString());
         }
+        String[] argsSplit = ce.getCommandArgsString().split(" to ");
+
+        Process p = new ProcessBuilder("units", "-t", argsSplit[0], argsSplit[1]).start();
+
+        p.waitFor(); // hacky for right now, but this is dangerous! make sure your bash commands won't hang
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder output = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+
+        reader.close();
+        ce.sendReply(output.toString());
     }
 }

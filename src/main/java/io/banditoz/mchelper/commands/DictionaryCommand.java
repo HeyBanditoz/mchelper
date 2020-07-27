@@ -20,7 +20,7 @@ public class DictionaryCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = null;
         int toLookup = 0;

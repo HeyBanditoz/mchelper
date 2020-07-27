@@ -24,7 +24,7 @@ public class HeapDumpCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         boolean live;
         String fileName;
 
@@ -39,14 +39,10 @@ public class HeapDumpCommand extends ElevatedCommand {
 
         long before = System.nanoTime();
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        try {
-            HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(
-                    server, "com.sun.management:type=HotSpotDiagnostic", HotSpotDiagnosticMXBean.class);
-            mxBean.dumpHeap(fileName, live);
-            long after = System.nanoTime() - before;
-            ce.sendReply("Done. Heap dump (with filename `" + fileName + "`) created in " + (after / 1000000) + " ms.");
-        } catch (IOException ex) {
-            ce.sendExceptionMessage(ex);
-        }
+        HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(
+                server, "com.sun.management:type=HotSpotDiagnostic", HotSpotDiagnosticMXBean.class);
+        mxBean.dumpHeap(fileName, live);
+        long after = System.nanoTime() - before;
+        ce.sendReply("Done. Heap dump (with filename `" + fileName + "`) created in " + (after / 1000000) + " ms.");
     }
 }

@@ -22,7 +22,7 @@ public class FloodCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         int howMany = Integer.parseInt(ce.getCommandArgs()[1]);
         if (howMany < 1) {
             ce.sendExceptionMessage(new IllegalArgumentException("You must send at least one message."));

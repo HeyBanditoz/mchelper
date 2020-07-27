@@ -30,26 +30,16 @@ public class RemindmeCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
-        Duration d;
-        try {
-            d = getDurationFromString(ce.getCommandArgs()[1]);
-        } catch (ParseException e) {
-            ce.sendExceptionMessage(e);
-            return;
-        }
+    protected void onCommand(CommandEvent ce) throws Exception {
+        Duration d = getDurationFromString(ce.getCommandArgs()[1]);
         Reminder r = new Reminder();
         r.setAuthorId(ce.getEvent().getAuthor().getIdLong());
         r.setChannelId(ce.getEvent().isFromGuild() ? ce.getEvent().getChannel().getIdLong() : ce.getEvent().getPrivateChannel().getIdLong());
         r.setReminder(ce.getCommandArgsString().replaceFirst("\\S+\\s+", ""));
         r.setRemindWhen(new Timestamp(Instant.now().toEpochMilli() + (d.getSeconds() * 1000)));
         r.setIsFromDm(!ce.getEvent().isFromGuild());
-        try {
-            int id = ce.getMCHelper().getReminderService().schedule(new ReminderRunnable(r, ce.getMCHelper()));
-            ce.sendReply("Reminder " + id + " coming at you in duration " + d + ".");
-        } catch (SQLException e) {
-            ce.sendExceptionMessage(e);
-        }
+        int id = ce.getMCHelper().getReminderService().schedule(new ReminderRunnable(r, ce.getMCHelper()));
+        ce.sendReply("Reminder " + id + " coming at you in duration " + d + ".");
     }
 
     private Duration getDurationFromString(String s) throws ParseException {

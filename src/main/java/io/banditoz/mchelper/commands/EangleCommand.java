@@ -18,7 +18,7 @@ public class EangleCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         CoordinatePoint point1 = new CoordinatePoint(ce.getCommandArgs()[1], ce.getCommandArgs()[2]);
         CoordinatePoint point2 = new CoordinatePoint(ce.getCommandArgs()[3], ce.getCommandArgs()[4]);
         ce.sendReply("**Yaw:** " + String.format("%.1f", point1.getAngleBetweenTwoPoints(point2)) +

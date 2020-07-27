@@ -21,7 +21,7 @@ public class RockPaperScissorsCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         int result = rand.nextInt(3) + 1;
         String args = ce.getCommandArgs()[1];
         if (args.equalsIgnoreCase("rock") || args.equalsIgnoreCase("paper") || args.equalsIgnoreCase("scissors")) {

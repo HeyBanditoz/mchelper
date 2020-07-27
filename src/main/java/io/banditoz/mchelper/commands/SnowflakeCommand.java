@@ -18,7 +18,7 @@ public class SnowflakeCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         ce.sendReply(SnowflakeUtils.returnDateTimesForIDs(ce.getCommandArgsString()));
     }
 }

@@ -30,7 +30,7 @@ public class EvalCommand extends ElevatedCommand {
 
     // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         String args;
         if (ce.getCommandArgsString().startsWith("```groovy")) {
             args = ce.getCommandArgsString().replace("```groovy", "").replace("```", "");
@@ -38,26 +38,22 @@ public class EvalCommand extends ElevatedCommand {
         else {
             args = ce.getCommandArgsString();
         }
-        try {
-            String imports = "import net.dv8tion.jda.*;\n" +
-                    "import java.util.*;\n" +
-                    "import io.banditoz.mchelper.utils.database.*;\n";
-            engine.put("ce", ce);
-            engine.put("args", ce.getCommandArgs());
-            engine.put("jda", ce.getEvent().getJDA());
-            if (ce.getEvent().isFromType(ChannelType.TEXT)) {
-                engine.put("guild", ce.getEvent().getGuild());
-                engine.put("member", ce.getEvent().getMember());
-            }
-            Object out = engine.eval(imports + args);
-            if (out == null) {
-                ce.sendReply(null); // checked in CommandUtils
-            }
-            else {
-                ce.sendReply(out.toString());
-            }
-        } catch (Exception ex) {
-            CommandUtils.sendExceptionMessage(ce.getEvent(), ex, LOGGER, true, true);
+        String imports = "import net.dv8tion.jda.*;\n" +
+                "import java.util.*;\n" +
+                "import io.banditoz.mchelper.utils.database.*;\n";
+        engine.put("ce", ce);
+        engine.put("args", ce.getCommandArgs());
+        engine.put("jda", ce.getEvent().getJDA());
+        if (ce.getEvent().isFromType(ChannelType.TEXT)) {
+            engine.put("guild", ce.getEvent().getGuild());
+            engine.put("member", ce.getEvent().getMember());
+        }
+        Object out = engine.eval(imports + args);
+        if (out == null) {
+            ce.sendReply(null); // checked in CommandUtils
+        }
+        else {
+            ce.sendReply(out.toString());
         }
     }
 }

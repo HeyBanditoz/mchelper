@@ -17,7 +17,7 @@ public class PingCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         ce.getEvent().getJDA().getRestPing().queue((p) -> ce.sendReply("Pong! Websocket: " + ce.getEvent().getJDA().getGatewayPing() + "ms, REST: " + p + " ms."));
     }
 }

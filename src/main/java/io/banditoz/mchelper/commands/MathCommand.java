@@ -20,7 +20,7 @@ public class MathCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         BigDecimal result;
         result = new Expression(ce.getCommandArgsString()).eval();
         if (result.toPlainString().length() >= 256) {

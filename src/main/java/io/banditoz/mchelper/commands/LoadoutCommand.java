@@ -68,7 +68,7 @@ public class LoadoutCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         if (!canRun) {
             ce.sendReply("League's API could not be reached or this command has not yet been run before. Please try again in a moment.");
             ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);

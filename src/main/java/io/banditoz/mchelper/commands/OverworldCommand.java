@@ -18,7 +18,7 @@ public class OverworldCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         CoordinatePoint point1 = new CoordinatePoint(ce.getCommandArgs()[1], ce.getCommandArgs()[2]);
         CoordinatePoint overworld = point1.getOverworldCoordinates();
         ce.sendReply(overworld.toIntegerString());

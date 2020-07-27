@@ -27,22 +27,18 @@ public class StockCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         Finance finance = new Finance(ce.getMCHelper());
-        try {
-            Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
-            String ticker = args.get("ticker");
-            Quote quote = finance.getQuote(ticker);
-            CompanyProfile cp = finance.getCompanyProfile(ticker);
-            if (args.getBoolean("graph")) {
-                RawCandlestick candles = finance.getCandlestickForTicker(ticker, args.getBoolean("yearly"));
-                ce.sendEmbedImageReply(Finance.generateStockMessageEmbed(quote, cp), Finance.generateStockGraph(candles, cp));
-            }
-            else {
-                ce.sendEmbedReply(Finance.generateStockMessageEmbed(quote, cp));
-            }
-        } catch (Exception e) {
-            ce.sendExceptionMessage(e);
+        Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
+        String ticker = args.get("ticker");
+        Quote quote = finance.getQuote(ticker);
+        CompanyProfile cp = finance.getCompanyProfile(ticker);
+        if (args.getBoolean("graph")) {
+            RawCandlestick candles = finance.getCandlestickForTicker(ticker, args.getBoolean("yearly"));
+            ce.sendEmbedImageReply(Finance.generateStockMessageEmbed(quote, cp), Finance.generateStockGraph(candles, cp));
+        }
+        else {
+            ce.sendEmbedReply(Finance.generateStockMessageEmbed(quote, cp));
         }
     }
 

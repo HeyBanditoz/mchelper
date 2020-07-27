@@ -20,7 +20,7 @@ public class AddquoteCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         QuotesDao qd = new QuotesDaoImpl(ce.getDatabase());
         try {
             long messageId = Long.parseLong(ce.getCommandArgs()[1]);
@@ -32,17 +32,11 @@ public class AddquoteCommand extends Command {
             qd.saveQuote(nq);
             ce.sendReply("Quote (from message ID) added.");
         } catch (NumberFormatException ex) { // it isn't an ID, let's continue
-            try {
-                NamedQuote nq = NamedQuote.parseString(ce.getCommandArgsString());
-                nq.setGuildId(ce.getGuild().getIdLong());
-                nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
-                qd.saveQuote(nq);
-                ce.sendReply("Quote added.");
-            } catch (Exception e) {
-                ce.sendExceptionMessage(e);
-            }
-        } catch (Exception ex) {
-            ce.sendExceptionMessage(ex);
+            NamedQuote nq = NamedQuote.parseString(ce.getCommandArgsString());
+            nq.setGuildId(ce.getGuild().getIdLong());
+            nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
+            qd.saveQuote(nq);
+            ce.sendReply("Quote added.");
         }
     }
 }

@@ -18,7 +18,7 @@ public class FromMorseCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         ce.sendReply(MorseUtils.fromMorse(ce.getCommandArgsString()));
     }
 }

@@ -19,7 +19,7 @@ public class DiceRollerCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
+    protected void onCommand(CommandEvent ce) throws Exception {
         DiceExpression e = DiceExpression.parse(ce.getCommandArgsString());
         ce.sendReply(new DiceResultPrettyPrinter().prettyPrint(e.roll()));
     }

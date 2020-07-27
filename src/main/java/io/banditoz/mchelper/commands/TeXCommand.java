@@ -18,11 +18,7 @@ public class TeXCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) {
-        try {
-            TeXRenderer.sendTeXToChannel(ce.getEvent(), ce.getCommandArgsString());
-        } catch (Exception ex) {
-            ce.sendExceptionMessage(ex);
-        }
+    protected void onCommand(CommandEvent ce) throws Exception {
+        TeXRenderer.sendTeXToChannel(ce.getEvent(), ce.getCommandArgsString());
     }
 }
