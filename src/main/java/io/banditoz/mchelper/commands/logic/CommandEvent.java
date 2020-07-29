@@ -16,8 +16,8 @@ import java.io.File;
  * Class which holds the MessageReceivedEvent and command arguments.
  */
 public class CommandEvent {
-    private final String COMMAND_ARGS_STRING;
-    private final String[] COMMAND_ARGS;
+    private String COMMAND_ARGS_STRING;
+    private String[] COMMAND_ARGS;
     private final MessageReceivedEvent EVENT;
     private final Logger LOGGER;
     private final Guild GUILD;
@@ -27,8 +27,6 @@ public class CommandEvent {
 
     public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper) {
         this.EVENT = event;
-        this.COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(event);
-        this.COMMAND_ARGS = CommandUtils.commandArgs(event.getMessage().getContentDisplay());
         this.LOGGER = logger;
         this.GUILD = (event.isFromGuild()) ? event.getGuild() : null;
         this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor(), mcHelper.getSettings());
@@ -42,6 +40,9 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String getCommandArgsString() {
+        if (COMMAND_ARGS_STRING == null) {
+            COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(EVENT);
+        }
         return COMMAND_ARGS_STRING;
     }
 
@@ -51,6 +52,9 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String[] getCommandArgs() {
+        if (COMMAND_ARGS == null) {
+            COMMAND_ARGS = CommandUtils.commandArgs(EVENT.getMessage().getContentDisplay());
+        }
         return COMMAND_ARGS;
     }
 
@@ -60,6 +64,7 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String[] getCommandArgsWithoutName() {
+        // we don't hold this on the class level because you probably shouldn't be running this more than once (for argparse4j)
         String[] newArgs = new String[COMMAND_ARGS.length - 1];
         System.arraycopy(COMMAND_ARGS, 1, newArgs, 0, newArgs.length);
         return newArgs;
