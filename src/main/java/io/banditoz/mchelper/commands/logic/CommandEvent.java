@@ -64,6 +64,9 @@ public class CommandEvent {
      * @return The arguments.
      */
     public String[] getCommandArgsWithoutName() {
+        if (COMMAND_ARGS == null) {
+            COMMAND_ARGS = CommandUtils.commandArgs(EVENT.getMessage().getContentDisplay());
+        }
         // we don't hold this on the class level because you probably shouldn't be running this more than once (for argparse4j)
         String[] newArgs = new String[COMMAND_ARGS.length - 1];
         System.arraycopy(COMMAND_ARGS, 1, newArgs, 0, newArgs.length);
