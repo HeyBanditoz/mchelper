@@ -6,11 +6,19 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.impl.action.StoreArgumentAction;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentType;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class QuoteCommand extends Command {
     @Override
@@ -20,23 +28,24 @@ public class QuoteCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("[search]")
-                .withDescription("Finds a random quote from this guild or optionally searches for one.");
+        return new Help(commandName(), false).withParser(getDefaultArgs());
     }
 
     @Override
     protected void onCommand(CommandEvent ce) throws Exception {
+        Namespace args = getDefaultArgs().parseArgs(ce.getCommandArgsWithoutName());
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
-        if (ce.getCommandArgs().length > 1 && ce.getCommandArgs()[1].equals("stats")) {
+        if (args.get("stats") != null && args.getBoolean("stats")) {
             ce.sendReply(getStatsString(ce, dao));
         }
         else {
             Optional<NamedQuote> nq;
-            if (ce.getCommandArgsString().isEmpty()) {
+            if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
                 nq = dao.getRandomQuote(ce.getGuild());
             }
             else {
-                nq = dao.getRandomQuoteByMatch(ce.getCommandArgsString(), ce.getGuild());
+                String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
+                nq = dao.getRandomQuoteByMatch(s, ce.getGuild());
             }
             nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
         }
@@ -68,5 +77,16 @@ public class QuoteCommand extends Command {
             reply.set(s);
         });
         return reply.get() + "```";
+    }
+
+    private ArgumentParser getDefaultArgs() {
+        ArgumentParser parser = ArgumentParsers.newFor("quote").addHelp(false).build();
+        parser.addArgument("-s", "--stats")
+                .action(Arguments.storeTrue())
+                .help("retrieve stats instead");
+        parser.addArgument("quoteAndAuthor")
+                .help("quote content and quote attribution to search by")
+                .nargs("*");
+        return parser;
     }
 }
