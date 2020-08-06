@@ -58,13 +58,14 @@ public class MCHelper {
         JDA.addEventListener(new TeXListener(this));
         JDA.addEventListener(new RedditListener(this));
 
+        DB = new Database(this);
+
         if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             JDA.addEventListener(new GuildJoinLeaveListener(this));
         }
         else {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
-        DB = new Database(this);
 
         JDA.awaitReady();
 
