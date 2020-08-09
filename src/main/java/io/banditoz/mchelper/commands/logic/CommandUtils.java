@@ -123,6 +123,26 @@ public class CommandUtils {
         }
     }
 
+    public static void sendEmbedThumbnailReply(MessageEmbed me, ByteArrayOutputStream image, String randomUUID, MessageReceivedEvent e) throws Exception {
+        String imageName = randomUUID + ".png";
+        File f = new File(imageName);
+
+        try (OutputStream outputStream = new FileOutputStream(imageName)) {
+            image.writeTo(outputStream);
+
+            Process p = new ProcessBuilder("oxipng", imageName).start();
+            p.waitFor();
+
+            e.getMessage().getChannel()
+                    .sendFile(f)
+                    .embed(me)
+                    .queue();
+            image.close();
+        } finally {
+            f.delete();
+        }
+    }
+
     /**
      * Checks the message for abnormalities, (null, empty) and formats it accordingly. It will also take any URLs and
      * wrap them in brackets, so Discord doesn't embed them.

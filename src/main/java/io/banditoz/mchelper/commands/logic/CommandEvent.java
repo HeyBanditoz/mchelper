@@ -135,6 +135,10 @@ public class CommandEvent {
         CommandUtils.sendEmbedImageReply(me, image, this.EVENT);
     }
 
+    public void sendEmbedThumbnailReply(MessageEmbed me, ByteArrayOutputStream image, String randomUUID) throws Exception {
+        CommandUtils.sendEmbedThumbnailReply(me, image, randomUUID, this.EVENT);
+    }
+
     public void sendFile(String msg, File f) {
         CommandUtils.sendFile(msg, f, this.EVENT);
     }
