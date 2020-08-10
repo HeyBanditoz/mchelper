@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.2.0_182') {
+    implementation('net.dv8tion:JDA:4.2.0_189') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -54,13 +54,13 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
     implementation 'com.merakianalytics.orianna:orianna:4.0.0-rc5'
-    implementation 'org.codehaus.groovy:groovy-jsr223:3.0.4'
+    implementation 'org.codehaus.groovy:groovy-jsr223:3.0.5'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2'
 
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
     implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
-    implementation('org.knowm.xchart:xchart:3.6.4') {
+    implementation('org.knowm.xchart:xchart:3.6.5') {
         exclude module: 'VectorGraphics2D'
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
