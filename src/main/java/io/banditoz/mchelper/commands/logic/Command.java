@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.MCHelperImpl;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
@@ -38,7 +39,7 @@ import java.util.HashMap;
  * }
  * </pre>
  *
- * @see io.banditoz.mchelper.MCHelper
+ * @see CommandHandler
  */
 public abstract class Command {
     protected abstract void onCommand(CommandEvent ce) throws Exception;

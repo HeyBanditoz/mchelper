@@ -57,17 +57,20 @@ dependencies {
     implementation 'org.codehaus.groovy:groovy-jsr223:3.0.5'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2'
-
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
     implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     implementation('org.knowm.xchart:xchart:3.6.5') {
-        exclude module: 'VectorGraphics2D'
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // Define the main class for the application
