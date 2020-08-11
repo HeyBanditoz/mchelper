@@ -47,7 +47,18 @@ public class QuoteCommand extends Command {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
                 nq = dao.getRandomQuoteByMatch(s, ce.getGuild());
             }
-            nq.ifPresentOrElse(namedQuote -> ce.sendReply(namedQuote.format()), () -> ce.sendReply("No quote found."));
+            nq.ifPresentOrElse(namedQuote -> {
+                if (args.get("include_author")) {
+                    ce.getMCHelper().getJDA().retrieveUserById(namedQuote.getAuthorId()).queue(user -> {
+                        ce.sendReply(namedQuote.format() + " (author is " + user.getAsMention() + ")");
+                    }, throwable -> {
+                        ce.sendReply(namedQuote.format() + " (author is " + namedQuote.getAuthorId() + ")");
+                    });
+                }
+                else {
+                    ce.sendReply(namedQuote.format());
+                }
+            }, () -> ce.sendReply("No quote found."));
         }
     }
 
@@ -84,6 +95,9 @@ public class QuoteCommand extends Command {
         parser.addArgument("-s", "--stats")
                 .action(Arguments.storeTrue())
                 .help("retrieve stats instead");
+        parser.addArgument("-i", "--include-author")
+                .action(Arguments.storeTrue())
+                .help("include who added the quote");
         parser.addArgument("quoteAndAuthor")
                 .help("quote content and quote attribution to search by")
                 .nargs("*");
