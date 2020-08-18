@@ -77,6 +77,7 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new InviteBotCommand());
         commands.add(new RockPaperScissorsCommand());
         commands.add(new ServerStatusCommand());
+        commands.add(new UrbanDictionaryCommand());
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");

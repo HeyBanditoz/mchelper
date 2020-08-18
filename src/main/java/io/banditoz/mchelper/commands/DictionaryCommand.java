@@ -3,9 +3,9 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.dictionary.Definition;
-import io.banditoz.mchelper.utils.dictionary.DictionaryResult;
-import io.banditoz.mchelper.utils.dictionary.DictionarySearcher;
+import io.banditoz.mchelper.dictionary.Definition;
+import io.banditoz.mchelper.dictionary.DictionaryResult;
+import io.banditoz.mchelper.dictionary.DictionarySearcher;
 
 public class DictionaryCommand extends Command {
     @Override
@@ -24,17 +24,12 @@ public class DictionaryCommand extends Command {
         DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = null;
         int toLookup = 0;
-        try {
-            if (ce.getCommandArgs()[1].matches("\\d+")) {
-                toLookup = Integer.parseInt(ce.getCommandArgs()[1]) - 1; // zero indexed
-                result = ds.search(ce.getCommandArgs()[2]);
-            }
-            else {
-                result = ds.search(ce.getCommandArgsString());
-            }
-        } catch (Exception ex) {
-            ce.sendExceptionMessage(ex);
-            return;
+        if (ce.getCommandArgs()[1].matches("\\d+")) {
+            toLookup = Integer.parseInt(ce.getCommandArgs()[1]) - 1; // zero indexed
+            result = ds.search(ce.getCommandArgs()[2]);
+        }
+        else {
+            result = ds.search(ce.getCommandArgsString());
         }
         Definition d = result.getDefinitions().get(toLookup);
         String reply = result.getWord() + ", " +

@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils.dictionary;
+package io.banditoz.mchelper.dictionary;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
