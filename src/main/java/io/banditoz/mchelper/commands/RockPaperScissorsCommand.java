@@ -4,11 +4,9 @@ import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RockPaperScissorsCommand extends Command {
-    Random rand = new Random();
-
     @Override
     public String commandName() {
         return "rps";
@@ -22,7 +20,7 @@ public class RockPaperScissorsCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) throws Exception {
-        int result = rand.nextInt(3) + 1;
+        int result = ThreadLocalRandom.current().nextInt(3) + 1;
         String args = ce.getCommandArgs()[1];
         if (args.equalsIgnoreCase("rock") || args.equalsIgnoreCase("paper") || args.equalsIgnoreCase("scissors")) {
             if (args.equalsIgnoreCase("rock") && result == 1) {

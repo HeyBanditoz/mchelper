@@ -7,8 +7,6 @@ import io.banditoz.mchelper.utils.database.CoordinatePoint;
 import io.banditoz.mchelper.utils.database.dao.CoordsDao;
 import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
 
-import java.sql.SQLException;
-
 public class CoordCommand extends Command {
     @Override
     public String commandName() {

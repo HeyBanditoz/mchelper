@@ -6,7 +6,6 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ReminderRunnable;
 import io.banditoz.mchelper.utils.database.Reminder;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

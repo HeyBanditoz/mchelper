@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -10,7 +9,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 public class EvalCommand extends ElevatedCommand {
-    private ScriptEngine engine;
+    private final ScriptEngine engine;
 
     public EvalCommand() {
         engine = new ScriptEngineManager().getEngineByName("groovy");

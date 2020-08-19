@@ -6,7 +6,6 @@ import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.utils.Help;
 
 import javax.management.MBeanServer;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;

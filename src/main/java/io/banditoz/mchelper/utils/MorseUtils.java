@@ -4,7 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 public class MorseUtils {
-    private static BiMap<Character, String> morseMap = HashBiMap.create(42); // values in morse
+    private static final BiMap<Character, String> morseMap = HashBiMap.create(42); // values in morse
 
     static {
         morseMap.put('A', ".-");

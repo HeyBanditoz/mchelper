@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.MCHelperImpl;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;

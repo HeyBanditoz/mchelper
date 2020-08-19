@@ -7,8 +7,6 @@ import io.banditoz.mchelper.utils.database.Reminder;
 import io.banditoz.mchelper.utils.database.dao.RemindersDao;
 import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
 
-import java.sql.SQLException;
-
 public class DeleteReminderCommand extends Command {
     @Override
     public String commandName() {

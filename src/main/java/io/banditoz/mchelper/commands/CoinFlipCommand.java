@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.utils.Help;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CoinFlipCommand extends Command {
     @Override
@@ -20,7 +21,7 @@ public class CoinFlipCommand extends Command {
 
     @Override
     protected void onCommand(CommandEvent ce) throws Exception {
-        if (new Random().nextBoolean()) {
+        if (ThreadLocalRandom.current().nextBoolean()) {
             ce.sendReply("Heads!");
         }
         else {

@@ -4,8 +4,6 @@ import io.banditoz.mchelper.utils.database.NamedQuote;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
