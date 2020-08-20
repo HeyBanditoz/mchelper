@@ -6,6 +6,12 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.CoordinatePoint;
 import io.banditoz.mchelper.utils.database.dao.CoordsDao;
 import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparsers;
+
+import java.util.List;
 
 public class CoordCommand extends Command {
     @Override
@@ -15,24 +21,22 @@ public class CoordCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<save|add,show|list,delete|remove,help>")
-                .withDescription("Saves coordinates to the database. See !coords help");
+        return new Help(commandName(), false).withParser(getDefualtArgs());
     }
 
     @Override
     protected void onCommand(CommandEvent ce) throws Exception {
         CoordsDao dao = new CoordsDaoImpl(ce.getDatabase());
-        if (ce.getCommandArgs().length <= 1) {
-            help(ce);
-            return;
-        }
-        String name = ce.getCommandArgs()[1];
-        if (name.equalsIgnoreCase("save") || name.equalsIgnoreCase("add")) {
-            CoordinatePoint point = new CoordinatePoint(ce.getCommandArgs()[3], ce.getCommandArgs()[4],
-                    ce.getCommandArgs()[2], ce.getEvent().getAuthor().getIdLong(), ce.getGuild().getIdLong());
+        Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
+        if (args.get("subcommand").equals("add")) {
+            List<String> argsAsString = args.getList("point");
+            ce.sendReply(argsAsString.toString());
+            CoordinatePoint point = new CoordinatePoint(argsAsString.get(1), argsAsString.get(2),
+                    argsAsString.get(3), ce.getEvent().getAuthor().getIdLong(), ce.getGuild().getIdLong());
             dao.savePoint(point);
             ce.sendReply(point + " saved.");
         }
+        /*
         else if (name.equalsIgnoreCase("show") || name.equalsIgnoreCase("list")) {
             if (ce.getCommandArgs().length > 2) {
                 ce.sendReply(dao.getPointByName(ce.getCommandArgs()[2], ce.getGuild()).toString());
@@ -48,18 +52,24 @@ public class CoordCommand extends Command {
             ce.sendReply("Deleted.");
         }
         else if (name.equalsIgnoreCase("help")) {
-            help(ce);
         }
         else {
             ce.sendReply("Unrecognized operator " + name + ".");
         }
+        */
     }
 
-    private void help(CommandEvent ce) {
-        String s = "save or add: adds new coord to list. \n" +
-                "show or list: display all coords \n" +
-                "show <name> or list <name>: display coord with <name>.\n" +
-                "delete or remove: remove an item";
-        ce.sendReply(s);
+    private ArgumentParser getDefualtArgs() {
+        ArgumentParser parser = ArgumentParsers.newFor("coords").addHelp(false).build();
+        parser.description("Manipulate this guild's coordinate list.");
+        Subparsers subparsers = parser.addSubparsers().dest("subcommand");
+        subparsers.addParser("add").aliases("save")
+                .addArgument("point")
+                .nargs("*");
+        subparsers.addParser("remove").aliases("delete")
+                .addArgument("name")
+                .nargs("*");
+        subparsers.addParser("list").aliases("show");
+        return parser;
     }
 }

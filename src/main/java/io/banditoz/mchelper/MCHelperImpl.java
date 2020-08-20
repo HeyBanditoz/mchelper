@@ -60,7 +60,15 @@ public class MCHelperImpl implements MCHelper {
         JDA.addEventListener(new TeXListener(this));
         JDA.addEventListener(new RedditListener(this));
 
-        DB = new Database(this);
+        if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
+            DB = new Database(this);
+            RS = new ReminderService(this, SES);
+        }
+        else {
+            DB = null;
+            RS = null;
+            LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
+        }
 
         if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             JDA.addEventListener(new GuildJoinLeaveListener(this));
@@ -74,7 +82,6 @@ public class MCHelperImpl implements MCHelper {
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completes below.
 
-        RS = new ReminderService(this, SES);
         SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),

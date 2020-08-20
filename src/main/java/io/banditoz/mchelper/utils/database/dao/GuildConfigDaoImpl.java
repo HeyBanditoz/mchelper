@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,9 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
         }
         GuildConfig gc = cache.get(g.getIdLong());
         if (gc == null) {
+            if (DATABASE == null) {
+                return new GuildConfig(); // hackily return the default GuildConfig if no database is configured
+            }
             try (Connection c = DATABASE.getConnection()) {
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
                 ps.setLong(1, g.getIdLong());
