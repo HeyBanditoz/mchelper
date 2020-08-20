@@ -3,6 +3,8 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.paste.Paste;
+import io.banditoz.mchelper.utils.paste.PasteggUploader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -107,6 +109,25 @@ public class CommandEvent {
      */
     public void sendReply(String msg) {
         CommandUtils.sendReply(msg, EVENT);
+    }
+
+    /**
+     * Sends a reply. If it is over 2000 characters, it will be placed into paste.gg. Otherwise. the reply is sent
+     * sanitized.
+     *
+     * @param msg The reply.
+     */
+    public void sendPastableReply(String msg) {
+        if (msg.length() > 2000) {
+            try {
+                sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(new Paste(msg)));
+            } catch (Exception e) {
+                sendReply(msg);
+            }
+        }
+        else {
+            sendReply(msg);
+        }
     }
 
     /**

@@ -52,7 +52,7 @@ public class EvalCommand extends ElevatedCommand {
             ce.sendReply(null); // checked in CommandUtils
         }
         else {
-            ce.sendReply(out.toString());
+            ce.sendPastableReply("```" + out.toString() + "```");
         }
     }
 }
