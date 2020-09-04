@@ -36,10 +36,10 @@ public class FunctionPlotter {
     public FunctionPlotter(String math, double xMin, double xMax, double yMin, double yMax, double step) {
         // sanity checks
         if (xMin >= xMax) {
-            throw new IllegalArgumentException("bad range");
+            throw new IllegalArgumentException("bad domain");
         }
         if (yMin >= yMax) {
-            throw new IllegalArgumentException("bad domain");
+            throw new IllegalArgumentException("bad range");
         }
         int size = (int) Math.round((Math.abs(xMin) + Math.abs(xMax)) / step);
         if (size <= step) {
@@ -53,7 +53,6 @@ public class FunctionPlotter {
         X_DATA = new ArrayList<>(size);
         Y_DATA = new ArrayList<>(size);
         for (double x = X_MIN; x < X_MAX; x += step) {
-            EXPRESSION.setVariable("x", BigDecimal.valueOf(x));
             EXPRESSION.setVariable("x", BigDecimal.valueOf(x));
             try {
                 X_DATA.add(x);
