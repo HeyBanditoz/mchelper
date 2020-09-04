@@ -70,6 +70,7 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new RockPaperScissorsCommand());
         commands.add(new ServerStatusCommand());
         commands.add(new UrbanDictionaryCommand());
+        commands.add(new PlotCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             commands.add(new CoordCommand());
