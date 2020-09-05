@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.serverstatus.MinecraftServerStatus;
+import io.banditoz.mchelper.serverstatus.Player;
 import io.banditoz.mchelper.serverstatus.StatusResponse;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -11,7 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.UUID;
+import java.util.*;
 
 public class ServerStatusCommand extends Command {
     @Override
@@ -39,11 +40,16 @@ public class ServerStatusCommand extends Command {
             StatusResponse response = status.fetchData();
             String description = response.getDescriptionAsString();
             String randomUUID = UUID.randomUUID().toString().replace("-", "");
+            List<Player> players = new ArrayList<>(response.getPlayers().getSample());
+            Collections.sort(players);
+            StringJoiner sj = new StringJoiner(", ");
+            players.forEach(p -> sj.add(p.getName()));
             MessageEmbed me = new EmbedBuilder()
                     .setTitle(addr.toString())
                     .setDescription(description.isEmpty() ? "<no description>" : description)
                     .addField("Players", String.format("%d/%d", response.getPlayers().getOnline(), response.getPlayers().getMax()), true)
                     .addField("Version", String.format("%s (%s)", response.getVersion().getName(), response.getVersion().getProtocol()), true)
+                    .addField("Player Sample", players.isEmpty() ? "<no player sample>" : sj.toString(), false)
                     .setThumbnail(String.format("attachment://%s.png", randomUUID))
                     .setColor(Color.GREEN)
                     .build();

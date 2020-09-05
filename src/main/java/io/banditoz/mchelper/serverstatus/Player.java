@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.serverstatus;
 
-public class Player {
+import org.jetbrains.annotations.NotNull;
+
+public class Player implements Comparable<Player> {
     private String name;
     private String id;
 
@@ -12,4 +14,13 @@ public class Player {
         return id;
     }
 
+    @Override
+    public int compareTo(@NotNull Player p) {
+        return this.getName().toLowerCase().compareTo(p.getName().toLowerCase());
+    }
+
+    @Override
+    public String toString() {
+        return name + '(' + id + ')';
+    }
 }
