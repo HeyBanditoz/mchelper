@@ -67,87 +67,75 @@ public class MinecraftServerStatus {
      * @throws IOException If there was a problem connecting to the server or parsing the data.
      */
     public StatusResponse fetchData() throws IOException {
-        Socket socket = new Socket();
-        OutputStream outputStream;
-        DataOutputStream dataOutputStream;
-        InputStream inputStream;
-        InputStreamReader inputStreamReader;
+        try (
+            Socket socket = new Socket();
+            OutputStream outputStream = socket.getOutputStream();
+            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+            InputStream inputStream = socket.getInputStream()
+        ) {
+            socket.setSoTimeout(this.timeout);
+            socket.connect(host, timeout);
 
-        socket.setSoTimeout(this.timeout);
+            ByteArrayOutputStream b = new ByteArrayOutputStream();
+            DataOutputStream handshake = new DataOutputStream(b);
+            handshake.writeByte(0x00); //packet id for handshake
+            writeVarInt(handshake, 4); //protocol version
+            writeVarInt(handshake, this.host.getHostString().length()); //host length
+            handshake.writeBytes(this.host.getHostString()); //host string
+            handshake.writeShort(host.getPort()); //port
+            writeVarInt(handshake, 1); //state (1 for handshake)
 
-        socket.connect(host, timeout);
-
-        outputStream = socket.getOutputStream();
-        dataOutputStream = new DataOutputStream(outputStream);
-
-        inputStream = socket.getInputStream();
-        inputStreamReader = new InputStreamReader(inputStream);
-
-        ByteArrayOutputStream b = new ByteArrayOutputStream();
-        DataOutputStream handshake = new DataOutputStream(b);
-        handshake.writeByte(0x00); //packet id for handshake
-        writeVarInt(handshake, 4); //protocol version
-        writeVarInt(handshake, this.host.getHostString().length()); //host length
-        handshake.writeBytes(this.host.getHostString()); //host string
-        handshake.writeShort(host.getPort()); //port
-        writeVarInt(handshake, 1); //state (1 for handshake)
-
-        writeVarInt(dataOutputStream, b.size()); //prepend size
-        dataOutputStream.write(b.toByteArray()); //write handshake packet
+            writeVarInt(dataOutputStream, b.size()); //prepend size
+            dataOutputStream.write(b.toByteArray()); //write handshake packet
 
 
-        dataOutputStream.writeByte(0x01); //size is only 1
-        dataOutputStream.writeByte(0x00); //packet id for ping
-        DataInputStream dataInputStream = new DataInputStream(inputStream);
-        int size = readVarInt(dataInputStream); //size of packet
-        int id = readVarInt(dataInputStream); //packet id
+            dataOutputStream.writeByte(0x01); //size is only 1
+            dataOutputStream.writeByte(0x00); //packet id for ping
+            DataInputStream dataInputStream = new DataInputStream(inputStream);
+            int size = readVarInt(dataInputStream); //size of packet
+            int id = readVarInt(dataInputStream); //packet id
 
-        if (id == -1) {
-            throw new IOException("Premature end of stream.");
+            if (id == -1) {
+                throw new IOException("Premature end of stream.");
+            }
+
+            if (id != 0x00) { //we want a status response
+                throw new IOException("Invalid packetID (got " + id + ")");
+            }
+            int length = readVarInt(dataInputStream); //length of json string
+
+            if (length == -1) {
+                throw new IOException("Premature end of stream.");
+            }
+
+            if (length == 0) {
+                throw new IOException("Invalid string length.");
+            }
+
+            byte[] in = new byte[length];
+            dataInputStream.readFully(in);  //read json string
+            String json = new String(in);
+
+            long now = System.currentTimeMillis();
+            dataOutputStream.writeByte(0x09); //size of packet
+            dataOutputStream.writeByte(0x01); //0x01 for ping
+            dataOutputStream.writeLong(now); //time!?
+
+            readVarInt(dataInputStream);
+            id = readVarInt(dataInputStream);
+            if (id == -1) {
+                throw new IOException("Premature end of stream.");
+            }
+
+            if (id != 0x01) {
+                throw new IOException("Invalid packetID (got " + id + ")");
+            }
+            long pingtime = dataInputStream.readLong(); //read response
+
+            StatusResponse response = om.readValue(json, StatusResponse.class);
+            response.setTime((int) (now - pingtime));
+
+            return response;
         }
-
-        if (id != 0x00) { //we want a status response
-            throw new IOException("Invalid packetID (got " + id + ")");
-        }
-        int length = readVarInt(dataInputStream); //length of json string
-
-        if (length == -1) {
-            throw new IOException("Premature end of stream.");
-        }
-
-        if (length == 0) {
-            throw new IOException("Invalid string length.");
-        }
-
-        byte[] in = new byte[length];
-        dataInputStream.readFully(in);  //read json string
-        String json = new String(in);
-
-        long now = System.currentTimeMillis();
-        dataOutputStream.writeByte(0x09); //size of packet
-        dataOutputStream.writeByte(0x01); //0x01 for ping
-        dataOutputStream.writeLong(now); //time!?
-
-        readVarInt(dataInputStream);
-        id = readVarInt(dataInputStream);
-        if (id == -1) {
-            throw new IOException("Premature end of stream.");
-        }
-
-        if (id != 0x01) {
-            throw new IOException("Invalid packetID (got " + id + ")");
-        }
-        long pingtime = dataInputStream.readLong(); //read response
-
-        StatusResponse response = om.readValue(json, StatusResponse.class);
-        response.setTime((int) (now - pingtime));
-
-        dataOutputStream.close();
-        outputStream.close();
-        inputStreamReader.close();
-        inputStream.close();
-        socket.close();
-
-        return response;
     }
 }
