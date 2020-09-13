@@ -85,6 +85,9 @@ public abstract class Command {
                 CommandUtils.sendExceptionMessage(e, ex, LOGGER);
             } catch (Throwable t) {
                 CommandUtils.sendThrowableMessage(e, t, LOGGER);
+                if (t instanceof OutOfMemoryError) {
+                    System.gc();
+                }
                 throw t; // rethrow
             }
         }
