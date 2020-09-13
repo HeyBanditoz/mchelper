@@ -9,7 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class which represents a user added quote from the database.
+ * Class which represents a user added quote from the database. Quotes must be in this format:
+ * <pre>"Quote content." Quote author</pre>
+ * or else the parsing will fail. Any leading dashes in the author field will be removed.
  */
 public class NamedQuote {
     /** The guild this quote came from. Used for filtering the right guild when a user requests a quote. */
@@ -22,7 +24,9 @@ public class NamedQuote {
     private String quoteAuthor;
     /** The Timestamp of when this quote was created in the database. */
     private Timestamp lastModified;
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM uuuu");
+    private final static DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMMM uuuu");
+    private final static Pattern QUOTE_PARSER = Pattern.compile("\"(.*?)\"\\s+");
+    private final static String GREEDY_DASHES = "^-+";
 
     public long getGuildId() {
         return guildId;
@@ -64,16 +68,24 @@ public class NamedQuote {
         this.lastModified = lastModified;
     }
 
+    /**
+     * Attempts to build a NamedQuote given a String.
+     *
+     * @param s The String to parse.
+     * @return A NamedQuote from the String.
+     * @throws IllegalArgumentException if there was an error parsing the quote.
+     */
     public static NamedQuote parseString(String s) {
         // fuck you, apple!
         s = s.replace('“', '"').replace('”', '"');
 
         NamedQuote nq = new NamedQuote();
-        Pattern p = Pattern.compile("\"(.*?)\"\\s+");
-        Matcher m = p.matcher(s);
+        Matcher m = QUOTE_PARSER.matcher(s);
         if (m.find()) {
+            // replace the quotation marks with nothing inside the quote body
             nq.setQuote(m.group().replace("\"", "").trim());
-            nq.setQuoteAuthor(m.replaceFirst(""));
+            // replace extra dashes in the author field with nothing
+            nq.setQuoteAuthor(m.replaceFirst("").replaceFirst(GREEDY_DASHES, ""));
         }
         else {
             throw new IllegalArgumentException("Could not create named quote from string!");
@@ -103,6 +115,6 @@ public class NamedQuote {
      * @return The formatted String.
      */
     public String format() {
-        return "\n> " + this.getQuote() + "\n      **" + this.getQuoteAuthor() + "** — " + formatter.format(this.getLastModified().toLocalDateTime());
+        return "\n> " + this.getQuote() + "\n      **" + this.getQuoteAuthor() + "** — " + DATE.format(this.getLastModified().toLocalDateTime());
     }
 }
