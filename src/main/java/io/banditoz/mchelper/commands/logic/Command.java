@@ -83,6 +83,9 @@ public abstract class Command {
                 LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
             } catch (Exception ex) {
                 CommandUtils.sendExceptionMessage(e, ex, LOGGER);
+            } catch (Throwable t) {
+                CommandUtils.sendThrowableMessage(e, t, LOGGER);
+                throw t; // rethrow
             }
         }
         else {

@@ -28,6 +28,12 @@ public class CommandUtils {
         _sendReply(reply, e.getChannel(), true);
     }
 
+    public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
+        l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
+        String reply = "**THROWABLE THROWN!!!** " + StringUtils.truncate(t.toString(), 300, true);
+        _sendReply(reply, e.getChannel(), true);
+    }
+
     /**
      * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
      * will appear as normal but, otherwise not do anything.
