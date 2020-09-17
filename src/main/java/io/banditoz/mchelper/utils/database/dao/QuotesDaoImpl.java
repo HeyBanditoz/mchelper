@@ -18,7 +18,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
+        return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp()) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
     }
 
     @Override
