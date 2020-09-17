@@ -67,14 +67,19 @@ public class MinecraftServerStatus {
      * @throws IOException If there was a problem connecting to the server or parsing the data.
      */
     public StatusResponse fetchData() throws IOException {
-        try (
-            Socket socket = new Socket();
-            OutputStream outputStream = socket.getOutputStream();
-            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-            InputStream inputStream = socket.getInputStream()
-        ) {
+        Socket socket = null;
+        OutputStream outputStream = null;
+        DataOutputStream dataOutputStream = null;
+        InputStream inputStream  = null;
+        try {
+            socket = new Socket();
+
             socket.setSoTimeout(this.timeout);
             socket.connect(host, timeout);
+
+            outputStream = socket.getOutputStream();
+            dataOutputStream = new DataOutputStream(outputStream);
+            inputStream = socket.getInputStream();
 
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream handshake = new DataOutputStream(b);
@@ -136,6 +141,19 @@ public class MinecraftServerStatus {
             response.setTime((int) (now - pingtime));
 
             return response;
+        } finally {
+            if (socket != null) {
+                socket.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (dataOutputStream != null) {
+                dataOutputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
     }
 }
