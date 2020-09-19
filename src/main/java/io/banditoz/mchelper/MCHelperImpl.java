@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.regex_listeners.RegexableHandler;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -38,6 +39,7 @@ public class MCHelperImpl implements MCHelper {
     private final ScheduledExecutorService SES;
     private final ThreadPoolExecutor TPE;
     private final CommandHandler CH;
+    private final RegexableHandler RH;
     private final ReminderService RS;
     private final Database DB;
     private final Settings SETTINGS;
@@ -50,6 +52,7 @@ public class MCHelperImpl implements MCHelper {
         SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
                 .build());
         this.CH = new CommandHandler(this);
+        this.RH = new RegexableHandler(this);
 
         if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
             LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
@@ -58,8 +61,7 @@ public class MCHelperImpl implements MCHelper {
 
         JDA = JDABuilder.createLight(SETTINGS.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES).setMemberCachePolicy(MemberCachePolicy.ALL).enableCache(CacheFlag.VOICE_STATE).build();
         JDA.addEventListener(CH);
-        JDA.addEventListener(new TeXListener(this));
-        JDA.addEventListener(new RedditListener(this));
+        JDA.addEventListener(RH);
 
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             DB = new Database(this);
