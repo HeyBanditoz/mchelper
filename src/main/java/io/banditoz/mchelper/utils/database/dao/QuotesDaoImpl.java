@@ -2,7 +2,7 @@ package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.UserStat;
+import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,15 +65,15 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public Set<UserStat> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
+    public Set<StatPoint<Long>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT author_id, COUNT(author_id) AS 'count' FROM `quotes` WHERE guild_id=? GROUP BY author_id ORDER BY COUNT(author_id) DESC");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.isLast()) {
-                    TreeSet<UserStat> stats = new TreeSet<>();
+                    TreeSet<StatPoint<Long>> stats = new TreeSet<>();
                     while (rs.next()) {
-                        stats.add(new UserStat(rs.getLong("author_id"), rs.getInt("count")));
+                        stats.add(new StatPoint<>(rs.getLong("author_id"), rs.getInt("count")));
                     }
                     return stats;
                 }

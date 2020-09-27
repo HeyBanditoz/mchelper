@@ -5,7 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.UserStat;
+import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -76,17 +76,17 @@ public class QuoteCommand extends Command {
      * @throws SQLException If there was an error with the database.
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
-        Set<UserStat> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        Set<StatPoint<Long>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
         if (quotes.isEmpty()) {
             return "This guild has no quotes to gather statistics for.";
         }
-        int quoteCount = quotes.stream().mapToInt(UserStat::getCount).sum();
+        int quoteCount = quotes.stream().mapToInt(StatPoint::getCount).sum();
         StringBuffer reply = new StringBuffer("We have " + quoteCount + " quotes for this guild.\n```\n");
         quotes.forEach((us) -> {
             try {
-                reply.append(ce.getMCHelper().getJDA().retrieveUserById(us.getUserId()).complete().getAsTag()).append(": ").append(us.getCount()).append('\n');
+                reply.append(ce.getMCHelper().getJDA().retrieveUserById(us.getThing()).complete().getAsTag()).append(": ").append(us.getCount()).append('\n');
             } catch (Exception ex) {
-                reply.append(us.getUserId()).append(": ").append(us.getCount()).append('\n');
+                reply.append(us.getThing()).append(": ").append(us.getCount()).append('\n');
             }
         });
         return reply.toString() + "```";
