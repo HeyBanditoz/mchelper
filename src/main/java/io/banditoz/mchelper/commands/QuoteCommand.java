@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
+import io.banditoz.mchelper.utils.database.UserStat;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -13,8 +14,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -76,18 +77,18 @@ public class QuoteCommand extends Command {
      * @throws SQLException If there was an error with the database.
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
-        Map<Long, Integer> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        Set<UserStat> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
         if (quotes.isEmpty()) {
             return "This guild has no quotes to gather statistics for.";
         }
-        int quoteCount = quotes.values().stream().mapToInt(integer -> integer).sum();
+        int quoteCount = quotes.stream().mapToInt(UserStat::getCount).sum();
         AtomicReference<String> reply = new AtomicReference<>("We have " + quoteCount + " quotes for this guild.\n```\n");
-        quotes.forEach((id, count) -> {
+        quotes.forEach((us) -> {
             String s = reply.get();
             try {
-                s += ce.getMCHelper().getJDA().retrieveUserById(id).complete().getAsTag() + ": " + count + '\n';
+                s += ce.getMCHelper().getJDA().retrieveUserById(us.getUserId()).complete().getAsTag() + ": " + us.getCount() + '\n';
             } catch (Exception ex) {
-                s += id + ": " + count + '\n';
+                s += us.getUserId() + ": " + us.getCount() + '\n';
             }
             reply.set(s);
         });

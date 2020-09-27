@@ -1,11 +1,13 @@
 package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.utils.database.NamedQuote;
+import io.banditoz.mchelper.utils.database.UserStat;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface QuotesDao {
     /**
@@ -40,5 +42,5 @@ public interface QuotesDao {
      * @return A {@link Map} of how many quotes a unique author has added, empty if the guild contains no quotes.
      * @throws SQLException If there was an error getting the quotes.
      */
-    Map<Long, Integer> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
+    Set<UserStat> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
 }
