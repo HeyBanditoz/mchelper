@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.urbandictionary.UDDefinition;
 import io.banditoz.mchelper.urbandictionary.UDResult;
 import io.banditoz.mchelper.urbandictionary.UDSearcher;
@@ -25,7 +26,7 @@ public class UrbanDictionaryCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         UDSearcher ud = new UDSearcher(ce.getMCHelper());
         Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
         String search = args.getList("word").stream().map(Object::toString).collect(Collectors.joining(" "));
@@ -33,7 +34,7 @@ public class UrbanDictionaryCommand extends Command {
         UDResult result = ud.search(search);
         if (result.getResults().isEmpty()) {
             ce.sendReply("No definition found.");
-            return;
+            return Status.FAIL;
         }
         UDDefinition definition = result.getResults().get(num);
         String definitionString = formatUrbanDictionaryLinkToMarkdown(definition.getDefinition(), true);
@@ -54,6 +55,7 @@ public class UrbanDictionaryCommand extends Command {
                 .setTimestamp(definition.getWrittenOn())
                 .setFooter(num + 1 + "/" + result.getResults().size())
                 .build());
+        return Status.SUCCESS;
     }
 
     private String formatUrbanDictionaryLinkToMarkdown(String s, boolean isDef) {

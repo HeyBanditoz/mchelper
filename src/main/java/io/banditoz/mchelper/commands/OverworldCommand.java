@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.CoordinatePoint;
 
@@ -18,9 +19,10 @@ public class OverworldCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         CoordinatePoint point1 = new CoordinatePoint(ce.getCommandArgs()[1], ce.getCommandArgs()[2]);
         CoordinatePoint overworld = point1.getOverworldCoordinates();
         ce.sendReply(overworld.toIntegerString());
+        return Status.SUCCESS;
     }
 }

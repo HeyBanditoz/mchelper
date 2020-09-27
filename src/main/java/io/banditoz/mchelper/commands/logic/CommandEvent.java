@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.time.LocalDateTime;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -26,14 +27,17 @@ public class CommandEvent {
     private final MCHelper MCHELPER;
     private final boolean IS_ELEVATED;
     private final Database DATABASE;
+    private final String COMMAND_NAME;
+    private final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
 
-    public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper) {
+    public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper, String commandClassName) {
         this.EVENT = event;
         this.LOGGER = logger;
         this.GUILD = (event.isFromGuild()) ? event.getGuild() : null;
         this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor(), mcHelper.getSettings());
         this.MCHELPER = mcHelper;
         this.DATABASE = mcHelper.getDatabase();
+        this.COMMAND_NAME = commandClassName;
     }
 
     /**
@@ -198,5 +202,17 @@ public class CommandEvent {
      */
     public Settings getSettings() {
         return MCHELPER.getSettings();
+    }
+
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    public LocalDateTime getExecutedWhen() {
+        return EXECUTED_WHEN;
     }
 }

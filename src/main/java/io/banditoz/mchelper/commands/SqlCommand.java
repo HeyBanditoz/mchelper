@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
 import java.sql.Connection;
@@ -22,12 +23,13 @@ public class SqlCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         try (Connection c = ce.getDatabase().getConnection()) {
             ResultSet rs = c.prepareStatement(ce.getCommandArgsString()).executeQuery();
             ce.sendReply(formatTable(rs));
             rs.close();
         }
+        return Status.SUCCESS;
     }
 
     /**

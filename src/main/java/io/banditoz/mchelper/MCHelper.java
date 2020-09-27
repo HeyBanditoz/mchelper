@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
@@ -21,6 +22,7 @@ public interface MCHelper {
     ThreadPoolExecutor getThreadPoolExecutor();
     Settings getSettings();
     List<Command> getCommands();
+    StatsRecorder getStatsRecorder();
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one.

@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
@@ -20,7 +21,7 @@ public class AddquoteCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         QuotesDao qd = new QuotesDaoImpl(ce.getDatabase());
         try {
             long messageId = Long.parseLong(ce.getCommandArgs()[1]);
@@ -38,5 +39,6 @@ public class AddquoteCommand extends Command {
             qd.saveQuote(nq);
             ce.sendReply("Quote added.");
         }
+        return Status.SUCCESS;
     }
 }

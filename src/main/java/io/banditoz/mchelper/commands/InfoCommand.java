@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import com.sun.management.OperatingSystemMXBean;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -25,7 +26,7 @@ public class InfoCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
         long totalJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() >> 20;
@@ -46,5 +47,6 @@ public class InfoCommand extends Command {
                 .addField("Running Commands", String.format("%d/%d", tpe.getActiveCount(), tpe.getMaximumPoolSize()), true)
                 .addField("Uptime", uptime, true);
         ce.sendEmbedReply(eb.build());
+        return Status.SUCCESS;
     }
 }

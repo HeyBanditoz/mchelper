@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
@@ -23,7 +24,7 @@ public class DefaultChannelCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         GuildConfigDao dao = new GuildConfigDaoImpl(ce.getDatabase());
         GuildConfig gc = dao.getConfig(ce.getGuild());
         if (ce.getCommandArgs().length == 1) {
@@ -37,5 +38,6 @@ public class DefaultChannelCommand extends Command {
         else {
             ce.sendReply("You are not the guild owner.");
         }
+        return Status.SUCCESS;
     }
 }

@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,7 +20,7 @@ public class RockPaperScissorsCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         int result = ThreadLocalRandom.current().nextInt(3) + 1;
         String args = ce.getCommandArgs()[1];
         if (args.equalsIgnoreCase("rock") || args.equalsIgnoreCase("paper") || args.equalsIgnoreCase("scissors")) {
@@ -52,11 +53,14 @@ public class RockPaperScissorsCommand extends Command {
             }
             else {
                 ce.sendReply("An error occurred.");
+                return Status.FAIL;
             }
         }
         else {
             ce.sendReply("Invalid parameter! Try rock, paper, or scissors.");
+            return Status.FAIL;
         }
+        return Status.SUCCESS;
     }
 }
 

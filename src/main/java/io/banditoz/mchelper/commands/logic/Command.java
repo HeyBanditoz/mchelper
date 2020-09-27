@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.stats.Stat;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
@@ -41,7 +43,7 @@ import java.util.HashMap;
  * @see CommandHandler
  */
 public abstract class Command {
-    protected abstract void onCommand(CommandEvent ce) throws Exception;
+    protected abstract Status onCommand(CommandEvent ce) throws Exception;
     public abstract String commandName();
     public abstract Help getHelp();
 
@@ -71,18 +73,18 @@ public abstract class Command {
     /**
      * Runs onCommand() in parallel.
      */
-    protected void execute(MessageReceivedEvent e, MCHelper MCHelper) {
+    protected Stat execute(MessageReceivedEvent e, MCHelper MCHelper) {
+        CommandEvent ce = new CommandEvent(e, LOGGER, MCHelper, this.getClass().getSimpleName());
+        long before = System.nanoTime();
         if (handleCooldown(e.getAuthor().getId())) {
             e.getChannel().sendTyping().queue();
             try {
-                LOGGER.info(String.format("Executing command: <%s@%s> %s",
-                        e.getAuthor().toString(), e.getChannel().toString(), e.getMessage().getContentDisplay()));
-                long before = System.nanoTime();
-                onCommand(new CommandEvent(e, LOGGER, MCHelper));
+                Status status = onCommand(ce);
                 long after = System.nanoTime() - before;
-                LOGGER.debug("Command ran in " + (after / 1000000) + " ms.");
+                return new LoggableCommandEvent(ce, (int) (after / 1000000), status);
             } catch (Exception ex) {
                 CommandUtils.sendExceptionMessage(e, ex, LOGGER);
+                return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.EXCEPTIONAL_FAILURE);
             } catch (Throwable t) {
                 CommandUtils.sendThrowableMessage(e, t, LOGGER);
                 if (t instanceof OutOfMemoryError) {
@@ -93,6 +95,7 @@ public abstract class Command {
         }
         else {
             e.getMessage().addReaction("⏲️").queue();
+            return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
         }
     }
 

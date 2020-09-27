@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -25,17 +26,18 @@ public class TeamsCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         VoiceChannel vc = ce.getEvent().getMember().getVoiceState().getChannel();
         if (vc == null) {
             ce.sendReply("You are not in a voice channel.");
+            return Status.FAIL;
         }
         else {
             // TODO Optimize this algorithm!
             List<Member> members = new ArrayList<>(vc.getMembers());
             if (members.size() < 3) {
                 ce.sendReply("Not enough people to form teams.");
-                return;
+                return Status.FAIL;
             }
             StringBuilder reply = new StringBuilder("**TEAMS**\n```properties\nTEAM-1: ");
             Collections.shuffle(members, ThreadLocalRandom.current());
@@ -54,6 +56,7 @@ public class TeamsCommand extends Command {
             }
             reply.append(sj.toString()).append("```");
             ce.sendReply(reply.toString());
+            return Status.SUCCESS;
         }
     }
 }

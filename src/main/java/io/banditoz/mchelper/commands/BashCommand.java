@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ProcessUtils;
 
@@ -18,9 +19,10 @@ public class BashCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         Process p = new ProcessBuilder("bash", "-c", ce.getCommandArgsString()).start();
         String output = ProcessUtils.runProcess(p);
         ce.sendPastableReply(output);
+        return Status.SUCCESS;
     }
 }

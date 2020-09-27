@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import com.sun.management.HotSpotDiagnosticMXBean;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
 import javax.management.MBeanServer;
@@ -23,7 +24,7 @@ public class HeapDumpCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         boolean live;
         String fileName;
 
@@ -43,5 +44,6 @@ public class HeapDumpCommand extends ElevatedCommand {
         mxBean.dumpHeap(fileName, live);
         long after = System.nanoTime() - before;
         ce.sendReply("Done. Heap dump (with filename `" + fileName + "`) created in " + (after / 1000000) + " ms.");
+        return Status.SUCCESS;
     }
 }

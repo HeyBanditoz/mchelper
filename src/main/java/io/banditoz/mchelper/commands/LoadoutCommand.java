@@ -5,6 +5,7 @@ import com.merakianalytics.orianna.types.common.Region;
 import com.merakianalytics.orianna.types.core.staticdata.*;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
 import java.time.Duration;
@@ -68,11 +69,11 @@ public class LoadoutCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         if (!canRun) {
             ce.sendReply("League's API could not be reached or this command has not yet been run before. Please try again in a moment.");
             ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);
-            return;
+            return Status.FAIL;
         }
         ArrayList<String> strings = new ArrayList<>();
         if (ce.getCommandArgs().length > 1) {
@@ -83,6 +84,7 @@ public class LoadoutCommand extends Command {
                 if (!stats.contains(s)) {
                     removable.add(s);
                     ce.sendReply("Your parameter " + s + " has been removed because it was not found as a valid stat, use !help.");
+                    return Status.FAIL;
                 }
             }
             strings.removeAll(removable);
@@ -186,7 +188,7 @@ public class LoadoutCommand extends Command {
             builder.append("\\* ").append(item.getName()).append("\n");
             if (count >= 1000) {
                 ce.sendReply("Items could not be found for you selected filters, please try again.");
-                return;
+                return Status.FAIL;
             }
         }
         builder.append("Your runes will be:\n");
@@ -273,5 +275,6 @@ public class LoadoutCommand extends Command {
         if (lastUpdate == null || lastUpdate.isBefore(LocalDateTime.now().minus(Duration.ofMinutes(1)))) {
             ce.getMCHelper().getThreadPoolExecutor().execute(LoadoutCommand::createData);
         }
+        return Status.SUCCESS;
     }
 }

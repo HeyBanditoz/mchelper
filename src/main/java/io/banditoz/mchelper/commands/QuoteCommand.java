@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
@@ -29,7 +30,7 @@ public class QuoteCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         Namespace args = getDefaultArgs().parseArgs(ce.getCommandArgsWithoutName());
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         if (args.get("stats") != null && args.getBoolean("stats")) {
@@ -44,7 +45,8 @@ public class QuoteCommand extends Command {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
                 nq = dao.getRandomQuoteByMatch(s, ce.getGuild());
             }
-            nq.ifPresentOrElse(namedQuote -> {
+            if (nq.isPresent()) {
+                NamedQuote namedQuote = nq.get();
                 if (args.get("include_author")) {
                     ce.getMCHelper().getJDA().retrieveUserById(namedQuote.getAuthorId()).queue(user -> {
                         ce.sendReply(namedQuote.format() + " (author is " + user.getAsMention() + ")");
@@ -55,8 +57,13 @@ public class QuoteCommand extends Command {
                 else {
                     ce.sendReply(namedQuote.format());
                 }
-            }, () -> ce.sendReply("No quote found."));
+            }
+            else {
+                ce.sendReply("No quote found.");
+                return Status.FAIL;
+            }
         }
+        return Status.SUCCESS;
     }
 
     /**

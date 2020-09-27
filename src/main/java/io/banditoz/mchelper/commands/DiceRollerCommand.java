@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.github.tfriedrichs.dicebot.expression.DiceExpression;
 import io.github.tfriedrichs.dicebot.result.DiceResultPrettyPrinter;
@@ -19,8 +20,9 @@ public class DiceRollerCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         DiceExpression e = DiceExpression.parse(ce.getCommandArgsString());
         ce.sendReply(new DiceResultPrettyPrinter().prettyPrint(e.roll()));
+        return Status.SUCCESS;
     }
 }

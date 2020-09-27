@@ -6,6 +6,7 @@ import io.banditoz.mchelper.investing.Finance;
 import io.banditoz.mchelper.investing.model.CompanyProfile;
 import io.banditoz.mchelper.investing.model.Quote;
 import io.banditoz.mchelper.investing.model.RawCandlestick;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.*;
@@ -27,7 +28,7 @@ public class StockCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         Finance finance = new Finance(ce.getMCHelper());
         Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
         String ticker = args.get("ticker");
@@ -40,6 +41,7 @@ public class StockCommand extends Command {
         else {
             ce.sendEmbedReply(Finance.generateStockMessageEmbed(quote, cp));
         }
+        return Status.SUCCESS;
     }
 
     private ArgumentParser getDefualtArgs() {

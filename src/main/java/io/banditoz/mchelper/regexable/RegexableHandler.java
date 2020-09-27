@@ -1,6 +1,8 @@
-package io.banditoz.mchelper.regex_listeners;
+package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.stats.Stat;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -27,6 +29,7 @@ public class RegexableHandler extends ListenerAdapter {
         if (event.getMessage().getContentRaw().length() > 0 && dao.getConfig(event.getGuild()).getPrefix() == event.getMessage().getContentRaw().charAt(0)) return;
 
         getRegexableByEvent(event).ifPresent(r -> MCHELPER.getThreadPoolExecutor().execute(() -> {
+            long before = System.nanoTime();
             try {
                 Matcher m = r.regex().matcher(event.getMessage().getContentRaw());
                 // even though this would have previously passed in the Stream's filter, (r.containsRegexable()),
@@ -34,13 +37,28 @@ public class RegexableHandler extends ListenerAdapter {
                 // world (or JVM, but it could be both!) if it does. I should rewrite it to only try to match once,
                 // instead of twice.
                 if (m.find()) {
-                    r.onRegexCommand(new RegexCommandEvent(event, MCHELPER, m.group(), r.LOGGER));
+                    // regex matched... let's continue.
+                    RegexCommandEvent rce = new RegexCommandEvent(event, MCHELPER, m.group(), r.LOGGER, r.getClass().getSimpleName());
+                    try {
+                        Status status = r.onRegexCommand(rce);
+                        Stat s = new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, status);
+                        MCHELPER.getStatsRecorder().record(s);
+                        LOGGER.info(s.getLogMessage());
+                    }
+                    catch (Exception e) {
+                        MCHELPER.getStatsRecorder().record(new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, Status.EXCEPTIONAL_FAILURE));
+                    } catch (Throwable t) {
+                        if (t instanceof OutOfMemoryError) {
+                            System.gc();
+                        }
+                        throw t; // rethrow
+                    }
                 }
                 else {
                     LOGGER.warn(r.getClass().getName() + " somehow passed initial filtering but now does not match! What the hell is happening?!");
                 }
             } catch (Exception e) {
-                r.LOGGER.error("Regexable listener threw exception!", e);
+                r.LOGGER.error("Regex processing threw exception!", e);
             }
         }));
     }

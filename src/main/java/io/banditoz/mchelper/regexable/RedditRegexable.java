@@ -1,5 +1,6 @@
-package io.banditoz.mchelper.regex_listeners;
+package io.banditoz.mchelper.regexable;
 
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.RedditLinkExtractor;
 
 import java.util.regex.Pattern;
@@ -13,9 +14,10 @@ public class RedditRegexable extends Regexable {
     }
 
     @Override
-    protected void onRegexCommand(RegexCommandEvent re) throws Exception {
+    protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
         re.sendTyping();
         RedditLinkExtractor rle = new RedditLinkExtractor(re.getMCHelper());
         re.sendReply(rle.extractFromRedditAppLink(re.getArgs()));
+        return Status.SUCCESS;
     }
 }

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
-import io.banditoz.mchelper.regex_listeners.RegexableHandler;
+import io.banditoz.mchelper.stats.StatsRecorder;
+import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -43,6 +44,7 @@ public class MCHelperImpl implements MCHelper {
     private final ReminderService RS;
     private final Database DB;
     private final Settings SETTINGS;
+    private final StatsRecorder STATS;
 
     public MCHelperImpl() throws LoginException, InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -72,6 +74,8 @@ public class MCHelperImpl implements MCHelper {
             RS = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
+
+        STATS = new StatsRecorder(this);
 
         if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             JDA.addEventListener(new GuildJoinLeaveListener(this));
@@ -132,6 +136,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public List<Command> getCommands() {
         return CH.getCommands();
+    }
+
+    @Override
+    public StatsRecorder getStatsRecorder() {
+        return STATS;
     }
 
     @Override

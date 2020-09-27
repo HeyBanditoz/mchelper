@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.SnowflakeUtils;
 
@@ -18,7 +19,8 @@ public class SnowflakeCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         ce.sendReply(SnowflakeUtils.returnDateTimesForIDs(ce.getCommandArgsString()));
+        return Status.SUCCESS;
     }
 }

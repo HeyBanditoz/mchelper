@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.dictionary.Definition;
 import io.banditoz.mchelper.dictionary.DictionaryResult;
@@ -20,7 +21,7 @@ public class DictionaryCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = null;
         int toLookup = 0;
@@ -43,5 +44,6 @@ public class DictionaryCommand extends Command {
                 result.getDefinitions().size() +
                 ")"; // now this is a work of beauty
         ce.sendReply(reply);
+        return Status.SUCCESS;
     }
 }

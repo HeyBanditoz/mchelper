@@ -67,6 +67,7 @@ public class SettingsManager {
         defaultSettings.setDatabaseHostAndPort("Host and port of the database.");
         defaultSettings.setDatabaseUsername("Database username.");
         defaultSettings.setDatabasePassword("Database password.");
+        defaultSettings.setRecordCommandAndRegexStatistics(true);
         return defaultSettings;
     }
 

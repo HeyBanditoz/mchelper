@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
@@ -27,7 +28,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         if (!(ce.getCommandArgs().length > 1)) {
             char prefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
             StringBuilder sb = new StringBuilder();
@@ -35,13 +36,16 @@ public class HelpCommand extends Command {
                 sb.append('`').append(prefix).append(s).append("` ");
             }
             ce.sendReply(sb.toString());
+            return Status.SUCCESS;
         }
         else {
             if (helps.containsKey(ce.getCommandArgs()[1])) {
                 ce.sendReply(helps.get(ce.getCommandArgs()[1]).toString());
+                return Status.SUCCESS;
             }
             else {
                 ce.sendReply("That command does not exist.");
+                return Status.FAIL;
             }
         }
     }

@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.regex_listeners;
+package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
@@ -6,21 +6,30 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.time.LocalDateTime;
+
 public class RegexCommandEvent {
-    private final MessageReceivedEvent EVENT;
+    protected final MessageReceivedEvent EVENT;
     private final MCHelper MCHELPER;
     private final Logger LOGGER;
-    private final String ARGS;
+    protected final String ARGS;
+    protected final String CLASS_NAME;
+    protected final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
 
-    public RegexCommandEvent(@NotNull MessageReceivedEvent event, MCHelper mcHelper, String args, Logger logger) {
+    public RegexCommandEvent(@NotNull MessageReceivedEvent event, MCHelper mcHelper, String args, Logger logger, String className) {
         this.EVENT = event;
         this.MCHELPER = mcHelper;
         this.ARGS = args;
         this.LOGGER = logger;
+        this.CLASS_NAME = className;
     }
 
     public MessageReceivedEvent getEvent() {
         return EVENT;
+    }
+
+    public String getClassName() {
+        return CLASS_NAME;
     }
 
     public String getArgs() {
@@ -45,5 +54,13 @@ public class RegexCommandEvent {
      */
     public void sendTyping() {
         getEvent().getChannel().sendTyping().queue();
+    }
+
+    public Logger getLogger() {
+        return LOGGER;
+    }
+
+    public LocalDateTime getExecutedWhen() {
+        return EXECUTED_WHEN;
     }
 }

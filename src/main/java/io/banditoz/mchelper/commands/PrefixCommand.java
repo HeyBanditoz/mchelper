@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
@@ -22,7 +23,7 @@ public class PrefixCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         GuildConfigDao dao = new GuildConfigDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length == 1) {
             ce.sendReply(dao.getConfig(ce.getGuild()).getPrefix() + " is this guild's prefix.");
@@ -36,6 +37,8 @@ public class PrefixCommand extends Command {
         }
         else {
             ce.sendReply("You are not the guild owner.");
+            return Status.FAIL;
         }
+        return Status.SUCCESS;
     }
 }

@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.CoordinatePoint;
 import io.banditoz.mchelper.utils.database.dao.CoordsDao;
@@ -20,11 +21,10 @@ public class CoordCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         CoordsDao dao = new CoordsDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length <= 1) {
             help(ce);
-            return;
         }
         String name = ce.getCommandArgs()[1];
         if (name.equalsIgnoreCase("save") || name.equalsIgnoreCase("add")) {
@@ -52,7 +52,9 @@ public class CoordCommand extends Command {
         }
         else {
             ce.sendReply("Unrecognized operator " + name + ".");
+            return Status.FAIL;
         }
+        return Status.SUCCESS;
     }
 
     private void help(CommandEvent ce) {

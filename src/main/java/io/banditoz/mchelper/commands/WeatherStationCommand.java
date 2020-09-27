@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.weather.es.Weather;
 import io.banditoz.mchelper.utils.weather.es.GrafanaImageFetcher;
@@ -19,7 +20,7 @@ public class WeatherStationCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         int hourSince = 24;
         if (ce.getCommandArgs().length > 1) {
             hourSince = Integer.parseInt(ce.getCommandArgsString());
@@ -27,5 +28,6 @@ public class WeatherStationCommand extends Command {
         ce.getEvent().getChannel().sendMessage(new Weather(ce.getMCHelper()).getLatestFormattedWeather() + "\nGraph shows weather from the past " + hourSince + " hour(s).")
                 .addFile(new GrafanaImageFetcher(ce.getMCHelper()).fetchFahrenheit(hourSince), "graph.png")
                 .queue();
+        return Status.SUCCESS;
     }
 }

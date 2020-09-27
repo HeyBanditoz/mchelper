@@ -4,6 +4,7 @@ import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Region;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.*;
+import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.utils.Settings;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -26,7 +27,11 @@ public class CommandHandler extends ListenerAdapter {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return; // don't execute own commands
         getCommandByEvent(event).ifPresent(c -> {
             if (c.canExecute(event, MCHELPER)) {
-                MCHELPER.getThreadPoolExecutor().execute(() -> c.execute(event, MCHELPER));
+                MCHELPER.getThreadPoolExecutor().execute(() -> {
+                    Stat s = c.execute(event, MCHELPER);
+                    LOGGER.info(s.getLogMessage());
+                    MCHELPER.getStatsRecorder().record(s);
+                });
             }
         });
     }

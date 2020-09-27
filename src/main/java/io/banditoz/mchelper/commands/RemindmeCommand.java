@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ReminderRunnable;
 import io.banditoz.mchelper.utils.database.Reminder;
@@ -29,7 +30,7 @@ public class RemindmeCommand extends Command {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         Duration d = getDurationFromString(ce.getCommandArgs()[1]);
         Reminder r = new Reminder();
         r.setAuthorId(ce.getEvent().getAuthor().getIdLong());
@@ -39,6 +40,7 @@ public class RemindmeCommand extends Command {
         r.setIsFromDm(!ce.getEvent().isFromGuild());
         int id = ce.getMCHelper().getReminderService().schedule(new ReminderRunnable(r, ce.getMCHelper()));
         ce.sendReply("Reminder " + id + " coming at you in duration " + d + ".");
+        return Status.SUCCESS;
     }
 
     private Duration getDurationFromString(String s) throws ParseException {

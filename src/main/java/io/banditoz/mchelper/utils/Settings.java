@@ -35,6 +35,8 @@ public class Settings {
     private String databaseHostAndPort;
     @JsonProperty("databaseName")
     private String databaseName;
+    @JsonProperty("recordCommandAndRegexStatistics")
+    private Boolean recordCommandAndRegexStatistics;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -174,5 +176,15 @@ public class Settings {
     @JsonProperty("databaseName")
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
+    }
+
+    @JsonProperty("recordCommandAndRegexStatistics")
+    public Boolean getRecordCommandAndRegexStatistics() {
+        return recordCommandAndRegexStatistics;
+    }
+
+    @JsonProperty("recordCommandAndRegexStatistics")
+    public void setRecordCommandAndRegexStatistics(Boolean recordCommandAndRegexStatistics) {
+        this.recordCommandAndRegexStatistics = recordCommandAndRegexStatistics;
     }
 }

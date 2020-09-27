@@ -31,6 +31,7 @@ public class Database {
         daos.add(new RemindersDaoImpl(this));
         daos.add(new QuotesDaoImpl(this));
         daos.add(new CompanyProfileDaoImpl(this));
+        daos.add(new StatisticsDaoImpl(this));
         daos.forEach(Dao::generateTable);
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds.");
     }

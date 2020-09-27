@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
 import java.io.File;
@@ -20,18 +21,21 @@ public class UploadLogsCommand extends ElevatedCommand {
     }
 
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         File htmlLogFile = new File("log.html");
         if (htmlLogFile.exists()) {
             if (htmlLogFile.canRead()) {
                 ce.sendFile("Here is this session's log file.", htmlLogFile);
+                return Status.SUCCESS;
             }
             else {
                 ce.sendReply("Cannot read the HTML log file.");
+                return Status.FAIL;
             }
         }
         else {
             ce.sendReply("The HTML log file does not exist.");
+            return Status.FAIL;
         }
     }
 }

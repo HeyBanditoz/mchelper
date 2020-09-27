@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.ChannelType;
 
@@ -29,7 +30,7 @@ public class EvalCommand extends ElevatedCommand {
 
     // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java
     @Override
-    protected void onCommand(CommandEvent ce) throws Exception {
+    protected Status onCommand(CommandEvent ce) throws Exception {
         String args;
         if (ce.getCommandArgsString().startsWith("```groovy")) {
             args = ce.getCommandArgsString().replace("```groovy", "").replace("```", "");
@@ -54,5 +55,6 @@ public class EvalCommand extends ElevatedCommand {
         else {
             ce.sendPastableReply("```" + out.toString() + "```");
         }
+        return Status.SUCCESS;
     }
 }
