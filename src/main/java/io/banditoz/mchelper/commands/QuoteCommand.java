@@ -16,7 +16,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class QuoteCommand extends Command {
@@ -82,17 +81,15 @@ public class QuoteCommand extends Command {
             return "This guild has no quotes to gather statistics for.";
         }
         int quoteCount = quotes.stream().mapToInt(UserStat::getCount).sum();
-        AtomicReference<String> reply = new AtomicReference<>("We have " + quoteCount + " quotes for this guild.\n```\n");
+        StringBuffer reply = new StringBuffer("We have " + quoteCount + " quotes for this guild.\n```\n");
         quotes.forEach((us) -> {
-            String s = reply.get();
             try {
-                s += ce.getMCHelper().getJDA().retrieveUserById(us.getUserId()).complete().getAsTag() + ": " + us.getCount() + '\n';
+                reply.append(ce.getMCHelper().getJDA().retrieveUserById(us.getUserId()).complete().getAsTag()).append(": ").append(us.getCount()).append('\n');
             } catch (Exception ex) {
-                s += us.getUserId() + ": " + us.getCount() + '\n';
+                reply.append(us.getUserId()).append(": ").append(us.getCount()).append('\n');
             }
-            reply.set(s);
         });
-        return reply.get() + "```";
+        return reply.toString() + "```";
     }
 
     private ArgumentParser getDefaultArgs() {
