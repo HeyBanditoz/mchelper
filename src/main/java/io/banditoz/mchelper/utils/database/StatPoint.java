@@ -29,7 +29,7 @@ public class StatPoint<T> implements Comparable<StatPoint<T>> {
 
     @Override
     public int compareTo(@NotNull StatPoint o) {
-        return Integer.compare(o.count, this.count); // reverse, so the one with the biggest count is the first
+        return (count > o.count) ? -1 : 1; // reverse, so the one with the biggest count is the first
     }
 
     @Override

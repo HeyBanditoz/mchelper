@@ -2,8 +2,13 @@ package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.utils.database.StatPoint;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     public StatisticsDaoImpl(Database database) {
@@ -34,5 +39,30 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
             ps.setTimestamp(8, Timestamp.valueOf(s.getExecutedWhen()));
             ps.execute();
         }
+    }
+
+    @Override
+    public Set<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps;
+            if (g == null) {
+                ps = c.prepareStatement("SELECT name, COUNT(name) AS 'count' FROM `statistics` GROUP BY name ORDER BY COUNT(name) DESC;");
+            }
+            else {
+                ps = c.prepareStatement("SELECT name, COUNT(name) AS 'count' FROM `statistics` WHERE guild_id=? GROUP BY name ORDER BY COUNT(name) DESC;");
+                ps.setLong(1, g.getIdLong());
+            }
+            ps.execute();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.isLast()) {
+                    TreeSet<StatPoint<String>> stats = new TreeSet<>();
+                    while (rs.next()) {
+                        stats.add(new StatPoint<>(rs.getString("name"), rs.getInt("count")));
+                    }
+                    return stats;
+                }
+            }
+        }
+        return Collections.emptySet();
     }
 }
