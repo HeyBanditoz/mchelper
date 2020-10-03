@@ -6,9 +6,9 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 
 public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     public StatisticsDaoImpl(Database database) {
@@ -42,7 +42,7 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     }
 
     @Override
-    public Set<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
+    public List<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps;
             if (g == null) {
@@ -55,14 +55,15 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
             ps.execute();
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.isLast()) {
-                    TreeSet<StatPoint<String>> stats = new TreeSet<>();
+                    ArrayList<StatPoint<String>> stats = new ArrayList<>();
                     while (rs.next()) {
                         stats.add(new StatPoint<>(rs.getString("name"), rs.getInt("count")));
                     }
+                    stats.sort(StatPoint::compareTo);
                     return stats;
                 }
             }
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 }

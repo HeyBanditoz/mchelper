@@ -14,8 +14,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QuoteCommand extends Command {
@@ -76,7 +76,7 @@ public class QuoteCommand extends Command {
      * @throws SQLException If there was an error with the database.
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
-        Set<StatPoint<Long>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        List<StatPoint<Long>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
         if (quotes.isEmpty()) {
             return "This guild has no quotes to gather statistics for.";
         }

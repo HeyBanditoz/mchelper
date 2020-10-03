@@ -8,7 +8,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDao;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
 
-import java.util.Set;
+import java.util.List;
 
 public class StatisticsCommand extends Command {
     @Override
@@ -25,7 +25,7 @@ public class StatisticsCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         StatisticsDao dao = new StatisticsDaoImpl(ce.getDatabase());
-        Set<StatPoint<String>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
+        List<StatPoint<String>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
         if (stats.isEmpty()) {
             ce.sendReply("No commands run for this guild, somehow.");
             return Status.FAIL;

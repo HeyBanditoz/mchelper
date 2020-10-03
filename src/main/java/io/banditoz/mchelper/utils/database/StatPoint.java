@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @param <T> The type of this statistic point.
  */
-public class StatPoint<T> implements Comparable<StatPoint<T>> {
+public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<T>> {
     private final T thing;
     private final int count;
 
@@ -28,8 +28,13 @@ public class StatPoint<T> implements Comparable<StatPoint<T>> {
     }
 
     @Override
-    public int compareTo(@NotNull StatPoint o) {
-        return (count > o.count) ? -1 : 1; // reverse, so the one with the biggest count is the first
+    public int compareTo(@NotNull StatPoint<T> o) {
+        if (count == o.count) {
+            return thing.compareTo(o.thing);
+        }
+        else {
+            return (count > o.count) ? -1 : 1; // reverse, so the one with the biggest count is the first
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -39,12 +40,12 @@ public class ServerStatusCommand extends Command {
         MinecraftServerStatus status = new MinecraftServerStatus(addr, 5000, ce.getMCHelper().getObjectMapper());
         try {
             StatusResponse response = status.fetchData();
-            String description = response.getDescriptionAsString();
+            String description = MarkdownSanitizer.escape(response.getDescriptionAsString());
             String randomUUID = UUID.randomUUID().toString().replace("-", "");
             List<Player> players = new ArrayList<>(response.getPlayers().getSample());
-            Collections.sort(players);
+            players.sort(Player::compareTo);
             StringJoiner sj = new StringJoiner(", ");
-            players.forEach(p -> sj.add(p.getName()));
+            players.forEach(p -> sj.add(MarkdownSanitizer.escape(p.getName())));
             MessageEmbed me = new EmbedBuilder()
                     .setTitle(addr.toString())
                     .setDescription(description.isEmpty() ? "<no description>" : description)

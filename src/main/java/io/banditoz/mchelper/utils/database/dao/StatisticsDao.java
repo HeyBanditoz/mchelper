@@ -5,9 +5,9 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.sql.SQLException;
-import java.util.Set;
+import java.util.List;
 
 public interface StatisticsDao {
     void log(Stat s) throws SQLException;
-    Set<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException;
+    List<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException;
 }
