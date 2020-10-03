@@ -26,7 +26,7 @@ import java.util.HashMap;
  * <pre>
  * public class PingCommand extends Command {
  *      public String CommandName() {
- *          return "!ping";
+ *          return "ping";
  *      }
  *
  *      public Help getHelp() {
@@ -34,8 +34,9 @@ import java.util.HashMap;
  *             .withDescription("Returns \"Pong!\"");
  *      }
  *
- *      protected void onCommand(CommandEvent ce) throws Exception {
+ *      protected Status onCommand(CommandEvent ce) throws Exception {
  *          ce.sendReply("Pong!");
+ *          return Status.SUCCESS;
  *      }
  * }
  * </pre>
