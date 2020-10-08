@@ -15,6 +15,7 @@ import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import okhttp3.OkHttpClient;
@@ -61,7 +62,12 @@ public class MCHelperImpl implements MCHelper {
             System.exit(1);
         }
 
-        JDA = JDABuilder.createLight(SETTINGS.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES).setMemberCachePolicy(MemberCachePolicy.ALL).enableCache(CacheFlag.VOICE_STATE).build();
+        JDA = JDABuilder.createDefault(SETTINGS.getDiscordToken())
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .enableCache(CacheFlag.VOICE_STATE)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .build();
         JDA.addEventListener(CH);
         JDA.addEventListener(RH);
 
