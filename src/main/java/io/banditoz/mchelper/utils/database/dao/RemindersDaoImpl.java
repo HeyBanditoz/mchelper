@@ -14,7 +14,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `reminders`( `id` int(11) AUTO_INCREMENT PRIMARY KEY, `channel_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `reminder` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `remind_when` datetime NOT NULL, `reminded` tinyint(1) NOT NULL DEFAULT 0, `is_dm` tinyint(1) NOT NULL, `deleted` tinyint(1) NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return "CREATE TABLE IF NOT EXISTS `reminders`( `id` int(11) AUTO_INCREMENT PRIMARY KEY, `channel_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `reminder` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `remind_when` datetime NOT NULL, `reminded` tinyint(1) NOT NULL DEFAULT 0, `is_dm` tinyint(1) NOT NULL, `deleted` tinyint(1) NOT NULL DEFAULT 0) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
     @Override
