@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
@@ -70,6 +71,7 @@ public class MCHelperImpl implements MCHelper {
                 .build();
         JDA.addEventListener(CH);
         JDA.addEventListener(RH);
+        Pages.activate(JDA);
 
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             DB = new Database(this);
@@ -148,7 +150,6 @@ public class MCHelperImpl implements MCHelper {
     public StatsRecorder getStatsRecorder() {
         return STATS;
     }
-
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());

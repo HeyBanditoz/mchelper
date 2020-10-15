@@ -39,6 +39,7 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -62,6 +63,9 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.6.5') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
+
+    implementation 'com.github.ygimenez:Pagination-Utils:1.2.5b'
+
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2'
 
