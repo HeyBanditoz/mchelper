@@ -25,7 +25,7 @@ public interface QuotesDao {
      * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
      * @throws SQLException If there was an error getting the quote.
      */
-    Optional<NamedQuote> getRandomQuoteByMatch(String search, Guild g) throws SQLException;
+    List<Optional<NamedQuote>> getQuotesByMatch(String search, Guild g) throws SQLException;
     /**
      * Returns a random quote by a {@link Guild} A random one will be retrieved.
      *

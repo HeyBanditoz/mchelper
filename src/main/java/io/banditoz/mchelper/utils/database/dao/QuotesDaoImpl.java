@@ -36,17 +36,21 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public Optional<NamedQuote> getRandomQuoteByMatch(String search, @NotNull Guild g) throws SQLException {
+    public List<Optional<NamedQuote>> getQuotesByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND() LIMIT 1");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND()");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
             ps.setString(3, search);
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return Optional.empty();
                 ps.close();
-                return buildQuoteFromResultSet(rs);
+                ArrayList<Optional<NamedQuote>> quotes = new ArrayList<>();
+                while (rs.next()) {
+                    quotes.add(buildQuoteFromResultSet(rs));
+                }
+                rs.close();
+                return quotes;
             }
         }
     }
