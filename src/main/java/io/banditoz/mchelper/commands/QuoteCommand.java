@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class QuoteCommand extends Command {
-
     @Override
     public String commandName() {
         return "quote";
@@ -46,7 +45,7 @@ public class QuoteCommand extends Command {
         }
         else {
             List<NamedQuote> quotes = new ArrayList<>();
-            ArrayList<Page> pages = new ArrayList<>();
+            List<Page> pages = new ArrayList<>();
             if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
                 dao.getRandomQuote(ce.getGuild()).ifPresent(quotes::add);
             }
@@ -57,7 +56,7 @@ public class QuoteCommand extends Command {
             EmbedBuilder eb = new EmbedBuilder();
             for (NamedQuote nq : quotes) {
                 eb.clear();
-                eb.setColor(Color.green);
+                eb.setColor(Color.GREEN);
                 eb.setDescription(nq.format());
                 if (args.get("include_author")) {
                     ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(user -> {
@@ -72,6 +71,8 @@ public class QuoteCommand extends Command {
                 eb.setDescription("No quote found.");
                 eb.setColor(Color.RED);
                 pages.add(new Page(PageType.EMBED, eb.build()));
+                ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue();
+                return Status.FAIL;
             }
             if (pages.size() == 1) {
                 ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue();
