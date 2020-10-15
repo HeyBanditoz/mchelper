@@ -110,11 +110,11 @@ public class NamedQuote {
     }
 
     /**
-     * Formats the date for use in Discord.
+     * Formats the quote for use in Discord.
      *
      * @return The formatted String.
      */
-    public String getDateFormated() {
-        return DATE.format(this.getLastModified().toLocalDateTime());
+    public String format() {
+        return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + '*';
     }
 }

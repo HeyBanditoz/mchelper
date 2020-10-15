@@ -20,10 +20,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -47,34 +45,26 @@ public class QuoteCommand extends Command {
             ce.sendReply(getStatsString(ce, dao));
         }
         else {
-            List<Optional<NamedQuote>> nq = new ArrayList<>();
+            List<NamedQuote> quotes = new ArrayList<>();
             ArrayList<Page> pages = new ArrayList<>();
             if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
-                nq.add(dao.getRandomQuote(ce.getGuild()));
+                dao.getRandomQuote(ce.getGuild()).ifPresent(quotes::add);
             }
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
-                nq = dao.getQuotesByMatch(s, ce.getGuild());
+                quotes = dao.getQuotesByMatch(s, ce.getGuild());
             }
             EmbedBuilder eb = new EmbedBuilder();
-            for (Optional<NamedQuote> namedQuoteOptional : nq) {
+            for (NamedQuote nq : quotes) {
                 eb.clear();
-                if (namedQuoteOptional.isPresent()) {
-                    NamedQuote namedQuote = namedQuoteOptional.get();
-                    eb.setColor(Color.green);
-                    eb.setDescription("" + namedQuote.getQuote() + "\n\n*" + namedQuote.getQuoteAuthor() + " — " + namedQuote.getDateFormated() + "*");
-                    if (args.get("include_author")) {
-                        ce.getMCHelper().getJDA().retrieveUserById(namedQuote.getAuthorId()).queue(user -> {
-                            eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
-                        }, throwable -> {
-                            eb.setFooter("Added by " + namedQuote.getAuthorId(),"https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png");
-                        });
-                    }
-                }
-                else {
-                    eb.setDescription("No quote found.");
-                    eb.setColor(Color.RED);
-                    return Status.FAIL;
+                eb.setColor(Color.green);
+                eb.setDescription(nq.format());
+                if (args.get("include_author")) {
+                    ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(user -> {
+                        eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
+                    }, throwable -> {
+                        eb.setFooter("Added by " + nq.getAuthorId(), "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png");
+                    });
                 }
                 pages.add(new Page(PageType.EMBED, eb.build()));
             }
@@ -85,7 +75,8 @@ public class QuoteCommand extends Command {
             }
             if (pages.size() == 1) {
                 ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue();
-            } else {
+            }
+            else {
                 ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
                     Pages.paginate(success, pages, 1, TimeUnit.MINUTES);
                 });
