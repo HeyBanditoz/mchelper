@@ -77,6 +77,7 @@ public class CommandHandler extends ListenerAdapter {
         commands.add(new UrbanDictionaryCommand());
         commands.add(new PlotCommand());
         commands.add(new TeamsCommand());
+        commands.add(new UserInfoCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             commands.add(new CoordCommand());

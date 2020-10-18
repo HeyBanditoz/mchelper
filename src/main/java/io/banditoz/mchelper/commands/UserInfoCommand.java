@@ -1,0 +1,76 @@
+package io.banditoz.mchelper.commands;
+
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.StringJoiner;
+
+public class UserInfoCommand extends Command {
+    @Override
+    public String commandName() {
+        return "userinfo";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false).withDescription("Returns information about a user.").withParameters("[mentions]");
+    }
+
+    @Override
+    protected Status onCommand(CommandEvent ce) throws Exception {
+        Member m;
+        List<Member> mentionedMembers = ce.getEvent().getMessage().getMentionedMembers();
+        List<Member> joinSortedMembers = new ArrayList<>(ce.getGuild().getMembers()); // JDA returns an immutable list, make a new ArrayList so we can sort it instead
+        joinSortedMembers.sort(Comparator.comparing(Member::getTimeJoined));
+        if (mentionedMembers.isEmpty()) {
+            m = ce.getEvent().getMember();
+        }
+        else {
+            m = mentionedMembers.get(0);
+        }
+        int ourIndex = joinSortedMembers.indexOf(m);
+        StringJoiner membersJoined = new StringJoiner(" → ");
+
+        if (ourIndex - 2 >= 0) {
+            membersJoined.add(MarkdownSanitizer.escape(joinSortedMembers.get(ourIndex - 2).getEffectiveName()));
+        }
+        if (ourIndex - 1 >= 0) {
+            membersJoined.add(MarkdownSanitizer.escape(joinSortedMembers.get(ourIndex - 1).getEffectiveName()));
+        }
+        membersJoined.add("**" + MarkdownSanitizer.escape(joinSortedMembers.get(ourIndex).getEffectiveName()) + "**");
+        if (ourIndex + 1 < joinSortedMembers.size()) {
+            membersJoined.add(MarkdownSanitizer.escape(joinSortedMembers.get(ourIndex + 1).getEffectiveName()));
+        }
+        if (ourIndex + 2 < joinSortedMembers.size()) {
+            membersJoined.add(MarkdownSanitizer.escape(joinSortedMembers.get(ourIndex + 2).getEffectiveName()));
+        }
+
+        StringJoiner roles = new StringJoiner(", ");
+        for (Role role : m.getRoles()) {
+            roles.add(role.getName());
+        }
+        MessageEmbed me = new EmbedBuilder()
+                .setTitle(m.getUser().getAsTag())
+                .setThumbnail(m.getUser().getEffectiveAvatarUrl())
+                .addField("ID", m.getUser().getId(), false)
+                .addField("Nickname", m.getNickname() == null ? "<no nickname>" : m.getNickname(), false)
+                .addField("Creation Date", m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME), false)
+                .addField("Join Date", m.getTimeJoined().format(DateTimeFormatter.RFC_1123_DATE_TIME), false)
+                .addField("Join Order (" + (ourIndex + 1) + " of " + joinSortedMembers.size() + ")", membersJoined.toString(), false)
+                .addField("Roles", roles.toString().isEmpty() ? "<no roles>": roles.toString(), false)
+                .build();
+        ce.sendEmbedReply(me);
+        return Status.SUCCESS;
+    }
+}
