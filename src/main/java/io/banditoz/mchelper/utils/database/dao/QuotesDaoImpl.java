@@ -43,18 +43,19 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
             ps.setString(3, search);
-            try (ResultSet rs = ps.executeQuery()) {
-                ps.close();
-                List<NamedQuote> quotes = new ArrayList<>();
-                while (rs.next()) {
-                    Optional<NamedQuote> onq = buildQuoteFromResultSet(rs);
-                    onq.ifPresent(quotes::add);
-                }
-                rs.close();
-                return quotes;
-            }
+            return buildNamedQuotesFromResultSet(ps);
         }
     }
+
+    @Override
+    public List<NamedQuote> getAllQuotesForGuild(@NotNull Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND()");
+            ps.setLong(1, g.getIdLong());
+            return buildNamedQuotesFromResultSet(ps);
+        }
+    }
+
 
     @Override
     public Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException {
@@ -96,5 +97,18 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         nq.setQuoteAuthor(rs.getString("quote_author"));
         nq.setLastModified(rs.getTimestamp("last_modified"));
         return Optional.of(nq);
+    }
+
+    private List<NamedQuote> buildNamedQuotesFromResultSet(PreparedStatement ps) throws SQLException {
+        try (ResultSet rs = ps.executeQuery()) {
+            ps.close();
+            List<NamedQuote> quotes = new ArrayList<>();
+            while (rs.next()) {
+                Optional<NamedQuote> onq = buildQuoteFromResultSet(rs);
+                onq.ifPresent(quotes::add);
+            }
+            rs.close();
+            return quotes;
+        }
     }
 }

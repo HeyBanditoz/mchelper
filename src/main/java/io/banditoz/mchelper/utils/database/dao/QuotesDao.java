@@ -22,10 +22,18 @@ public interface QuotesDao {
      *
      * @param search The {@link String} to search for in the database.
      * @param g      The {@link Guild} to search by.
-     * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
+     * @return A {@link List} that may or may not contain {@link NamedQuote}s for the guild.
      * @throws SQLException If there was an error getting the quote.
      */
     List<NamedQuote> getQuotesByMatch(String search, Guild g) throws SQLException;
+    /**
+     * Returns a list of all quotes by a {@link Guild}.
+     *
+     * @param g The {@link Guild} to search for in the database.
+     * @return A {@link List} that may or may not contain {@link NamedQuote}s for the guild.
+     * @throws SQLException If there was an error getting the quote.
+     */
+    List<NamedQuote> getAllQuotesForGuild(Guild g) throws SQLException;
     /**
      * Returns a random quote by a {@link Guild} A random one will be retrieved.
      *

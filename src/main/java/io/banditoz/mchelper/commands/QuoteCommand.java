@@ -46,7 +46,11 @@ public class QuoteCommand extends Command {
         else {
             List<NamedQuote> quotes = new ArrayList<>();
             List<Page> pages = new ArrayList<>();
-            if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
+
+            if (args.getBoolean("all") != null && args.getBoolean("all")) {
+                quotes = dao.getAllQuotesForGuild(ce.getGuild());
+            }
+            else if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
                 dao.getRandomQuote(ce.getGuild()).ifPresent(quotes::add);
             }
             else {
@@ -54,10 +58,11 @@ public class QuoteCommand extends Command {
                 quotes = dao.getQuotesByMatch(s, ce.getGuild());
             }
             EmbedBuilder eb = new EmbedBuilder();
-            for (NamedQuote nq : quotes) {
+            for (int i = 0; i < quotes.size(); i++) {
+                NamedQuote nq = quotes.get(i);
                 eb.clear();
                 eb.setColor(Color.GREEN);
-                eb.setDescription(nq.format());
+                eb.setDescription(nq.format() + " *(" + (i + 1) + " of " + quotes.size() + ")*");
                 if (args.get("include_author")) {
                     ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(user -> {
                         eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
@@ -70,16 +75,15 @@ public class QuoteCommand extends Command {
             if (pages.size() == 0) {
                 eb.setDescription("No quote found.");
                 eb.setColor(Color.RED);
-                pages.add(new Page(PageType.EMBED, eb.build()));
-                ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue();
+                ce.sendEmbedReply(eb.build());
                 return Status.FAIL;
             }
             if (pages.size() == 1) {
-                ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue();
+                ce.sendEmbedReply(eb.build());
             }
             else {
                 ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-                    Pages.paginate(success, pages, 1, TimeUnit.MINUTES);
+                    Pages.paginate(success, pages, 1, TimeUnit.MINUTES, 2, ce.getEvent().getAuthor()::equals);
                 });
 
             }
@@ -121,6 +125,9 @@ public class QuoteCommand extends Command {
         parser.addArgument("-i", "--include-author")
                 .action(Arguments.storeTrue())
                 .help("include who added the quote");
+        parser.addArgument("-a", "--all")
+                .action(Arguments.storeTrue())
+                .help("get all quotes by a guild, skipping quoteAndAuthor");
         parser.addArgument("quoteAndAuthor")
                 .help("quote content and quote attribution to search by")
                 .nargs("*");
