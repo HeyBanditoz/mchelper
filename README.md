@@ -14,13 +14,6 @@ By default, the bot will assume you have the server members intent
 checked. If not, it will fail to start (for now.) It is required for
 the guild leave/join listener to function.
 
-## Listeners
-The bot also implements a set of a few Regex listeners, for making
-lives easier. This includes
-* $$TeX Math$$ - Parses text wrapped inside of the '$$'
-* https://reddit.app.link/foobar - Grabs a real reddit link from 
-reddit.app.link.
-
 ## Configuration
 Should be mostly self-explanatory. On first run the bot will generate
 one for you. The bot expects a MariaDB database instance to be
