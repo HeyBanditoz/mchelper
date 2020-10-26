@@ -6,6 +6,7 @@ import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.utils.HttpResponseException;
@@ -144,6 +145,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public List<Command> getCommands() {
         return CH.getCommands();
+    }
+
+    @Override
+    public List<Regexable> getRegexListeners() {
+        return RH.getRegexables();
     }
 
     @Override

@@ -36,6 +36,15 @@ public abstract class Regexable {
     }
 
     /**
+     * Returns the {@link Pattern} associated with this {@link Regexable}.
+     *
+     * @return The {@link Pattern}.
+     */
+    public Pattern getPattern() {
+        return this.regex();
+    }
+
+    /**
      * Checks if the channel is on cooldown.
      *
      * @param id The ID to check.

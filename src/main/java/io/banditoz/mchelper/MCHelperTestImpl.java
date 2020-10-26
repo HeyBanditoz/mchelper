@@ -1,10 +1,12 @@
-package io.banditoz.mchelper.mock_classes;
+package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.ReminderService;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.regexable.Regexable;
+import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
@@ -20,9 +22,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class MCHelperTestImpl implements MCHelper {
     private final CommandHandler CH;
+    private final RegexableHandler RH;
 
     public MCHelperTestImpl() {
         this.CH = new CommandHandler(this);
+        this.RH = new RegexableHandler(this);
     }
 
     @Override
@@ -58,6 +62,11 @@ public class MCHelperTestImpl implements MCHelper {
     @Override
     public List<Command> getCommands() {
         return CH.getCommands();
+    }
+
+    @Override
+    public List<Regexable> getRegexListeners() {
+        return RH.getRegexables();
     }
 
     @Override

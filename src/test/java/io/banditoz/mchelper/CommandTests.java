@@ -1,7 +1,6 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.mock_classes.MCHelperTestImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

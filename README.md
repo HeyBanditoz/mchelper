@@ -2,7 +2,7 @@
 
 MCHelper is a simple Discord bot with a small set of commands, such as
 TeX parsing, a math command, dice roller, quotes saving
-among a few others. Use the help command to find out all you can do.
+among a few others. See [the command list](COMMANDS.md) for what you can do.
 
 The bot is currently private. If for whatever reason you would like to
 use it, you can build the bot with `./gradlew shadowJar` assuming you

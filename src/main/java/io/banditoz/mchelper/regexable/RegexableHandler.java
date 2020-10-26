@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -68,6 +69,10 @@ public class RegexableHandler extends ListenerAdapter {
         return regexables.stream()
                 .filter(r -> r.containsRegexable(e.getMessage().getContentRaw()))
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Regexable> getRegexables() {
+        return Collections.unmodifiableList(regexables);
     }
 
     public RegexableHandler(MCHelper mcHelper) {
