@@ -47,7 +47,7 @@ There are a total of 42 commands and 4 regex listeners.
 ### PingCommand
 `ping` - <no parameters>  - Returns the current websocket and API ping.
 ### PlotCommand
-`plot` - <expression> - plots a function, use x
+`plot` - <expression> - Plots a function, use x
 ### PrefixCommand
 `prefix` - (prefix) - Gets or sets the prefix for this guild. (By default, it is a '!' and must be a char.
 ### QuoteCommand
