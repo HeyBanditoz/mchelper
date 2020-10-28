@@ -14,7 +14,7 @@ public class PlotCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<expression>").withDescription("plots a function, use x");
+        return new Help(commandName(), false).withParameters("<expression>").withDescription("Plots a function, use x");
     }
 
     @Override
