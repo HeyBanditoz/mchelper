@@ -13,7 +13,7 @@ There are a total of 42 commands and 4 regex listeners.
 ### DeleteReminderCommand
 `delremind` - <id> - Deletes a reminder.
 ### DiceRollerCommand
-`roll` - xdy[k[l|h]]... - Rolls x number of dice with y faces. Supports keep-highs or keep-lows.
+`roll` - [dice notation] - Roll some dice following standard dice notation.
 ### DictionaryCommand
 `define` - [num] <word> - Finds the definition of a word using Owlbot's API.
 ### EangleCommand
