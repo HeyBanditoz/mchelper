@@ -34,3 +34,15 @@ deploy_production:
         - ssh -i $KEY -p $PORT -o StrictHostKeyChecking=no discord@$IP 'sudo /bin/systemctl restart mchelper.service'
     only:
         - master
+
+new_commands:
+    stage: deploy
+    script:
+        - cp -v COMMANDS.md COMMANDS_OLD.md
+        - echo "$PRIVATE_TOKEN" > token
+        - apt update
+        - apt -y install curl
+        - gradle run --args="dumpcommands"
+        - bash push_commands_to_gitlab.sh
+    only:
+        - master

@@ -83,3 +83,6 @@ heapdump-*
 
 # HTML log file
 log.html
+
+# Temporary files
+COMMANDS_OLD.md
