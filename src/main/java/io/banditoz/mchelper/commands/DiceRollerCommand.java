@@ -15,8 +15,8 @@ public class DiceRollerCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParameters("xdy[k[l|h]]...")
-                .withDescription("Rolls x number of dice with y faces. Supports keep-highs or keep-lows.");
+        return new Help(commandName(), false).withParameters("[dice notation]")
+                .withDescription("Roll some dice following standard dice notation.");
     }
 
     @Override
