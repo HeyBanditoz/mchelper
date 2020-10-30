@@ -93,6 +93,15 @@ public class MCHelperImpl implements MCHelper {
             LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
         }
 
+        // Shut things down gracefully.
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Shutdown hook fired. Shutting down JDA and thread pools...");
+            SES.shutdown();
+            TPE.shutdown();
+            JDA.shutdown();
+        }));
+
         JDA.awaitReady();
 
         // now that JDA is done loading, we can initialize things
