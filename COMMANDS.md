@@ -15,7 +15,7 @@ There are a total of 42 commands and 4 regex listeners.
 ### DiceRollerCommand
 `roll` - [dice notation] - Roll some dice following standard dice notation.
 ### DictionaryCommand
-`define` - [num] <word> - Finds the definition of a word using Owlbot's API.
+`define` - <word> - Finds the definition of a word using Owlbot's API.
 ### EangleCommand
 `eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
 ### EvalCommand
@@ -100,18 +100,7 @@ named arguments:
 ### UploadLogsCommand
 `uploadlogs` - <no parameters>  - Uploads this bot session's logs to the current channel (ELEVATED)
 ### UrbanDictionaryCommand
-```
-usage: ud [-n NUMBER] [word [word ...]]
-
-Gets a definition from Urban Dictionary's API.
-
-positional arguments:
-  word                   word to search for
-
-named arguments:
-  -n NUMBER, --number NUMBER
-                         the result to get (if multiple exist)
-```
+`ud` - <word> - Gets a definition from Urban Dictionary's API.
 ### UserInfoCommand
 `userinfo` - [mentions] - Returns information about a user.
 ### VersionCommand
