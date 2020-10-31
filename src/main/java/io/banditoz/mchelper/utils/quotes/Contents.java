@@ -1,8 +1,8 @@
 package io.banditoz.mchelper.utils.quotes;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class Contents {
     @JsonProperty("quotes")

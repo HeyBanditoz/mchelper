@@ -6,7 +6,8 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
-import java.util.*;
+import java.util.List;
+import java.util.TreeMap;
 
 public class HelpCommand extends Command {
     private final TreeMap<String, Help> helps = new TreeMap<>(); // TreeMap keeps it sorted

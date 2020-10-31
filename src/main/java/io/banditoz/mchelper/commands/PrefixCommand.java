@@ -8,7 +8,8 @@ import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
-import static io.banditoz.mchelper.commands.logic.CommandPermissions.*;
+import static io.banditoz.mchelper.commands.logic.CommandPermissions.isBotOwner;
+import static io.banditoz.mchelper.commands.logic.CommandPermissions.isGuildOwner;
 
 public class PrefixCommand extends Command {
     @Override

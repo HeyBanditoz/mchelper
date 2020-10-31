@@ -1,9 +1,9 @@
 package io.banditoz.mchelper.urbandictionary;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UDDefinition {
     @JsonProperty("defid")

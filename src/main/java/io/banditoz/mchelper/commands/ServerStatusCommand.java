@@ -14,7 +14,10 @@ import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 public class ServerStatusCommand extends Command {
     @Override

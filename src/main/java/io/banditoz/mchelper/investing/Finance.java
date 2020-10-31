@@ -11,10 +11,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
-import org.knowm.xchart.*;
+import org.knowm.xchart.BitmapEncoder;
+import org.knowm.xchart.OHLCChart;
+import org.knowm.xchart.OHLCChartBuilder;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.RedditLinkExtractor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

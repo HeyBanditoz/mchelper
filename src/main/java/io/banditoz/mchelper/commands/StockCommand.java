@@ -9,7 +9,8 @@ import io.banditoz.mchelper.investing.model.RawCandlestick;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.*;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 public class StockCommand extends Command {
     @Override

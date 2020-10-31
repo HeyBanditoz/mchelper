@@ -2,7 +2,6 @@ package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.regexable.Regexable;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

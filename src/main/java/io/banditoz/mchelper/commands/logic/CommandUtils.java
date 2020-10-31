@@ -9,8 +9,14 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,6 +76,7 @@ public class CommandUtils {
      * Internal method for sending a reply. Named differently to prevent infinite recursion.
      *
      * @param msg The reply.
+     * @return The message object sent.
      * @param c   The MessageChannel to send to.
      */
     private static void _sendReply(String msg, MessageChannel c, boolean sanitizeMentions) {

@@ -9,7 +9,8 @@ import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.utils.MiscUtil;
 
-import static io.banditoz.mchelper.commands.logic.CommandPermissions.*;
+import static io.banditoz.mchelper.commands.logic.CommandPermissions.isBotOwner;
+import static io.banditoz.mchelper.commands.logic.CommandPermissions.isGuildOwner;
 
 public class DefaultChannelCommand extends Command {
     @Override

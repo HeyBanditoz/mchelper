@@ -2,7 +2,9 @@ package io.banditoz.mchelper.utils.paste;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

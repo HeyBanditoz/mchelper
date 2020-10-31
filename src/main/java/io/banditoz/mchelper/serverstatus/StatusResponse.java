@@ -3,7 +3,9 @@ package io.banditoz.mchelper.serverstatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

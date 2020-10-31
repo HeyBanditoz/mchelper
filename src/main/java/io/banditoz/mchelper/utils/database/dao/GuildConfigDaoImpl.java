@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

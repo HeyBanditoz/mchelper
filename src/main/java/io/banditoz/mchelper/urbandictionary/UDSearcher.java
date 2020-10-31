@@ -1,8 +1,8 @@
 package io.banditoz.mchelper.urbandictionary;
 
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.dictionary.DictionarySearcher;
+import io.banditoz.mchelper.utils.HttpResponseException;
 import okhttp3.Request;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;

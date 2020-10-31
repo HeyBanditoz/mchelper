@@ -1,9 +1,12 @@
 package io.banditoz.mchelper.utils.paste;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 
 public class Paste {
     public Paste(String message) {

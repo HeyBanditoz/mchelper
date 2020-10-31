@@ -2,11 +2,11 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.dictionary.Definition;
 import io.banditoz.mchelper.dictionary.DictionaryResult;
 import io.banditoz.mchelper.dictionary.DictionarySearcher;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
 
 public class DictionaryCommand extends Command {
     @Override

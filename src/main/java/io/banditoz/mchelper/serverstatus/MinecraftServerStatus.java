@@ -2,13 +2,7 @@ package io.banditoz.mchelper.serverstatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
