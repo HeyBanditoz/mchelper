@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.commands;
 
+import com.github.ygimenez.method.Pages;
+import com.github.ygimenez.model.Page;
+import com.github.ygimenez.type.PageType;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
@@ -8,11 +11,11 @@ import io.banditoz.mchelper.urbandictionary.UDResult;
 import io.banditoz.mchelper.urbandictionary.UDSearcher;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UrbanDictionaryCommand extends Command {
     @Override
@@ -22,40 +25,51 @@ public class UrbanDictionaryCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withParser(getDefualtArgs());
+        return new Help(commandName(), false).withParameters("<word>").withDescription("Gets a definition from Urban Dictionary's API.");
     }
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         UDSearcher ud = new UDSearcher(ce.getMCHelper());
-        Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
-        String search = args.getList("word").stream().map(Object::toString).collect(Collectors.joining(" "));
-        int num = args.getInt("number") - 1;
-        UDResult result = ud.search(search);
-        if (result.getResults().isEmpty()) {
+        List<Page> pages = createPagesFromDefinition(ud.search(ce.getCommandArgsString()));
+
+        if (pages.isEmpty()) {
             ce.sendReply("No definition found.");
             return Status.FAIL;
         }
-        UDDefinition definition = result.getResults().get(num);
-        String definitionString = formatUrbanDictionaryLinkToMarkdown(definition.getDefinition(), true);
-        String definitionExample = formatUrbanDictionaryLinkToMarkdown(definition.getExample(), false);
-        String definitionExampleTwo = null;
-        if (definitionExample.length() > 1024 ) {
-            String originalDef = definitionExample;
-            definitionExample = definitionExample.substring(0, 1022);
-            definitionExampleTwo = originalDef.substring(1022);
-        }
 
-        ce.sendEmbedReply(new EmbedBuilder()
-                .setTitle(search, definition.getPermalink())
-                .setAuthor(definition.getAuthor() + " ↑" + definition.getThumbsUp() + " ↓" + definition.getThumbsDown())
-                .setDescription(definitionString)
-                .addField("Example", '*' + definitionExample + '*', true)
-                .addField(definitionExampleTwo != null ? "(cont'd)" : null, (definitionExampleTwo != null ? '*' + definitionExampleTwo + '*' : null), true)
-                .setTimestamp(definition.getWrittenOn())
-                .setFooter(num + 1 + "/" + result.getResults().size())
-                .build());
+        ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
+            Pages.paginate(success, pages, 1, TimeUnit.MINUTES, 2, ce.getEvent().getAuthor()::equals);
+        });
+
         return Status.SUCCESS;
+    }
+
+    private List<Page> createPagesFromDefinition(UDResult result) {
+        ArrayList<Page> pages = new ArrayList<>();
+        List<UDDefinition> results = result.getResults();
+        for (int i = 0; i < results.size(); i++) {
+            UDDefinition definition = results.get(i);
+            String definitionString = formatUrbanDictionaryLinkToMarkdown(definition.getDefinition(), true);
+            String definitionExample = formatUrbanDictionaryLinkToMarkdown(definition.getExample(), false);
+            String definitionExampleTwo = null;
+            if (definitionExample.length() > 1024) {
+                String originalDef = definitionExample;
+                definitionExample = definitionExample.substring(0, 1022);
+                definitionExampleTwo = originalDef.substring(1022);
+            }
+
+            pages.add(new Page(PageType.EMBED, new EmbedBuilder()
+                    .setTitle(definition.getWord(), definition.getPermalink())
+                    .setAuthor(definition.getAuthor() + " ↑" + definition.getThumbsUp() + " ↓" + definition.getThumbsDown())
+                    .setDescription(definitionString)
+                    .addField("Example", '*' + definitionExample + '*', true)
+                    .addField(definitionExampleTwo != null ? "(cont'd)" : null, (definitionExampleTwo != null ? '*' + definitionExampleTwo + '*' : null), true)
+                    .setTimestamp(definition.getWrittenOn())
+                    .setFooter(i + 1 + "/" + result.getResults().size())
+                    .build()));
+        }
+        return pages;
     }
 
     private String formatUrbanDictionaryLinkToMarkdown(String s, boolean isDef) {
@@ -76,18 +90,5 @@ public class UrbanDictionaryCommand extends Command {
         else {
             return n;
         }
-    }
-
-    private ArgumentParser getDefualtArgs() {
-        ArgumentParser parser = ArgumentParsers.newFor("ud").addHelp(false).build();
-        parser.description("Gets a definition from Urban Dictionary's API.");
-        parser.addArgument("-n", "--number")
-                .type(Integer.class)
-                .setDefault(1)
-                .help("the result to get (if multiple exist)");
-        parser.addArgument("word")
-                .help("word to search for")
-                .nargs("*");
-        return parser;
     }
 }

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class UDSearcher {
     private final MCHelper MCHELPER;
-    public static final Cache<String, UDResult> CACHE = new Cache2kBuilder<String, UDResult>() {}.expireAfterWrite(1, TimeUnit.DAYS).suppressExceptions(false).build();
+    private static final Cache<String, UDResult> CACHE = new Cache2kBuilder<String, UDResult>() {}.expireAfterWrite(1, TimeUnit.DAYS).suppressExceptions(false).build();
     private final Logger LOGGER = LoggerFactory.getLogger(DictionarySearcher.class);
 
     public UDSearcher(MCHelper mcHelper) {
@@ -34,6 +34,7 @@ public class UDSearcher {
             String json = MCHELPER.performHttpRequest(request);
             LOGGER.debug(json);
             UDResult definition = MCHELPER.getObjectMapper().readValue(json, UDResult.class);
+            definition.getResults().sort(UDDefinition::compareTo); // highest votes first
             CACHE.put(word, definition);
             return definition;
         }

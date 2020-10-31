@@ -1,11 +1,12 @@
 package io.banditoz.mchelper.urbandictionary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class UDDefinition {
+public class UDDefinition implements Comparable<UDDefinition> {
     @JsonProperty("defid")
     private int defid;
 
@@ -81,5 +82,10 @@ public class UDDefinition {
 
     public String getExample() {
         return example;
+    }
+
+    @Override
+    public int compareTo(@NotNull UDDefinition o) {
+        return Integer.compare((o.thumbsUp + o.thumbsDown), (thumbsUp + thumbsDown));
     }
 }
