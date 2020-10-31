@@ -30,7 +30,6 @@ public class AddquoteCommand extends Command {
             if (messageReactionAddEvent.getUser().isBot() || events.get(messageReactionAddEvent.getUserId()) == null) {
                 return;
             }
-            System.out.println(messageReactionAddEvent.getUserId());
             if (events.containsKey(messageReactionAddEvent.getUserId())) {
                 events.get(messageReactionAddEvent.getUserId()).accept(messageReactionAddEvent);
             }
@@ -97,7 +96,6 @@ public class AddquoteCommand extends Command {
         finalMessage.addReaction("\uD83C\uDD98").queue();
         int finalId = id;
         handler.addEvent(ce.getEvent().getMember().getId(), new Consumer<MessageReactionAddEvent>() {
-
             private Future<?> timeout;
             private final Consumer<Void> success = s -> handler.removeEvent(finalMessage.getAuthor().getId());
 
@@ -107,6 +105,12 @@ public class AddquoteCommand extends Command {
 
             @Override
             public void accept(MessageReactionAddEvent event) {
+                if (!finalMessage.getId().equals(event.getMessageId())) {
+                    return;
+                }
+                if (!event.getReactionEmote().getEmoji().equals("\uD83C\uDD98")) {
+                    return;
+                }
                 if (!finalMessage.getAuthor().equals(event.getUser())) {
                     return;
                 }
