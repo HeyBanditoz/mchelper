@@ -1,8 +1,6 @@
 package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.ReminderService;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -18,6 +16,7 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class MCHelperTestImpl implements MCHelper {
@@ -71,6 +70,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public StatsRecorder getStatsRecorder() {
+        return null;
+    }
+
+    @Override
+    public ScheduledExecutorService getSES() {
         return null;
     }
 

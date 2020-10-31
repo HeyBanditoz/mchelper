@@ -7,8 +7,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
-import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.regexable.RegexableHandler;
+import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
@@ -156,6 +156,12 @@ public class MCHelperImpl implements MCHelper {
     public StatsRecorder getStatsRecorder() {
         return STATS;
     }
+
+    @Override
+    public ScheduledExecutorService getSES() {
+        return SES;
+    }
+
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());

@@ -13,6 +13,7 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public interface MCHelper {
@@ -25,6 +26,7 @@ public interface MCHelper {
     List<Command> getCommands();
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();
+    ScheduledExecutorService getSES();
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one.

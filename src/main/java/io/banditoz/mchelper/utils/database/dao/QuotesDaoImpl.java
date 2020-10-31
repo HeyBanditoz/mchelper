@@ -6,11 +6,11 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class QuotesDaoImpl extends Dao implements QuotesDao {
     public QuotesDaoImpl(Database database) {
@@ -19,19 +19,24 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp()) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
+        return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp(), `id` INT(10) unsigned PRIMARY KEY AUTO_INCREMENT) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
     }
 
     @Override
-    public void saveQuote(NamedQuote nq) throws SQLException {
+    public int saveQuote(NamedQuote nq) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `quotes` VALUES (?, ?, ?, ?, (SELECT NOW()))");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO `quotes` (guild_id,author_id,quote,quote_author,last_modified) VALUES (?, ?, ?, ?, (SELECT NOW()))", Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, nq.getGuildId());
             ps.setLong(2, nq.getAuthorId());
             ps.setString(3, nq.getQuote());
             ps.setString(4, nq.getQuoteAuthor());
             ps.execute();
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            int id = rs.getInt(1);
             ps.close();
+            rs.close();
+            return id;
         }
     }
 
@@ -87,6 +92,18 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             }
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public void editQuote(int id, NamedQuote nq) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("UPDATE quotes SET quote = ?, quote_author = ? WHERE id = ?");
+            ps.setString(1, nq.getQuote());
+            ps.setString(2, nq.getQuoteAuthor());
+            ps.setInt(3, id);
+            ps.execute();
+            ps.close();
+        }
     }
 
     private Optional<NamedQuote> buildQuoteFromResultSet(ResultSet rs) throws SQLException {

@@ -14,9 +14,10 @@ public interface QuotesDao {
      * Saves a {@link NamedQuote} to the database.
      *
      * @param nq The Quote to save.
+     * @return The id of the quote added.
      * @throws SQLException If there was an error saving a quote.
      */
-    void saveQuote(NamedQuote nq) throws SQLException;
+    int saveQuote(NamedQuote nq) throws SQLException;
     /**
      * Returns a list of quotes by a {@link Guild} by a search.
      *
@@ -51,4 +52,12 @@ public interface QuotesDao {
      * @throws SQLException If there was an error getting the quotes.
      */
     List<StatPoint<Long>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
+
+    /**
+     * Saves a {@link NamedQuote} in the database.
+     *
+     * @param id The id of the Quote to edit.
+     * @throws SQLException If there was an error saving a quote.
+     */
+    void editQuote(int id, NamedQuote nq) throws SQLException;
 }

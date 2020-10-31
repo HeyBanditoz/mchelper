@@ -25,7 +25,7 @@ public class NamedQuote {
     /** The Timestamp of when this quote was created in the database. */
     private Timestamp lastModified;
     private final static DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMMM uuuu");
-    private final static Pattern QUOTE_PARSER = Pattern.compile("\"(.*?)\"\\s+");
+    private final static Pattern QUOTE_PARSER = Pattern.compile("^\"(.*?)\"\\s+");
     private final static String GREEDY_DASHES = "^-+";
 
     public long getGuildId() {
