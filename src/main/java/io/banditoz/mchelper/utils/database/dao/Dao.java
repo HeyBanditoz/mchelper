@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class Dao {
     public abstract String getSqlTableGenerator();
@@ -17,8 +19,11 @@ public abstract class Dao {
     }
 
     public void generateTable() {
+        String[] list = getSqlTableGenerator().split("; ");
         try (Connection c = DATABASE.getConnection()) {
-            c.prepareStatement(getSqlTableGenerator()).execute();
+            for (String s : list) {
+                c.prepareStatement(s).execute();
+            }
         } catch (SQLException e) {
             LOGGER.error("Failed to create table!", e);
         }
