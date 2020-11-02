@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.banditoz.mchelper.commands.ManageRolesCommand;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.HttpResponseException;
-import io.banditoz.mchelper.utils.Settings;
-import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.*;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -48,6 +49,7 @@ public class MCHelperImpl implements MCHelper {
     private final Database DB;
     private final Settings SETTINGS;
     private final StatsRecorder STATS;
+    private final RoleReactionListener RRL;
 
     public MCHelperImpl() throws LoginException, InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -70,8 +72,7 @@ public class MCHelperImpl implements MCHelper {
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
-        JDA.addEventListener(CH);
-        JDA.addEventListener(RH);
+        JDA.addEventListener(CH,RH);
         Pages.activate(JDA);
 
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
@@ -103,7 +104,8 @@ public class MCHelperImpl implements MCHelper {
         }));
 
         JDA.awaitReady();
-
+        RRL = new RoleReactionListener(this);
+        JDA.addEventListener(RRL.getAddHandler(),RRL.getRemoveHandler());
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completes below.
 
@@ -191,5 +193,10 @@ public class MCHelperImpl implements MCHelper {
             throw new HttpResponseException(response.code());
         }
         return response;
+    }
+
+    @Override
+    public RoleReactionListener getRRL() {
+        return RRL;
     }
 }
