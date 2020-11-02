@@ -12,10 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class RoleReactionListener {
+    private HashMap<String, String> messages = new HashMap<>();
     private RolesDao rd;
     private MCHelper mcHelper;
     private final Logger LOGGER = LoggerFactory.getLogger(RoleReactionListener.class);
@@ -24,6 +27,9 @@ public class RoleReactionListener {
         public void eventConsumer(GenericEvent event) {
             MessageReactionAddEvent messageReactionAddEvent = (MessageReactionAddEvent)event;
             if (messageReactionAddEvent.getUser().isBot()) {
+                return;
+            }
+            if (!messages.containsValue(messageReactionAddEvent.getMessageId())) {
                 return;
             }
             try {
@@ -48,6 +54,9 @@ public class RoleReactionListener {
             if (messageReactionRemoveEvent.getUser().isBot()) {
                 return;
             }
+            if (!messages.containsValue(messageReactionRemoveEvent.getMessageId())) {
+                return;
+            }
             try {
                 if (events.containsKey(":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":")) {
                     events.get(":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":").accept(messageReactionRemoveEvent);
@@ -65,11 +74,14 @@ public class RoleReactionListener {
         this.rd = new RolesDaoImpl(mcHelper.getDatabase());
         mcHelper.getJDA().addEventListener(addHandler);
         mcHelper.getJDA().addEventListener(removeHandler);
+
         for (Guild g : mcHelper.getJDA().getGuilds()) {
             try {
                 if (!rd.containsGuild(g)) {
                     continue;
                 }
+                Map.Entry<String, String> temp = rd.getChannelAndMessageId(g);
+                messages.put(temp.getKey(),temp.getValue());
                 List<RoleObject> map = rd.getRoles(g);
                 for (RoleObject e : map) {
                     addHandler.addEvent(e.getEmote(), new Consumer<MessageReactionAddEvent>() {
@@ -148,6 +160,14 @@ public class RoleReactionListener {
                 }
             }
         });
+    }
+
+    public HashMap<String, String> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(HashMap<String, String> messages) {
+        this.messages = messages;
     }
 
     public void removeEvent(String emote) {

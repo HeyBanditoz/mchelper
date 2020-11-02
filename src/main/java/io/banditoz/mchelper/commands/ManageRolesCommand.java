@@ -63,6 +63,7 @@ public class ManageRolesCommand extends Command {
                 MessageEmbed me = new EmbedBuilder().setDescription("React to be added to a role, remove your reaction to lose the role.\n\n**Use `!manageroles -a <emote> <name> <role_id>` to add.**").setColor(Color.CYAN).build();
                 Message message = channel.sendMessage(me).complete();
                 rd.init(channel,message,ce.getGuild());
+                ce.getMCHelper().getRRL().getMessages().put(channel.getId(),message.getId());
                 ce.sendReply("Guild initialized!");
             }
         } else if (!rd.containsGuild(ce.getGuild())) {
@@ -71,6 +72,7 @@ public class ManageRolesCommand extends Command {
         } else if (args.get("deactivate") != null && args.getBoolean("deactivate")) {
             Map.Entry<String,String> entry = rd.deactivate(ce.getGuild());
             ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).queue(s -> {s.delete().queue();});
+            ce.getMCHelper().getRRL().getMessages().remove(entry.getKey());
             ce.sendReply("Guild deactivated!");
         } else if (args.get("add_role") != null && args.getBoolean("add_role")) {
             if (rd.addRole(args.getList("params").get(0).toString(),args.getList("params").get(1).toString(),ce.getGuild(),ce.getGuild().getRoleById(args.getList("params").get(2).toString()))) {
