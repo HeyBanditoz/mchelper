@@ -4,19 +4,18 @@ MCHelper is a simple Discord bot with a small set of commands, such as
 TeX parsing, a math command, dice roller, quotes saving
 among a few others. See [the command list](COMMANDS.md) for what you can do.
 
-The bot is currently private. If for whatever reason you would like to
-use it, you can build the bot with `./gradlew shadowJar` assuming you
-have a Java development environment set up. Or, you can check the
-CI/CD and see if there are any built.
+The bot is currently private. If would like to use it, you can grab the latest jar from CI
+[here.](https://gitlab.com/HeyBanditoz/mchelper/-/jobs/artifacts/master/raw/build/libs/io.banditoz.mchelper-all.jar?job=package)
+Or, use Gradle: `./gradlew shadowJar`
 
 ## NOTE ON GATEWAY INTENTS
-By default, the bot will assume you have the server members intent
-checked. If not, it will fail to start (for now.) It is required for
-the guild leave/join listener to function.
+Currently, the bot requires the server members intent to be enabled. It is
+required for catching when users/bots join or leave the guild. See
+[GuildMemberJoinEvent](https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/events/guild/member/GuildMemberJoinEvent.html)
+and [GuildMemberLeaveEvent.](https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/events/guild/member/GuildMemberLeaveEvent.html)
 
 ## Configuration
-Should be mostly self-explanatory. On first run the bot will generate
-one for you. The bot expects a MariaDB database instance to be
-available, but it isn't required. Some functionality will be
-disabled if the `databaseHostAndPort` field in the configuration
-is null or is default.
+On first run the bot will generate one for you. The bot expects
+a MariaDB database instance to be available, but it isn't required.
+Some functionality will be disabled if the `databaseHostAndPort` field
+in the configuration is null or default.
