@@ -93,7 +93,7 @@ public class AddquoteCommand extends Command {
         }
         ce.getEvent().getChannel().sendMessage(message).queue();
         Message finalMessage = ce.getEvent().getMessage();
-        finalMessage.addReaction("\uD83C\uDD98").queue();
+        finalMessage.addReaction("✏").queue();
         int finalId = id;
         handler.addEvent(ce.getEvent().getMember().getId(), new Consumer<MessageReactionAddEvent>() {
             private Future<?> timeout;
@@ -108,7 +108,7 @@ public class AddquoteCommand extends Command {
                 if (!finalMessage.getId().equals(event.getMessageId())) {
                     return;
                 }
-                if (!event.getReactionEmote().getEmoji().equals("\uD83C\uDD98")) {
+                if (!event.getReactionEmote().getEmoji().equals("✏")) {
                     return;
                 }
                 if (!finalMessage.getAuthor().equals(event.getUser())) {
