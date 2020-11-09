@@ -6,19 +6,18 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class CommandHandler extends ListenerAdapter {
-    private final List<Command> commands;
+    /** The command map. String is the command name (what the user types) and Command is the command. */
+    private final Map<String, Command> commands = new HashMap<>();
     private final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
     private final MCHelper MCHELPER;
 
@@ -37,81 +36,89 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     protected Optional<Command> getCommandByEvent(MessageReceivedEvent e) {
-        return commands.stream()
-                .filter(c -> c.containsCommand(e, MCHELPER.getDatabase()))
-                .findAny();
+        String[] args = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
+        if (args.length == 0) {
+            return Optional.empty();
+        }
+        char prefix = '!';
+        if (e.isFromGuild()) {
+            prefix = new GuildConfigDaoImpl(MCHELPER.getDatabase()).getConfig(e.getGuild()).getPrefix();
+        }
+        if (args[0].charAt(0) != prefix) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(commands.get(args[0].substring(1))); // remove the prefix from the command arg
     }
 
-    public List<Command> getCommands() {
-        return Collections.unmodifiableList(commands);
+    public Collection<Command> getCommands() {
+        return commands.values();
     }
 
     public CommandHandler(MCHelper MCHelper) {
         this.MCHELPER = MCHelper;
         Settings settings = MCHelper.getSettings();
         LOGGER.info("Registering commands and listeners...");
-        commands = new ArrayList<>();
-        commands.add(new BashCommand());
-        commands.add(new InfoCommand());
-        commands.add(new MathCommand());
-        commands.add(new EangleCommand());
-        commands.add(new NetherCommand());
-        commands.add(new OverworldCommand());
-        commands.add(new UnitsCommand());
-        commands.add(new TeXCommand());
-        commands.add(new PickCommand());
-        commands.add(new ToMorseCommand());
-        commands.add(new FromMorseCommand());
-        commands.add(new EvalCommand());
-        commands.add(new DiceRollerCommand());
-        commands.add(new CoinFlipCommand());
-        commands.add(new VersionCommand());
-        commands.add(new PingCommand());
-        commands.add(new HeapDumpCommand());
-        commands.add(new UploadLogsCommand());
-        commands.add(new FloodCommand());
-        commands.add(new SnowflakeCommand());
-        commands.add(new InviteBotCommand());
-        commands.add(new RockPaperScissorsCommand());
-        commands.add(new ServerStatusCommand());
-        commands.add(new UrbanDictionaryCommand());
-        commands.add(new PlotCommand());
-        commands.add(new TeamsCommand());
-        commands.add(new UserInfoCommand());
-        commands.add(new JoinOrderCommand());
+        add(new BashCommand());
+        add(new InfoCommand());
+        add(new MathCommand());
+        add(new EangleCommand());
+        add(new NetherCommand());
+        add(new OverworldCommand());
+        add(new UnitsCommand());
+        add(new TeXCommand());
+        add(new PickCommand());
+        add(new ToMorseCommand());
+        add(new FromMorseCommand());
+        add(new EvalCommand());
+        add(new DiceRollerCommand());
+        add(new CoinFlipCommand());
+        add(new VersionCommand());
+        add(new PingCommand());
+        add(new HeapDumpCommand());
+        add(new UploadLogsCommand());
+        add(new FloodCommand());
+        add(new SnowflakeCommand());
+        add(new InviteBotCommand());
+        add(new RockPaperScissorsCommand());
+        add(new ServerStatusCommand());
+        add(new UrbanDictionaryCommand());
+        add(new PlotCommand());
+        add(new TeamsCommand());
+        add(new UserInfoCommand());
+        add(new JoinOrderCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
-            commands.add(new CoordCommand());
-            commands.add(new QuoteCommand());
-            commands.add(new AddquoteCommand());
-            commands.add(new SqlCommand());
-            commands.add(new RemindmeCommand());
-            commands.add(new DeleteReminderCommand());
-            commands.add(new DefaultChannelCommand());
-            commands.add(new PrefixCommand());
-            commands.add(new StatisticsCommand());
-            commands.add(new ManageRolesCommand());
+            add(new CoordCommand());
+            add(new QuoteCommand());
+            add(new AddquoteCommand());
+            add(new SqlCommand());
+            add(new RemindmeCommand());
+            add(new DeleteReminderCommand());
+            add(new DefaultChannelCommand());
+            add(new PrefixCommand());
+            add(new StatisticsCommand());
+            add(new ManageRolesCommand());
         }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
             LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
         }
         else {
-            commands.add(new DictionaryCommand());
+            add(new DictionaryCommand());
         }
 
         if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
             LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
         }
         else {
-            commands.add(new WeatherStationCommand());
+            add(new WeatherStationCommand());
         }
 
         if (settings.getFinnhubKey() == null || settings.getFinnhubKey().equals("Alpha Vantage API key here")) {
             LOGGER.info("Finnhub API key not defined! Not enabling financial commands.");
         }
         else {
-            commands.add(new StockCommand());
+            add(new StockCommand());
         }
 
         if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
@@ -120,9 +127,13 @@ public class CommandHandler extends ListenerAdapter {
         else {
             Orianna.setRiotAPIKey(settings.getRiotApiKey());
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
-            commands.add(new LoadoutCommand());
+            add(new LoadoutCommand());
         }
-        commands.add(new HelpCommand(commands)); // this must be registered last
+        add(new HelpCommand(commands.values())); // this must be registered last
         LOGGER.info(commands.size() + " commands registered.");
+    }
+    
+    private void add(Command c) {
+        commands.put(c.commandName(), c);
     }
 }

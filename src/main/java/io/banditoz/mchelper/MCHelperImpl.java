@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.banditoz.mchelper.commands.ManageRolesCommand;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -15,8 +14,6 @@ import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -30,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -154,7 +152,7 @@ public class MCHelperImpl implements MCHelper {
     }
 
     @Override
-    public List<Command> getCommands() {
+    public Collection<Command> getCommands() {
         return CH.getCommands();
     }
 

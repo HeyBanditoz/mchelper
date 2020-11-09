@@ -16,6 +16,7 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -65,7 +66,7 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
-    public List<Command> getCommands() {
+    public Collection<Command> getCommands() {
         return CH.getCommands();
     }
 

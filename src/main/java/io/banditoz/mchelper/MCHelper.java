@@ -13,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,7 +25,7 @@ public interface MCHelper {
     ReminderService getReminderService();
     ThreadPoolExecutor getThreadPoolExecutor();
     Settings getSettings();
-    List<Command> getCommands();
+    Collection<Command> getCommands();
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();
     ScheduledExecutorService getSES();

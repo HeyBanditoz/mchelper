@@ -4,8 +4,6 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,19 +96,6 @@ public abstract class Command {
             e.getMessage().addReaction("⏲️").queue();
             return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
         }
-    }
-
-    protected boolean containsCommand(MessageReceivedEvent e, Database database) {
-        String[] args = CommandUtils.commandArgs(e.getMessage().getContentDisplay());
-        if (args.length == 0) {
-            return false;
-        }
-        char prefix = '!';
-        if (e.isFromGuild()) {
-            prefix = new GuildConfigDaoImpl(database).getConfig(e.getGuild()).getPrefix();
-        }
-        String expected = prefix + commandName();
-        return expected.equalsIgnoreCase(args[0]);
     }
 
     /**

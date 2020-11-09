@@ -6,7 +6,7 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.TreeMap;
 
 public class HelpCommand extends Command {
@@ -17,7 +17,7 @@ public class HelpCommand extends Command {
         return "help";
     }
 
-    public HelpCommand(List<Command> commands) {
+    public HelpCommand(Collection<Command> commands) {
         helps.put(this.commandName(), getHelp()); // let's add ourselves into the mix, eh?
         commands.forEach(c -> helps.put(c.commandName(), c.getHelp()));
     }
