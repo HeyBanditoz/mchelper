@@ -1,5 +1,5 @@
 # Commands
-There are a total of 43 commands and 4 regex listeners.
+There are a total of 44 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BashCommand
@@ -18,6 +18,8 @@ There are a total of 43 commands and 4 regex listeners.
 `define` - <word> - Finds the definition of a word using Owlbot's API.
 ### EangleCommand
 `eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
+### EightBallCommand
+`8` - <no parameters>  - Seek wisdom of the eight ball.
 ### EvalCommand
 `eval` - \`\`\`groovy<newline>\`\`\` - Evaluates Groovy. If you don't use code blocks, a return is added to the beginning of the code,otherwise, if you are using code blocks, you should return something. (ELEVATED)
 ### FloodCommand
