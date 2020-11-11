@@ -86,6 +86,7 @@ public class CommandHandler extends ListenerAdapter {
         add(new TeamsCommand());
         add(new UserInfoCommand());
         add(new JoinOrderCommand());
+        add(new EightBallCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             add(new CoordCommand());
