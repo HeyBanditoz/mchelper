@@ -41,7 +41,7 @@ public class DictionaryCommand extends Command {
         }
         else {
             ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-                Pages.paginate(success, pages, 1, TimeUnit.MINUTES, 2, ce.getEvent().getAuthor()::equals);
+                Pages.paginate(success, pages, 1, TimeUnit.MINUTES, ce.getEvent().getAuthor()::equals);
             });
         }
         return Status.SUCCESS;

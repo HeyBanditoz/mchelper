@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.2.0_210') {
+    implementation('net.dv8tion:JDA:4.2.0_215') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -63,7 +63,7 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.6.5') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
-    implementation('com.github.ygimenez:Pagination-Utils:1.2.5b') {
+    implementation('com.github.ygimenez:Pagination-Utils:1.3.0') {
         exclude module: 'JDA' // this pulls JDA, which in turns opus-java, so don't.
     }
 
