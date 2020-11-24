@@ -30,13 +30,13 @@ public class CommandUtils {
      */
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l) {
         l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
-        String reply = "**Exception thrown:** " + StringUtils.truncate(ex.toString(), 300, true);
+        String reply = "**Status: Calamitous:** " + StringUtils.truncate(ex.toString(), 300, true);
         _sendReply(reply, e.getChannel(), true);
     }
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
         l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
-        String reply = "**THROWABLE THROWN!!!** " + StringUtils.truncate(t.toString(), 300, true);
+        String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(t.toString(), 300, true);
         _sendReply(reply, e.getChannel(), true);
     }
 
