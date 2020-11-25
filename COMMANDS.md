@@ -40,16 +40,16 @@ There are a total of 44 commands and 4 regex listeners.
 `loadout` - [stats] - Gives a random league champ and loadout. [stats](must be lowercase): ap = Ability Power, ad = Attack Damage, as = Attack Speed, mana = Mana, ar = Armour, crit = Critical damage or chance, hp = Health, mr = Magic Resist, ms = Movement Speed.
 ### ManageRolesCommand
 ```
-usage: roles [-i] [-d] [-a] [-r] [params [params ...]]
+usage: roles [-i] [--deactivate] [-a] [-r] [params [params ...]]
 
 positional arguments:
   params                 the rest of the parameters for previous arguments
 
 named arguments:
   -i, --init             initialize role management
-  -d, --deactivate       remove role management
+  --deactivate           remove role management
   -a, --add-role         adds a role
-  -r, --remove-role      removes a role
+  -r, -d, --remove-role  removes a role
 ```
 ### MathCommand
 `math` - <math> - Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.
