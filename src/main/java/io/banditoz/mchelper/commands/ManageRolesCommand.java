@@ -140,13 +140,13 @@ public class ManageRolesCommand extends Command {
         parser.addArgument("-i", "--init")
                 .action(Arguments.storeTrue())
                 .help("initialize role management");
-        parser.addArgument("-d", "--deactivate")
+        parser.addArgument("--deactivate")
                 .action(Arguments.storeTrue())
                 .help("remove role management");
         parser.addArgument("-a", "--add-role")
                 .action(Arguments.storeTrue())
                 .help("adds a role");
-        parser.addArgument("-r", "--remove-role")
+        parser.addArgument("-r", "-d", "--remove-role")
                 .action(Arguments.storeTrue())
                 .help("removes a role");
         parser.addArgument("params")
