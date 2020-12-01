@@ -127,7 +127,7 @@ named arguments:
 ### BetRegexable
 `\bbet((s)?|(ting)?|(ted))\b`
 ### DadRegexable
-`^(i'?m)\b`
+`^(i['’])?m|(imma)\b`
 ### RedditRegexable
 `https://reddit.app.link/\w.*`
 ### TeXRegexable
