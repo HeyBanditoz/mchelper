@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DadRegexable extends Regexable {
-    private static final Pattern PATTERN = Pattern.compile("^(i['’])?m|(imma)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN = Pattern.compile("^(i['’]?)m(ma)?\\b", Pattern.CASE_INSENSITIVE);
 
     @Override
     public Pattern regex() {
