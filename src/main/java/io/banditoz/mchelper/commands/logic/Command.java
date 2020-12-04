@@ -4,12 +4,14 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.EnumSet;
 import java.util.HashMap;
 
 /**
@@ -47,6 +49,16 @@ public abstract class Command {
     public abstract Help getHelp();
 
     /**
+     * Return the required Discord permissions to run this command. Note that a user must have <b>all</b> the
+     * permissions in the EnumSet.
+     *
+     * @return The required permissions.
+     */
+    protected EnumSet<Permission> getRequiredPermissions() {
+        return EnumSet.noneOf(Permission.class);
+    }
+
+    /**
      * Return this command's cooldown in seconds. Override and return what you want the cooldown to be.
      *
      * @return The cooldown.
@@ -75,6 +87,14 @@ public abstract class Command {
     protected Stat execute(MessageReceivedEvent e, MCHelper MCHelper) {
         CommandEvent ce = new CommandEvent(e, LOGGER, MCHelper, this.getClass().getSimpleName());
         long before = System.nanoTime();
+        // bot owners can bypass permission checks
+        if (!CommandPermissions.isBotOwner(e.getAuthor(), MCHelper.getSettings())) {
+            if (!e.getMember().getPermissions().containsAll(getRequiredPermissions())) {
+                e.getMessage().addReaction("\uD83D\uDD34").queue();
+                return new LoggableCommandEvent(ce, (int) ((System.nanoTime()) - before) / 1000000, Status.NO_PERMISSION);
+            }
+        }
+
         if (handleCooldown(e.getAuthor().getId())) {
             e.getChannel().sendTyping().queue();
             try {

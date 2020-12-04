@@ -11,7 +11,9 @@ public enum Status {
     /** The executable failed with an exception. */
     EXCEPTIONAL_FAILURE(2),
     /** The executable was on cooldown. */
-    COOLDOWN(3);
+    COOLDOWN(3),
+    /** The user has no permissions to execute this command. */
+    NO_PERMISSION(4);
 
     private final int value;
 
@@ -26,4 +28,6 @@ public enum Status {
     public int getValue() {
         return value;
     }
+
+
 }
