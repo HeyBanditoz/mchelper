@@ -12,6 +12,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -21,6 +22,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.awt.Color;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -62,7 +64,7 @@ public class QuoteCommand extends Command {
                 NamedQuote nq = quotes.get(i);
                 eb.clear();
                 eb.setColor(Color.GREEN);
-                eb.setDescription(nq.format() + " *(" + (i + 1) + " of " + quotes.size() + ")*");
+                eb.setDescription(nq.format(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
                 if (args.get("include_author")) {
                     ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(user -> {
                         eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
@@ -128,6 +130,9 @@ public class QuoteCommand extends Command {
         parser.addArgument("-a", "--all")
                 .action(Arguments.storeTrue())
                 .help("get all quotes by a guild, skipping quoteAndAuthor");
+        parser.addArgument("-d", "--id")
+                .action(Arguments.storeTrue())
+                .help("include the internal quote ID");
         parser.addArgument("quoteAndAuthor")
                 .help("quote content and quote attribution to search by")
                 .nargs("*");

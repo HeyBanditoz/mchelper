@@ -24,6 +24,9 @@ public class NamedQuote {
     private String quoteAuthor;
     /** The Timestamp of when this quote was created in the database. */
     private Timestamp lastModified;
+    /** The ID of the quote as it appears in the database. */
+    private int id;
+
     private final static DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMMM uuuu");
     private final static Pattern QUOTE_PARSER = Pattern.compile("^\"(.*?)\"\\s+");
     private final static String GREEDY_DASHES = "^-+";
@@ -66,6 +69,14 @@ public class NamedQuote {
 
     public void setLastModified(Timestamp lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -114,7 +125,16 @@ public class NamedQuote {
      *
      * @return The formatted String.
      */
-    public String format() {
-        return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + '*';
+    public String format(boolean includeId) {
+        if (includeId) {
+            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + "* (#" + id + ")";
+        }
+        else {
+            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + '*';
+        }
+    }
+
+    public String formatPlain() {
+        return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
     }
 }

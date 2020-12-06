@@ -60,4 +60,14 @@ public interface QuotesDao {
      * @throws SQLException If there was an error saving a quote.
      */
     void editQuote(int id, NamedQuote nq) throws SQLException;
+
+    /**
+     * Attempts to delete a quote given an ID and the guild it should be from.
+     *
+     * @param id The ID of the quote.
+     * @param g The guild it's in.
+     * @return Whether or not the quote deletion succeeded.
+     * @throws SQLException If there was an error deleting the quote.
+     */
+    boolean deleteQuote(int id, Guild g) throws SQLException;
 }

@@ -99,6 +99,7 @@ public class CommandHandler extends ListenerAdapter {
             add(new PrefixCommand());
             add(new StatisticsCommand());
             add(new ManageRolesCommand());
+            add(new DeleteQuoteCommand());
         }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {

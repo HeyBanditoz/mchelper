@@ -106,6 +106,34 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         }
     }
 
+    @Override
+    public boolean deleteQuote(int id, Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE id=? AND guild_id=?");
+            ps.setInt(1, id);
+            ps.setLong(2, g.getIdLong());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+                Optional<NamedQuote> nq = buildQuoteFromResultSet(rs);
+                if (nq.isPresent()) {
+                    NamedQuote quote = nq.get();
+                    LOGGER.info("Deleting quote #" + quote.getId() + " from guild \"" + g.getName() + "\" with content: " + quote.formatPlain());
+                    ps = c.prepareStatement("DELETE FROM quotes WHERE id=?");
+                    ps.setInt(1, id);
+                    ps.execute();
+                    ps.close();
+                    return true;
+                }
+                else {
+                    ps.close();
+                    return false;
+                }
+            }
+        }
+    }
+
     private Optional<NamedQuote> buildQuoteFromResultSet(ResultSet rs) throws SQLException {
         NamedQuote nq = new NamedQuote();
         nq.setGuildId(rs.getLong("guild_id"));
@@ -113,6 +141,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         nq.setQuote(rs.getString("quote"));
         nq.setQuoteAuthor(rs.getString("quote_author"));
         nq.setLastModified(rs.getTimestamp("last_modified"));
+        nq.setId(rs.getInt("id"));
         return Optional.of(nq);
     }
 
