@@ -1,5 +1,5 @@
 # Commands
-There are a total of 44 commands and 4 regex listeners.
+There are a total of 45 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BashCommand
@@ -10,6 +10,8 @@ There are a total of 44 commands and 4 regex listeners.
 `coords` - <save|add,show|list,delete|remove,help> - Saves coordinates to the database. See !coords help
 ### DefaultChannelCommand
 `defaultchannel` - (channel ID) - Gets or sets the default channel for this guild.
+### DeleteQuoteCommand
+`delquote` - <quote ID> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
 ### DeleteReminderCommand
 `delremind` - <id> - Deletes a reminder.
 ### DiceRollerCommand
@@ -67,7 +69,7 @@ named arguments:
 `prefix` - (prefix) - Gets or sets the prefix for this guild. (By default, it is a '!' and must be a char.
 ### QuoteCommand
 ```
-usage: quote [-s] [-i] [-a] [quoteAndAuthor [quoteAndAuthor ...]]
+usage: quote [-s] [-i] [-a] [-d] [quoteAndAuthor [quoteAndAuthor ...]]
 
 positional arguments:
   quoteAndAuthor         quote content and quote attribution to search by
@@ -76,6 +78,7 @@ named arguments:
   -s, --stats            retrieve stats instead
   -i, --include-author   include who added the quote
   -a, --all              get all quotes by a guild, skipping quoteAndAuthor
+  -d, --id               include the internal quote ID
 ```
 ### RemindmeCommand
 `remindme` - <duration> <reminder> - Creates a reminder. It is accurate give or take a second.
