@@ -48,12 +48,14 @@ public class EvalCommand extends ElevatedCommand {
             engine.put("guild", ce.getEvent().getGuild());
             engine.put("member", ce.getEvent().getMember());
         }
+        long before = System.currentTimeMillis();
         Object out = engine.eval(imports + args);
+        long duration = System.currentTimeMillis() - before;
         if (out == null) {
-            ce.sendReply(null); // checked in CommandUtils
+            ce.sendReply("Executed in " + duration + "ms.\n<null output>");
         }
         else {
-            ce.sendPastableReply("```" + out.toString() + "```");
+            ce.sendPastableReply("Executed in " + duration + " ms.\n```\n" + out.toString() + "```");
         }
         return Status.SUCCESS;
     }
