@@ -120,8 +120,8 @@ public class Finance {
             c = Color.RED;
         }
         return new EmbedBuilder()
-                .setTitle(cp.getName())
-                .setDescription(cp.getFinnhubIndustry())
+                .setTitle(cp.getName() == null ? "<unknown ticker>" : cp.getName())
+                .setDescription(cp.getFinnhubIndustry() == null ? "<unknown industry>" : cp.getName())
                 .addField("Price", String.valueOf(quote.getCurrentPrice()), true)
                 .addField("Change", String.valueOf(quote.getChange()), true)
                 .addField("Change Percent", String.valueOf(quote.getChangePercent()) + '%', true)
@@ -132,7 +132,8 @@ public class Finance {
     }
 
     public static ByteArrayOutputStream generateStockGraph(RawCandlestick candles, CompanyProfile cp) throws IOException {
-        OHLCChart chart = new OHLCChartBuilder().width(2000).height(750).title(cp.getName()).build();
+        String name = cp.getName() == null ? "null" : cp.getName();
+        OHLCChart chart = new OHLCChartBuilder().width(2000).height(750).title(name).build();
         chart.addSeries("Series", candles.getAsDates(), candles.getOpens(), candles.getHighs(), candles.getLows(), candles.getCloses(), candles.getVolumes())
                 .setUpColor(Color.GREEN)
                 .setDownColor(Color.RED);
