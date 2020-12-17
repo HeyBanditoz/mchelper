@@ -1,5 +1,5 @@
 # Commands
-There are a total of 45 commands and 4 regex listeners.
+There are a total of 46 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BashCommand
@@ -84,6 +84,8 @@ named arguments:
 `remindme` - <duration> <reminder> - Creates a reminder. It is accurate give or take a second.
 ### RockPaperScissorsCommand
 `rps` - <rock/paper/scissors> - Chooses a random, Rock, Paper, or Scissors
+### RussianRouletteCommand
+`roulette` - <no parameters>  - Kick a random person from your voice channel!
 ### ServerStatusCommand
 `status` - <address[:port]> - Fetches information about a Minecraft server.
 ### SnowflakeCommand
