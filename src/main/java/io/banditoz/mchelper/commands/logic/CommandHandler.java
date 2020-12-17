@@ -54,6 +54,10 @@ public class CommandHandler extends ListenerAdapter {
         return commands.values();
     }
 
+    public boolean removeCommandByName(String name) {
+        return commands.remove(name) != null;
+    }
+
     public CommandHandler(MCHelper MCHelper) {
         this.MCHELPER = MCHelper;
         Settings settings = MCHelper.getSettings();
@@ -88,6 +92,7 @@ public class CommandHandler extends ListenerAdapter {
         add(new JoinOrderCommand());
         add(new EightBallCommand());
         add(new RussianRouletteCommand());
+        add(new RemoveCommandCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             add(new CoordCommand());

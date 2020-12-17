@@ -66,8 +66,8 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
-    public Collection<Command> getCommands() {
-        return CH.getCommands();
+    public CommandHandler getCommandHandler() {
+        return CH;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class CommandTests {
         Set<String> newList = new HashSet<>();
         StringJoiner duplicateCommands = new StringJoiner(", ");
         int duplicates = 0;
-        for (Command command : mcHelper.getCommands()) {
+        for (Command command : mcHelper.getCommandHandler().getCommands()) {
             if (!newList.add(command.commandName())) {
                 duplicateCommands.add(command.getClass().toString());
                 duplicates++;
@@ -32,7 +32,7 @@ public class CommandTests {
     public void noCommandShallHaveNullHelp() {
         StringJoiner nullHelps = new StringJoiner(", ");
         int nullHelpsCounter = 0;
-        for (Command command : mcHelper.getCommands()) {
+        for (Command command : mcHelper.getCommandHandler().getCommands()) {
             if (command.getHelp() == null) {
                 nullHelps.add(command.getClass().toString());
                 nullHelpsCounter++;

@@ -21,7 +21,7 @@ public class CommandsToMarkdown {
         StringBuilder markdown = new StringBuilder("# Commands\n");
         ClassNameComparator comp = new ClassNameComparator();
 
-        List<Command> commands = new ArrayList<>(mcHelper.getCommands());
+        List<Command> commands = new ArrayList<>(mcHelper.getCommandHandler().getCommands());
         commands.sort(comp);
         List<Regexable> regexables = new ArrayList<>(mcHelper.getRegexListeners());
         regexables.sort(comp);

@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
@@ -25,7 +26,7 @@ public interface MCHelper {
     ReminderService getReminderService();
     ThreadPoolExecutor getThreadPoolExecutor();
     Settings getSettings();
-    Collection<Command> getCommands();
+    CommandHandler getCommandHandler();
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();
     ScheduledExecutorService getSES();
