@@ -1,5 +1,5 @@
 # Commands
-There are a total of 46 commands and 4 regex listeners.
+There are a total of 47 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BashCommand
@@ -82,6 +82,8 @@ named arguments:
 ```
 ### RemindmeCommand
 `remindme` - <duration> <reminder> - Creates a reminder. It is accurate give or take a second.
+### RemoveCommandCommand
+`removecommand` - <command> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
 ### RockPaperScissorsCommand
 `rps` - <rock/paper/scissors> - Chooses a random, Rock, Paper, or Scissors
 ### RussianRouletteCommand
