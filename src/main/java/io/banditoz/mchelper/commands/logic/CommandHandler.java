@@ -87,6 +87,7 @@ public class CommandHandler extends ListenerAdapter {
         add(new UserInfoCommand());
         add(new JoinOrderCommand());
         add(new EightBallCommand());
+        add(new RussianRouletteCommand());
 
         if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             add(new CoordCommand());
