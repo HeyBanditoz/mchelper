@@ -5,14 +5,12 @@ import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
-import java.util.HashMap;
 
 /**
  * Represents the abstract class for any Command the bot may have. Note any command you implement
@@ -47,6 +45,15 @@ public abstract class Command {
     protected abstract Status onCommand(CommandEvent ce) throws Exception;
     public abstract String commandName();
     public abstract Help getHelp();
+    protected Cooldown cooldown = getDefaultCooldown();
+
+    protected Cooldown getDefaultCooldown() {
+        return null; // eh, should probably use a constructor for each command that wants a cooldown, but whatever
+    }
+
+    public Cooldown getCooldown() {
+        return cooldown;
+    }
 
     /**
      * Return the required Discord permissions to run this command. Note that a user must have <b>all</b> the
@@ -57,17 +64,6 @@ public abstract class Command {
     protected EnumSet<Permission> getRequiredPermissions() {
         return EnumSet.noneOf(Permission.class);
     }
-
-    /**
-     * Return this command's cooldown in seconds. Override and return what you want the cooldown to be.
-     *
-     * @return The cooldown.
-     */
-    protected int getCooldown() {
-        return 0;
-    }
-
-    protected HashMap<String, Instant> cooldowns = getCooldown() > 0 ? new HashMap<>() : null;
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -95,53 +91,57 @@ public abstract class Command {
             }
         }
 
-        if (handleCooldown(e.getAuthor().getId())) {
-            e.getChannel().sendTyping().queue();
-            try {
-                Status status = onCommand(ce);
-                long after = System.nanoTime() - before;
-                return new LoggableCommandEvent(ce, (int) (after / 1000000), status);
-            } catch (Exception ex) {
-                CommandUtils.sendExceptionMessage(e, ex, LOGGER);
-                return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.EXCEPTIONAL_FAILURE);
-            } catch (Throwable t) {
-                CommandUtils.sendThrowableMessage(e, t, LOGGER);
-                if (t instanceof OutOfMemoryError) {
-                    System.gc();
-                }
-                throw t; // rethrow
+        ISnowflake entity = null;
+        if (cooldown != null) {
+            switch (cooldown.getType()) {
+                case PER_USER:
+                    entity = e.getAuthor();
+                    if (!cooldown.handle(e.getAuthor())) {
+                        e.getMessage().addReaction("⏲️").queue();
+                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
+                    }
+                    break;
+                case PER_GUILD:
+                    entity = e.getGuild();
+                    if (!cooldown.handle(e.getGuild())) {
+                        e.getMessage().addReaction("⏲️").queue();
+                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + cooldown.getType());
             }
         }
-        else {
-            e.getMessage().addReaction("⏲️").queue();
-            return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
+        e.getChannel().sendTyping().queue();
+        try {
+            Status status = onCommand(ce);
+            if (status != Status.SUCCESS) {
+                lazyRemove(entity);
+            }
+            long after = System.nanoTime() - before;
+            return new LoggableCommandEvent(ce, (int) (after / 1000000), status);
+        } catch (Exception ex) {
+            lazyRemove(entity);
+            CommandUtils.sendExceptionMessage(e, ex, LOGGER);
+            return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.EXCEPTIONAL_FAILURE);
+        } catch (Throwable t) {
+            lazyRemove(entity);
+            CommandUtils.sendThrowableMessage(e, t, LOGGER);
+            if (t instanceof OutOfMemoryError) {
+                System.gc();
+            }
+            throw t; // rethrow
         }
     }
 
     /**
-     * Checks if the user is on cooldown.
+     * Removes an entity from the cooldown list, if the cooldown object exists.
      *
-     * @param id The ID to check.
-     * @return true if they are allowed to run the command, false if they are still on cooldown.
+     * @param entity The entity to remove.
      */
-    private boolean handleCooldown(String id) {
-        if (getCooldown() > 0) {
-            Instant cooldown = cooldowns.get(id);
-            if (cooldown == null) {
-                Instant instant = Instant.now().plus(getCooldown(), ChronoUnit.SECONDS);
-                cooldowns.put(id, instant);
-                return true;
-            }
-            else if (Instant.now().isAfter(cooldown)) {
-                cooldowns.replace(id, Instant.now().plus(getCooldown(), ChronoUnit.SECONDS));
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return true;
+    private void lazyRemove(ISnowflake entity) {
+        if (entity != null && cooldown != null) {
+            cooldown.remove(entity);
         }
     }
 }

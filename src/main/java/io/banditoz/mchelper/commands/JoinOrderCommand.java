@@ -2,11 +2,14 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Cooldown;
+import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,8 +27,8 @@ public class JoinOrderCommand extends Command {
     }
 
     @Override
-    protected int getCooldown() {
-        return 30;
+    public Cooldown getDefaultCooldown() {
+        return new Cooldown(30, ChronoUnit.SECONDS, CooldownType.PER_USER);
     }
 
     @Override

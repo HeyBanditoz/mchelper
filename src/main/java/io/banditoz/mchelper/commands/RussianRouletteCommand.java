@@ -1,14 +1,13 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.commands.logic.*;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -19,8 +18,8 @@ public class RussianRouletteCommand extends Command {
     }
 
     @Override
-    public int getCooldown() {
-        return 120; // two minutes
+    public Cooldown getDefaultCooldown() {
+        return new Cooldown(2, ChronoUnit.MINUTES, CooldownType.PER_USER);
     }
 
     @Override

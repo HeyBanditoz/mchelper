@@ -2,8 +2,12 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Cooldown;
+import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+
+import java.time.temporal.ChronoUnit;
 
 public class FloodCommand extends Command {
     @Override
@@ -18,8 +22,8 @@ public class FloodCommand extends Command {
     }
 
     @Override
-    protected int getCooldown() {
-        return 10;
+    public Cooldown getDefaultCooldown() {
+        return new Cooldown(10, ChronoUnit.SECONDS, CooldownType.PER_USER);
     }
 
     @Override

@@ -2,6 +2,8 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Cooldown;
+import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.investing.Finance;
 import io.banditoz.mchelper.investing.model.CompanyProfile;
 import io.banditoz.mchelper.investing.model.Quote;
@@ -11,6 +13,8 @@ import io.banditoz.mchelper.utils.Help;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
+
+import java.time.temporal.ChronoUnit;
 
 public class StockCommand extends Command {
     @Override
@@ -24,8 +28,8 @@ public class StockCommand extends Command {
     }
 
     @Override
-    protected int getCooldown() {
-        return 3;
+    public Cooldown getDefaultCooldown() {
+        return new Cooldown(3, ChronoUnit.SECONDS, CooldownType.PER_USER);
     }
 
     @Override
