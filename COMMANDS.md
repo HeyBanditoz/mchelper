@@ -1,11 +1,13 @@
 # Commands
-There are a total of 47 commands and 4 regex listeners.
+There are a total of 48 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### CoinFlipCommand
 `flip` - <no parameters>  - Flips a coin.
+### CooldownsCommand
+`cooldowns` - [user as mention] - Returns the cooldowns for you or another user.
 ### CoordCommand
 `coords` - <save|add,show|list,delete|remove,help> - Saves coordinates to the database. See !coords help
 ### DefaultChannelCommand
