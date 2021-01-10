@@ -36,7 +36,7 @@ public class Settings {
     @JsonProperty("databaseName")
     private String databaseName;
     @JsonProperty("recordCommandAndRegexStatistics")
-    private Boolean recordCommandAndRegexStatistics;
+    private Boolean recordCommandAndRegexStatistics = false; // default value, TODO maybe fix others above too?
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
