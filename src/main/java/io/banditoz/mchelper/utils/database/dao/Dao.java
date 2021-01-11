@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
 
 public abstract class Dao {
     public abstract String getSqlTableGenerator();

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
@@ -27,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -51,6 +49,12 @@ public class MCHelperImpl implements MCHelper {
 
     public MCHelperImpl() throws LoginException, InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
+
+        if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
+            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
+            System.exit(1);
+        }
+
         TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
@@ -58,11 +62,6 @@ public class MCHelperImpl implements MCHelper {
                 .build());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
-
-        if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
-            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
-            System.exit(1);
-        }
 
         JDA = JDABuilder.createDefault(SETTINGS.getDiscordToken())
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
@@ -94,12 +93,7 @@ public class MCHelperImpl implements MCHelper {
 
         // Shut things down gracefully.
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            LOGGER.info("Shutdown hook fired. Shutting down JDA and thread pools...");
-            SES.shutdown();
-            TPE.shutdown();
-            JDA.shutdown();
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         JDA.awaitReady();
         RRL = new RoleReactionListener(this);
@@ -119,6 +113,14 @@ public class MCHelperImpl implements MCHelper {
             SES.scheduleAtFixedRate(new FahrenheitStatus(this), 0L, 1, TimeUnit.MINUTES);
         }
         LOGGER.info("MCHelper initialization finished.");
+    }
+
+    private void shutdown() {
+        LOGGER.info("Shutdown hook fired. Shutting down JDA and thread pools...");
+        if (SES != null) SES.shutdown();
+        if (TPE != null) TPE.shutdown();
+        if (JDA != null) JDA.shutdown();
+        if (STATS != null) STATS.shutdown();
     }
 
     @Override

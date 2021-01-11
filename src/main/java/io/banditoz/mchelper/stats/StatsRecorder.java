@@ -33,4 +33,8 @@ public class StatsRecorder {
             }
         });
     }
+
+    public void shutdown() {
+        TPE.shutdown();
+    }
 }

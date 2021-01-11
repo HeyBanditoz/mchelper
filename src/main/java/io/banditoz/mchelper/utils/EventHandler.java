@@ -15,7 +15,7 @@ public abstract class EventHandler<E extends GenericEvent> extends ListenerAdapt
     private Class<E> c;
 
     public EventHandler() {
-        this.c = (Class<E>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];;
+        this.c = (Class<E>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     public void addEvent(String id, Consumer<E> act) {

@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.utils;
 
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.commands.ManageRolesCommand;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
 import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
 import net.dv8tion.jda.api.entities.Guild;

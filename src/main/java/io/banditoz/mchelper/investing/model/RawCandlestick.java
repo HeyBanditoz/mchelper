@@ -62,22 +62,4 @@ public class RawCandlestick {
         }
         return dates;
     }
-
-    /*
-    public OHLCSeries toOHLCDataset(String companyName) {
-        return new OHLCSeries(companyName, unixTimestamps, opens, highs, lows, closes, volumes, Series.DataType.Date);
-        OHLCDataItem[] items = new OHLCDataItem[unixTimestamps.length];
-        for (int i = 0; i < unixTimestamps.length; i++) {
-            items[i] = new OHLCDataItem(
-                    new Date(TimeUnit.MILLISECONDS.convert(unixTimestamps[i], TimeUnit.SECONDS)),
-                    opens[i],
-                    highs[i],
-                    lows[i],
-                    closes[i],
-                    volumes[i]
-            );
-        }
-        return new DefaultOHLCDataset(companyName, items);
-    }
-    */
 }

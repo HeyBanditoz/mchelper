@@ -1,10 +1,8 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.EventHandler;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.RoleObject;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
@@ -12,24 +10,14 @@ import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
-import net.dv8tion.jda.api.exceptions.ContextException;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class ManageRolesCommand extends Command {
 

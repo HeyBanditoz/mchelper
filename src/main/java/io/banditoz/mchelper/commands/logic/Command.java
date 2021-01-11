@@ -45,7 +45,7 @@ public abstract class Command {
     protected abstract Status onCommand(CommandEvent ce) throws Exception;
     public abstract String commandName();
     public abstract Help getHelp();
-    protected Cooldown cooldown = getDefaultCooldown();
+    protected final Cooldown cooldown = getDefaultCooldown();
 
     protected Cooldown getDefaultCooldown() {
         return null; // eh, should probably use a constructor for each command that wants a cooldown, but whatever

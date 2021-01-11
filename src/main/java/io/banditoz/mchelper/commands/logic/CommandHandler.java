@@ -47,7 +47,7 @@ public class CommandHandler extends ListenerAdapter {
         if (args[0].charAt(0) != prefix) {
             return Optional.empty();
         }
-        return Optional.ofNullable(commands.get(args[0].substring(1))); // remove the prefix from the command arg
+        return Optional.ofNullable(commands.get(args[0].substring(1).toLowerCase())); // remove the prefix from the command arg
     }
 
     public Collection<Command> getCommands() {

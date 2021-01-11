@@ -4,15 +4,15 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Cooldown {
     private final CooldownType type;
     private final int time;
     private final ChronoUnit timeUnit;
-    private final HashMap<ISnowflake, Instant> map = new HashMap<>();
+    private final Map<ISnowflake, Instant> map = new ConcurrentHashMap<>();
 
     public Cooldown(int time, ChronoUnit timeUnit, CooldownType type) {
         this.type = type;
