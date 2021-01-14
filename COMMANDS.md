@@ -1,7 +1,9 @@
 # Commands
-There are a total of 48 commands and 4 regex listeners.
+There are a total of 53 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
+### BalanceCommand
+`balance` - <no parameters>  - Checks your balance.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### CoinFlipCommand
@@ -20,6 +22,8 @@ There are a total of 48 commands and 4 regex listeners.
 `roll` - [dice notation] - Roll some dice following standard dice notation.
 ### DictionaryCommand
 `define` - <word> - Finds the definition of a word using Owlbot's API.
+### DoubleOrNothingCommand
+`don` - <ante (with range 5 <= x <= 50)> - Play double or nothing to win some money!
 ### EangleCommand
 `eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
 ### EightBallCommand
@@ -40,6 +44,8 @@ There are a total of 48 commands and 4 regex listeners.
 `invite` - <no parameters>  - Generates an invite link to invite the bot.
 ### JoinOrderCommand
 `joinorder` - <no parameters>  - Sends this guild's join order.
+### LeaderboardCommand
+`leaderboard` - <no parameters>  - Gets the money leaderboard for this guild.
 ### LoadoutCommand
 `loadout` - [stats] - Gives a random league champ and loadout. [stats](must be lowercase): ap = Ability Power, ad = Attack Damage, as = Attack Speed, mana = Mana, ar = Armour, crit = Critical damage or chance, hp = Health, mr = Magic Resist, ms = Movement Speed.
 ### ManageRolesCommand
@@ -119,6 +125,10 @@ named arguments:
 `teams` - <no parameters>  - sends a message with your voice channel divided into teams
 ### ToMorseCommand
 `tomorse` - <string> - Encodes a message to morse code.
+### TransactionsCommand
+`txns` - <no parameters>  - Fetches your last 10 transactions.
+### TransferCommand
+`transfer` - <to> <amount> [memo] - Transfer money.
 ### UnitsCommand
 `units` - <conversion> - Launches a conversion between two units separated by 'to'.
 ### UploadLogsCommand
