@@ -6,9 +6,13 @@ import com.github.ygimenez.method.Pages;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
+import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.*;
+import io.banditoz.mchelper.utils.HttpResponseException;
+import io.banditoz.mchelper.utils.RoleReactionListener;
+import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.quotes.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
@@ -46,6 +50,7 @@ public class MCHelperImpl implements MCHelper {
     private final Settings SETTINGS;
     private final StatsRecorder STATS;
     private final RoleReactionListener RRL;
+    private final AccountManager AM;
 
     public MCHelperImpl() throws LoginException, InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -75,10 +80,12 @@ public class MCHelperImpl implements MCHelper {
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             DB = new Database(this);
             RS = new ReminderService(this, SES);
+            AM = new AccountManager(DB);
         }
         else {
             DB = null;
             RS = null;
+            AM = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
 
@@ -174,6 +181,16 @@ public class MCHelperImpl implements MCHelper {
     }
 
     @Override
+    public AccountManager getAccountManager() {
+        return AM;
+    }
+
+    @Override
+    public RoleReactionListener getRRL() {
+        return RRL;
+    }
+
+    @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();
@@ -193,10 +210,5 @@ public class MCHelperImpl implements MCHelper {
             throw new HttpResponseException(response.code());
         }
         return response;
-    }
-
-    @Override
-    public RoleReactionListener getRRL() {
-        return RRL;
     }
 }

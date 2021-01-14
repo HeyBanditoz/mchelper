@@ -51,7 +51,7 @@ public interface QuotesDao {
      * @return A {@link Map} of how many quotes a unique author has added, empty if the guild contains no quotes.
      * @throws SQLException If there was an error getting the quotes.
      */
-    List<StatPoint<Long>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
+    List<StatPoint<Long, Integer>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException;
 
     /**
      * Saves a {@link NamedQuote} in the database.

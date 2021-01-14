@@ -10,11 +10,11 @@ import java.util.Objects;
  *
  * @param <T> The type of this statistic point.
  */
-public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<T>> {
+public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> implements Comparable<StatPoint<T, V>> {
     private final T thing;
-    private final int count;
+    private final V count;
 
-    public StatPoint(T thing, int count) {
+    public StatPoint(T thing, V count) {
         this.thing = thing;
         this.count = count;
     }
@@ -23,17 +23,17 @@ public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<
         return thing;
     }
 
-    public int getCount() {
+    public V getCount() {
         return count;
     }
 
     @Override
-    public int compareTo(@NotNull StatPoint<T> o) {
+    public int compareTo(@NotNull StatPoint<T, V> o) {
         if (count == o.count) {
             return thing.compareTo(o.thing);
         }
         else {
-            return (count > o.count) ? -1 : 1; // reverse, so the one with the biggest count is the first
+            return (o.count.compareTo(count)); // reverse, so the one with the biggest count is the first
         }
     }
 
@@ -45,7 +45,7 @@ public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        StatPoint<?> point = (StatPoint<?>) o;
+        StatPoint<?, ?> point = (StatPoint<?, ?>) o;
         return count == point.count &&
                 thing.equals(point.thing);
     }
@@ -57,6 +57,6 @@ public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<
 
     @Override
     public String toString() {
-        return thing.toString() + ": " + count;
+        return thing.toString() + ": " + count.toString();
     }
 }

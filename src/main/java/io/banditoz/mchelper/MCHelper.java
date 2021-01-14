@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
+import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.RoleReactionListener;
@@ -29,6 +30,7 @@ public interface MCHelper {
     StatsRecorder getStatsRecorder();
     ScheduledExecutorService getSES();
     RoleReactionListener getRRL();
+    AccountManager getAccountManager();
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one.

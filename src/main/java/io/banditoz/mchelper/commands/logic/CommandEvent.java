@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 public class CommandEvent {
     private String COMMAND_ARGS_STRING;
     private String[] COMMAND_ARGS;
+    private String[] RAW_ARGS;
     private final MessageReceivedEvent EVENT;
     private final Logger LOGGER;
     private final Guild GUILD;
@@ -62,6 +63,18 @@ public class CommandEvent {
             COMMAND_ARGS = CommandUtils.commandArgs(EVENT.getMessage().getContentDisplay());
         }
         return COMMAND_ARGS;
+    }
+
+    /**
+     * Grabs the <i>raw</i> command arguments as an array.
+     *
+     * @return The arguments.
+     */
+    public String[] getRawCommandArgs() {
+        if (RAW_ARGS == null) {
+            RAW_ARGS = CommandUtils.commandArgs(EVENT.getMessage().getContentRaw());
+        }
+        return RAW_ARGS;
     }
 
     /**

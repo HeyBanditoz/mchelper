@@ -25,13 +25,13 @@ public class StatisticsCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         StatisticsDao dao = new StatisticsDaoImpl(ce.getDatabase());
-        List<StatPoint<String>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
+        List<StatPoint<String, Integer>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
         if (stats.isEmpty()) {
             ce.sendReply("No commands run for this guild, somehow.");
             return Status.FAIL;
         }
         StringBuilder reply = new StringBuilder("Statistics for this guild:\n```\n");
-        for (StatPoint<String> stat : stats) {
+        for (StatPoint<String, Integer> stat : stats) {
             reply.append(stat.toString()).append('\n');
         }
         ce.sendReply(reply.toString() + "```");

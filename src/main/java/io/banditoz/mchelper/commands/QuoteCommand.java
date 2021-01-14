@@ -101,7 +101,7 @@ public class QuoteCommand extends Command {
      * @throws SQLException If there was an error with the database.
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
-        List<StatPoint<Long>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        List<StatPoint<Long, Integer>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
         if (quotes.isEmpty()) {
             return "This guild has no quotes to gather statistics for.";
         }
