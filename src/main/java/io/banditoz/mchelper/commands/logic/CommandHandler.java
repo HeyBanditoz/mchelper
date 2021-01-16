@@ -112,7 +112,7 @@ public class CommandHandler extends ListenerAdapter {
             add(new LeaderboardCommand());
             add(new TransactionsCommand());
             add(new DoubleOrNothingCommand());
-            add(new BlackJackCommand());
+            add(new BalanceGraphCommand());
         }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {

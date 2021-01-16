@@ -1,9 +1,11 @@
 # Commands
-There are a total of 53 commands and 4 regex listeners.
+There are a total of 54 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
 `balance` - <no parameters>  - Checks your balance.
+### BalanceGraphCommand
+`balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaciton.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### CoinFlipCommand
@@ -23,7 +25,7 @@ There are a total of 53 commands and 4 regex listeners.
 ### DictionaryCommand
 `define` - <word> - Finds the definition of a word using Owlbot's API.
 ### DoubleOrNothingCommand
-`don` - <ante (with range 5 <= x <= 500)> - Play double or nothing to win some money!
+`don` - <ante (with range 5 <= x <= 2000)> - Play double or nothing to win some money!
 ### EangleCommand
 `eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
 ### EightBallCommand
