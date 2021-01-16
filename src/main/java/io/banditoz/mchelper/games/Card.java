@@ -13,4 +13,12 @@ public class Card {
     public String toString() {
         return SUIT.getStringValue() + RANK.getStringValue();
     }
+
+    public Suit getSUIT() {
+        return SUIT;
+    }
+
+    public Rank getRANK() {
+        return RANK;
+    }
 }
