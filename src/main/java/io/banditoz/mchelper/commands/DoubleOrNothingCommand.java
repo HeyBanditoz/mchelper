@@ -40,7 +40,7 @@ public class DoubleOrNothingCommand extends Command {
         User u = ce.getEvent().getAuthor();
         BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1]);
         if (!(ante.compareTo(LOWER) >= 0 && ante.compareTo(UPPER) <= 0)) {
-            ce.sendReply("Your bet must be between 5 and 2000!");
+            ce.sendReply("Your bet must be between " + LOWER + " and " + UPPER + "!");
             return Status.FAIL;
         }
         if (GAMES.containsKey(u)) {
