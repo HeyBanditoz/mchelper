@@ -54,7 +54,7 @@ public class BlackJackCommand extends Command {
             GAMES.put(u, game);
             game.play();
             try {
-                ce.getMCHelper().getAccountManager().remove(ante, u.getIdLong(), "black jack ante");
+                ce.getMCHelper().getAccountManager().remove(ante, u.getIdLong(), "blackjack ante");
             } catch (MoneyException ex) {
                 GAMES.remove(u);
                 ce.sendExceptionMessage(ex);
@@ -176,7 +176,7 @@ public class BlackJackCommand extends Command {
             dealerString.append("\n");
         }
         return new EmbedBuilder()
-                .setTitle("Black Jack!")
+                .setTitle("BlackJack!")
                 .setColor(Color.GREEN)
                 .setDescription("You have $" + AccountManager.format(currentAmount) + " up for bet!"
                         + "\n\n *Your hand: " + game.getPlayersSum() + "*\n" + playerString
@@ -199,7 +199,7 @@ public class BlackJackCommand extends Command {
             dealerString.append("\n");
         }
         return new EmbedBuilder()
-                .setTitle("Black Jack!")
+                .setTitle("BlackJack!")
                 .setColor(Color.RED)
                 .setDescription("You lost $" + AccountManager.format(currentAmount) + "!"
                         + "\n\n*Final Hands:*"
@@ -241,7 +241,7 @@ public class BlackJackCommand extends Command {
                 break;
         }
         return new EmbedBuilder()
-                .setTitle("Black Jack!")
+                .setTitle("BlackJack!")
                 .setColor(c)
                 .setDescription(won
                         + "\n\n*Final Hands:*"

@@ -108,11 +108,11 @@ public class BlackJackGame {
         } else {
             currentBet = currentBet.multiply(TWO);
         }
-        accs.add(currentBet, player.getIdLong(), "black jack winnings");
+        accs.add(currentBet, player.getIdLong(), "blackjack winnings");
     }
 
     public void standOff() throws Exception {
-        accs.add(currentBet, player.getIdLong(), "black jack winnings");
+        accs.add(currentBet, player.getIdLong(), "blackjack winnings");
     }
 
     public BigDecimal getCurrentBet() {
