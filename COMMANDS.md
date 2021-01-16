@@ -1,9 +1,11 @@
 # Commands
-There are a total of 53 commands and 4 regex listeners.
+There are a total of 54 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
 `balance` - <no parameters>  - Checks your balance.
+### BalanceGraphCommand
+`balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaciton.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### CoinFlipCommand
