@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DoubleOrNothingCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
-    private static final BigDecimal UPPER = BigDecimal.valueOf(500);
+    private static final BigDecimal UPPER = BigDecimal.valueOf(2000);
     private static final Map<User, DoubleOrNothingGame> GAMES = new ConcurrentHashMap<>(); // TODO add a proper game handler instead of this?
 
     @Override
@@ -40,7 +40,7 @@ public class DoubleOrNothingCommand extends Command {
         User u = ce.getEvent().getAuthor();
         BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1]);
         if (!(ante.compareTo(LOWER) >= 0 && ante.compareTo(UPPER) <= 0)) {
-            ce.sendReply("Your bet must be between 5 and 500!");
+            ce.sendReply("Your bet must be between 5 and 2000!");
             return Status.FAIL;
         }
         if (GAMES.containsKey(u)) {
