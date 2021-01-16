@@ -62,6 +62,10 @@ public class Transaction implements Comparable<Transaction> {
         return amount;
     }
 
+    public BigDecimal getFinalAmount() {
+        return before.add(amount);
+    }
+
     public LocalDateTime getDate() {
         return date;
     }

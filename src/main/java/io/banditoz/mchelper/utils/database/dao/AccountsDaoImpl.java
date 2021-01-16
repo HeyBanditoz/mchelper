@@ -128,7 +128,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
 
     @Override
     public List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException {
-        List<Transaction> txns = new ArrayList<>(n);
+        List<Transaction> txns = new ArrayList<>(Math.min(n, 10000)); // hacky
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? LIMIT ?");
             ps.setLong(1, id);
