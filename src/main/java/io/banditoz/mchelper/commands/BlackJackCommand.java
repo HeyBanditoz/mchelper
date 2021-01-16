@@ -80,6 +80,12 @@ public class BlackJackCommand extends Command {
                         LOGGER.error("Error while paying out!", ex);
                     }
                 }
+                if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
+                    success.editMessage(lose(game.getCurrentBet(), u,game)).queue();
+                    GAMES.remove(u);
+                    Pages.handler.removeEvent(success);
+                    success.clearReactions().queue();
+                }
             });
         }
         return Status.SUCCESS;
@@ -101,6 +107,7 @@ public class BlackJackCommand extends Command {
                     message.editMessage(win(2,game.getCurrentBet(), user,game)).queue();
                     Pages.handler.removeEvent(message);
                     message.clearReactions().queue();
+                    GAMES.remove(user);
                     return;
                 }
                 game.payout(true);
@@ -135,7 +142,6 @@ public class BlackJackCommand extends Command {
             game.hitDealer();
         }
         try {
-            //TODO -- TIE
             if (game.getDealerSum()>21 || game.getDealerSum()<game.getPlayersSum()) {
                 game.payout(false);
                 message.editMessage(win(0,game.getCurrentBet(), user,game)).queue();
