@@ -1,5 +1,5 @@
 # Commands
-There are a total of 54 commands and 4 regex listeners.
+There are a total of 55 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -8,6 +8,8 @@ There are a total of 54 commands and 4 regex listeners.
 `balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaciton.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
+### BlackJackCommand
+`blackjack` - <ante (with range 5 <= x <= 500)> - Play double or nothing to win some money!
 ### CoinFlipCommand
 `flip` - <no parameters>  - Flips a coin.
 ### CooldownsCommand
