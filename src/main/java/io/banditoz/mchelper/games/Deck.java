@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.games;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class Deck {
     private LinkedList<Card> cards;

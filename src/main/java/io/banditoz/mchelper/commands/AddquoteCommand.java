@@ -118,28 +118,22 @@ public class AddquoteCommand extends Command {
                 timeout.cancel(false);
                 ce.sendReply("Enter your new quote (\"<new_quote>\" <author>)");
                 handler.removeEvent(finalMessage.getAuthor().getId());
-                listener.addEvent(ce.getEvent().getMember().getId(), new Consumer<GuildMessageReceivedEvent>() {
-                    @Override
-                    public void accept(GuildMessageReceivedEvent guildMessageReceivedEvent) {
-                        try {
-                            NamedQuote namedQuote = NamedQuote.parseString(guildMessageReceivedEvent.getMessage().getContentDisplay());
-                            qd.editQuote(finalId,namedQuote);
-                            ce.sendReply("Quote edited!");
-                        } catch (IllegalArgumentException ex) {
-                            return;
-                        } catch (SQLException ex) {
-                            ce.sendExceptionMessage(ex);
-                        }
-                        listener.removeEvent(guildMessageReceivedEvent.getAuthor().getId());
+                listener.addEvent(ce.getEvent().getMember().getId(), guildMessageReceivedEvent -> {
+                    try {
+                        NamedQuote namedQuote = NamedQuote.parseString(guildMessageReceivedEvent.getMessage().getContentDisplay());
+                        qd.editQuote(finalId,namedQuote);
+                        ce.sendReply("Quote edited!");
+                    } catch (IllegalArgumentException ex) {
+                        return;
+                    } catch (SQLException ex) {
+                        ce.sendExceptionMessage(ex);
                     }
+                    listener.removeEvent(guildMessageReceivedEvent.getAuthor().getId());
                 });
-                ce.getMCHelper().getSES().schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (listener.containsEvent(ce.getEvent().getAuthor().getId())) {
-                            listener.removeEvent(ce.getEvent().getAuthor().getId());
-                            ce.sendReply(finalMessage.getAuthor().getAsMention() + " your quote edit has expired.");
-                        }
+                ce.getMCHelper().getSES().schedule(() -> {
+                    if (listener.containsEvent(ce.getEvent().getAuthor().getId())) {
+                        listener.removeEvent(ce.getEvent().getAuthor().getId());
+                        ce.sendReply(finalMessage.getAuthor().getAsMention() + " your quote edit has expired.");
                     }
                 },5, TimeUnit.MINUTES);
             }

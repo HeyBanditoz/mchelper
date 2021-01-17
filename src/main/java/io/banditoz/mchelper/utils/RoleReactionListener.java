@@ -83,38 +83,32 @@ public class RoleReactionListener {
                 messages.put(temp.getKey(),temp.getValue());
                 List<RoleObject> map = rd.getRoles(g);
                 for (RoleObject e : map) {
-                    addHandler.addEvent(e.getEmote(), new Consumer<MessageReactionAddEvent>() {
-                        @Override
-                        public void accept(MessageReactionAddEvent messageReactionAddEvent) {
-                            if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionAddEvent.getUserId())) {
-                                return;
-                            }
+                    addHandler.addEvent(e.getEmote(), messageReactionAddEvent -> {
+                        if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionAddEvent.getUserId())) {
+                            return;
+                        }
+                        try {
                             try {
-                                try {
-                                    messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), ":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
-                                } catch (IllegalStateException ex) {
-                                    messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), messageReactionAddEvent.getReactionEmote().getName()).getRole_id())).queue();
-                                }
-                            } catch (SQLException ex) {
-                                LOGGER.error("Error connecting to database!",ex);
+                                messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), ":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
+                            } catch (IllegalStateException ex) {
+                                messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), messageReactionAddEvent.getReactionEmote().getName()).getRole_id())).queue();
                             }
+                        } catch (SQLException ex) {
+                            LOGGER.error("Error connecting to database!",ex);
                         }
                     });
-                    removeHandler.addEvent(e.getEmote(), new Consumer<MessageReactionRemoveEvent>() {
-                        @Override
-                        public void accept(MessageReactionRemoveEvent messageReactionRemoveEvent) {
-                            if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionRemoveEvent.getUserId())) {
-                                return;
-                            }
+                    removeHandler.addEvent(e.getEmote(), messageReactionRemoveEvent -> {
+                        if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionRemoveEvent.getUserId())) {
+                            return;
+                        }
+                        try {
                             try {
-                                try {
-                                    messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), ":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
-                                } catch (IllegalStateException ex) {
-                                    messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), messageReactionRemoveEvent.getReactionEmote().getName()).getRole_id())).queue();
-                                }
-                            } catch (SQLException ex) {
-                                LOGGER.error("Error connecting to database!",ex);
+                                messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), ":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
+                            } catch (IllegalStateException ex) {
+                                messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), messageReactionRemoveEvent.getReactionEmote().getName()).getRole_id())).queue();
                             }
+                        } catch (SQLException ex) {
+                            LOGGER.error("Error connecting to database!",ex);
                         }
                     });
                 }
@@ -125,38 +119,32 @@ public class RoleReactionListener {
     }
 
     public void addEvent(String emote) {
-        addHandler.addEvent(emote, new Consumer<MessageReactionAddEvent>() {
-            @Override
-            public void accept(MessageReactionAddEvent messageReactionAddEvent) {
-                if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionAddEvent.getUserId())) {
-                    return;
-                }
+        addHandler.addEvent(emote, messageReactionAddEvent -> {
+            if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionAddEvent.getUserId())) {
+                return;
+            }
+            try {
                 try {
-                    try {
-                        messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), ":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
-                    } catch (IllegalStateException ex) {
-                        messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), messageReactionAddEvent.getReactionEmote().getName()).getRole_id())).queue();
-                    }
-                } catch (SQLException ex) {
-                    LOGGER.error("Error connecting to database!",ex);
+                    messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), ":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
+                } catch (IllegalStateException ex) {
+                    messageReactionAddEvent.getGuild().addRoleToMember(messageReactionAddEvent.getUserId(), messageReactionAddEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionAddEvent.getGuild(), messageReactionAddEvent.getReactionEmote().getName()).getRole_id())).queue();
                 }
+            } catch (SQLException ex) {
+                LOGGER.error("Error connecting to database!",ex);
             }
         });
-        removeHandler.addEvent(emote, new Consumer<MessageReactionRemoveEvent>() {
-            @Override
-            public void accept(MessageReactionRemoveEvent messageReactionRemoveEvent) {
-                if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionRemoveEvent.getUserId())) {
-                    return;
-                }
+        removeHandler.addEvent(emote, messageReactionRemoveEvent -> {
+            if (mcHelper.getJDA().getSelfUser().getId().equals(messageReactionRemoveEvent.getUserId())) {
+                return;
+            }
+            try {
                 try {
-                    try {
-                        messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), ":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
-                    } catch (IllegalStateException ex) {
-                        messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), messageReactionRemoveEvent.getReactionEmote().getName()).getRole_id())).queue();
-                    }
-                } catch (SQLException ex) {
-                    LOGGER.error("Error connecting to database!",ex);
+                    messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), ":" + messageReactionRemoveEvent.getReactionEmote().getEmote().getName() + ":").getRole_id())).queue();
+                } catch (IllegalStateException ex) {
+                    messageReactionRemoveEvent.getGuild().removeRoleFromMember(messageReactionRemoveEvent.getUserId(), messageReactionRemoveEvent.getGuild().getRoleById(rd.getRoleByEmote(messageReactionRemoveEvent.getGuild(), messageReactionRemoveEvent.getReactionEmote().getName()).getRole_id())).queue();
                 }
+            } catch (SQLException ex) {
+                LOGGER.error("Error connecting to database!",ex);
             }
         });
     }

@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
