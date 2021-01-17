@@ -3,9 +3,11 @@ There are a total of 55 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
-`balance` - <no parameters>  - Checks your balance.
+`bal` - <no parameters>  - Checks your balance.
 ### BalanceGraphCommand
 `balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaciton.
+### BaltopCommand
+`baltop` - <no parameters>  - Gets the money leaderboard for this guild.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### BlackJackCommand
@@ -48,8 +50,6 @@ There are a total of 55 commands and 4 regex listeners.
 `invite` - <no parameters>  - Generates an invite link to invite the bot.
 ### JoinOrderCommand
 `joinorder` - <no parameters>  - Sends this guild's join order.
-### LeaderboardCommand
-`leaderboard` - <no parameters>  - Gets the money leaderboard for this guild.
 ### LoadoutCommand
 `loadout` - [stats] - Gives a random league champ and loadout. [stats](must be lowercase): ap = Ability Power, ad = Attack Damage, as = Attack Speed, mana = Mana, ar = Armour, crit = Critical damage or chance, hp = Health, mr = Magic Resist, ms = Movement Speed.
 ### ManageRolesCommand
