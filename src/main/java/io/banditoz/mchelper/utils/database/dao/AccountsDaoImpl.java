@@ -24,7 +24,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE `accounts`( `id` bigint(18) NOT NULL, `balance` decimal(13,2) DEFAULT NULL, `created_at` datetime NOT NULL DEFAULT current_timestamp(), PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; CREATE TABLE `transactions`( `from_id` bigint(18) DEFAULT NULL, `to_id` bigint(18) DEFAULT NULL, `before` decimal(13,2) NOT NULL, `amount` decimal(13,2) NOT NULL, `memo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `when` datetime NOT NULL DEFAULT current_timestamp()) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return "CREATE TABLE IF NOT EXISTS `accounts`( `id` bigint(18) NOT NULL, `balance` decimal(13,2) DEFAULT NULL, `created_at` datetime NOT NULL DEFAULT current_timestamp(), PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; CREATE TABLE IF NOT EXISTS `transactions`( `from_id` bigint(18) DEFAULT NULL, `to_id` bigint(18) DEFAULT NULL, `before` decimal(13,2) NOT NULL, `amount` decimal(13,2) NOT NULL, `memo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `when` datetime NOT NULL DEFAULT current_timestamp()) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
     }
 
     @Override
