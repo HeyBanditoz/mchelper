@@ -109,7 +109,7 @@ public class CommandHandler extends ListenerAdapter {
             add(new DeleteQuoteCommand());
             add(new TransferCommand());
             add(new BalanceCommand());
-            add(new LeaderboardCommand());
+            add(new BaltopCommand());
             add(new TransactionsCommand());
             add(new DoubleOrNothingCommand());
             add(new BalanceGraphCommand());

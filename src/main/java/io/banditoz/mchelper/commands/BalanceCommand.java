@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 public class BalanceCommand extends Command {
     @Override
     public String commandName() {
-        return "balance";
+        return "bal";
     }
 
     @Override

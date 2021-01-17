@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class LeaderboardCommand extends Command {
+public class BaltopCommand extends Command {
     @Override
     public String commandName() {
-        return "leaderboard";
+        return "baltop";
     }
 
     @Override
