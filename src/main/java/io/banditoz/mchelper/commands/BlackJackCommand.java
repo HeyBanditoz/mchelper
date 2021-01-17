@@ -66,8 +66,8 @@ public class BlackJackCommand extends Command {
                         Map.of("\uD83C\uDCCF", (member, message1) -> hit(member.getUser(), message1),
                                 "\uD83E\uDDCD", (member, message1) -> stand(member.getUser(), message1)),
                         false,
-                        60,
-                        TimeUnit.SECONDS,
+                        2147483647,
+                        TimeUnit.DAYS,
                         ce.getEvent().getAuthor()::equals);
                 if (game.getPlayersSum()==21) {
                     try {
@@ -79,8 +79,7 @@ public class BlackJackCommand extends Command {
                     } catch (Exception ex) {
                         LOGGER.error("Error while paying out!", ex);
                     }
-                }
-                if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
+                } else if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
                     success.editMessage(lose(game.getCurrentBet(), u,game)).queue();
                     GAMES.remove(u);
                     Pages.handler.removeEvent(success);
