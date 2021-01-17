@@ -31,6 +31,9 @@ public class CommandUtils {
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l) {
         l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
         String reply = "**Status: Calamitous:** " + StringUtils.truncate(ex.toString(), 300, true);
+        if (ex instanceof ArrayIndexOutOfBoundsException) {
+            reply += " (are you missing arguments?)";
+        }
         _sendReply(reply, e.getChannel(), true);
     }
 
