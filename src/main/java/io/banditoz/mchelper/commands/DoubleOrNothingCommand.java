@@ -64,8 +64,8 @@ public class DoubleOrNothingCommand extends Command {
                         Map.of("\uD83D\uDCB0", (member, message1) -> bet(member.getUser(), message1),
                                 "\uD83D\uDEAA", (member, message1) -> stop(member.getUser(), message1)),
                         false,
-                        60,
-                        TimeUnit.SECONDS,
+                        2147483647,
+                        TimeUnit.DAYS,
                         ce.getEvent().getAuthor()::equals);
             });
         }
