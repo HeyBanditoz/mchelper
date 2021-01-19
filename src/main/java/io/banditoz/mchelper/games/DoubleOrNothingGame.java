@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DoubleOrNothingGame {
     private BigDecimal currentBet;
-    private final Random rand;
+    private final Random rand = new Random();
     private final AccountManager accs;
     private int times = 0;
     private final User player;
@@ -18,7 +18,6 @@ public class DoubleOrNothingGame {
     public DoubleOrNothingGame(BigDecimal initialBet, User player, AccountManager accs) {
         this.currentBet = initialBet;
         this.player = player;
-        this.rand = ThreadLocalRandom.current();
         this.accs = accs;
     }
 
