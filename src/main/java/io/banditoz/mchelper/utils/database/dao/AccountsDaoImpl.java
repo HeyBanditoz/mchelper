@@ -145,6 +145,21 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         return txns;
     }
 
+    @Override
+    public List<Long> getAllAccounts() throws SQLException {
+        List<Long> accs = new ArrayList<>();
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT id FROM accounts");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                accs.add(rs.getLong(1));
+            }
+            rs.close();
+            ps.close();
+        }
+        return accs;
+    }
+
     /**
      * Creates a new account with the current SEED_MONEY value.
      *

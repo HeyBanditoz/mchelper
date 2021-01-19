@@ -118,6 +118,16 @@ public class AccountManager {
     }
 
     /**
+     * Get a list of all user IDs that have a balance.
+     *
+     * @return A list of all user IDs.
+     * @throws SQLException If there was a problem fetching all the IDs.
+     */
+    public List<Long> getAllAccounts() throws SQLException {
+        return dao.getAllAccounts();
+    }
+
+    /**
      * Ensures
      *
      * @param base

@@ -16,4 +16,5 @@ public interface AccountsDao {
     List<StatPoint<Long, BigDecimal>> getLeaderboard() throws SQLException;
     void log(Transaction t) throws SQLException;
     List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException;
+    List<Long> getAllAccounts() throws SQLException;
 }

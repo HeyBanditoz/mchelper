@@ -1,9 +1,11 @@
-package io.banditoz.mchelper.utils.quotes;
+package io.banditoz.mchelper.runnables;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import io.banditoz.mchelper.utils.quotes.QotdFetcher;
+import io.banditoz.mchelper.utils.quotes.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

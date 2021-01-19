@@ -8,13 +8,14 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.RegexableHandler;
+import io.banditoz.mchelper.runnables.StimulusCheckRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.quotes.QotdRunnable;
+import io.banditoz.mchelper.runnables.QotdRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -112,6 +113,13 @@ public class MCHelperImpl implements MCHelper {
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
+
+        if (DB != null) {
+            SES.scheduleAtFixedRate(new StimulusCheckRunnable(this),
+                    QotdRunnable.getDelay().getSeconds(),
+                    TimeUnit.DAYS.toSeconds(1),
+                    TimeUnit.SECONDS);
+        }
 
         if (SETTINGS.getEsUrl() == null) {
             LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
