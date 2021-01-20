@@ -10,7 +10,6 @@ import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.User;
 
-import java.util.Collections;
 import java.util.List;
 
 public class BalanceGraphCommand extends Command {
@@ -28,9 +27,14 @@ public class BalanceGraphCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         AccountsDao dao = new AccountsDaoImpl(ce.getDatabase());
-        User u = ce.getEvent().getAuthor();
+        User u;
+        if (ce.getEvent().getMessage().getMentionedUsers().isEmpty()) {
+            u = ce.getEvent().getAuthor();
+        }
+        else {
+            u = ce.getEvent().getMessage().getMentionedUsers().get(0);
+        }
         List<Transaction> txns = dao.getNTransactionsForUser(u.getIdLong(), Integer.MAX_VALUE);
-        Collections.reverse(txns);
 
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(u.getName(), txns);
         ce.sendImageReply("Transaction history for " + u.getName(), thp.plot());

@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.plotter;
 
 import io.banditoz.mchelper.utils.database.Transaction;
+import io.banditoz.mchelper.utils.database.Type;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -29,8 +30,13 @@ public class TransactionHistoryPlotter {
      */
     public ByteArrayOutputStream plot() throws IOException {
         XYChart chart = new XYChartBuilder().title("Transaction history for " + name).width(1500).height(800).build();
-        double[] y = transactions.stream().map(Transaction::getFinalAmount).mapToDouble(BigDecimal::doubleValue).toArray();
-        chart.addSeries(" ", generate1ToN(transactions.size()), y);
+        double[] y = transactions.stream()
+                .filter(transaction -> transaction.getType() != Type.TRANSFER) // TODO make this in SQL instead
+                .map(Transaction::getFinalAmount)
+                .mapToDouble(BigDecimal::doubleValue)
+                .toArray();
+        chart.addSeries(" ", generate1ToN(y.length), y);
+        chart.getStyler().setYAxisDecimalPattern("$###,###.###");
 
         BufferedImage bi = BitmapEncoder.getBufferedImage(chart);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -41,7 +47,7 @@ public class TransactionHistoryPlotter {
     private double[] generate1ToN(int n) {
         double[] array = new double[n];
         for (int i = 1; i < n; i++) {
-            array[i - 1] = i;
+            array[i] = i;
         }
         return array;
     }
