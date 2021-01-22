@@ -42,7 +42,7 @@ public class Finance {
                 .addPathSegment("api")
                 .addPathSegment("v1")
                 .addPathSegment("quote")
-                .addQueryParameter("symbol", ticker)
+                .addQueryParameter("symbol", ticker.toUpperCase())
                 .addQueryParameter("token", API_KEY)
                 .build();
         Request request = new Request.Builder()
@@ -53,6 +53,7 @@ public class Finance {
 
     public CompanyProfile getCompanyProfile(String ticker) throws IOException, HttpResponseException {
         // first, check SQL cache
+        ticker = ticker.toUpperCase();
         CompanyProfileDao dao = new CompanyProfileDaoImpl(MCHELPER.getDatabase());
         Optional<CompanyProfile> companyProfile = dao.getCompanyProfile(ticker);
         // nothing, get from API
@@ -77,6 +78,7 @@ public class Finance {
     }
 
     public RawCandlestick getCandlestickForTicker(String ticker, boolean yearly) throws IOException, HttpResponseException {
+        ticker = ticker.toUpperCase();
         Calendar open = Calendar.getInstance();
         if (!yearly) {
             open.set(Calendar.HOUR_OF_DAY, 6);
@@ -112,16 +114,10 @@ public class Finance {
     }
 
     public static MessageEmbed generateStockMessageEmbed(Quote quote, CompanyProfile cp) {
-        Color c;
-        if (quote.getChangePercent() > 0) {
-            c = Color.GREEN;
-        }
-        else {
-            c = Color.RED;
-        }
+        Color c = quote.getChangePercent() > 0 ? Color.GREEN : Color.RED;
         return new EmbedBuilder()
                 .setTitle(cp.getName() == null ? "<unknown ticker>" : cp.getName())
-                .setDescription(cp.getFinnhubIndustry() == null ? "<unknown industry>" : cp.getName())
+                .setDescription(cp.getFinnhubIndustry() == null ? "<unknown industry>" : cp.getFinnhubIndustry())
                 .addField("Price", String.valueOf(quote.getCurrentPrice()), true)
                 .addField("Change", String.valueOf(quote.getChange()), true)
                 .addField("Change Percent", String.valueOf(quote.getChangePercent()) + '%', true)
