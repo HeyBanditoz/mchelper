@@ -34,13 +34,16 @@ public class StimulusCheckRunnable implements Runnable {
                     Objects.requireNonNull(MCHELPER.getJDA().getUserById(account)).openPrivateChannel().queue(privateChannel ->
                             privateChannel.sendMessage("Hello. Since you have a balance of " + oldBal + ", your " +
                                     "account has been credited " + newBal + " to make $1,000.").queue(null, throwable ->
-                                    LOGGER.warn("Failed to deliver DM regarding stimulus payments to " + account + ".", throwable)
-                            ));
+                                    warn(throwable, account)), throwable -> warn(throwable, account));
                 }
             }
             LOGGER.info("Stimulus checks delivered to " + i + " user(s).");
         } catch (Exception ex) {
             LOGGER.error("Error while processing stimulus check payments!", ex);
         }
+    }
+
+    private void warn(Throwable t, long account) {
+        LOGGER.warn("Failed to deliver DM regarding stimulus payments to " + account + ".", t);
     }
 }
