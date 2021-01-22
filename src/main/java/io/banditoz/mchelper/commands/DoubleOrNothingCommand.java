@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DoubleOrNothingCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
-    private static final BigDecimal UPPER = BigDecimal.valueOf(2000);
+    private static final BigDecimal UPPER = BigDecimal.valueOf(200000);
     private static final Map<User, DoubleOrNothingGame> GAMES = new ConcurrentHashMap<>(); // TODO add a proper game handler instead of this?
 
     @Override
