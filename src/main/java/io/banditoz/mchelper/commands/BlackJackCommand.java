@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BlackJackCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
-    private static final BigDecimal UPPER = BigDecimal.valueOf(500);
+    private static final BigDecimal UPPER = BigDecimal.valueOf(200000);
     private static final Map<User, BlackJackGame> GAMES = new ConcurrentHashMap<>();
 
     @Override
