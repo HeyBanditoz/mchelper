@@ -11,7 +11,7 @@ There are a total of 55 commands and 4 regex listeners.
 ### BashCommand
 `bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
 ### BlackJackCommand
-`blackjack` - <ante (with range 5 <= x <= 500)> - Play double or nothing to win some money!
+`blackjack` - <ante (with range 5 <= x <= 200000)> - Play double or nothing to win some money!
 ### CoinFlipCommand
 `flip` - <no parameters>  - Flips a coin.
 ### CooldownsCommand
