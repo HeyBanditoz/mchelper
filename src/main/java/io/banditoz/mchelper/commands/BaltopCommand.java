@@ -6,12 +6,15 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.StatPoint;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static io.banditoz.mchelper.utils.StringUtils.*;
 
 public class BaltopCommand extends Command {
     @Override
@@ -40,11 +43,23 @@ public class BaltopCommand extends Command {
                 .filter(Objects::nonNull)
                 .sorted(StatPoint::compareTo)
                 .collect(Collectors.toList());
-        StringBuilder reply = new StringBuilder("Monetary leaderboard for this guild:\n```\n");
-        for (StatPoint<String, BigDecimal> point : organized) {
-            reply.append(point.getThing()).append(": ").append('$').append(AccountManager.format(point.getCount())).append('\n');
-        }
-        ce.sendReply(reply.toString() + "```");
+        ce.sendEmbedReply(new EmbedBuilder()
+                .setAuthor("Money leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
+                .appendDescription(generateBaltopTable(organized))
+                .build());
         return Status.SUCCESS;
+    }
+
+    private String generateBaltopTable(List<StatPoint<String, BigDecimal>> stats) {
+        StringBuilder sb = new StringBuilder("\n```Rank  Name\n");
+        for (int i = 1; i < stats.size(); i++) {
+            StatPoint<String, BigDecimal> point = stats.get(i - 1);
+            String name = padZeros(truncate(point.getThing().replace("`", ""), 16, false), 20);
+
+            sb.append(padZeros(String.valueOf(i) + '.', 5)).append(name);
+            sb.append('$').append(AccountManager.format(point.getCount())).append('\n');
+        }
+        System.out.println(sb.toString());
+        return sb.toString() + "```";
     }
 }

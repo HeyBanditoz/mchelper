@@ -23,4 +23,19 @@ public class StringUtils {
             return s;
         }
     }
+
+    /**
+     * Pads a String with zeros to make the String a specified length.
+     *
+     * @param s     The String to pad.
+     * @param zeros The number of spaces to add.
+     * @return The padded String
+     */
+    public static String padZeros(String s, int zeros) {
+        StringBuilder sb = new StringBuilder(s);
+        while (sb.length() <= zeros) {
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
 }
