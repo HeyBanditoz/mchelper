@@ -59,7 +59,6 @@ public class BaltopCommand extends Command {
             sb.append(padZeros(String.valueOf(i) + '.', 5)).append(name);
             sb.append('$').append(AccountManager.format(point.getCount())).append('\n');
         }
-        System.out.println(sb.toString());
         return sb.toString() + "```";
     }
 }
