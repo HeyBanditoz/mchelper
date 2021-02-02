@@ -1,5 +1,5 @@
 # Commands
-There are a total of 55 commands and 4 regex listeners.
+There are a total of 56 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -145,6 +145,8 @@ named arguments:
 `version` - <no parameters>  - Returns the bot's version.
 ### WeatherStationCommand
 `ws` - [hours] - Returns various statistics of my weather station, including a Fahrenheit graph.
+### WorkCommand
+`work` - <no parameters>  - Work for money every day.
 
 # Regex Listeners
 ### BetRegexable
