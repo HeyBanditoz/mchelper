@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
+import io.banditoz.mchelper.utils.DateUtils;
 import net.dv8tion.jda.api.entities.ISnowflake;
 
 import java.time.Duration;
@@ -60,7 +61,7 @@ public class Cooldown {
             return null;
         }
         else if (Instant.now().isBefore(cooldown)) {
-            return humanReadableDuration(Duration.between(Instant.now(), cooldown));
+            return DateUtils.humanReadableDuration(Duration.between(Instant.now(), cooldown));
         }
         else {
             return null;
@@ -69,13 +70,5 @@ public class Cooldown {
 
     public CooldownType getType() {
         return type;
-    }
-
-    // https://stackoverflow.com/a/40487511
-    private String humanReadableDuration(Duration duration) {
-        return duration.toString()
-                .substring(2)
-                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase();
     }
 }

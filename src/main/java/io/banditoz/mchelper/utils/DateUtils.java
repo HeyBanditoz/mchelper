@@ -1,9 +1,6 @@
 package io.banditoz.mchelper.utils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -281,4 +278,12 @@ public class DateUtils {
      */
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
+
+    // https://stackoverflow.com/a/40487511
+    public static String humanReadableDuration(Duration duration) {
+        return duration.toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+    }
 }

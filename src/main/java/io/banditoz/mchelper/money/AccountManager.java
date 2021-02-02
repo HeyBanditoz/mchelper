@@ -5,18 +5,22 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
 import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
+import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class AccountManager {
     private final AccountsDao dao;
+    private final TasksDaoImpl tasks;
 
     public AccountManager(Database database) {
         dao = new AccountsDaoImpl(database);
+        tasks = new TasksDaoImpl(database);
     }
 
     public BigDecimal queryBalance(long id, boolean allowCreation) throws Exception {
@@ -125,6 +129,10 @@ public class AccountManager {
      */
     public List<Long> getAllAccounts() throws SQLException {
         return dao.getAllAccounts();
+    }
+
+    public LocalDateTime whenCanDoTask(long id, Task t) throws SQLException {
+        return tasks.getWhenCanExecute(id, t);
     }
 
     /**

@@ -114,6 +114,11 @@ public class CommandHandler extends ListenerAdapter {
             add(new DoubleOrNothingCommand());
             add(new BalanceGraphCommand());
             add(new BlackJackCommand());
+            try {
+                add(new WorkCommand(MCHELPER.getObjectMapper()));
+            } catch (Exception ex) {
+                LOGGER.error("Error while initializing the work responses.", ex);
+            }
         }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {

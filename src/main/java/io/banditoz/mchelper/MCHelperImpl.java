@@ -8,7 +8,6 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.RegexableHandler;
-import io.banditoz.mchelper.runnables.StimulusCheckRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.RoleReactionListener;
@@ -113,13 +112,6 @@ public class MCHelperImpl implements MCHelper {
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
-
-        if (DB != null) {
-            SES.scheduleAtFixedRate(new StimulusCheckRunnable(this),
-                    QotdRunnable.getDelay().getSeconds(),
-                    TimeUnit.DAYS.toSeconds(1),
-                    TimeUnit.SECONDS);
-        }
 
         if (SETTINGS.getEsUrl() == null) {
             LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
