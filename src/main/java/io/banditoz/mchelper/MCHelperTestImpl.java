@@ -23,8 +23,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class MCHelperTestImpl implements MCHelper {
     private final CommandHandler CH;
     private final RegexableHandler RH;
+    private final ObjectMapper OM;
 
     public MCHelperTestImpl() {
+        this.OM = new ObjectMapper();
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
     }
@@ -36,7 +38,7 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public ObjectMapper getObjectMapper() {
-        return null;
+        return OM;
     }
 
     @Override
