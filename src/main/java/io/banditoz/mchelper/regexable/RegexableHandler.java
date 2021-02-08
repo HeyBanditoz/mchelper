@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
@@ -48,6 +49,7 @@ public class RegexableHandler extends ListenerAdapter {
                             LOGGER.info(s.getLogMessage());
                         } catch (Exception e) {
                             MCHELPER.getStatsRecorder().record(new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, Status.EXCEPTIONAL_FAILURE));
+                            CommandUtils.sendExceptionMessage(event, e, r.LOGGER);
                         } catch (Throwable t) {
                             if (t instanceof OutOfMemoryError) {
                                 System.gc();
