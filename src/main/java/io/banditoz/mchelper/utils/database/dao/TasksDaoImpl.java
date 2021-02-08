@@ -14,7 +14,7 @@ public class TasksDaoImpl extends Dao implements TasksDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE `tasks`( `id` bigint(18) DEFAULT NULL, `task_id` tinyint(4) DEFAULT NULL, `can_run_again` datetime DEFAULT NULL, UNIQUE KEY `unique_task` (`id`,`task_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        return "CREATE TABLE IF NOT EXISTS `tasks`( `id` bigint(18) DEFAULT NULL, `task_id` tinyint(4) DEFAULT NULL, `can_run_again` datetime DEFAULT NULL, UNIQUE KEY `unique_task` (`id`,`task_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
     }
 
     @Override
