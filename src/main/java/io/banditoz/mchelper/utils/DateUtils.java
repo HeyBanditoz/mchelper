@@ -278,8 +278,12 @@ public class DateUtils {
      */
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
-
-    // https://stackoverflow.com/a/40487511
+    /**
+     * Converts a {@link Duration} to a better human readable format.
+     * @param duration The Duration to convert.
+     * @return The cleanly formatted String representation.
+     * @author https://stackoverflow.com/a/40487511
+     */
     public static String humanReadableDuration(Duration duration) {
         return duration.toString()
                 .substring(2)

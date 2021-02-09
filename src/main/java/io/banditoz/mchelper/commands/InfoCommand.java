@@ -4,6 +4,7 @@ import com.sun.management.OperatingSystemMXBean;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -30,10 +31,7 @@ public class InfoCommand extends Command {
         OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
         long totalJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() >> 20;
-        String uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()).toString()
-                .substring(2)
-                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase(); // https://stackoverflow.com/a/40487511
+        String uptime = DateUtils.humanReadableDuration(Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()));
         AtomicInteger users = new AtomicInteger();
         ce.getEvent().getJDA().getGuilds().forEach(guild -> users.addAndGet(guild.getMemberCount()));
         ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
