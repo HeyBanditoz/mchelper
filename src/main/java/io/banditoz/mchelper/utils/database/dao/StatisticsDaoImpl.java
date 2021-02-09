@@ -66,4 +66,18 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public int getTotalCommandsRun() throws SQLException {
+        int commandsRun = -1;
+        try (Connection c = DATABASE.getConnection()) {
+            PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM statistics WHERE name LIKE '%Command%';");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            commandsRun = rs.getInt(1);
+            rs.close();
+            ps.close();
+        }
+        return commandsRun;
+    }
 }

@@ -10,4 +10,5 @@ import java.util.List;
 public interface StatisticsDao {
     void log(Stat s) throws SQLException;
     List<StatPoint<String, Integer>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException;
+    int getTotalCommandsRun() throws SQLException;
 }

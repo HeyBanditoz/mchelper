@@ -5,6 +5,7 @@ import com.merakianalytics.orianna.types.common.Region;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.*;
 import io.banditoz.mchelper.stats.Stat;
+import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,14 +21,19 @@ public class CommandHandler extends ListenerAdapter {
     private final Map<String, Command> commands = new HashMap<>();
     private final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
     private final MCHelper MCHELPER;
+    private int commandsRun;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return; // don't execute own commands
+        if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong())
+            return; // don't execute own commands
         getCommandByEvent(event).ifPresent(c -> {
             if (c.canExecute(event, MCHELPER)) {
                 MCHELPER.getThreadPoolExecutor().execute(() -> {
                     Stat s = c.execute(event, MCHELPER);
+                    if (s.getStatus() == Status.SUCCESS) {
+                        commandsRun++;
+                    }
                     LOGGER.info(s.getLogMessage());
                     MCHELPER.getStatsRecorder().record(s);
                 });
@@ -153,8 +159,12 @@ public class CommandHandler extends ListenerAdapter {
         add(new HelpCommand(commands.values())); // this must be registered last
         LOGGER.info(commands.size() + " commands registered.");
     }
-    
+
     private void add(Command c) {
         commands.put(c.commandName(), c);
+    }
+
+    public int getCommandsRun() {
+        return commandsRun;
     }
 }
