@@ -1,17 +1,22 @@
 package io.banditoz.mchelper.runnables;
 
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
-import io.banditoz.mchelper.utils.quotes.QotdFetcher;
-import io.banditoz.mchelper.utils.quotes.Quote;
+import io.banditoz.mchelper.utils.database.dao.QuotesDao;
+import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.Color;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public class QotdRunnable implements Runnable {
     private final Logger LOGGER = LoggerFactory.getLogger(QotdRunnable.class);
@@ -24,24 +29,31 @@ public class QotdRunnable implements Runnable {
     @Override
     public void run() {
         LOGGER.info("Sending quote of the day...");
-        String quoteOfTheDay = "There was most likely an exception while fetching the quote of the day. Check the logs.";
-        try {
-            quoteOfTheDay = formatQuote(new QotdFetcher(MCHELPER).getQotd());
-        } catch (Exception e) {
-            LOGGER.error("Could not fetch the quote of the day!", e);
-        }
+        QuotesDao dao = new QuotesDaoImpl(MCHELPER.getDatabase());
         int i = 0;
         for (GuildConfig guild : new GuildConfigDaoImpl(MCHELPER.getDatabase()).getAllGuildConfigs()) {
             if (guild.getPostQotdToDefaultChannel()) {
                 i++;
-                CommandUtils.sendReply("Here is your quote of the day:\n" + quoteOfTheDay, MCHELPER.getJDA().getTextChannelById(guild.getDefaultChannel()));
+                // getting the guild from the cache sucks, but if it fails we probably aren't even in their guild anymore
+                Guild g = MCHELPER.getJDA().getGuildById(guild.getId());
+                if (g != null) {
+                    try {
+                        Optional<NamedQuote> nq = dao.getRandomQuote(g);
+                        nq.ifPresent(namedQuote -> g.getTextChannelById(guild.getDefaultChannel()).sendMessage(formatQuote(namedQuote)).queue());
+                    } catch (Exception e) {
+                        LOGGER.error("Could not send QOTD to " + guild.getId() + " as there was an exception fetching one or sending to the channel.", e);
+                    }
+                }
+                else {
+                    LOGGER.warn("Could not send QOTD to " + guild.getId() + " as it doesn't exist in the cache.");
+                }
             }
         }
         LOGGER.info("Delivered quote of the day to " + i + " guild(s).");
     }
 
-    private String formatQuote(Quote qi) {
-        return "“" + qi.getBody() + "” --" + qi.getAuthor();
+    private MessageEmbed formatQuote(NamedQuote nq) {
+        return new EmbedBuilder().setTitle("Quote of the Day").setColor(Color.GREEN).setDescription(nq.format(false)).build();
     }
 
     public static Duration getDelay() {
