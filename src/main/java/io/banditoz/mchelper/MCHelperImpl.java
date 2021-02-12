@@ -2,7 +2,9 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.ygimenez.exception.InvalidHandlerException;
 import com.github.ygimenez.method.Pages;
+import com.github.ygimenez.model.PaginatorBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -75,7 +77,14 @@ public class MCHelperImpl implements MCHelper {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
         JDA.addEventListener(CH,RH);
-        Pages.activate(JDA);
+        try {
+            Pages.activate(PaginatorBuilder.createPaginator()
+            .setHandler(getJDA())
+            .shouldRemoveOnReact(true)
+            .build());
+        } catch (InvalidHandlerException e) {
+            LOGGER.error("Somehow, even though we passed in a JDA object, Pagination-Utils rejected it.", e);
+        }
 
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
             DB = new Database(this);

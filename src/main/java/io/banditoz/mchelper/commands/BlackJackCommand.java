@@ -72,7 +72,7 @@ public class BlackJackCommand extends Command {
                     try {
                         game.payout(true);
                         success.editMessage(win(1,game.getCurrentBet(), u,game)).queue();
-                        Pages.handler.removeEvent(success);
+                        Pages.getHandler().removeEvent(success);
                         success.clearReactions().queue();
                         GAMES.remove(u);
                     } catch (Exception ex) {
@@ -81,7 +81,7 @@ public class BlackJackCommand extends Command {
                 } else if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
                     success.editMessage(lose(game.getCurrentBet(), u,game)).queue();
                     GAMES.remove(u);
-                    Pages.handler.removeEvent(success);
+                    Pages.getHandler().removeEvent(success);
                     success.clearReactions().queue();
                 }
             });
@@ -103,14 +103,14 @@ public class BlackJackCommand extends Command {
                 if (game.getDealerSum()==21) {
                     game.standOff();
                     message.editMessage(win(2,game.getCurrentBet(), user,game)).queue();
-                    Pages.handler.removeEvent(message);
+                    Pages.getHandler().removeEvent(message);
                     message.clearReactions().queue();
                     GAMES.remove(user);
                     return;
                 }
                 game.payout(true);
                 message.editMessage(win(1,game.getCurrentBet(), user,game)).queue();
-                Pages.handler.removeEvent(message);
+                Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
                 GAMES.remove(user);
             } else if (sum < 21) {
@@ -123,7 +123,7 @@ public class BlackJackCommand extends Command {
                 }
                 message.editMessage(lose(game.getCurrentBet(), user,game)).queue();
                 GAMES.remove(user);
-                Pages.handler.removeEvent(message);
+                Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             }
         } catch (Exception ex) {
@@ -143,16 +143,16 @@ public class BlackJackCommand extends Command {
             if (game.getDealerSum()>21 || game.getDealerSum()<game.getPlayersSum()) {
                 game.payout(false);
                 message.editMessage(win(0,game.getCurrentBet(), user,game)).queue();
-                Pages.handler.removeEvent(message);
+                Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             } else if (game.getDealerSum()==game.getPlayersSum()) {
                 game.standOff();
                 message.editMessage(win(2,game.getCurrentBet(), user,game)).queue();
-                Pages.handler.removeEvent(message);
+                Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             } else{
                 message.editMessage(lose(game.getCurrentBet(), user,game)).queue();
-                Pages.handler.removeEvent(message);
+                Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             }
         } catch (Exception ex) {

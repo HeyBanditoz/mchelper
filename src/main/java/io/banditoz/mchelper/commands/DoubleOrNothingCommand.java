@@ -83,7 +83,7 @@ public class DoubleOrNothingCommand extends Command {
         else {
             message.editMessage(lose(game.getCurrentBet(), user)).queue();
             GAMES.remove(user);
-            Pages.handler.removeEvent(message);
+            Pages.getHandler().removeEvent(message);
             message.clearReactions().queue();
         }
     }
@@ -97,7 +97,7 @@ public class DoubleOrNothingCommand extends Command {
         try {
             game.payout();
             message.editMessage(cashout(game.getCurrentBet(), user)).queue();
-            Pages.handler.removeEvent(message);
+            Pages.getHandler().removeEvent(message);
             message.clearReactions().queue();
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
