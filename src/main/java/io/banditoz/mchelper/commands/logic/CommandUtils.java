@@ -8,11 +8,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -22,6 +20,7 @@ import java.util.regex.Pattern;
 
 public class CommandUtils {
     private static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandUtils.class);
 
     /**
      * Sends a reply containing the exception message.
@@ -113,6 +112,18 @@ public class CommandUtils {
                     .addFile(f)
                     .queue();
             image.close();
+        } catch (IOException ex) {
+            LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
+            MessageBuilder m = new MessageBuilder(formatMessage(msg));
+            if (sanitizeMentions) {
+                m.denyMentions(Message.MentionType.values());
+            }
+
+            e.getMessage().getChannel()
+                    .sendMessage(m.build())
+                    .addFile(f)
+                    .queue();
+            image.close();
         } finally {
             f.delete();
         }
@@ -128,6 +139,14 @@ public class CommandUtils {
 
             Process p = new ProcessBuilder("oxipng", imageName).start();
             p.waitFor();
+
+            e.getMessage().getChannel()
+                    .sendMessage(me)
+                    .addFile(f)
+                    .queue();
+            image.close();
+        } catch (IOException ex) {
+            LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
 
             e.getMessage().getChannel()
                     .sendMessage(me)
@@ -152,6 +171,14 @@ public class CommandUtils {
             e.getMessage().getChannel()
                     .sendFile(f)
                     .embed(me)
+                    .queue();
+            image.close();
+        } catch (IOException ex) {
+            LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
+
+            e.getMessage().getChannel()
+                    .sendMessage(me)
+                    .addFile(f)
                     .queue();
             image.close();
         } finally {

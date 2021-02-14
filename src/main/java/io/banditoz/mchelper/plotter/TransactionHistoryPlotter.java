@@ -5,6 +5,7 @@ import io.banditoz.mchelper.utils.database.Type;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -29,15 +30,14 @@ public class TransactionHistoryPlotter {
      * @throws IOException If there was a problem generating the image.
      */
     public ByteArrayOutputStream plot() throws IOException {
-        XYChart chart = new XYChartBuilder().title("Transaction history for " + name).width(1500).height(800).build();
         double[] y = transactions.stream()
                 .filter(transaction -> transaction.getType() != Type.TRANSFER) // TODO make this in SQL instead
                 .map(Transaction::getFinalAmount)
                 .mapToDouble(BigDecimal::doubleValue)
                 .toArray();
-        chart.addSeries(" ", generate1ToN(y.length), y);
-        chart.getStyler().setYAxisDecimalPattern("$###,###.###");
-
+        XYChart chart = new XYChartBuilder().title("Transaction history for " + name).width(1500).height(800).build();
+        chart.addSeries(name, generate1ToN(y.length), y).setMarker(SeriesMarkers.NONE);
+        chart.getStyler().setYAxisDecimalPattern("$###,###.###").setLegendVisible(false);
         BufferedImage bi = BitmapEncoder.getBufferedImage(chart);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bi, "png", baos);
