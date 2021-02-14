@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static io.banditoz.mchelper.utils.StringUtils.padZeros;
+import static io.banditoz.mchelper.utils.StringUtils.truncate;
 
 /**
  * A simple class which wraps a type around a count. Implements a {@link java.util.Comparator} where the highest thing
@@ -57,13 +58,14 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
      * </pre>
      *
      * @param list           The list to build a leaderboard from.
+     * @param thingLength    The maximum length of the thing before it gets truncated down.
      * @param thingFormatter How to format the Thing in the leaderboard.
      * @param countFormatter How to format the Count in the leaderboard.
      * @param <T>            The Thing type.
      * @param <V>            The Count type.
      * @return A pretty formatted table (ideally for use in an embed.)
      */
-    public static <T extends Comparable<T>, V extends Comparable<V>> String statsToPrettyLeaderboard(List<StatPoint<T, V>> list, Function<T, String> thingFormatter, Function<V, String> countFormatter) {
+    public static <T extends Comparable<T>, V extends Comparable<V>> String statsToPrettyLeaderboard(List<StatPoint<T, V>> list, int thingLength, Function<T, String> thingFormatter, Function<V, String> countFormatter) {
         Objects.requireNonNull(list, "The list cannot be null!");
         Objects.requireNonNull(thingFormatter, "The thingFormatter cannot be null!");
         Objects.requireNonNull(countFormatter, "The countFormatter cannot be null!");
@@ -71,9 +73,9 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
         StringBuilder sb = new StringBuilder("\n```Rank  Name\n");
         for (int i = 1; i < list.size(); i++) {
             StatPoint<T, V> point = list.get(i - 1);
-            String name = thingFormatter.apply(point.getThing());
+            String name = padZeros(truncate(thingFormatter.apply(point.thing), thingLength, false), thingLength + 4);
             sb.append(padZeros(String.valueOf(i) + '.', 5)).append(name);
-            sb.append(countFormatter.apply(point.getCount())).append('\n');
+            sb.append(countFormatter.apply(point.count)).append('\n');
         }
         return sb.toString() + "```";
     }

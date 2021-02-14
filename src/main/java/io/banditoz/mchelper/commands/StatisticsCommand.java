@@ -12,9 +12,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import static io.banditoz.mchelper.utils.StringUtils.padZeros;
-import static io.banditoz.mchelper.utils.StringUtils.truncate;
-
 public class StatisticsCommand extends Command {
     @Override
     public String commandName() {
@@ -43,8 +40,8 @@ public class StatisticsCommand extends Command {
     }
 
     private String generateStatsTable(List<StatPoint<String, Integer>> list) {
-        return StatPoint.statsToPrettyLeaderboard(list,
-                s -> padZeros(truncate(s.replace("Command", "").replace("Regexable", ""), 16, false), 20),
+        return StatPoint.statsToPrettyLeaderboard(list, 16,
+                s -> s.replace("Command", "").replace("Regexable", ""),
                 count -> DecimalFormat.getInstance().format(count));
     }
 }

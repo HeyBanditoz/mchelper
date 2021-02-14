@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static io.banditoz.mchelper.utils.StringUtils.*;
-
 public class BaltopCommand extends Command {
     @Override
     public String commandName() {
@@ -51,8 +49,8 @@ public class BaltopCommand extends Command {
     }
 
     private String generateBaltopTable(List<StatPoint<String, BigDecimal>> stats) {
-        return StatPoint.statsToPrettyLeaderboard(stats,
-                s -> padZeros(truncate(s.replace("`", ""), 16, false), 20),
+        return StatPoint.statsToPrettyLeaderboard(stats, 16,
+                s -> s.replace("`", ""),
                 bd -> "$" + AccountManager.format(bd));
     }
 }

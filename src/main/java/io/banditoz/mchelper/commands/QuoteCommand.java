@@ -27,9 +27,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static io.banditoz.mchelper.utils.StringUtils.padZeros;
-import static io.banditoz.mchelper.utils.StringUtils.truncate;
-
 public class QuoteCommand extends Command {
     @Override
     public String commandName() {
@@ -110,8 +107,8 @@ public class QuoteCommand extends Command {
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
         List<StatPoint<Long, Integer>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
-        return StatPoint.statsToPrettyLeaderboard(quotes,
-                id -> padZeros(truncate(tryGetEffectiveMemberNameById(id, ce.getGuild()).replace("`", ""), 16, false), 20),
+        return StatPoint.statsToPrettyLeaderboard(quotes, 16,
+                id -> tryGetEffectiveMemberNameById(id, ce.getGuild()).replace("`", ""),
                 count -> DecimalFormat.getInstance().format(count));
     }
 
