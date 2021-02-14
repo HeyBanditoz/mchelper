@@ -12,6 +12,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -20,10 +21,14 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.awt.Color;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static io.banditoz.mchelper.utils.StringUtils.padZeros;
+import static io.banditoz.mchelper.utils.StringUtils.truncate;
 
 public class QuoteCommand extends Command {
     @Override
@@ -41,7 +46,10 @@ public class QuoteCommand extends Command {
         Namespace args = getDefaultArgs().parseArgs(ce.getCommandArgsWithoutName());
         QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         if (args.get("stats") != null && args.getBoolean("stats")) {
-            ce.sendReply(getStatsString(ce, dao));
+            ce.sendEmbedReply(new EmbedBuilder()
+                    .setAuthor("Quote leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
+                    .appendDescription(getStatsString(ce, dao))
+                    .build());
         }
         else {
             List<NamedQuote> quotes = new ArrayList<>();
@@ -102,19 +110,24 @@ public class QuoteCommand extends Command {
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
         List<StatPoint<Long, Integer>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
-        if (quotes.isEmpty()) {
-            return "This guild has no quotes to gather statistics for.";
+        return StatPoint.statsToPrettyLeaderboard(quotes,
+                id -> padZeros(truncate(tryGetEffectiveMemberNameById(id, ce.getGuild()).replace("`", ""), 16, false), 20),
+                count -> DecimalFormat.getInstance().format(count));
+    }
+
+    /**
+     * Tries to get a member's effective name by their ID, if it fails, just get their ID instead.
+     *
+     * @param l The ID.
+     * @param g The guild to check against.
+     * @return Their effect name, or ID if they don't exist.
+     */
+    private String tryGetEffectiveMemberNameById(long l, Guild g) {
+        try {
+            return g.getMemberById(l).getEffectiveName();
+        } catch (Exception ex) {
+            return String.valueOf(l);
         }
-        int quoteCount = quotes.stream().mapToInt(StatPoint::getCount).sum();
-        StringBuffer reply = new StringBuffer("We have " + quoteCount + " quotes for this guild.\n```\n");
-        quotes.forEach((us) -> {
-            try {
-                reply.append(ce.getMCHelper().getJDA().retrieveUserById(us.getThing()).complete().getAsTag()).append(": ").append(us.getCount()).append('\n');
-            } catch (Exception ex) {
-                reply.append(us.getThing()).append(": ").append(us.getCount()).append('\n');
-            }
-        });
-        return reply.toString() + "```";
     }
 
     private ArgumentParser getDefaultArgs() {

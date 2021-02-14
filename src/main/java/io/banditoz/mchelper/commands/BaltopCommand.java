@@ -51,14 +51,8 @@ public class BaltopCommand extends Command {
     }
 
     private String generateBaltopTable(List<StatPoint<String, BigDecimal>> stats) {
-        StringBuilder sb = new StringBuilder("\n```Rank  Name\n");
-        for (int i = 1; i < stats.size(); i++) {
-            StatPoint<String, BigDecimal> point = stats.get(i - 1);
-            String name = padZeros(truncate(point.getThing().replace("`", ""), 16, false), 20);
-
-            sb.append(padZeros(String.valueOf(i) + '.', 5)).append(name);
-            sb.append('$').append(AccountManager.format(point.getCount())).append('\n');
-        }
-        return sb.toString() + "```";
+        return StatPoint.statsToPrettyLeaderboard(stats,
+                s -> padZeros(truncate(s.replace("`", ""), 16, false), 20),
+                bd -> "$" + AccountManager.format(bd));
     }
 }

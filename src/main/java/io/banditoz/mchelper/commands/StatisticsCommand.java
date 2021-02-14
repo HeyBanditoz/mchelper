@@ -7,8 +7,13 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDao;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
+import net.dv8tion.jda.api.EmbedBuilder;
 
+import java.text.DecimalFormat;
 import java.util.List;
+
+import static io.banditoz.mchelper.utils.StringUtils.padZeros;
+import static io.banditoz.mchelper.utils.StringUtils.truncate;
 
 public class StatisticsCommand extends Command {
     @Override
@@ -30,11 +35,16 @@ public class StatisticsCommand extends Command {
             ce.sendReply("No commands run for this guild, somehow.");
             return Status.FAIL;
         }
-        StringBuilder reply = new StringBuilder("Statistics for this guild:\n```\n");
-        for (StatPoint<String, Integer> stat : stats) {
-            reply.append(stat.toString()).append('\n');
-        }
-        ce.sendReply(reply.toString() + "```");
+        ce.sendEmbedReply(new EmbedBuilder()
+                .setAuthor("Command and listener statistics for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
+                .appendDescription(generateStatsTable(stats))
+                .build());
         return Status.SUCCESS;
+    }
+
+    private String generateStatsTable(List<StatPoint<String, Integer>> list) {
+        return StatPoint.statsToPrettyLeaderboard(list,
+                s -> padZeros(truncate(s.replace("Command", "").replace("Regexable", ""), 16, false), 20),
+                count -> DecimalFormat.getInstance().format(count));
     }
 }
