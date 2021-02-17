@@ -87,7 +87,7 @@ public class MCHelperImpl implements MCHelper {
         }
 
         if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
-            DB = new Database(this);
+            DB = new Database(SETTINGS);
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
         }

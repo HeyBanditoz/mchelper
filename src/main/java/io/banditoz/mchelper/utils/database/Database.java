@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.utils.database;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.*;
 import org.mariadb.jdbc.MariaDbPoolDataSource;
@@ -15,8 +14,7 @@ public class Database {
     private final MariaDbPoolDataSource POOL;
     private final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
-    public Database(MCHelper mcHelper) {
-        Settings settings = mcHelper.getSettings();
+    public Database(Settings settings) {
         String url = "jdbc:mariadb://" + settings.getDatabaseHostAndPort() +
                 "/" + settings.getDatabaseName() +
                 "?user=" + settings.getDatabaseUsername() +
