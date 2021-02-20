@@ -33,6 +33,7 @@ public class Database {
         daos.add(new RolesDaoImpl(this));
         daos.add(new AccountsDaoImpl(this));
         daos.add(new TasksDaoImpl(this));
+        daos.add(new UserCacheDaoImpl(this));
         daos.forEach(Dao::generateTable);
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds.");
     }
