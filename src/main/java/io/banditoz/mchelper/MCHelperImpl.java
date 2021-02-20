@@ -17,6 +17,7 @@ import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.runnables.QotdRunnable;
+import io.banditoz.mchelper.utils.database.UserMaintenanceRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -90,6 +91,10 @@ public class MCHelperImpl implements MCHelper {
             DB = new Database(SETTINGS);
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
+            SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
+                    10,
+                    43200,
+                    TimeUnit.SECONDS);
         }
         else {
             DB = null;
