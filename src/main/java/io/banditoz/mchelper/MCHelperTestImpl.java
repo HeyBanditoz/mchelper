@@ -109,16 +109,12 @@ public class MCHelperTestImpl implements MCHelper {
         settings.setBotOwners(defaultOwners);
         settings.setOwlBotToken("eryhue354uh3y4ewtgs");
         settings.setCommandThreads(1);
-        settings.setWatchDeletedMessages(false);
         settings.setFinnhubKey("35uy7ewsgfhed");
         settings.setRiotApiKey("we98ytfghioned.");
         settings.setDatabaseName("no_database");
         settings.setDatabaseHostAndPort("localhost:3306");
         settings.setDatabaseUsername("root");
         settings.setDatabasePassword("toor");
-        settings.setEsUrl("http://127.0.0.1");
-        settings.setGrafanaToken("jsdfujw930tydsg");
-        settings.setGrafanaUrl("http://127.0.0.1");
         return settings;
     }
 }

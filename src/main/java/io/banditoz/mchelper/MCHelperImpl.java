@@ -127,12 +127,6 @@ public class MCHelperImpl implements MCHelper {
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
 
-        if (SETTINGS.getEsUrl() == null) {
-            LOGGER.info("Elasticsearch URL not defined! Not showing temperature on status...");
-        }
-        else {
-            SES.scheduleAtFixedRate(new FahrenheitStatus(this), 0L, 1, TimeUnit.MINUTES);
-        }
         LOGGER.info("MCHelper initialization finished.");
     }
 

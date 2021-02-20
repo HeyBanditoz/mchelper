@@ -134,13 +134,6 @@ public class CommandHandler extends ListenerAdapter {
             add(new DictionaryCommand());
         }
 
-        if (settings.getEsUrl() == null || settings.getGrafanaToken() == null || settings.getGrafanaUrl() == null) {
-            LOGGER.info("No weather station configs defined! Not enabling the weather station command...");
-        }
-        else {
-            add(new WeatherStationCommand());
-        }
-
         if (settings.getFinnhubKey() == null || settings.getFinnhubKey().equals("Alpha Vantage API key here")) {
             LOGGER.info("Finnhub API key not defined! Not enabling financial commands.");
         }
