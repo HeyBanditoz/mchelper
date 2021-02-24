@@ -39,7 +39,6 @@ public class BaltopCommand extends Command {
                     }
                 })
                 .filter(Objects::nonNull)
-                .sorted(StatPoint::compareTo)
                 .collect(Collectors.toList());
         ce.sendEmbedReply(new EmbedBuilder()
                 .setAuthor("Money leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())

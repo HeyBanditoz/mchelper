@@ -86,7 +86,6 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                     while (rs.next()) {
                         stats.add(new StatPoint<>(rs.getLong("author_id"), rs.getInt("count")));
                     }
-                    stats.sort(StatPoint::compareTo);
                     return stats;
                 }
             }

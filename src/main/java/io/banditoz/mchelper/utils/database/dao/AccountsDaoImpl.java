@@ -89,7 +89,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     public List<StatPoint<Long, BigDecimal>> getLeaderboard() throws SQLException {
         List<StatPoint<Long, BigDecimal>> leaderboard = new ArrayList<>();
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT id, balance FROM accounts;");
+            PreparedStatement ps = c.prepareStatement("SELECT id, balance FROM accounts ORDER BY balance DESC;");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 leaderboard.add(new StatPoint<>(rs.getLong(1), rs.getBigDecimal(2)));
@@ -97,7 +97,6 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
             ps.close();
             rs.close();
         }
-        leaderboard.sort(StatPoint::compareTo);
         return leaderboard;
     }
 

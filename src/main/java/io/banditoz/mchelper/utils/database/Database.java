@@ -18,8 +18,8 @@ public class Database {
         String url = "jdbc:mariadb://" + settings.getDatabaseHostAndPort() +
                 "/" + settings.getDatabaseName() +
                 "?user=" + settings.getDatabaseUsername() +
-                "&password=" + settings.getDatabasePassword() + "" +
-                "&useUnicode=true&pool&maxPoolSize=2";
+                "&password=" + settings.getDatabasePassword() +
+                "&useUnicode=true&pool&maxPoolSize=5&maxIdleTime=1800";
         POOL = new MariaDbPoolDataSource(url);
 
         // we have a connection, generate tables!
