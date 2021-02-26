@@ -15,7 +15,7 @@ public class Deck {
     }
 
     public Deck(int decks) {
-        cards = buildStandardDeck(1);
+        cards = buildStandardDeck(decks);
         shufflePercent = 0;
         Collections.shuffle(cards);
     }
@@ -27,13 +27,13 @@ public class Deck {
     }
 
     public Deck(int decks, double shufflePercent) {
-        this.cards = buildStandardDeck(1);
+        this.cards = buildStandardDeck(decks);
         this.shufflePercent = shufflePercent;
         Collections.shuffle(cards);
     }
 
     public void shuffle() {
-        for (int i = 0; i < used.size(); i++) {
+        while (!used.isEmpty()) {
             cards.push(used.pop());
         }
         Collections.shuffle(cards);
@@ -46,6 +46,10 @@ public class Deck {
         Card temp = cards.pop();
         used.push(temp);
         return temp;
+    }
+
+    public int getRemainingCards() {
+        return cards.size();
     }
 
     private LinkedList<Card> buildStandardDeck(int decks) {

@@ -174,13 +174,13 @@ public class BlackJackCommand extends Command {
             dealerString.append("\n");
         }
         return new EmbedBuilder()
-                .setTitle("BlackJack!")
+                .setTitle("Blackjack!")
                 .setColor(Color.GREEN)
                 .setDescription("You have $" + AccountManager.format(currentAmount) + " up for bet!"
                         + "\n\n *Your hand: " + game.getPlayersSum() + "*\n" + playerString
                         + "\n*Their hand:*\n" + dealerString
                         + "\n*\uD83C\uDCCF to hit!\n\uD83E\uDDCD to stand.*")
-                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .setFooter(u.getName() + " (" + game.getRemainingCards() + " cards left in deck.)", u.getEffectiveAvatarUrl())
                 .build();
     }
 
@@ -197,19 +197,19 @@ public class BlackJackCommand extends Command {
             dealerString.append("\n");
         }
         return new EmbedBuilder()
-                .setTitle("BlackJack!")
+                .setTitle("Blackjack!")
                 .setColor(Color.RED)
                 .setDescription("You lost $" + AccountManager.format(currentAmount) + "!"
                         + "\n\n*Final Hands:*"
                         + "\n*Your hand: " + game.getPlayersSum() + "*\n" + playerString
                         + "\n*Their hand: " + game.getDealerSum() + "*\n" + dealerString)
                 .setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/421/797/f5a.gif")
-                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .setFooter(u.getName() + " (" + game.getRemainingCards() + " cards left in deck.)", u.getEffectiveAvatarUrl())
                 .build();
     }
 
     /**
-     * @Param state 0 when normal win (dealer bust or beat dealer), 1 when blackjack, 2 when stand-off
+     * @param state 0 when normal win (dealer bust or beat dealer), 1 when blackjack, 2 when stand-off
      */
     private MessageEmbed win(int state, BigDecimal currentAmount, User u, BlackJackGame game) {
         StringBuilder playerString = new StringBuilder(), dealerString = new StringBuilder();
@@ -239,14 +239,14 @@ public class BlackJackCommand extends Command {
                 break;
         }
         return new EmbedBuilder()
-                .setTitle("BlackJack!")
+                .setTitle("Blackjack!")
                 .setColor(c)
                 .setDescription(won
                         + "\n\n*Final Hands:*"
                         + "\n*Your hand: " + game.getPlayersSum() + "*\n" + playerString
                         + "\n*Their hand: " + game.getDealerSum() + "*\n" + dealerString)
                 .setImage(image)
-                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .setFooter(u.getName() + " (" + game.getRemainingCards() + " cards left in deck.)", u.getEffectiveAvatarUrl())
                 .build();
     }
 }
