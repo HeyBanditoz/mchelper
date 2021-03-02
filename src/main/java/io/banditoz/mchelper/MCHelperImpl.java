@@ -102,8 +102,12 @@ public class MCHelperImpl implements MCHelper {
             AM = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
+        if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
+            LOGGER.info("Enabling the Elasticsearch message logging service for the following channels: " + SETTINGS.getLoggedChannels());
+            JDA.addEventListener(new MessageLogger(this, TPE));
+        }
 
-        STATS = new StatsRecorder(this);
+        STATS = new StatsRecorder(this, TPE);
 
         if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
             JDA.addEventListener(new GuildJoinLeaveListener(this));
@@ -135,7 +139,6 @@ public class MCHelperImpl implements MCHelper {
         if (SES != null) SES.shutdown();
         if (TPE != null) TPE.shutdown();
         if (JDA != null) JDA.shutdown();
-        if (STATS != null) STATS.shutdown();
     }
 
     @Override

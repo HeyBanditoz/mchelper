@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // Thanks https://github.com/DV8FromTheWorld/Yui/blob/e8da929a8f637591e4da53599c39c8161be38746/src/net/dv8tion//SettingsManager.java
@@ -54,10 +55,8 @@ public class SettingsManager {
 
     private Settings getDefaultSettings() {
         Settings defaultSettings = new Settings();
-        List<String> defaultOwners = new ArrayList<>();
-        defaultOwners.add("Bot ID here");
         defaultSettings.setDiscordToken("Bot token here...");
-        defaultSettings.setBotOwners(defaultOwners);
+        defaultSettings.setBotOwners(Collections.singletonList("Owner IDs here..."));
         defaultSettings.setOwlBotToken("OwlBot API key here.");
         defaultSettings.setCommandThreads(2);
         defaultSettings.setFinnhubKey("Alpha Vantage API key here.");
@@ -67,6 +66,8 @@ public class SettingsManager {
         defaultSettings.setDatabaseUsername("Database username.");
         defaultSettings.setDatabasePassword("Database password.");
         defaultSettings.setRecordCommandAndRegexStatistics(true);
+        defaultSettings.setElasticsearchMessageEndpoint("http://endpoint:9200/thing/_doc");
+        defaultSettings.setLoggedChannels(Collections.emptyList());
         return defaultSettings;
     }
 

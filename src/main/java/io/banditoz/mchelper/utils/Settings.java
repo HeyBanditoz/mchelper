@@ -29,6 +29,10 @@ public class Settings {
     private String databaseName;
     @JsonProperty("recordCommandAndRegexStatistics")
     private Boolean recordCommandAndRegexStatistics = false; // default value, TODO maybe fix others above too?
+    @JsonProperty("elasticsearchMessageEndpoint")
+    private String elasticsearchMessageEndpoint;
+    @JsonProperty("loggedChannels")
+    private List<String> loggedChannels;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -138,5 +142,25 @@ public class Settings {
     @JsonProperty("recordCommandAndRegexStatistics")
     public void setRecordCommandAndRegexStatistics(Boolean recordCommandAndRegexStatistics) {
         this.recordCommandAndRegexStatistics = recordCommandAndRegexStatistics;
+    }
+
+    @JsonProperty("elasticsearchMessageEndpoint")
+    public String getElasticsearchMessageEndpoint() {
+        return elasticsearchMessageEndpoint;
+    }
+
+    @JsonProperty("elasticsearchMessageEndpoint")
+    public void setElasticsearchMessageEndpoint(String elasticsearchMessageEndpoint) {
+        this.elasticsearchMessageEndpoint = elasticsearchMessageEndpoint;
+    }
+
+    @JsonProperty("loggedChannels")
+    public List<String> getLoggedChannels() {
+        return loggedChannels;
+    }
+
+    @JsonProperty("loggedChannels")
+    public void setLoggedChannels(List<String> loggedChannels) {
+        this.loggedChannels = loggedChannels;
     }
 }

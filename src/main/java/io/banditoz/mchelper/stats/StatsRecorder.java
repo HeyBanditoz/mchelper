@@ -1,40 +1,32 @@
 package io.banditoz.mchelper.stats;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
 
 public class StatsRecorder {
     private final MCHelper MCHELPER;
-    private final ThreadPoolExecutor TPE;
+    private final ExecutorService ES;
     private final Logger LOGGER = LoggerFactory.getLogger(StatsRecorder.class);
 
-    public StatsRecorder(MCHelper mcHelper) {
+    public StatsRecorder(MCHelper mcHelper, ExecutorService es) {
         this.MCHELPER = mcHelper;
-        TPE = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(), new ThreadFactoryBuilder().setNameFormat("StatsRecorder-%d").build());
+        this.ES = es;
     }
 
     public void record(Stat s) {
         if (!MCHELPER.getSettings().getRecordCommandAndRegexStatistics() || MCHELPER.getDatabase() == null) {
             return;
         }
-        TPE.execute(() -> {
+        ES.execute(() -> {
             try {
                 new StatisticsDaoImpl(MCHELPER.getDatabase()).log(s);
             } catch (Exception ex) {
                 LOGGER.error("Error while recording a Stat!", ex);
             }
         });
-    }
-
-    public void shutdown() {
-        TPE.shutdown();
     }
 }
