@@ -19,7 +19,7 @@ public class RussianRouletteCommand extends Command {
 
     @Override
     public Cooldown getDefaultCooldown() {
-        return new Cooldown(2, ChronoUnit.MINUTES, CooldownType.PER_USER);
+        return new Cooldown(1, ChronoUnit.MINUTES, CooldownType.PER_USER);
     }
 
     @Override
@@ -37,8 +37,21 @@ public class RussianRouletteCommand extends Command {
         ce.getMCHelper().getSES().schedule(() -> {
             try {
                 if (check(ce, vs)) {
-                    Member toKick = vs.getChannel().getMembers().get(ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size()));
-                    vs.getGuild().kickVoiceMember(toKick).queue(unused -> ce.sendReply("**BANG!**"));
+                    if (ThreadLocalRandom.current().nextDouble() <= 0.2) {
+                        int rand0 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
+                        int rand1 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
+                        while (rand0 == rand1) {
+                            rand1 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
+                        }
+                        int finalRand = rand1;
+                        vs.getGuild().kickVoiceMember(vs.getChannel().getMembers().get(rand0)).queue(unused ->
+                                vs.getGuild().kickVoiceMember(vs.getChannel().getMembers().get(finalRand)).queue(unused1 ->
+                                        ce.sendReply("**BANG BANG!!** The gun malfunctioned, and shot twice!")));
+                    }
+                    else {
+                        Member toKick = vs.getChannel().getMembers().get(ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size()));
+                        vs.getGuild().kickVoiceMember(toKick).queue(unused -> ce.sendReply("**BANG!**"));
+                    }
                 }
             } catch (Exception ex) {
                 CommandUtils.sendExceptionMessage(ce.getEvent(), ex, LOGGER);
