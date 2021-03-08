@@ -25,6 +25,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class QuoteCommand extends Command {
@@ -60,7 +62,26 @@ public class QuoteCommand extends Command {
             }
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
-                quotes = dao.getQuotesByMatch(s, ce.getGuild());
+                if (!(s.startsWith("`") && s.endsWith("`"))) {
+                    quotes = dao.getQuotesByMatch(s, ce.getGuild());
+                }
+                else {
+                    s = s.substring(1, s.length() - 1);
+                    quotes = dao.getAllQuotesForGuild(ce.getGuild());
+                    // do regex processing on java side as opposed to SQL, so user gets feedback if their regex is invalid
+                    // it's probably extremely inefficient to do it here, but fight me
+                    Pattern p = Pattern.compile(s);
+                    quotes = quotes.stream().filter(namedQuote -> {
+                        Matcher m = p.matcher(namedQuote.getQuote());
+                        if (m.find()) {
+                            return true;
+                        }
+                        else {
+                            m = p.matcher(namedQuote.getQuoteAuthor());
+                            return m.find();
+                        }
+                    }).collect(Collectors.toUnmodifiableList());
+                }
             }
             EmbedBuilder eb = new EmbedBuilder();
             for (int i = 0; i < quotes.size(); i++) {
@@ -142,7 +163,7 @@ public class QuoteCommand extends Command {
                 .action(Arguments.storeTrue())
                 .help("include the internal quote ID");
         parser.addArgument("quoteAndAuthor")
-                .help("quote content and quote attribution to search by")
+                .help("quote content and quote attribution to search by (wrap with ` to do a regex search)")
                 .nargs("*");
         return parser;
     }
