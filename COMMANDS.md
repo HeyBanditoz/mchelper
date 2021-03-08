@@ -84,7 +84,8 @@ named arguments:
 usage: quote [-s] [-i] [-a] [-d] [quoteAndAuthor [quoteAndAuthor ...]]
 
 positional arguments:
-  quoteAndAuthor         quote content and quote attribution to search by
+  quoteAndAuthor         quote content and quote  attribution  to search by
+                         (wrap with ` to do a regex search)
 
 named arguments:
   -s, --stats            retrieve stats instead
