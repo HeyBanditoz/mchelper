@@ -85,7 +85,7 @@ public abstract class Command {
         long before = System.nanoTime();
         // bot owners can bypass permission checks
         if (!CommandPermissions.isBotOwner(e.getAuthor(), MCHelper.getSettings())) {
-            if (!e.getMember().getPermissions().containsAll(getRequiredPermissions())) {
+            if (e.isFromGuild() && !e.getMember().getPermissions().containsAll(getRequiredPermissions())) {
                 e.getMessage().addReaction("\uD83D\uDD34").queue();
                 return new LoggableCommandEvent(ce, (int) ((System.nanoTime()) - before) / 1000000, Status.NO_PERMISSION);
             }
