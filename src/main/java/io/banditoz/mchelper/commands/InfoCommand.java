@@ -49,9 +49,9 @@ public class InfoCommand extends Command {
         int totalUsers = users.size();
         long distinctUsers = users.stream().distinct().count();
 
-        StatisticsDao dao = new StatisticsDaoImpl(ce.getDatabase());
+        StatisticsDao dao = ce.getDatabase() == null ? null : new StatisticsDaoImpl(ce.getDatabase());
         int commandsRun = ce.getMCHelper().getCommandHandler().getCommandsRun();
-        int commandsRunEver = dao.getTotalCommandsRun();
+        int commandsRunEver = dao == null ? 0 : dao.getTotalCommandsRun();
 
         ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
         EmbedBuilder eb = new EmbedBuilder()
@@ -61,7 +61,7 @@ public class InfoCommand extends Command {
                 .addField("CPU Usage", new DecimalFormat("###.###%").format(bean.getProcessCpuLoad()), true)
                 .addField("Load Average", getLoadAverage(), true)
                 .addField("Guilds", Integer.toString(ce.getEvent().getJDA().getGuilds().size()), true)
-                .addField("Users (distinct/total)", String.format("%d/%d", distinctUsers, totalUsers), true)
+                .addField("Users (guild/distinct/total)", String.format("%d/%d/%d", ce.getGuild().getMembers().size(), distinctUsers, totalUsers), true)
                 .addField("Running Commands", String.format("%d/%d", tpe.getActiveCount(), tpe.getMaximumPoolSize()), true)
                 .addField("Commands Run (session/forever)", String.format("%d/%d", commandsRun, commandsRunEver), true)
                 .addField("Uptime", uptime, true);
@@ -72,8 +72,8 @@ public class InfoCommand extends Command {
     private String getLoadAverage() {
         try (InputStream inputStream = Runtime.getRuntime().exec("cat /proc/loadavg").getInputStream();
              Scanner s = new Scanner(inputStream).useDelimiter("\\A")) {
-            String ssdf = s.next();
-            Matcher m = LOAD_PATTERN.matcher(ssdf);
+            String loadAvg = s.next();
+            Matcher m = LOAD_PATTERN.matcher(loadAvg);
             m.find();
             return m.group();
         } catch (Exception e) {
