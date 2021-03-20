@@ -149,6 +149,13 @@ public class CommandHandler extends ListenerAdapter {
             Orianna.setDefaultRegion(Region.NORTH_AMERICA);
             add(new LoadoutCommand());
         }
+
+        if (settings.getTarkovMarketApiKey() == null || settings.getTarkovMarketApiKey().equals("https://tarkov-market.com API key here.")) {
+            LOGGER.info("No tarkov-market API key defined! Not enabling the Tarkov market command...");
+        }
+        else {
+            add(new TarkovCommand());
+        }
         add(new HelpCommand(commands.values())); // this must be registered last
         LOGGER.info(commands.size() + " commands registered.");
     }

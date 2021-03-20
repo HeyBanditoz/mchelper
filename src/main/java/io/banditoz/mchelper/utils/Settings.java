@@ -33,6 +33,8 @@ public class Settings {
     private String elasticsearchMessageEndpoint;
     @JsonProperty("loggedChannels")
     private List<String> loggedChannels;
+    @JsonProperty("tarkovMarketApiKey")
+    private String tarkovMarketApiKey;
 
     @JsonProperty("discordToken")
     public String getDiscordToken() {
@@ -162,5 +164,15 @@ public class Settings {
     @JsonProperty("loggedChannels")
     public void setLoggedChannels(List<String> loggedChannels) {
         this.loggedChannels = loggedChannels;
+    }
+
+    @JsonProperty("tarkovMarketApiKey")
+    public String getTarkovMarketApiKey() {
+        return tarkovMarketApiKey;
+    }
+
+    @JsonProperty("tarkovMarketApiKey")
+    public void setTarkovMarketApiKey(String tarkovMarketApiKey) {
+        this.tarkovMarketApiKey = tarkovMarketApiKey;
     }
 }

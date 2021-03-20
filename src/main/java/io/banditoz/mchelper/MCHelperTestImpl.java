@@ -115,6 +115,7 @@ public class MCHelperTestImpl implements MCHelper {
         settings.setDatabaseHostAndPort("localhost:3306");
         settings.setDatabaseUsername("root");
         settings.setDatabasePassword("toor");
+        settings.setTarkovMarketApiKey("sgfjklw4epoitju");
         return settings;
     }
 }
