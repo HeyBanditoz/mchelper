@@ -64,7 +64,7 @@ public class TarkovMarketResult {
                 .addField("Lowest Price", DecimalFormat.getInstance().format(price) + traderPriceCur, true)
                 .addField("Avg 24h Price", DecimalFormat.getInstance().format(avg24hPrice) + traderPriceCur, true)
                 .addField("Price Difference", "1 day: **" + sDiff24h + "**\n7 days: **" + sDiff7d + "**", true)
-                .setFooter("Price updated on " + DateUtils.getLocallyZonedRFC1123(updated))
+                .setTimestamp(updated)
                 .build();
 
     }

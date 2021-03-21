@@ -43,7 +43,7 @@ public class TarkovCommand extends Command {
             List<Page> pages = new ArrayList<>(results.size());
             for (int i = 0; i < results.size(); i++) {
                 MessageEmbed oldEmbed = results.get(i).getAsEmbed();
-                MessageEmbed newEmbed = new EmbedBuilder(oldEmbed).setFooter(oldEmbed.getFooter().getText() + " (" + (i + 1) + " of " + results.size() + ")").build();
+                MessageEmbed newEmbed = new EmbedBuilder(oldEmbed).setFooter("(" + (i + 1) + " of " + results.size() + ")").build();
                 pages.add(new Page(PageType.EMBED, newEmbed));
             }
             ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
