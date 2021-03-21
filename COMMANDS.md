@@ -1,5 +1,5 @@
 # Commands
-There are a total of 55 commands and 4 regex listeners.
+There are a total of 56 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -124,6 +124,8 @@ named arguments:
   -y {true,false}, --yearly {true,false}
                          generated graph will show yearly data
 ```
+### TarkovCommand
+`tarkov` - <item name> - Returns pricing information about a given item from the tarkov-market API.
 ### TeXCommand
 `tex` - <tex> - Generates a mathematical equation using TeX markup.
 ### TeamsCommand
