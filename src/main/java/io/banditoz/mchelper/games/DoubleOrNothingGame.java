@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.math.BigDecimal;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class DoubleOrNothingGame {
     private BigDecimal currentBet;

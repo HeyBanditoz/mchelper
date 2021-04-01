@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class RoleReactionListener {
     private HashMap<String, String> messages = new HashMap<>();
