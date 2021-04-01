@@ -1,8 +1,10 @@
-package io.banditoz.mchelper.commands.logic;
+package io.banditoz.mchelper.commands;
 
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.Page;
 import com.github.ygimenez.type.PageType;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.tarkovmarket.TarkovMarketResult;
 import io.banditoz.mchelper.tarkovmarket.TarkovMarketSearcher;
