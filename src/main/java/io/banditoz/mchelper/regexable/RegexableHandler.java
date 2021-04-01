@@ -85,6 +85,7 @@ public class RegexableHandler extends ListenerAdapter {
         regexables.add(new RedditRegexable());
         regexables.add(new DadRegexable());
         regexables.add(new BetRegexable());
+        regexables.add(new ReactionRegexable());
         LOGGER.info(regexables.size() + " regexable listeners registered.");
     }
 }
