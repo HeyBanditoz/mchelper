@@ -1,5 +1,7 @@
 # MCHelper
 
+[![pipeline status](https://gitlab.com/HeyBanditoz/mchelper/badges/master/pipeline.svg)](https://gitlab.com/HeyBanditoz/mchelper/-/commits/master)
+
 MCHelper is a simple Discord bot with a small set of commands, such as
 TeX parsing, a math command, dice roller, quotes saving
 among a few others. See [the command list](COMMANDS.md) for what you can do.
