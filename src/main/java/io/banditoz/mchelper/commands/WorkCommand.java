@@ -15,14 +15,16 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class WorkCommand extends Command {
     private final List<TaskResponse> workResponses;
+    private final Random random = new SecureRandom();
 
     @Override
     public String commandName() {
@@ -50,7 +52,7 @@ public class WorkCommand extends Command {
         if (ldt.isBefore(LocalDateTime.now())) {
             BigDecimal earnings = Task.WORK.getRandomAmount();
             BigDecimal newBal = ce.getMCHelper().getAccountManager().add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work");
-            TaskResponse randResponse = workResponses.get(ThreadLocalRandom.current().nextInt(workResponses.size()));
+            TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
             String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
             dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
             ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());

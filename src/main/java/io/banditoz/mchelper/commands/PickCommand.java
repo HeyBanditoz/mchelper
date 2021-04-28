@@ -5,13 +5,16 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 import static io.banditoz.mchelper.utils.ListUtils.extractNumRandomly;
 
 public class PickCommand extends Command {
+    private final Random random = new SecureRandom();
+
     @Override
     public String commandName() {
         return "pick";
@@ -42,7 +45,7 @@ public class PickCommand extends Command {
         else {
             options = new ArrayList<>(Arrays.asList(args.split("\\s+")));
         }
-        ce.sendReply(extractNumRandomly(howMany, options, ThreadLocalRandom.current()));
+        ce.sendReply(extractNumRandomly(howMany, options, random));
         return Status.SUCCESS;
     }
 }

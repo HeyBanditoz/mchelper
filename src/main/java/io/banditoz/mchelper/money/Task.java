@@ -2,13 +2,13 @@ package io.banditoz.mchelper.money;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public enum Task {
     WORK;
 
-    private static final Random rand = ThreadLocalRandom.current();
+    private static final Random rand = new SecureRandom();
 
     /**
      * Returns the delay of this Task in seconds.

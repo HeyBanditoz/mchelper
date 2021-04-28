@@ -6,11 +6,13 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 public class EightBallCommand extends Command {
+    private final Random random = new SecureRandom();
     private static final List<String> RESPONSES;
 
     static {
@@ -51,7 +53,7 @@ public class EightBallCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         // if they're from a guild, get their (maybe existent) nickname, else just their username
         String name = (ce.getEvent().isFromGuild() ? ce.getEvent().getMember().getEffectiveName() : ce.getEvent().getAuthor().getName());
-        int num = ThreadLocalRandom.current().nextInt(RESPONSES.size());
+        int num = random.nextInt(RESPONSES.size());
 
         ce.sendEmbedReply(new EmbedBuilder()
                 .setAuthor(name + " shakes the magic 8-ball, asking...", null, ce.getEvent().getAuthor().getEffectiveAvatarUrl())

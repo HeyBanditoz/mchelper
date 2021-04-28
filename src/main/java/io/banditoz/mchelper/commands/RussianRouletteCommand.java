@@ -7,11 +7,14 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 
+import java.security.SecureRandom;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class RussianRouletteCommand extends Command {
+    private final Random random = new SecureRandom();
+
     @Override
     public String commandName() {
         return "roulette";
@@ -37,11 +40,11 @@ public class RussianRouletteCommand extends Command {
         ce.getMCHelper().getSES().schedule(() -> {
             try {
                 if (check(ce, vs)) {
-                    if (ThreadLocalRandom.current().nextDouble() <= 0.2) {
-                        int rand0 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
-                        int rand1 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
+                    if (random.nextDouble() <= 0.2) {
+                        int rand0 = random.nextInt(vs.getChannel().getMembers().size());
+                        int rand1 = random.nextInt(vs.getChannel().getMembers().size());
                         while (rand0 == rand1) {
-                            rand1 = ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size());
+                            rand1 = random.nextInt(vs.getChannel().getMembers().size());
                         }
                         int finalRand = rand1;
                         vs.getGuild().kickVoiceMember(vs.getChannel().getMembers().get(rand0)).queue(unused ->
@@ -49,7 +52,7 @@ public class RussianRouletteCommand extends Command {
                                         ce.sendReply("**BANG BANG!!** The gun malfunctioned, and shot twice!")));
                     }
                     else {
-                        Member toKick = vs.getChannel().getMembers().get(ThreadLocalRandom.current().nextInt(vs.getChannel().getMembers().size()));
+                        Member toKick = vs.getChannel().getMembers().get(random.nextInt(vs.getChannel().getMembers().size()));
                         vs.getGuild().kickVoiceMember(toKick).queue(unused -> ce.sendReply("**BANG!**"));
                     }
                 }
