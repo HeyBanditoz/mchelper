@@ -10,11 +10,9 @@ import java.util.List;
 public interface AccountsDao {
     BigDecimal queryBalance(long id) throws SQLException;
     boolean accountExists(long id) throws SQLException;
-    void subtract(BigDecimal amount, long id) throws SQLException;
-    void transferTo(BigDecimal amount, long from, long to) throws SQLException;
-    void add(BigDecimal amount, long id) throws SQLException;
+    void transferTo(BigDecimal amount, long from, long to, Transaction t) throws SQLException;
+    void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException;
     List<StatPoint<Long, BigDecimal>> getLeaderboard() throws SQLException;
-    void log(Transaction t) throws SQLException;
     List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException;
     List<Long> getAllAccounts() throws SQLException;
 }

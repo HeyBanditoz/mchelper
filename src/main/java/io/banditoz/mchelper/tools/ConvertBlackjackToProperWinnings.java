@@ -1,9 +1,11 @@
 package io.banditoz.mchelper.tools;
 
+import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.Transaction;
+import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -33,7 +35,7 @@ public class ConvertBlackjackToProperWinnings {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE memo LIKE '%blackjack%';");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                txns.add(Transaction.of(rs));
+                txns.add(AccountsDaoImpl.createTransactionFromResultSet(rs));
             }
             rs.close();
             ps.close();

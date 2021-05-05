@@ -57,8 +57,7 @@ public class AccountManager {
         synchronized (this) {
             priorBalance = queryBalance(from, true);
             checkAmount(priorBalance, amount);
-            dao.log(new Transaction(from, to, priorBalance, amount.negate(), null, memo));
-            dao.transferTo(amount, from, to);
+            dao.transferTo(amount, from, to, new Transaction(from, to, priorBalance, amount.negate(), null, memo));
         }
         return priorBalance.subtract(amount);
     }
@@ -81,8 +80,7 @@ public class AccountManager {
         synchronized (this) {
             priorBalance = queryBalance(to, false);
             //checkAmount(priorBalance, amount);
-            dao.log(new Transaction(null, to, priorBalance, amount, null, memo));
-            dao.add(amount, to);
+            dao.change(amount, to, new Transaction(null, to, priorBalance, amount, null, memo), true);
         }
         return priorBalance.add(amount);
     }
@@ -105,8 +103,7 @@ public class AccountManager {
         synchronized (this) {
             priorBalance = queryBalance(from, false);
             checkAmount(priorBalance, amount);
-            dao.log(new Transaction(from, null, priorBalance, amount.negate(), null, memo));
-            dao.subtract(amount, from);
+            dao.change(amount, from, new Transaction(from, null, priorBalance, amount.negate(), null, memo), false);
         }
         return priorBalance.add(amount);
     }

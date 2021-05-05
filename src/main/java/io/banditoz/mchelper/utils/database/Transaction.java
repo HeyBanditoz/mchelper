@@ -78,15 +78,6 @@ public class Transaction implements Comparable<Transaction> {
         return type;
     }
 
-    public static Transaction of(ResultSet rs) throws SQLException {
-        Long from = rs.getLong(1);
-        Long to = rs.getLong(2);
-        BigDecimal before = rs.getBigDecimal(3);
-        BigDecimal amount = rs.getBigDecimal(4);
-        String memo = rs.getString(5);
-        LocalDateTime time = rs.getTimestamp(6).toLocalDateTime();
-        return new Transaction(from == 0 ? null : from, to == 0 ? null : to, before, amount, time, memo);
-    }
 
     @Override
     public int compareTo(@NotNull Transaction o) {

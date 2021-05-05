@@ -6,6 +6,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,30 +59,43 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     @Override
-    public void subtract(BigDecimal amount, long id) throws SQLException {
+    public void transferTo(BigDecimal amount, long from, long to, Transaction t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance - ? WHERE id=?");
+            // TODO ensure Transaction matches the amount?
+            c.setAutoCommit(false);
+            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance - ? WHERE id = ?");
             ps.setBigDecimal(1, amount);
-            ps.setLong(2, id);
+            ps.setLong(2, from);
             ps.execute();
             ps.close();
+
+            ps = c.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE id = ?");
+            ps.setBigDecimal(1, amount);
+            ps.setLong(2, to);
+            ps.execute();
+            ps.close();
+
+            if (t != null) {
+                log(t, c);
+            }
+            c.commit();
         }
     }
 
     @Override
-    public void transferTo(BigDecimal amount, long from, long to) throws SQLException {
-        subtract(amount, from);
-        add(amount, to);
-    }
-
-    @Override
-    public void add(BigDecimal amount, long id) throws SQLException {
+    public void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException {
+        // TODO ensure Transaction matches the amount?
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE id=?");
+            c.setAutoCommit(false);
+            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance " + (add ? '+' : '-') + " ? WHERE id = ?");
             ps.setBigDecimal(1, amount);
             ps.setLong(2, id);
             ps.execute();
             ps.close();
+            if (t != null) {
+                log(t, c);
+            }
+            c.commit();
         }
     }
 
@@ -100,29 +114,25 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         return leaderboard;
     }
 
-    @Override
-    public void log(Transaction t) throws SQLException {
-        try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO transactions VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP())");
-            if (t.getFrom() == null) {
-                ps.setNull(1, Types.BIGINT);
-            }
-            else {
-                ps.setLong(1, t.getFrom());
-            }
-
-            if (t.getTo() == null) {
-                ps.setNull(2, Types.BIGINT);
-            }
-            else {
-                ps.setLong(2, t.getTo());
-            }
-            ps.setBigDecimal(3, t.getBefore());
-            ps.setBigDecimal(4, t.getAmount());
-            ps.setString(5, t.getMemo());
-            ps.execute();
-            ps.close();
+    private void log(Transaction t, Connection c) throws SQLException {
+        PreparedStatement ps = c.prepareStatement("INSERT INTO transactions VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP())");
+        if (t.getFrom() == null) {
+            ps.setNull(1, Types.BIGINT);
         }
+        else {
+            ps.setLong(1, t.getFrom());
+        }
+        if (t.getTo() == null) {
+            ps.setNull(2, Types.BIGINT);
+        }
+        else {
+            ps.setLong(2, t.getTo());
+        }
+        ps.setBigDecimal(3, t.getBefore());
+        ps.setBigDecimal(4, t.getAmount());
+        ps.setString(5, t.getMemo());
+        ps.execute();
+        ps.close();
     }
 
     @Override
@@ -135,7 +145,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
             ps.setLong(3, n);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                txns.add(Transaction.of(rs));
+                txns.add(createTransactionFromResultSet(rs));
             }
             rs.close();
             ps.close();
@@ -172,7 +182,16 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         ps.setBigDecimal(2, BigDecimal.ZERO);
         ps.execute();
         ps.close();
-        log(new Transaction(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"));
-        add(SEED_MONEY, id);
+        change(SEED_MONEY, id, new Transaction(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"), true);
+    }
+
+    public static Transaction createTransactionFromResultSet(ResultSet rs) throws SQLException {
+        Long from = rs.getLong(1);
+        Long to = rs.getLong(2);
+        BigDecimal before = rs.getBigDecimal(3);
+        BigDecimal amount = rs.getBigDecimal(4);
+        String memo = rs.getString(5);
+        LocalDateTime time = rs.getTimestamp(6).toLocalDateTime();
+        return new Transaction(from == 0 ? null : from, to == 0 ? null : to, before, amount, time, memo);
     }
 }
