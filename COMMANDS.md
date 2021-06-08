@@ -1,5 +1,5 @@
 # Commands
-There are a total of 56 commands and 4 regex listeners.
+There are a total of 58 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -103,6 +103,8 @@ named arguments:
 `roulette` - <no parameters>  - Kick a random person from your voice channel!
 ### ServerStatusCommand
 `status` - <address[:port]> - Fetches information about a Minecraft server.
+### SetTimeZoneCommand
+`settz` - <TZ name> - Adds a timezone. See here for a list of supported ones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ### SnowflakeCommand
 `snowflake` - <snowflakes...> - Converts Discord snowflake ID(s) to dates.
 ### SqlCommand
@@ -130,6 +132,8 @@ named arguments:
 `tex` - <tex> - Generates a mathematical equation using TeX markup.
 ### TeamsCommand
 `teams` - <no parameters>  - sends a message with your voice channel divided into teams
+### TimeZoneCommand
+`time` - [user] - Gets a timezone for a user.
 ### ToMorseCommand
 `tomorse` - <string> - Encodes a message to morse code.
 ### TransactionsCommand
