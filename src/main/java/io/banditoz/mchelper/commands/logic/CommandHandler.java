@@ -125,6 +125,8 @@ public class CommandHandler extends ListenerAdapter {
             } catch (Exception ex) {
                 LOGGER.error("Error while initializing the work responses.", ex);
             }
+            add(new SetTimeZoneCommand());
+            add(new TimeZoneCommand());
         }
 
         if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {

@@ -34,6 +34,7 @@ public class Database {
         daos.add(new AccountsDaoImpl(this));
         daos.add(new TasksDaoImpl(this));
         daos.add(new UserCacheDaoImpl(this));
+        daos.add(new TimeZoneInfoDaoImpl(this));
         daos.forEach(Dao::generateTable);
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds.");
     }
