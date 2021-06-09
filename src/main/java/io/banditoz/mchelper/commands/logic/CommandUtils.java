@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.AttachmentOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,13 @@ public class CommandUtils {
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }
-        _sendReply(reply, e.getChannel(), true);
+        _sendReply(reply, e, true);
     }
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
         l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
         String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(t.toString(), 300, true);
-        _sendReply(reply, e.getChannel(), true);
+        _sendReply(reply, e, true);
     }
 
     /**
@@ -50,17 +51,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e.getChannel(), true);
-    }
-
-    /**
-     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
-     * will appear as normal, but otherwise not do anything.
-     *
-     * @param msg The reply.
-     */
-    public static void sendReply(String msg, TextChannel chan) {
-        _sendReply(msg, chan, true);
+        _sendReply(msg, e, true);
     }
 
     /**
@@ -71,7 +62,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendUnsanitizedReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e.getChannel(), false);
+        _sendReply(msg, e, false);
     }
 
     /**
@@ -81,14 +72,14 @@ public class CommandUtils {
      * @return The message object sent.
      * @param c   The MessageChannel to send to.
      */
-    private static void _sendReply(String msg, MessageChannel c, boolean sanitizeMentions) {
+    private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions) {
         msg = formatMessage(msg);
         MessageBuilder mb = new MessageBuilder(msg);
         if (sanitizeMentions) {
             mb.denyMentions(Message.MentionType.values());
         }
         Queue<Message> toSend = mb.buildAll(MessageBuilder.SplitPolicy.NEWLINE);
-        toSend.forEach(message -> c.sendMessage(message).queue());
+        toSend.forEach(message -> c.getMessage().reply(message).queue());
     }
 
     public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e, boolean sanitizeMentions) throws Exception {
