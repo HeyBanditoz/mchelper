@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.tools;
 
-import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;

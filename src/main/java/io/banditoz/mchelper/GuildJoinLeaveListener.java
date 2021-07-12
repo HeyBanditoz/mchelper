@@ -34,7 +34,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
-            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessage(me).queue();
+            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessageEmbeds(me).queue();
         }
     }
 
@@ -50,7 +50,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
-            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessage(me).queue();
+            event.getGuild().getTextChannelById(gc.getDefaultChannel()).sendMessageEmbeds(me).queue();
         }
     }
 

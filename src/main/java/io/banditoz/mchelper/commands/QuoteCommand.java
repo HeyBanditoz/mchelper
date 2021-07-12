@@ -108,7 +108,7 @@ public class QuoteCommand extends Command {
                 ce.sendEmbedReply(eb.build());
             }
             else {
-                ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
+                ce.getEvent().getChannel().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
                     Pages.paginate(success, pages, 1, TimeUnit.MINUTES, ce.getEvent().getAuthor()::equals);
                 });
 

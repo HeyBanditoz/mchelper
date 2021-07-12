@@ -47,7 +47,7 @@ public class TarkovCommand extends Command {
                 MessageEmbed newEmbed = new EmbedBuilder(oldEmbed).setFooter("(" + (i + 1) + " of " + results.size() + ")").build();
                 pages.add(new Page(PageType.EMBED, newEmbed));
             }
-            ce.getEvent().getChannel().sendMessage((MessageEmbed) pages.get(0).getContent()).queue(success -> {
+            ce.getEvent().getChannel().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
                 Pages.paginate(success, pages, 1, TimeUnit.MINUTES, ce.getEvent().getAuthor()::equals);
             });
         }

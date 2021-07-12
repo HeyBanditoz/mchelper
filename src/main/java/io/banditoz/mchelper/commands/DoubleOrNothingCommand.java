@@ -59,7 +59,7 @@ public class DoubleOrNothingCommand extends Command {
                 return Status.EXCEPTIONAL_FAILURE;
             }
             MessageEmbed message = generate(ante, u);
-            ce.getEvent().getChannel().sendMessage(message).queue(success -> {
+            ce.getEvent().getChannel().sendMessageEmbeds(message).queue(success -> {
                 Pages.buttonize(success,
                         Map.of("\uD83D\uDCB0", (member, message1) -> bet(member.getUser(), message1),
                                 "\uD83D\uDEAA", (member, message1) -> stop(member.getUser(), message1)),
@@ -78,10 +78,10 @@ public class DoubleOrNothingCommand extends Command {
     private void bet(User user, Message message) {
         DoubleOrNothingGame game = GAMES.get(user);
         if (game.play()) {
-            message.editMessage(generate(game.getCurrentBet(), user)).queue();
+            message.editMessageEmbeds(generate(game.getCurrentBet(), user)).queue();
         }
         else {
-            message.editMessage(lose(game.getCurrentBet(), user)).queue();
+            message.editMessageEmbeds(lose(game.getCurrentBet(), user)).queue();
             GAMES.remove(user);
             Pages.getHandler().removeEvent(message);
             message.clearReactions().queue();
@@ -96,7 +96,7 @@ public class DoubleOrNothingCommand extends Command {
         // TODO better exception handling
         try {
             game.payout();
-            message.editMessage(cashout(game.getCurrentBet(), user)).queue();
+            message.editMessageEmbeds(cashout(game.getCurrentBet(), user)).queue();
             Pages.getHandler().removeEvent(message);
             message.clearReactions().queue();
         } catch (Exception ex) {

@@ -49,7 +49,7 @@ public class ManageRolesCommand extends Command {
             } else {
                 TextChannel channel = ce.getGuild().getTextChannelById(args.getList("params").get(0).toString());
                 MessageEmbed me = new EmbedBuilder().setDescription("React to be added to a role, remove your reaction to lose the role.\n\n**Use `!manageroles -a <emote> <name> <role_id>` to add.**").setColor(Color.CYAN).build();
-                Message message = channel.sendMessage(me).complete();
+                Message message = channel.sendMessageEmbeds(me).complete();
                 rd.init(channel,message,ce.getGuild());
                 ce.getMCHelper().getRRL().getMessages().put(channel.getId(),message.getId());
                 ce.sendReply("Guild initialized!");
@@ -68,7 +68,7 @@ public class ManageRolesCommand extends Command {
                 Map.Entry<String, String> entry = rd.getChannelAndMessageId(ce.getGuild());
                 Message message = ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).complete();
                 MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(rd.getRoles(ce.getGuild()), message, ce.getGuild().getEmotes())).setColor(Color.CYAN).build();
-                message.editMessage(me).queue();
+                message.editMessageEmbeds(me).queue();
                 ce.sendReply("Role " + args.getList("params").get(1).toString() + " has been added!");
             } else {
                 ce.sendReply("There is already a role with duplicate emote, name, or role_id");
@@ -90,7 +90,7 @@ public class ManageRolesCommand extends Command {
                     message.clearReactions(emoteName).queue();
                 }
                 MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(rd.getRoles(ce.getGuild()), message, ce.getGuild().getEmotes())).setColor(Color.CYAN).build();
-                message.editMessage(me).queue();
+                message.editMessageEmbeds(me).queue();
                 ce.sendReply("Removed role " + args.getList("params").get(0).toString() + "!");
                 ce.getMCHelper().getRRL().addEvent(emoteName);
             } else {

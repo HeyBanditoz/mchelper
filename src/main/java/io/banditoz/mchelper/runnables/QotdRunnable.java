@@ -39,7 +39,7 @@ public class QotdRunnable implements Runnable {
                 if (g != null) {
                     try {
                         Optional<NamedQuote> nq = dao.getRandomQuote(g);
-                        nq.ifPresent(namedQuote -> g.getTextChannelById(guild.getDefaultChannel()).sendMessage(formatQuote(namedQuote)).queue());
+                        nq.ifPresent(namedQuote -> g.getTextChannelById(guild.getDefaultChannel()).sendMessageEmbeds(formatQuote(namedQuote)).queue());
                     } catch (Exception e) {
                         LOGGER.error("Could not send QOTD to " + guild.getId() + " as there was an exception fetching one or sending to the channel.", e);
                     }

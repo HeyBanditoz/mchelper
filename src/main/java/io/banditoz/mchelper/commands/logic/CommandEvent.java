@@ -162,7 +162,7 @@ public class CommandEvent {
      * @param me The reply.
      */
     public void sendEmbedReply(MessageEmbed me) {
-        EVENT.getChannel().sendMessage(me).queue();
+        EVENT.getChannel().sendMessageEmbeds(me).queue();
     }
 
     public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {

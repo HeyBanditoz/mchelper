@@ -3,11 +3,8 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.utils.StringUtils;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.utils.AttachmentOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +129,7 @@ public class CommandUtils {
             p.waitFor();
 
             e.getMessage().getChannel()
-                    .sendMessage(me)
+                    .sendMessageEmbeds(me)
                     .addFile(f)
                     .queue();
             image.close();
@@ -140,7 +137,7 @@ public class CommandUtils {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
 
             e.getMessage().getChannel()
-                    .sendMessage(me)
+                    .sendMessageEmbeds(me)
                     .addFile(f)
                     .queue();
             image.close();
@@ -160,15 +157,14 @@ public class CommandUtils {
             p.waitFor();
 
             e.getMessage().getChannel()
-                    .sendFile(f)
-                    .embed(me)
+                    .sendFile(f).setEmbeds(me)
                     .queue();
             image.close();
         } catch (IOException ex) {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
 
             e.getMessage().getChannel()
-                    .sendMessage(me)
+                    .sendMessageEmbeds(me)
                     .addFile(f)
                     .queue();
             image.close();

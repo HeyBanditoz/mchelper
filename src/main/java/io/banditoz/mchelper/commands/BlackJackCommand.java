@@ -60,7 +60,7 @@ public class BlackJackCommand extends Command {
                 return Status.EXCEPTIONAL_FAILURE;
             }
             MessageEmbed message = generate(ante, u,game);
-            ce.getEvent().getChannel().sendMessage(message).queue(success -> {
+            ce.getEvent().getChannel().sendMessageEmbeds(message).queue(success -> {
                 Pages.buttonize(success,
                         Map.of("\uD83C\uDCCF", (member, message1) -> hit(member.getUser(), message1),
                                 "\uD83E\uDDCD", (member, message1) -> stand(member.getUser(), message1)),
@@ -71,7 +71,7 @@ public class BlackJackCommand extends Command {
                 if (game.getPlayersSum()==21) {
                     try {
                         game.payout(true);
-                        success.editMessage(win(1,game.getCurrentBet(), u,game)).queue();
+                        success.editMessageEmbeds(win(1, game.getCurrentBet(), u, game)).queue();
                         Pages.getHandler().removeEvent(success);
                         success.clearReactions().queue();
                         GAMES.remove(u);
@@ -79,7 +79,7 @@ public class BlackJackCommand extends Command {
                         LOGGER.error("Error while paying out!", ex);
                     }
                 } else if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
-                    success.editMessage(lose(game.getCurrentBet(), u,game)).queue();
+                    success.editMessageEmbeds(lose(game.getCurrentBet(), u, game)).queue();
                     GAMES.remove(u);
                     Pages.getHandler().removeEvent(success);
                     success.clearReactions().queue();
@@ -102,26 +102,26 @@ public class BlackJackCommand extends Command {
                 }
                 if (game.getDealerSum()==21) {
                     game.standOff();
-                    message.editMessage(win(2,game.getCurrentBet(), user,game)).queue();
+                    message.editMessageEmbeds(win(2, game.getCurrentBet(), user, game)).queue();
                     Pages.getHandler().removeEvent(message);
                     message.clearReactions().queue();
                     GAMES.remove(user);
                     return;
                 }
                 game.payout(true);
-                message.editMessage(win(1,game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(win(1, game.getCurrentBet(), user, game)).queue();
                 Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
                 GAMES.remove(user);
             } else if (sum < 21) {
-                message.editMessage(generate(game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(generate(game.getCurrentBet(), user, game)).queue();
                 message.removeReaction("\uD83C\uDCCF",user).queue();
             }
             else {
                 while (game.getDealerSum()<17) {
                     game.hitDealer();
                 }
-                message.editMessage(lose(game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(lose(game.getCurrentBet(), user, game)).queue();
                 GAMES.remove(user);
                 Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
@@ -142,16 +142,16 @@ public class BlackJackCommand extends Command {
         try {
             if (game.getDealerSum()>21 || game.getDealerSum()<game.getPlayersSum()) {
                 game.payout(false);
-                message.editMessage(win(0,game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(win(0, game.getCurrentBet(), user, game)).queue();
                 Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             } else if (game.getDealerSum()==game.getPlayersSum()) {
                 game.standOff();
-                message.editMessage(win(2,game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(win(2, game.getCurrentBet(), user, game)).queue();
                 Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             } else{
-                message.editMessage(lose(game.getCurrentBet(), user,game)).queue();
+                message.editMessageEmbeds(lose(game.getCurrentBet(), user, game)).queue();
                 Pages.getHandler().removeEvent(message);
                 message.clearReactions().queue();
             }
