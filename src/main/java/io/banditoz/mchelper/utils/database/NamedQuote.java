@@ -2,6 +2,7 @@ package io.banditoz.mchelper.utils.database;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
@@ -128,10 +129,10 @@ public class NamedQuote {
      */
     public String format(boolean includeId) {
         if (includeId) {
-            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + "* (#" + id + ")";
+            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + TimeFormat.DATE_LONG.format(this.getLastModified().toInstant()) + "* (#" + id + ")";
         }
         else {
-            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + DATE.format(this.getLastModified().toLocalDateTime()) + '*';
+            return this.getQuote() + "\n\n*" + this.getQuoteAuthor() + " — " + TimeFormat.DATE_LONG.format(this.getLastModified().toInstant()) + "*";
         }
     }
 
