@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.3.0_296') {
+    implementation('net.dv8tion:JDA:4.3.0_300') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
