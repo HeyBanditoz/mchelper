@@ -1,5 +1,5 @@
 # Commands
-There are a total of 58 commands and 4 regex listeners.
+There are a total of 59 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -150,6 +150,8 @@ named arguments:
 `userinfo` - [mentions] - Returns information about a user.
 ### VersionCommand
 `version` - <no parameters>  - Returns the bot's version.
+### WhoHasCommand
+`whohas` - <role ID> - Returns who has a certain role in the guild.
 ### WorkCommand
 `work` - <no parameters>  - Work for money every day.
 
