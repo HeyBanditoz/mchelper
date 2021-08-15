@@ -6,6 +6,12 @@ public class Quote {
     @JsonProperty("c")
     private double currentPrice;
 
+    @JsonProperty("d")
+    private double change;
+
+    @JsonProperty("dp")
+    private double changePercent;
+
     @JsonProperty("pc")
     private double previousClose;
 
@@ -46,12 +52,11 @@ public class Quote {
     }
 
     public double getChange() {
-        return (double) Math.round((currentPrice - previousClose) * 100D) / 100D;
+        return change;
     }
 
     public double getChangePercent() {
-        double changePercent = 100 * (currentPrice - previousClose) / previousClose;
-        return Math.round(changePercent * 100D) / 100D; // round to two decimal places, faster than DecimalFormat
+        return changePercent;
     }
 
     @Override
