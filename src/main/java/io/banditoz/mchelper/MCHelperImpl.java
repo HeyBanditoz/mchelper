@@ -81,21 +81,6 @@ public class MCHelperImpl implements MCHelper {
             LOGGER.error("Somehow, even though we passed in a JDA object, Pagination-Utils rejected it.", e);
         }
 
-        if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
-            DB = new Database(SETTINGS);
-            RS = new ReminderService(this, SES);
-            AM = new AccountManager(DB);
-            SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
-                    10,
-                    43200,
-                    TimeUnit.SECONDS);
-        }
-        else {
-            DB = null;
-            RS = null;
-            AM = null;
-            LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
-        }
         if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
             LOGGER.info("Enabling the Elasticsearch message logging service for the following channels: " + SETTINGS.getLoggedChannels());
             JDA.addEventListener(new MessageLogger(this, TPE));
@@ -115,10 +100,25 @@ public class MCHelperImpl implements MCHelper {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
         JDA.awaitReady();
+        // now that JDA is done loading, we can initialize things
+        // that could have used it before initialization completed.
+        if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
+            DB = new Database(SETTINGS);
+            RS = new ReminderService(this, SES);
+            AM = new AccountManager(DB);
+            SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
+                    10,
+                    43200,
+                    TimeUnit.SECONDS);
+        }
+        else {
+            DB = null;
+            RS = null;
+            AM = null;
+            LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
+        }
         RRL = new RoleReactionListener(this);
         JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
-        // now that JDA is done loading, we can initialize things
-        // that could have used it before initialization completes below.
 
         SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),
@@ -198,6 +198,7 @@ public class MCHelperImpl implements MCHelper {
     /**
      * Builds JDA. It's in its own method so the program can quit if it can't contact Discord
      * (so systemd can restart it until it can.)
+     *
      * @return A JDA instance.
      */
     private JDA buildJDA() {
