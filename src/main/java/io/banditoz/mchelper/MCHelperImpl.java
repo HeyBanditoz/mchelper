@@ -30,7 +30,6 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -55,7 +54,7 @@ public class MCHelperImpl implements MCHelper {
     private final RoleReactionListener RRL;
     private final AccountManager AM;
 
-    public MCHelperImpl() throws LoginException, InterruptedException {
+    public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
 
         if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
@@ -70,19 +69,14 @@ public class MCHelperImpl implements MCHelper {
                 .build());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
+        JDA = buildJDA();
+        JDA.addEventListener(CH, RH);
 
-        JDA = JDABuilder.createDefault(SETTINGS.getDiscordToken())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .enableCache(CacheFlag.VOICE_STATE)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                .build();
-        JDA.addEventListener(CH,RH);
         try {
             Pages.activate(PaginatorBuilder.createPaginator()
-            .setHandler(getJDA())
-            .shouldRemoveOnReact(true)
-            .build());
+                    .setHandler(getJDA())
+                    .shouldRemoveOnReact(true)
+                    .build());
         } catch (InvalidHandlerException e) {
             LOGGER.error("Somehow, even though we passed in a JDA object, Pagination-Utils rejected it.", e);
         }
@@ -122,7 +116,7 @@ public class MCHelperImpl implements MCHelper {
 
         JDA.awaitReady();
         RRL = new RoleReactionListener(this);
-        JDA.addEventListener(RRL.getAddHandler(),RRL.getRemoveHandler());
+        JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completes below.
 
@@ -199,6 +193,27 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public RoleReactionListener getRRL() {
         return RRL;
+    }
+
+    /**
+     * Builds JDA. It's in its own method so the program can quit if it can't contact Discord
+     * (so systemd can restart it until it can.)
+     * @return A JDA instance.
+     */
+    private JDA buildJDA() {
+        try {
+            return JDABuilder.createDefault(SETTINGS.getDiscordToken())
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .enableCache(CacheFlag.VOICE_STATE)
+                    .setChunkingFilter(ChunkingFilter.ALL)
+                    .build();
+        } catch (Exception ex) {
+            LOGGER.error("Couldn't build JDA. Exiting!", ex);
+            shutdown();
+            System.exit(1);
+        }
+        return null;
     }
 
     @Override
