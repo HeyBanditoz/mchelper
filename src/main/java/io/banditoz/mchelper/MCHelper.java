@@ -42,6 +42,17 @@ public interface MCHelper {
      * @see MCHelper#performHttpRequestGetResponse(Request)
      */
     String performHttpRequest(Request request) throws HttpResponseException, IOException;
+
+    /**
+     * Performs an HTTP request and returns nothing. This is preferable to use over making your own
+     * OkHttpClient or implementing one.
+     *
+     * @param request The Request object to use.
+     * @throws HttpResponseException If the response code is >=400
+     * @throws IOException           If there was an issue performing the HTTP request.
+     */
+    void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException;
+
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one. <b>You must close the response body once you are done with it.</b>

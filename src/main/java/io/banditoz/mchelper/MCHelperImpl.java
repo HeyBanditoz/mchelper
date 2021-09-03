@@ -220,22 +220,35 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
-        Response response = CLIENT.newCall(request).execute();
-        if (response.code() >= 400) {
-            throw new HttpResponseException(response.code());
+        String s;
+        try (Response r = placeRequest(request)) {
+            s = r.body().string();
         }
-        String body = response.body().string();
-        response.close();
-        return body;
+        return s;
     }
 
     @Override
     public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
-        Response response = CLIENT.newCall(request).execute();
-        if (response.code() >= 400) {
-            throw new HttpResponseException(response.code());
+        try (Response r = placeRequest(request)) {
+            return r;
         }
-        return response;
+    }
+
+    @Override
+    public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
+        LOGGER.debug(request.toString());
+        try (Response ignored = placeRequest(request)) {
+        }
+    }
+
+    private Response placeRequest(Request request) throws HttpResponseException, IOException {
+        LOGGER.debug(request.toString());
+        try (Response response = CLIENT.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throw new HttpResponseException(response.code());
+            }
+            return response;
+        }
     }
 }

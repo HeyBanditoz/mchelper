@@ -97,6 +97,10 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
+    public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
+    }
+
+    @Override
     public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
         return null;
     }

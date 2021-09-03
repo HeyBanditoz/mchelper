@@ -45,7 +45,7 @@ public class MessageLogger extends ListenerAdapter {
                         .url(MCHELPER.getSettings().getElasticsearchMessageEndpoint())
                         .post(RequestBody.create(MediaType.get("application/json"), json))
                         .build();
-                MCHELPER.performHttpRequest(request);
+                MCHELPER.performHttpRequestIgnoreResponse(request);
             } catch (Exception ex) {
                 LOGGER.error("Error while saving message " + m.getIdLong() + " to Elasticsearch!", ex);
             }
