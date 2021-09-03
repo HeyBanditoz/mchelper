@@ -31,13 +31,13 @@ public class CommandUtils {
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }
-        _sendReply(reply, e, true);
+        _sendReply(reply, e, true, true);
     }
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
         l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
         String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(t.toString(), 300, true);
-        _sendReply(reply, e, true);
+        _sendReply(reply, e, true, true);
     }
 
     /**
@@ -48,7 +48,18 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e, true);
+        _sendReply(msg, e, true, true);
+    }
+
+    /**
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
+     * will appear as normal but, otherwise not do anything. The invoking user will <i>not</i> be pinged.
+     *
+     * @param msg The reply.
+     * @param e   The MessageReceivedEvent to reply to.
+     */
+    public static void sendReplyWithoutPing(String msg, MessageReceivedEvent e) {
+        _sendReply(msg, e, true, false);
     }
 
     /**
@@ -59,24 +70,25 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendUnsanitizedReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e, false);
+        _sendReply(msg, e, false, true);
     }
 
     /**
      * Internal method for sending a reply. Named differently to prevent infinite recursion.
      *
-     * @param msg The reply.
-     * @return The message object sent.
-     * @param c   The MessageChannel to send to.
+     * @param msg              The reply.
+     * @param c                The MessageChannel to send to.
+     * @param sanitizeMentions Whether or not to sanitize mentions contained in the reply.
+     * @param ping             Whether or not to ping the invoker.
      */
-    private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions) {
+    private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions, boolean ping) {
         msg = formatMessage(msg);
         MessageBuilder mb = new MessageBuilder(msg);
         if (sanitizeMentions) {
             mb.denyMentions(Message.MentionType.values());
         }
         Queue<Message> toSend = mb.buildAll(MessageBuilder.SplitPolicy.NEWLINE);
-        toSend.forEach(message -> c.getMessage().reply(message).queue());
+        toSend.forEach(message -> c.getMessage().reply(message).mentionRepliedUser(ping).queue());
     }
 
     public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e, boolean sanitizeMentions) throws Exception {

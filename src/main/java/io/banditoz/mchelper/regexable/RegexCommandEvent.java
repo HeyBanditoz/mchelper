@@ -50,6 +50,15 @@ public class RegexCommandEvent {
     }
 
     /**
+     * Sends a reply. All mentions will be sanitized. The invoking user will <i>not</i> be pinged.
+     *
+     * @param msg The reply.
+     */
+    public void sendReplyWithoutPing(String msg) {
+        CommandUtils.sendReplyWithoutPing(msg, EVENT);
+    }
+
+    /**
      * Sends typing to where this event came from.
      */
     public void sendTyping() {

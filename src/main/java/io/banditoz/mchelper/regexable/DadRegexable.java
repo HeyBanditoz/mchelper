@@ -23,7 +23,7 @@ public class DadRegexable extends Regexable {
     protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
         if (ThreadLocalRandom.current().nextBoolean()) {
             Matcher m = PATTERN.matcher(re.getEvent().getMessage().getContentRaw());
-            re.sendReply("Hi" + m.replaceFirst("") + ", I'm Dad!");
+            re.sendReplyWithoutPing("Hi" + m.replaceFirst("") + ", I'm Dad!");
         }
         return Status.SUCCESS;
     }
