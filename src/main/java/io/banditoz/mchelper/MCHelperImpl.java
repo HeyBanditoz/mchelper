@@ -219,7 +219,6 @@ public class MCHelperImpl implements MCHelper {
 
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
-        LOGGER.debug(request.toString());
         String s;
         try (Response r = placeRequest(request)) {
             s = r.body().string();
@@ -229,7 +228,6 @@ public class MCHelperImpl implements MCHelper {
 
     @Override
     public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
-        LOGGER.debug(request.toString());
         try (Response r = placeRequest(request)) {
             return r;
         }
@@ -237,18 +235,16 @@ public class MCHelperImpl implements MCHelper {
 
     @Override
     public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
-        LOGGER.debug(request.toString());
         try (Response ignored = placeRequest(request)) {
         }
     }
 
     private Response placeRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
-        try (Response response = CLIENT.newCall(request).execute()) {
-            if (response.code() >= 400) {
-                throw new HttpResponseException(response.code());
-            }
-            return response;
+        Response response = CLIENT.newCall(request).execute();
+        if (response.code() >= 400) {
+            throw new HttpResponseException(response.code());
         }
+        return response;
     }
 }
