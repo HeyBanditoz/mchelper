@@ -23,6 +23,14 @@ plugins {
     id 'com.adarshr.test-logger' version '2.1.0'
 }
 
+shadowJar {
+    minimize {
+        exclude(dependency('org.cache2k:cache2k-core.*:.*'))
+        exclude(dependency('ch.qos.logback:logback-classic.*:.*'))
+        exclude(dependency('org.codehaus.groovy:groovy-jsr223.*:.*'))
+    }
+}
+
 gversion {
     srcDir = "src/main/java/"
     classPackage = "io.banditoz.mchelper"
