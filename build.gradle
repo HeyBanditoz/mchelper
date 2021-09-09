@@ -31,6 +31,10 @@ shadowJar {
     }
 }
 
+rootProject.tasks.named("shadowJar") {
+    duplicatesStrategy = 'include'
+}
+
 gversion {
     srcDir = "src/main/java/"
     classPackage = "io.banditoz.mchelper"
@@ -52,6 +56,8 @@ repositories {
         name 'm2-dv8tion'
     }
 }
+
+Copy
 
 dependencies {
     implementation('net.dv8tion:JDA:4.3.0_315') {
