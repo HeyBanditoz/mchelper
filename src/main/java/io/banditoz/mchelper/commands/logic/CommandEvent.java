@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
  */
 public class CommandEvent {
     private String COMMAND_ARGS_STRING;
+    private String RAW_COMMAND_ARGS_STRING;
     private String[] COMMAND_ARGS;
     private String[] RAW_ARGS;
     private final MessageReceivedEvent EVENT;
@@ -48,10 +49,23 @@ public class CommandEvent {
      */
     public String getCommandArgsString() {
         if (COMMAND_ARGS_STRING == null) {
-            COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(EVENT);
+            COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(EVENT, false);
         }
         return COMMAND_ARGS_STRING;
     }
+
+    /**
+     * Grabs the <i>raw</i> command arguments formatted as a String.
+     *
+     * @return The arguments.
+     */
+    public String getRawCommandArgsString() {
+        if (RAW_COMMAND_ARGS_STRING == null) {
+            RAW_COMMAND_ARGS_STRING = CommandUtils.generateCommandArgsString(EVENT, true);
+        }
+        return RAW_COMMAND_ARGS_STRING;
+    }
+
 
     /**
      * Grabs the command arguments as an array.

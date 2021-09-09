@@ -213,9 +213,9 @@ public class CommandUtils {
         return matches.toArray(new String[0]);
     }
 
-    public static String generateCommandArgsString(MessageReceivedEvent e) {
+    public static String generateCommandArgsString(MessageReceivedEvent e, boolean raw) {
         StringBuilder commandArgsBuilder = new StringBuilder();
-        String[] args = commandArgs(e.getMessage().getContentDisplay());
+        String[] args = commandArgs(raw ? e.getMessage().getContentRaw() : e.getMessage().getContentDisplay());
         for (int i = 1; i < args.length; i++) {
             if (i == args.length - 1) {
                 commandArgsBuilder.append(args[i]);

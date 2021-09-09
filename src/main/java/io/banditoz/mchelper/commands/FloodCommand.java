@@ -33,7 +33,7 @@ public class FloodCommand extends Command {
             ce.sendReply("You must send at least one message.");
             return Status.FAIL;
         }
-        String args = ce.getCommandArgsString().replaceFirst("\\d+ ", "");
+        String args = ce.getRawCommandArgsString().replaceFirst("\\d+ ", "");
         if (ce.isElevated()) {
             if (howMany > 50) {
                 ce.sendReply("You can't send more than 50 messages as an elevated user.");
@@ -56,7 +56,6 @@ public class FloodCommand extends Command {
     }
 
     private void flood(int howMany, String message, CommandEvent ce) {
-        message = message.replace("USER<", "<@");
         for (int i = 0; i < howMany; i++) {
             ce.sendUnsanitizedReply(message);
         }
