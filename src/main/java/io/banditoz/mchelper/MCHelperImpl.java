@@ -243,6 +243,7 @@ public class MCHelperImpl implements MCHelper {
         LOGGER.debug(request.toString());
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {
+            response.close();
             throw new HttpResponseException(response.code());
         }
         return response;
