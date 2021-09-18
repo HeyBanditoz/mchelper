@@ -37,14 +37,50 @@
     },
     {
         "task": 0,
-        "response": "%MENTION% made it big in crypto, cashing in %AMOUNT%."
-    },
-    {
-        "task": 0,
         "response": "%MENTION% sold their grandmother's antiques and made %AMOUNT%."
     },
     {
         "task": 0,
-        "response": "%MENTION% made it big in crypto, cashing in %AMOUNT%."
+        "response": "%MENTION% did a Trials carry and made %AMOUNT%. Prepare to be banned."
+    },
+    {
+        "task": 0,
+        "response": "It's payday! %MENTION% got a check worth %AMOUNT%."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% hit up r/wallstreetbets and won %AMOUNT% on Tesla calls."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% went to the tuition office and stole %AMOUNT%."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% was charged by Amazon -%AMOUNT% for their purchase."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% made an Among Us joke on their podcast, and collected %AMOUNT% in ad revenue."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% received %AMOUNT% from wedding gifts."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% has been granted passage to the Lighthouse, and got %AMOUNT% as loot."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% fell at the gates of the Lighthouse, and got %AMOUNT% because Bungie felt bad."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% sold their overpriced graphing calculator for %AMOUNT%."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% made %AMOUNT% in cheat sales today. Congratulations!"
     }
 ]
