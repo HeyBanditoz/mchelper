@@ -5,6 +5,7 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.Task;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class TaskResponse {
     @JsonProperty("task")
@@ -26,5 +27,18 @@ public class TaskResponse {
                     .replace("%AMOUNT%", "$" + AccountManager.format(amount));
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaskResponse that = (TaskResponse) o;
+        return task == that.task && Objects.equals(response, that.response);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(task, response);
     }
 }
