@@ -10,13 +10,23 @@ import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class AccountManager {
     private final AccountsDao dao;
     private final TasksDaoImpl tasks;
+    private final static DecimalFormat DF;
+
+    static {
+        DF = new DecimalFormat("#,###.##");
+        DF.setMaximumFractionDigits(2); // 0.1 becomes 0.10 instead of 0.1 when formatted
+        DF.setMinimumFractionDigits(0);
+//        DF.setPositivePrefix("");
+//        DF.setGroupingSize(3);
+//        DF.setDecimalSeparatorAlwaysShown(false);
+    }
 
     public AccountManager(Database database) {
         dao = new AccountsDaoImpl(database);
@@ -153,7 +163,19 @@ public class AccountManager {
         return d.setScale(2, RoundingMode.HALF_UP);
     }
 
+    /**
+     * Formats a BigDecimal to a String, with proper comma grouping. Ensures the scale is 0 or 2 depending on if a
+     * decimal is present.
+     *
+     * @param d The {@link BigDecimal} to format.
+     * @return The formatted number as a {@link String}.
+     */
     public static String format(BigDecimal d) {
-        return NumberFormat.getInstance().format(d);
+        d = d.stripTrailingZeros();
+        // other threads *could* potentially access this and change minimumFractionDigits, so synchronize it
+        synchronized (DF) {
+            DF.setMinimumFractionDigits(d.scale() > 0 ? 2 : 0);
+            return DF.format(d);
+        }
     }
 }
