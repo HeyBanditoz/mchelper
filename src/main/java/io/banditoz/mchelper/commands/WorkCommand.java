@@ -6,18 +6,18 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.Task;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.TaskResponse;
 import io.banditoz.mchelper.utils.database.dao.TasksDao;
 import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -59,8 +59,8 @@ public class WorkCommand extends Command {
             return Status.SUCCESS;
         }
         else {
-            Duration d = Duration.between(LocalDateTime.now(), ldt);
-            ce.sendReply("You cannot work for another " + DateUtils.humanReadableDuration(d) + ".");
+            long unix = ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            ce.sendReply("You cannot work until " + TimeFormat.DATE_TIME_LONG.format(unix));
             return Status.COOLDOWN;
         }
     }
