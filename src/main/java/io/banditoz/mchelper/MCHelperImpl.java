@@ -2,21 +2,19 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.github.ygimenez.exception.InvalidHandlerException;
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.PaginatorBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
-import io.banditoz.mchelper.regexable.Regexable;
+import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
+import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.utils.database.UserMaintenanceRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -53,6 +51,7 @@ public class MCHelperImpl implements MCHelper {
     private final StatsRecorder STATS;
     private final RoleReactionListener RRL;
     private final AccountManager AM;
+    private final ButtonListener BL;
 
     public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -71,15 +70,6 @@ public class MCHelperImpl implements MCHelper {
         this.RH = new RegexableHandler(this);
         JDA = buildJDA();
         JDA.addEventListener(CH, RH);
-
-        try {
-            Pages.activate(PaginatorBuilder.createPaginator()
-                    .setHandler(getJDA())
-                    .shouldRemoveOnReact(true)
-                    .build());
-        } catch (InvalidHandlerException e) {
-            LOGGER.error("Somehow, even though we passed in a JDA object, Pagination-Utils rejected it.", e);
-        }
 
         if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
             LOGGER.info("Enabling the Elasticsearch message logging service for the following channels: " + SETTINGS.getLoggedChannels());
@@ -118,6 +108,8 @@ public class MCHelperImpl implements MCHelper {
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         RRL = new RoleReactionListener(this);
+        BL = new ButtonListener(this);
+        JDA.addEventListener(BL);
         JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
 
         SES.scheduleAtFixedRate(new QotdRunnable(this),
@@ -193,6 +185,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public RoleReactionListener getRRL() {
         return RRL;
+    }
+
+    @Override
+    public ButtonListener getButtonListener() {
+        return BL;
     }
 
     /**

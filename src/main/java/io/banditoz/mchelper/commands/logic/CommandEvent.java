@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.interactions.EmbedPaginator;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.paste.Paste;
@@ -14,6 +15,8 @@ import org.slf4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -31,6 +34,7 @@ public class CommandEvent {
     private final Database DATABASE;
     private final String COMMAND_NAME;
     private final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
+
 
     public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper, String commandClassName) {
         this.EVENT = event;
@@ -193,6 +197,25 @@ public class CommandEvent {
 
     public void sendFile(String msg, File f) {
         CommandUtils.sendFile(msg, f, this.EVENT);
+    }
+
+    /**
+     * Sends a {@link List} of {@link MessageEmbed} off to the channel the {@link MessageReceivedEvent} came from.
+     * The list must be of size >=1.
+     *
+     * @param embeds A non-empty list containing {@link MessageEmbed}s.
+     */
+    public void sendEmbedPaginatedReply(List<MessageEmbed> embeds) {
+        if (embeds.size() == 0) {
+            throw new IllegalArgumentException("May not paginate with a list of a size of zero!");
+        }
+        else if (embeds.size() == 1) {
+            sendEmbedReply(embeds.get(0));
+        }
+        else {
+            EmbedPaginator paginator = new EmbedPaginator(MCHELPER.getButtonListener(), EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals);
+            paginator.go();
+        }
     }
 
     /**

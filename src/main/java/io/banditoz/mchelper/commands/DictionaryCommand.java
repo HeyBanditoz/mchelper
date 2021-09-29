@@ -1,8 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.Page;
-import com.github.ygimenez.type.PageType;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.dictionary.Definition;
@@ -15,7 +12,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class DictionaryCommand extends Command {
     @Override
@@ -34,28 +30,20 @@ public class DictionaryCommand extends Command {
         DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = ds.search(ce.getCommandArgsString());
 
-        List<Page> pages = createPagesFromDefinition(result);
-
-        if (pages.size() == 1) {
-            ce.sendEmbedReply((MessageEmbed) pages.get(0).getContent());
-        }
-        else {
-            ce.getEvent().getChannel().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-                Pages.paginate(success, pages, 1, TimeUnit.MINUTES, ce.getEvent().getAuthor()::equals);
-            });
-        }
+        List<MessageEmbed> embeds = createPagesFromDefinition(result);
+        ce.sendEmbedPaginatedReply(embeds);
         return Status.SUCCESS;
     }
 
-    private List<Page> createPagesFromDefinition(DictionaryResult dr) {
-        List<Page> pages = new ArrayList<>();
+    private List<MessageEmbed> createPagesFromDefinition(DictionaryResult dr) {
+        List<MessageEmbed> pages = new ArrayList<>();
         for (int i = 0; i < dr.getDefinitions().size(); i++) {
             Definition d = dr.getDefinitions().get(i);
-            pages.add(new Page(PageType.EMBED, new EmbedBuilder()
+            pages.add(new EmbedBuilder()
                     .setTitle(dr.getWord() + ", " + valueOrNull(d.getType()))
                     .setDescription(valueOrNull(d.getDefinition()))
                     .addField("Example", d.getExample() == null ? "<no example>" : d.getExample(), true)
-                    .setFooter(i + 1 + "/" + dr.getDefinitions().size()).build()));
+                    .setFooter(i + 1 + "/" + dr.getDefinitions().size()).build());
         }
         return pages;
     }

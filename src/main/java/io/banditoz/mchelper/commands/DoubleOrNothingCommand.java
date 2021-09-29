@@ -1,23 +1,28 @@
 package io.banditoz.mchelper.commands;
 
-import com.github.ygimenez.method.Pages;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.games.DoubleOrNothingGame;
+import io.banditoz.mchelper.interactions.ButtonInteractable;
+import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.awt.Color;
+import java.awt.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class DoubleOrNothingCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
@@ -58,15 +63,15 @@ public class DoubleOrNothingCommand extends Command {
                 ce.sendExceptionMessage(ex);
                 return Status.EXCEPTIONAL_FAILURE;
             }
-            MessageEmbed message = generate(ante, u);
-            ce.getEvent().getChannel().sendMessageEmbeds(message).queue(success -> {
-                Pages.buttonize(success,
-                        Map.of("\uD83D\uDCB0", (member, message1) -> bet(member.getUser(), message1),
-                                "\uD83D\uDEAA", (member, message1) -> stop(member.getUser(), message1)),
-                        false,
-                        2147483647,
-                        TimeUnit.DAYS,
-                        ce.getEvent().getAuthor()::equals);
+            MessageEmbed embed = generate(ante, u);
+            Button bet = Button.primary(UUID.randomUUID().toString(), "Bet");
+            Button stop = Button.danger(UUID.randomUUID().toString(), "Stop");
+            Message m = new MessageBuilder().setActionRows(ActionRow.of(bet, stop)).setEmbeds(embed).build();
+            ce.getEvent().getChannel().sendMessage(m).queue(message -> {
+                ButtonInteractable i = new ButtonInteractable(
+                        Map.of(bet, this::bet, stop, this::stop),
+                        ce.getEvent().getAuthor()::equals, 0, message);
+                ce.getMCHelper().getButtonListener().addInteractable(i);
             });
         }
         return Status.SUCCESS;
@@ -75,30 +80,33 @@ public class DoubleOrNothingCommand extends Command {
     /**
      * Method called when a user intends to play for more money.
      */
-    private void bet(User user, Message message) {
+    private void bet(WrappedButtonClickEvent wrappedEvent) {
+        ButtonClickEvent event = wrappedEvent.getEvent();
+        User user = event.getUser();
+
         DoubleOrNothingGame game = GAMES.get(user);
         if (game.play()) {
-            message.editMessageEmbeds(generate(game.getCurrentBet(), user)).queue();
+            event.editMessageEmbeds(generate(game.getCurrentBet(), user)).queue();
         }
         else {
-            message.editMessageEmbeds(lose(game.getCurrentBet(), user)).queue();
+            //wrappedEvent.getEvent().getMessage().editMessageEmbeds(lose(game.getCurrentBet(), user)).queue();
+            wrappedEvent.removeListenerAndDestroy(lose(game.getCurrentBet(), user));
             GAMES.remove(user);
-            Pages.getHandler().removeEvent(message);
-            message.clearReactions().queue();
         }
     }
 
     /**
      * Method called when a user intends to cash out their winnings.
      */
-    private void stop(User user, Message message) {
-        DoubleOrNothingGame game = GAMES.remove(user);
+    private void stop(WrappedButtonClickEvent wrappedEvent) {
+        ButtonClickEvent event = wrappedEvent.getEvent();
+        User user = event.getUser();
+
+        DoubleOrNothingGame game = GAMES.remove(event.getUser());
         // TODO better exception handling
         try {
             game.payout();
-            message.editMessageEmbeds(cashout(game.getCurrentBet(), user)).queue();
-            Pages.getHandler().removeEvent(message);
-            message.clearReactions().queue();
+            wrappedEvent.removeListenerAndDestroy(cashout(game.getCurrentBet(), user));
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
         }
@@ -108,8 +116,7 @@ public class DoubleOrNothingCommand extends Command {
         return new EmbedBuilder()
                 .setTitle("Double or Nothing!")
                 .setColor(Color.GREEN)
-                .setDescription("You currently have $" + AccountManager.format(currentAmount) + "!"
-                        + "\n\n*\uD83D\uDCB0 to keep playing!\n\uD83D\uDEAA to cash out.*")
+                .setDescription("You currently have $" + AccountManager.format(currentAmount) + "!")
                 .setFooter(u.getName(), u.getEffectiveAvatarUrl())
                 .build();
     }

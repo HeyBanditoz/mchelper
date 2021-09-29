@@ -2,9 +2,10 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.interactions.ButtonListener;
+import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
-import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.RoleReactionListener;
@@ -88,6 +89,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public AccountManager getAccountManager() {
+        return null;
+    }
+
+    @Override
+    public ButtonListener getButtonListener() {
         return null;
     }
 

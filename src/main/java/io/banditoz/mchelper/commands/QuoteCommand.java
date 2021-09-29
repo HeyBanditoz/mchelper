@@ -1,8 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.Page;
-import com.github.ygimenez.type.PageType;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
@@ -19,12 +16,11 @@ import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import java.awt.Color;
+import java.awt.*;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,7 +48,7 @@ public class QuoteCommand extends Command {
         }
         else {
             List<NamedQuote> quotes = new ArrayList<>();
-            List<Page> pages = new ArrayList<>();
+            List<MessageEmbed> embeds = new ArrayList<>();
 
             if (args.getBoolean("all") != null && args.getBoolean("all")) {
                 quotes = dao.getAllQuotesForGuild(ce.getGuild());
@@ -96,22 +92,16 @@ public class QuoteCommand extends Command {
                         eb.setFooter("Added by " + nq.getAuthorId(), "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png");
                     });
                 }
-                pages.add(new Page(PageType.EMBED, eb.build()));
+                embeds.add(eb.build());
             }
-            if (pages.size() == 0) {
+            if (embeds.size() == 0) {
                 eb.setDescription("No quote found.");
                 eb.setColor(Color.RED);
                 ce.sendEmbedReply(eb.build());
                 return Status.FAIL;
             }
-            if (pages.size() == 1) {
-                ce.sendEmbedReply(eb.build());
-            }
             else {
-                ce.getEvent().getChannel().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-                    Pages.paginate(success, pages, 1, TimeUnit.MINUTES, ce.getEvent().getAuthor()::equals);
-                });
-
+                ce.sendEmbedPaginatedReply(embeds);
             }
         }
         return Status.SUCCESS;

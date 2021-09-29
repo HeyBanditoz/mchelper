@@ -80,9 +80,6 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.8.0') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
-    implementation('com.github.ygimenez:Pagination-Utils:2.1.8') {
-        exclude module: 'JDA' // this pulls JDA, which in turns opus-java, so don't.
-    }
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2'

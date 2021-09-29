@@ -1,24 +1,28 @@
 package io.banditoz.mchelper.commands;
 
-import com.github.ygimenez.method.Pages;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.games.BlackJackGame;
 import io.banditoz.mchelper.games.Card;
+import io.banditoz.mchelper.interactions.ButtonInteractable;
+import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.awt.*;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class BlackJackCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
@@ -59,31 +63,33 @@ public class BlackJackCommand extends Command {
                 ce.sendExceptionMessage(ex);
                 return Status.EXCEPTIONAL_FAILURE;
             }
-            MessageEmbed message = generate(ante, u,game);
-            ce.getEvent().getChannel().sendMessageEmbeds(message).queue(success -> {
-                Pages.buttonize(success,
-                        Map.of("\uD83C\uDCCF", (member, message1) -> hit(member.getUser(), message1),
-                                "\uD83E\uDDCD", (member, message1) -> stand(member.getUser(), message1)),
-                        false,
-                        2147483647,
-                        TimeUnit.DAYS,
-                        ce.getEvent().getAuthor()::equals);
-                if (game.getPlayersSum()==21) {
-                    try {
-                        game.payout(true);
-                        success.editMessageEmbeds(win(1, game.getCurrentBet(), u, game)).queue();
-                        Pages.getHandler().removeEvent(success);
-                        success.clearReactions().queue();
-                        GAMES.remove(u);
-                    } catch (Exception ex) {
-                        LOGGER.error("Error while paying out!", ex);
-                    }
-                } else if (game.getDealerHand().get(1).getRANK().getValue()==1 && game.getDealerSum()==21) {
-                    success.editMessageEmbeds(lose(game.getCurrentBet(), u, game)).queue();
+
+            // resolve instant wins
+            if (game.getPlayersSum() == 21) {
+                try {
+                    game.payout(true);
+                    ce.sendEmbedReply(win(1, game.getCurrentBet(), u, game));
                     GAMES.remove(u);
-                    Pages.getHandler().removeEvent(success);
-                    success.clearReactions().queue();
+                    return Status.SUCCESS;
+                } catch (Exception ex) {
+                    LOGGER.error("Error while paying out!", ex);
                 }
+            } else if (game.getDealerHand().get(1).getRANK().getValue() == 1 && game.getDealerSum() == 21) {
+                ce.sendEmbedReply(lose(game.getCurrentBet(), u, game));
+                GAMES.remove(u);
+                return Status.SUCCESS;
+            }
+
+            MessageEmbed embed = generate(ante, u,game);
+            Button hit = Button.primary(UUID.randomUUID().toString(), "Hit");
+            Button stay = Button.primary(UUID.randomUUID().toString(), "Stay");
+            Message m = new MessageBuilder().setEmbeds(embed).setActionRows(ActionRow.of(hit, stay)).build();
+            ce.getEvent().getChannel().sendMessage(m).queue(success -> {
+                ButtonInteractable i = new ButtonInteractable(
+                        Map.of(hit, this::hit, stay, this::stand),
+                        ce.getEvent().getAuthor()::equals,
+                        0, success);
+                ce.getMCHelper().getButtonListener().addInteractable(i);
             });
         }
         return Status.SUCCESS;
@@ -92,8 +98,10 @@ public class BlackJackCommand extends Command {
     /**
      * Method called when a user intends to play for more money.
      */
-    private void hit(User user, Message message) {
+    private void hit(WrappedButtonClickEvent wrappedEvent) {
+        User user = wrappedEvent.getEvent().getUser();
         BlackJackGame game = GAMES.get(user);
+
         int sum = game.hitPlayer();
         try {
             if (sum == 21) {
@@ -102,29 +110,22 @@ public class BlackJackCommand extends Command {
                 }
                 if (game.getDealerSum()==21) {
                     game.standOff();
-                    message.editMessageEmbeds(win(2, game.getCurrentBet(), user, game)).queue();
-                    Pages.getHandler().removeEvent(message);
-                    message.clearReactions().queue();
+                    wrappedEvent.removeListenerAndDestroy(win(2, game.getCurrentBet(), user, game));
                     GAMES.remove(user);
                     return;
                 }
                 game.payout(true);
-                message.editMessageEmbeds(win(1, game.getCurrentBet(), user, game)).queue();
-                Pages.getHandler().removeEvent(message);
-                message.clearReactions().queue();
+                wrappedEvent.removeListenerAndDestroy(win(1, game.getCurrentBet(), user, game));
                 GAMES.remove(user);
             } else if (sum < 21) {
-                message.editMessageEmbeds(generate(game.getCurrentBet(), user, game)).queue();
-                message.removeReaction("\uD83C\uDCCF",user).queue();
+                wrappedEvent.getEvent().editMessageEmbeds(generate(game.getCurrentBet(), user, game)).queue();
             }
             else {
                 while (game.getDealerSum()<17) {
                     game.hitDealer();
                 }
-                message.editMessageEmbeds(lose(game.getCurrentBet(), user, game)).queue();
+                wrappedEvent.removeListenerAndDestroy(lose(game.getCurrentBet(), user, game));
                 GAMES.remove(user);
-                Pages.getHandler().removeEvent(message);
-                message.clearReactions().queue();
             }
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
@@ -134,26 +135,22 @@ public class BlackJackCommand extends Command {
     /**
      * Method called when a user intends to cash out their winnings.
      */
-    private void stand(User user, Message message) {
+    private void stand(WrappedButtonClickEvent wrappedEvent) {
+        User user = wrappedEvent.getEvent().getUser();
         BlackJackGame game = GAMES.remove(user);
+
         while (game.getDealerSum()<17) {
             game.hitDealer();
         }
         try {
             if (game.getDealerSum()>21 || game.getDealerSum()<game.getPlayersSum()) {
                 game.payout(false);
-                message.editMessageEmbeds(win(0, game.getCurrentBet(), user, game)).queue();
-                Pages.getHandler().removeEvent(message);
-                message.clearReactions().queue();
+                wrappedEvent.removeListenerAndDestroy(win(0, game.getCurrentBet(), user, game));
             } else if (game.getDealerSum()==game.getPlayersSum()) {
                 game.standOff();
-                message.editMessageEmbeds(win(2, game.getCurrentBet(), user, game)).queue();
-                Pages.getHandler().removeEvent(message);
-                message.clearReactions().queue();
-            } else{
-                message.editMessageEmbeds(lose(game.getCurrentBet(), user, game)).queue();
-                Pages.getHandler().removeEvent(message);
-                message.clearReactions().queue();
+                wrappedEvent.removeListenerAndDestroy(win(2, game.getCurrentBet(), user, game));
+            } else {
+                wrappedEvent.removeListenerAndDestroy(lose(game.getCurrentBet(), user, game));
             }
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
@@ -178,8 +175,7 @@ public class BlackJackCommand extends Command {
                 .setColor(Color.GREEN)
                 .setDescription("You have $" + AccountManager.format(currentAmount) + " up for bet!"
                         + "\n\n *Your hand: " + game.getPlayersSum() + "*\n" + playerString
-                        + "\n*Their hand:*\n" + dealerString
-                        + "\n*\uD83C\uDCCF to hit!\n\uD83E\uDDCD to stand.*")
+                        + "\n*Their hand:*\n" + dealerString)
                 .setFooter(u.getName() + " (" + game.getRemainingCards() + " cards left in deck.)", u.getEffectiveAvatarUrl())
                 .build();
     }
