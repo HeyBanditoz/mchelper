@@ -28,7 +28,7 @@ public class TransactionsCommand extends Command {
         for (Transaction txn : dao.getNTransactionsForUser(ce.getEvent().getAuthor().getIdLong(), 10)) {
             sj.add(txn.toString());
         }
-        ce.sendReply("```\n" + sj.toString() + "\n```");
+        ce.sendReply("Here are your last ten transactions:\n```\n" + sj + "\n```");
         return Status.SUCCESS;
     }
 }

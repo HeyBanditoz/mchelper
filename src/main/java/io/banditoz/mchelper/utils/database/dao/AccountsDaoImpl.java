@@ -1,8 +1,9 @@
 package io.banditoz.mchelper.utils.database.dao;
 
-import io.banditoz.mchelper.utils.database.Transaction;
+import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.StatPoint;
+import io.banditoz.mchelper.utils.database.Transaction;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -136,10 +137,13 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     @Override
-    public List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException {
+    public List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException, MoneyException {
+        if (n <= 0) {
+            throw new IllegalArgumentException("Need to fetch at least one transaction!");
+        }
         List<Transaction> txns = new ArrayList<>(Math.min(n, 10000)); // hacky
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? LIMIT ?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? ORDER BY `when` DESC LIMIT ?");
             ps.setLong(1, id);
             ps.setLong(2, id);
             ps.setLong(3, n);
@@ -149,6 +153,9 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
             }
             rs.close();
             ps.close();
+        }
+        if (txns.isEmpty()) {
+            throw new MoneyException("There is no transaction history for " + id);
         }
         txns.sort(Transaction::compareTo);
         return txns;

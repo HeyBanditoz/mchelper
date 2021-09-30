@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.plotter.TransactionHistoryPlotter;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
@@ -21,7 +22,7 @@ public class BalanceGraphCommand extends Command {
     @Override
     public Help getHelp() {
         return new Help(commandName(), false).withDescription("Graphs your transaction history, transaction" +
-                " by transaciton.");
+                " by transaction.");
     }
 
     @Override
@@ -34,10 +35,20 @@ public class BalanceGraphCommand extends Command {
         else {
             u = ce.getEvent().getMessage().getMentionedUsers().get(0);
         }
-        List<Transaction> txns = dao.getNTransactionsForUser(u.getIdLong(), Integer.MAX_VALUE);
+        int count = Integer.MAX_VALUE;
+        if (ce.getCommandArgs().length > 1) {
+            try {
+                count = Integer.parseInt(ce.getCommandArgs()[1]);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        List<Transaction> txns = dao.getNTransactionsForUser(u.getIdLong(), count);
+        if (txns.isEmpty()) {
+            throw new MoneyException("There is no account history for " + u.getAsTag());
+        }
 
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(u.getName(), txns);
-        ce.sendImageReply("Transaction history for " + u.getName(), thp.plot());
+        ce.sendImageReply("Last " + txns.size() + " transactions for " + u.getName(), thp.plot());
         return Status.SUCCESS;
 
     }
