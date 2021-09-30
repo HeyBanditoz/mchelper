@@ -28,7 +28,7 @@ public class RegexableHandler extends ListenerAdapter {
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return;
         // don't try to run a listener if a command is (probably) present
-        if (event.getMessage().getContentRaw().length() > 0 && dao.getConfig(event.getGuild()).getPrefix() == event.getMessage().getContentRaw().charAt(0)) return;
+        if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && dao.getConfig(event.getGuild()).getPrefix() == event.getMessage().getContentRaw().charAt(0)) return;
 
         getRegexableByEvent(event).forEach(r -> MCHELPER.getThreadPoolExecutor().execute(() -> {
             if (r.handleCooldown(event.getChannel().getId())) {
