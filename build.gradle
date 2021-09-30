@@ -57,10 +57,8 @@ repositories {
     }
 }
 
-Copy
-
 dependencies {
-    implementation('net.dv8tion:JDA:4.3.0_315') {
+    implementation('net.dv8tion:JDA:4.3.0_331') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -82,10 +80,10 @@ dependencies {
     }
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
-    runtimeOnly 'org.antlr:antlr4-runtime:4.7.2'
+    runtimeOnly 'org.antlr:antlr4-runtime:4.9.2'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
 }
 
 test {
