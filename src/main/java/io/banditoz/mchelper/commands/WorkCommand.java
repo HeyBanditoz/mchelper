@@ -18,12 +18,13 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @Requires(database = true)
 public class WorkCommand extends Command {
-    private List<TaskResponse> workResponses;
+    private final List<TaskResponse> workResponses = new ArrayList<>();
     private final Random random = new SecureRandom();
 
     @Override
