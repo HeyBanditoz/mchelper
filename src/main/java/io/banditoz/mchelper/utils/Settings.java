@@ -36,8 +36,13 @@ public class Settings {
     @JsonProperty("tarkovMarketApiKey")
     private String tarkovMarketApiKey;
 
+    private final static Settings defaultSettings = SettingsManager.getDefaultSettings();
+
     @JsonProperty("discordToken")
     public String getDiscordToken() {
+        if (discordToken != null && discordToken.equals(defaultSettings.discordToken)) {
+            return null;
+        }
         return discordToken;
     }
 
@@ -48,6 +53,9 @@ public class Settings {
 
     @JsonProperty("botOwners")
     public List<String> getBotOwners() {
+        if (botOwners != null && botOwners.isEmpty()) {
+            return null;
+        }
         return botOwners;
     }
 
@@ -58,6 +66,9 @@ public class Settings {
 
     @JsonProperty("owlBotToken")
     public String getOwlBotToken() {
+        if (owlBotToken != null && owlBotToken.equals(defaultSettings.owlBotToken)) {
+            return null;
+        }
         return owlBotToken;
     }
 
@@ -78,6 +89,9 @@ public class Settings {
 
     @JsonProperty("finnhubKey")
     public String getFinnhubKey() {
+        if (finnhubKey != null && finnhubKey.equals(defaultSettings.finnhubKey)) {
+            return null;
+        }
         return finnhubKey;
     }
 
@@ -88,6 +102,9 @@ public class Settings {
 
     @JsonProperty("riotApiKey")
     public String getRiotApiKey() {
+        if (riotApiKey != null && riotApiKey.equals(defaultSettings.riotApiKey)) {
+            return null;
+        }
         return riotApiKey;
     }
 
@@ -98,6 +115,9 @@ public class Settings {
 
     @JsonProperty("databaseUsername")
     public String getDatabaseUsername() {
+        if (databaseUsername != null && databaseUsername.equals(defaultSettings.databaseUsername)) {
+            return null;
+        }
         return databaseUsername;
     }
 
@@ -108,6 +128,9 @@ public class Settings {
 
     @JsonProperty("databasePassword")
     public String getDatabasePassword() {
+        if (databasePassword != null && databasePassword.equals(defaultSettings.databasePassword)) {
+            return null;
+        }
         return databasePassword;
     }
 
@@ -118,6 +141,9 @@ public class Settings {
 
     @JsonProperty("databaseHostAndPort")
     public String getDatabaseHostAndPort() {
+        if (databaseHostAndPort != null && databaseHostAndPort.equals(defaultSettings.databaseHostAndPort)) {
+            return null;
+        }
         return databaseHostAndPort;
     }
 
@@ -128,6 +154,9 @@ public class Settings {
 
     @JsonProperty("databaseName")
     public String getDatabaseName() {
+        if (databaseName != null && databaseName.equals(defaultSettings.databaseName)) {
+            return null;
+        }
         return databaseName;
     }
 
@@ -148,6 +177,9 @@ public class Settings {
 
     @JsonProperty("elasticsearchMessageEndpoint")
     public String getElasticsearchMessageEndpoint() {
+        if (elasticsearchMessageEndpoint != null && elasticsearchMessageEndpoint.equals(defaultSettings.elasticsearchMessageEndpoint)) {
+            return null;
+        }
         return elasticsearchMessageEndpoint;
     }
 
@@ -158,6 +190,9 @@ public class Settings {
 
     @JsonProperty("loggedChannels")
     public List<String> getLoggedChannels() {
+        if (loggedChannels != null && loggedChannels.isEmpty()) {
+            return null;
+        }
         return loggedChannels;
     }
 
@@ -168,6 +203,9 @@ public class Settings {
 
     @JsonProperty("tarkovMarketApiKey")
     public String getTarkovMarketApiKey() {
+        if (tarkovMarketApiKey != null && tarkovMarketApiKey.equals(defaultSettings.tarkovMarketApiKey)) {
+            return null;
+        }
         return tarkovMarketApiKey;
     }
 

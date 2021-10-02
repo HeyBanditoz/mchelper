@@ -78,11 +78,12 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.8.0') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
-
+    implementation 'org.reflections:reflections:0.9.12'
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.9.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
 }
 

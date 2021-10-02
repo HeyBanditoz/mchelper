@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.dictionary.Definition;
 import io.banditoz.mchelper.dictionary.DictionaryResult;
 import io.banditoz.mchelper.dictionary.DictionarySearcher;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.util.ArrayList;
 import java.util.List;
 
+@Requires(settingsMethod = "getOwlBotToken")
 public class DictionaryCommand extends Command {
     @Override
     public String commandName() {

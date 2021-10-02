@@ -2,12 +2,14 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.CoordinatePoint;
 import io.banditoz.mchelper.utils.database.dao.CoordsDao;
 import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
 
+@Requires(database = true)
 public class CoordCommand extends Command {
     @Override
     public String commandName() {

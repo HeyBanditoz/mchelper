@@ -1,9 +1,8 @@
 package io.banditoz.mchelper;
 
-import javax.security.auth.login.LoginException;
 
 public class Bot {
-    public static void main(String[] args) throws LoginException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         if (args.length > 0 && args[0].equalsIgnoreCase("dumpcommands")) {
             CommandsToMarkdown.commandsToMarkdown();
             System.exit(0);

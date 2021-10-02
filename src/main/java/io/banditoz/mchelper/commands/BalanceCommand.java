@@ -2,11 +2,13 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.entities.Member;
 
+@Requires(database = true)
 public class BalanceCommand extends Command {
     @Override
     public String commandName() {

@@ -51,7 +51,7 @@ public class SettingsManager {
         OM.writeValue(CONFIG_FILE.toFile(), this.settings);
     }
 
-    private Settings getDefaultSettings() {
+    public static Settings getDefaultSettings() {
         Settings defaultSettings = new Settings();
         defaultSettings.setDiscordToken("Bot token here...");
         defaultSettings.setBotOwners(Collections.singletonList("Owner IDs here..."));

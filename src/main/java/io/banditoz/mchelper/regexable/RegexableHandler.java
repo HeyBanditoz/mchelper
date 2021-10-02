@@ -4,6 +4,7 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.ClassUtils;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -77,14 +78,15 @@ public class RegexableHandler extends ListenerAdapter {
         return Collections.unmodifiableList(regexables);
     }
 
-    public RegexableHandler(MCHelper mcHelper) {
+    public RegexableHandler(MCHelper mcHelper) throws Exception {
         this.MCHELPER = mcHelper;
         this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
         regexables = new ArrayList<>();
-        regexables.add(new TeXRegexable());
-        regexables.add(new RedditRegexable());
-        regexables.add(new DadRegexable());
-        regexables.add(new BetRegexable());
-        LOGGER.info(regexables.size() + " regexable listeners registered.");
+        LOGGER.info("Registering regexable listeners...");
+        long before = System.currentTimeMillis();
+        for (Class<? extends Regexable> clazz : ClassUtils.getAllSubtypesOf(Regexable.class)) {
+            regexables.add(clazz.getDeclaredConstructor().newInstance());
+        }
+        LOGGER.info(regexables.size() + " regexable listeners registered in " + (System.currentTimeMillis() - before) + " ms.");
     }
 }

@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.EventHandler;
 import io.banditoz.mchelper.utils.Help;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+@Requires(database = true)
 public class AddquoteCommand extends Command {
 
     private final EventHandler<MessageReactionAddEvent> handler = new EventHandler<MessageReactionAddEvent>() {

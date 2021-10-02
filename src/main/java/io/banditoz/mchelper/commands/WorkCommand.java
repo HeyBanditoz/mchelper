@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.Task;
 import io.banditoz.mchelper.stats.Status;
@@ -13,30 +14,21 @@ import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
+@Requires(database = true)
 public class WorkCommand extends Command {
-    private final List<TaskResponse> workResponses;
+    private List<TaskResponse> workResponses;
     private final Random random = new SecureRandom();
 
     @Override
     public String commandName() {
         return "work";
-    }
-
-    public WorkCommand(ObjectMapper om) throws IOException {
-        // TODO this kinda sucks. Lol.
-        List<TaskResponse> tempList = om.readValue(getClass().getClassLoader()
-                .getResource("tasks_responses.json")
-                .openStream(), om.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
-        workResponses = tempList.stream().filter(taskResponse -> taskResponse.getTask() == Task.WORK).collect(Collectors.toUnmodifiableList());
     }
 
     @Override
@@ -47,6 +39,14 @@ public class WorkCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
+        if (workResponses.isEmpty()) {
+            // lazy evaluation I guess, lol
+            ObjectMapper om = ce.getMCHelper().getObjectMapper();
+            List<TaskResponse> tempList = om.readValue(getClass().getClassLoader()
+                    .getResource("tasks_responses.json")
+                    .openStream(), om.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
+            tempList.stream().filter(taskResponse -> taskResponse.getTask() == Task.WORK).forEach(workResponses::add);
+        }
         TasksDao dao = new TasksDaoImpl(ce.getDatabase());
         LocalDateTime ldt = dao.getWhenCanExecute(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {

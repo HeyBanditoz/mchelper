@@ -1,9 +1,6 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Cooldown;
-import io.banditoz.mchelper.commands.logic.CooldownType;
+import io.banditoz.mchelper.commands.logic.*;
 import io.banditoz.mchelper.investing.Finance;
 import io.banditoz.mchelper.investing.model.CompanyProfile;
 import io.banditoz.mchelper.investing.model.Quote;
@@ -16,6 +13,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.time.temporal.ChronoUnit;
 
+@Requires(settingsMethod = "getFinnhubKey")
 public class StockCommand extends Command {
     @Override
     public String commandName() {

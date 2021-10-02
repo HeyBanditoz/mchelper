@@ -5,7 +5,7 @@ There are a total of 59 commands and 4 regex listeners.
 ### BalanceCommand
 `bal` - <no parameters>  - Checks your balance.
 ### BalanceGraphCommand
-`balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaciton.
+`balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaction.
 ### BaltopCommand
 `baltop` - <no parameters>  - Gets the money leaderboard for this guild.
 ### BashCommand

@@ -15,7 +15,7 @@ import java.util.List;
 public class CommandsToMarkdown {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandsToMarkdown.class);
 
-    public static void commandsToMarkdown() {
+    public static void commandsToMarkdown() throws Exception {
         LOGGER.info("Beginning dumping of commands and regex listeners to markdown...");
         MCHelper mcHelper = new MCHelperTestImpl();
         StringBuilder markdown = new StringBuilder("# Commands\n");

@@ -66,10 +66,7 @@ public class MCHelperImpl implements MCHelper {
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
         SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
                 .build());
-        this.CH = new CommandHandler(this);
-        this.RH = new RegexableHandler(this);
         JDA = buildJDA();
-        JDA.addEventListener(CH, RH);
 
         if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
             LOGGER.info("Enabling the Elasticsearch message logging service for the following channels: " + SETTINGS.getLoggedChannels());
@@ -107,6 +104,9 @@ public class MCHelperImpl implements MCHelper {
             AM = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
+        this.CH = buildCommandHandler();
+        this.RH = buildRegexableHandler();
+        JDA.addEventListener(CH, RH);
         RRL = new RoleReactionListener(this);
         BL = new ButtonListener(this);
         JDA.addEventListener(BL);
@@ -213,6 +213,29 @@ public class MCHelperImpl implements MCHelper {
         }
         return null;
     }
+
+    private CommandHandler buildCommandHandler() {
+        try {
+            return new CommandHandler(this);
+        } catch (Exception ex) {
+            LOGGER.error("Couldn't build the command handler. Exiting!", ex);
+            shutdown();
+            System.exit(1);
+        }
+        return null;
+    }
+
+    private RegexableHandler buildRegexableHandler() {
+        try {
+            return new RegexableHandler(this);
+        } catch (Exception ex) {
+            LOGGER.error("Couldn't build the regexable handler. Exiting!", ex);
+            shutdown();
+            System.exit(1);
+        }
+        return null;
+    }
+
 
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {

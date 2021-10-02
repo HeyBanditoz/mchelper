@@ -1,11 +1,10 @@
 package io.banditoz.mchelper.commands.logic;
 
-import com.merakianalytics.orianna.Orianna;
-import com.merakianalytics.orianna.types.common.Region;
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.commands.*;
+import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.ClassUtils;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -14,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class CommandHandler extends ListenerAdapter {
@@ -64,107 +65,53 @@ public class CommandHandler extends ListenerAdapter {
         return commands.remove(name) != null;
     }
 
-    public CommandHandler(MCHelper MCHelper) {
+    public CommandHandler(MCHelper MCHelper) throws Exception {
         this.MCHELPER = MCHelper;
         Settings settings = MCHelper.getSettings();
-        LOGGER.info("Registering commands and listeners...");
-        add(new BashCommand());
-        add(new InfoCommand());
-        add(new MathCommand());
-        add(new EangleCommand());
-        add(new NetherCommand());
-        add(new OverworldCommand());
-        add(new UnitsCommand());
-        add(new TeXCommand());
-        add(new PickCommand());
-        add(new ToMorseCommand());
-        add(new FromMorseCommand());
-        add(new EvalCommand());
-        add(new DiceRollerCommand());
-        add(new CoinFlipCommand());
-        add(new VersionCommand());
-        add(new PingCommand());
-        add(new HeapDumpCommand());
-        add(new UploadLogsCommand());
-        add(new FloodCommand());
-        add(new SnowflakeCommand());
-        add(new InviteBotCommand());
-        add(new RockPaperScissorsCommand());
-        add(new ServerStatusCommand());
-        add(new UrbanDictionaryCommand());
-        add(new PlotCommand());
-        add(new TeamsCommand());
-        add(new UserInfoCommand());
-        add(new JoinOrderCommand());
-        add(new EightBallCommand());
-        add(new RussianRouletteCommand());
-        add(new RemoveCommandCommand());
-        add(new CooldownsCommand());
-        add(new WhoHasCommand());
-
-        if (settings.getDatabaseHostAndPort() != null && !settings.getDatabaseHostAndPort().equals("Host and port of the database.")) {
-            add(new CoordCommand());
-            add(new QuoteCommand());
-            add(new AddquoteCommand());
-            add(new SqlCommand());
-            add(new RemindmeCommand());
-            add(new DeleteReminderCommand());
-            add(new DefaultChannelCommand());
-            add(new PrefixCommand());
-            add(new StatisticsCommand());
-            add(new ManageRolesCommand());
-            add(new DeleteQuoteCommand());
-            add(new TransferCommand());
-            add(new BalanceCommand());
-            add(new BaltopCommand());
-            add(new TransactionsCommand());
-            add(new DoubleOrNothingCommand());
-            add(new BalanceGraphCommand());
-            add(new BlackJackCommand());
-            try {
-                add(new WorkCommand(MCHELPER.getObjectMapper()));
-            } catch (Exception ex) {
-                LOGGER.error("Error while initializing the work responses.", ex);
+        LOGGER.info("Registering commands...");
+        long before = System.currentTimeMillis();
+        Set<Class<? extends Command>> classes = ClassUtils.getAllSubtypesOf(Command.class);
+        for (Class<? extends Command> clazz : classes) {
+            if (Modifier.isAbstract(clazz.getModifiers())) {
+                // We have to catch ElevatedCommand here; that should be the only class, though.
+                continue;
             }
-            add(new SetTimeZoneCommand());
-            add(new TimeZoneCommand());
+            if (clazz.equals(HelpCommand.class)) {
+                // We manually add this at the end, as we pass in a list of Commands to HelpCommand at the end.
+                continue;
+            }
+            Command c = clazz.getDeclaredConstructor().newInstance();
+            Requires r = c.getClass().getAnnotation(Requires.class);
+            if (r == null) {
+                commands.put(c.commandName(), c);
+                continue;
+            }
+            if (r.database()) {
+                if (MCHelper.getSettings().getDatabaseName() != null) {
+                    commands.put(c.commandName(), c);
+                }
+                else {
+                    LOGGER.warn("Not registering " + clazz.getSimpleName() + " as the database is not configured.");
+                }
+            }
+            else if (!r.settingsMethod().isEmpty()) {
+                // This is hacky, but essentially the "Requires" annotation holds a field called method(), which
+                // returns the underlying method name in Settings, so we dynamically invoke it here to see if it's
+                // not null, which means the user configured that setting. We have to do it this way as you can't
+                // have a method reference in an annotation. :(
+                Method m = settings.getClass().getDeclaredMethod(r.settingsMethod());
+                String s = (String) m.invoke(settings);
+                if (s != null) {
+                    commands.put(c.commandName(), c);
+                }
+                else {
+                    LOGGER.warn("Not registering " + clazz.getSimpleName() + " as " + r.settingsMethod() + " is null or default.");
+                }
+            }
         }
-
-        if (settings.getOwlBotToken() == null || settings.getOwlBotToken().equals("OwlBot API key here.")) {
-            LOGGER.info("No OwlBot API key defined! Not enabling the dictionary define command...");
-        }
-        else {
-            add(new DictionaryCommand());
-        }
-
-        if (settings.getFinnhubKey() == null || settings.getFinnhubKey().equals("Alpha Vantage API key here")) {
-            LOGGER.info("Finnhub API key not defined! Not enabling financial commands.");
-        }
-        else {
-            add(new StockCommand());
-        }
-
-        if (settings.getRiotApiKey() == null || settings.getRiotApiKey().equals("Riot Api Key here")) {
-            LOGGER.info("Riot API key not defined! Not enabling Orianna.");
-        }
-        else {
-            Orianna.setRiotAPIKey(settings.getRiotApiKey());
-            Orianna.setDefaultRegion(Region.NORTH_AMERICA);
-            add(new LoadoutCommand());
-        }
-
-        if (settings.getTarkovMarketApiKey() == null || settings.getTarkovMarketApiKey().equals("https://tarkov-market.com API key here.")) {
-            LOGGER.info("No tarkov-market API key defined! Not enabling the Tarkov market command...");
-        }
-        else {
-            add(new TarkovCommand());
-        }
-        add(new HelpCommand(commands.values())); // this must be registered last
-        LOGGER.info(commands.size() + " commands registered.");
-    }
-
-    private void add(Command c) {
-        commands.put(c.commandName(), c);
+        HelpCommand help = new HelpCommand(commands.values());
+        commands.put(help.commandName(), help);
+        LOGGER.info(commands.size() + " commands registered in " + (System.currentTimeMillis() - before) + " ms.");
     }
 
     public int getCommandsRun() {

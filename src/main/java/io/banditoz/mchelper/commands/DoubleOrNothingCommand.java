@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.games.DoubleOrNothingGame;
 import io.banditoz.mchelper.interactions.ButtonInteractable;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Requires(database = true)
 public class DoubleOrNothingCommand extends Command {
     private static final BigDecimal LOWER = BigDecimal.valueOf(5);
     private static final BigDecimal UPPER = BigDecimal.valueOf(200000);

@@ -21,12 +21,13 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
+// This class only exists so CommandsToMarkdown can run, as Mockito is only used for testing.
 public class MCHelperTestImpl implements MCHelper {
     private final CommandHandler CH;
     private final RegexableHandler RH;
     private final ObjectMapper OM;
 
-    public MCHelperTestImpl() {
+    public MCHelperTestImpl() throws Exception {
         this.OM = new ObjectMapper();
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);

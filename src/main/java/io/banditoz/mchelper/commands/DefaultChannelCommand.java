@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.GuildConfig;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.utils.MiscUtil;
 import static io.banditoz.mchelper.commands.logic.CommandPermissions.isBotOwner;
 import static io.banditoz.mchelper.commands.logic.CommandPermissions.isGuildOwner;
 
+@Requires(database = true)
 public class DefaultChannelCommand extends Command {
     @Override
     public String commandName() {
