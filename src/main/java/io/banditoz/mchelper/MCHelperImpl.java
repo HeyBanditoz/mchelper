@@ -61,6 +61,17 @@ public class MCHelperImpl implements MCHelper {
             System.exit(1);
         }
 
+        // Splash
+        LOGGER.info("___  ________  _   _      _                 ");
+        LOGGER.info("|  \\/  /  __ \\| | | |    | |                ");
+        LOGGER.info("| .  . | /  \\/| |_| | ___| |_ __   ___ _ __ ");
+        LOGGER.info("| |\\/| | |    |  _  |/ _ \\ | '_ \\ / _ \\ '__|");
+        LOGGER.info("| |  | | \\__/\\| | | |  __/ | |_) |  __/ |   ");
+        LOGGER.info("\\_|  |_/\\____/\\_| |_/\\___|_| .__/ \\___|_|   ");
+        LOGGER.info("                           | |              ");
+        LOGGER.info("                           |_|              ");
+        LOGGER.info("MCHelper version " + Version.GIT_SHA + " committed on " + Version.GIT_DATE);
+
         TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
