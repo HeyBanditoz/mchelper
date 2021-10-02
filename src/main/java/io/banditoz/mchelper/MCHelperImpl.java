@@ -104,6 +104,8 @@ public class MCHelperImpl implements MCHelper {
             DB = new Database(SETTINGS);
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
+            RRL = new RoleReactionListener(this);
+            JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
             SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
                     10,
                     43200,
@@ -113,15 +115,14 @@ public class MCHelperImpl implements MCHelper {
             DB = null;
             RS = null;
             AM = null;
+            RRL = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         this.CH = buildCommandHandler();
         this.RH = buildRegexableHandler();
         JDA.addEventListener(CH, RH);
-        RRL = new RoleReactionListener(this);
         BL = new ButtonListener(this);
         JDA.addEventListener(BL);
-        JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
 
         SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),

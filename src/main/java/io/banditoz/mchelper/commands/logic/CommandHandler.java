@@ -87,7 +87,7 @@ public class CommandHandler extends ListenerAdapter {
                 continue;
             }
             if (r.database()) {
-                if (MCHelper.getSettings().getDatabaseName() != null) {
+                if (MCHelper.getSettings().getDatabaseHostAndPort() != null) {
                     commands.put(c.commandName(), c);
                 }
                 else {
