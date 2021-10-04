@@ -1,7 +1,6 @@
-package io.banditoz.mchelper;
+package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
@@ -53,7 +52,16 @@ public class CommandTests {
         }
     }
 
-    private Settings getMockSettings() {
+    @Test
+    public void testHelpToStringDoesNotException() {
+        AtomicReference<CommandHandler> ch = new AtomicReference<>();
+        assertDoesNotThrow(() -> ch.set(new CommandHandler(mcHelper)), "Exception initializing the CommandHandler. Cannot continue test.");
+        for (Command command : ch.get().getCommands()) {
+            command.getHelp().toString();
+        }
+    }
+
+    public static Settings getMockSettings() {
         Settings settings = new Settings();
         List<String> defaultOwners = new ArrayList<>();
         defaultOwners.add("12341234");

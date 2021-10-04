@@ -1,7 +1,6 @@
 package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.banditoz.mchelper.money.Task;
 import io.banditoz.mchelper.utils.database.TaskResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
