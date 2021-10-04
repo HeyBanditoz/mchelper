@@ -68,7 +68,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.3.0_331') {
+    implementation('net.dv8tion:JDA:4.3.0_333') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -89,12 +89,13 @@ dependencies {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     implementation 'org.reflections:reflections:0.9.12'
-    runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
-    runtimeOnly 'org.antlr:antlr4-runtime:4.9.2'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
+    runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testImplementation 'org.mockito:mockito-core:3.12.4'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 test {
