@@ -21,6 +21,10 @@ plugins {
 
     // Clean testing output
     id 'com.adarshr.test-logger' version '2.1.0'
+
+    // Code coverage
+    id 'jacoco'
+    id 'de.jansauer.printcoverage' version '2.0.0'
 }
 
 shadowJar {
@@ -44,6 +48,12 @@ gversion {
     debug = false
     language = "java"
     explicitType = false
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
 }
 
 repositories {
@@ -91,7 +101,10 @@ test {
     useJUnitPlatform()
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 // Define the main class for the application
 mainClassName = 'io.banditoz.mchelper.Bot'
-compileJava.options.encoding = 'UTF-8'
 project.compileJava.dependsOn(createVersionFile)
