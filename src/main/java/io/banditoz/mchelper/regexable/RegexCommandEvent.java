@@ -62,7 +62,7 @@ public class RegexCommandEvent {
      * Sends typing to where this event came from.
      */
     public void sendTyping() {
-        getEvent().getChannel().sendTyping().queue();
+        getEvent().getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
     }
 
     public Logger getLogger() {

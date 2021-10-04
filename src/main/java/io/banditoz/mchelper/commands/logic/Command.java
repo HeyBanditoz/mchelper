@@ -112,7 +112,7 @@ public abstract class Command {
                     throw new IllegalStateException("Unexpected value: " + cooldown.getType());
             }
         }
-        e.getChannel().sendTyping().queue();
+        e.getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
         try {
             Status status = onCommand(ce);
             if (status != Status.SUCCESS) {
