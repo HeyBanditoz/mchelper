@@ -1,6 +1,10 @@
 # MCHelper
 
-[![pipeline status](https://gitlab.com/HeyBanditoz/mchelper/badges/master/pipeline.svg)](https://gitlab.com/HeyBanditoz/mchelper/-/commits/master)
+[![Pipeline Status](https://gitlab.com/HeyBanditoz/mchelper/badges/master/pipeline.svg)](https://gitlab.com/HeyBanditoz/mchelper/-/jobs/artifacts/master/file/build/reports/tests/test/index.html?job=test)
+[![Coverage Report](https://gitlab.com/HeyBanditoz/mchelper/badges/master/coverage.svg)](https://gitlab.com/HeyBanditoz/mchelper/-/jobs/artifacts/master/file/build/reports/jacoco/test/html/index.html?job=test)
+
+[Latest Test Report](https://gitlab.com/HeyBanditoz/mchelper/-/jobs/artifacts/master/file/build/reports/tests/test/index.html?job=test) \|
+[Latest Coverage Report](https://gitlab.com/HeyBanditoz/mchelper/-/jobs/artifacts/master/file/build/reports/jacoco/test/html/index.html?job=test)
 
 MCHelper is a simple Discord bot with a small set of commands, such as
 TeX parsing, a math command, dice roller, quotes saving
