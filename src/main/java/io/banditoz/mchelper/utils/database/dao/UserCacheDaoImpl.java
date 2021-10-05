@@ -19,7 +19,7 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `username_cache`( `id` bigint(18) NOT NULL, `username` varchar(32) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+        return "CREATE TABLE IF NOT EXISTS `username_cache`( `id` bigint(18) NOT NULL, `username` varchar(32) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     }
 
     public void replaceAll(List<User> users) throws SQLException {
