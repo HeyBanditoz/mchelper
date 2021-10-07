@@ -123,6 +123,7 @@ public class MCHelperImpl implements MCHelper {
         JDA.addEventListener(CH, RH);
         BL = new ButtonListener(this);
         JDA.addEventListener(BL);
+        JDA.addEventListener(new SelfGuildJoinLeaveListener());
 
         SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),
