@@ -66,10 +66,6 @@ public class CommandTests extends BaseCommandTest {
         settings.setCommandThreads(1);
         settings.setFinnhubKey("35uy7ewsgfhed");
         settings.setRiotApiKey("we98ytfghioned.");
-        settings.setDatabaseName("no_database");
-        settings.setDatabaseHostAndPort("localhost:3306");
-        settings.setDatabaseUsername("root");
-        settings.setDatabasePassword("toor");
         settings.setTarkovMarketApiKey("sgfjklw4epoitju");
         return settings;
     }

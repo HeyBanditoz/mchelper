@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.utils.database;
 
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.*;
 import org.mariadb.jdbc.MariaDbPoolDataSource;
 import org.slf4j.Logger;
@@ -9,16 +8,21 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Database {
     private final MariaDbPoolDataSource POOL;
     private final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
-    public Database(Settings settings) {
-        String url = "jdbc:mariadb://" + settings.getDatabaseHostAndPort() +
-                "/" + settings.getDatabaseName() +
-                "?user=" + settings.getDatabaseUsername() +
-                "&password=" + settings.getDatabasePassword() +
+    public Database() {
+        if (!isConfigured()) {
+            throw new IllegalStateException("The database is not configured.");
+        }
+        Map<String, String> env = System.getenv();
+        String url = "jdbc:mariadb://" + env.get("HOST") +
+                "/" + env.get("DB") +
+                "?user=" + env.get("USER") +
+                "&password=" + env.get("PASS") +
                 "&useUnicode=true&pool&maxPoolSize=5&maxIdleTime=1800";
         POOL = new MariaDbPoolDataSource(url);
 
@@ -41,5 +45,13 @@ public class Database {
 
     public Connection getConnection() throws SQLException {
         return POOL.getConnection();
+    }
+
+    /**
+     * @return If the database environment variables are configured or not. HOST, DB, USER, PASS.
+     */
+    public static boolean isConfigured() {
+        Map<String, String> env = System.getenv();
+        return env.containsKey("HOST") && env.containsKey("DB") && env.containsKey("USER") && env.containsKey("PASS");
     }
 }

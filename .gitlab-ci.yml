@@ -26,7 +26,7 @@ package:
 test:
     stage: test
     script:
-        - gradle test jacocoTestReport printCoverage
+        - DB="test" HOST="127.0.0.1:3306" USER="root" PASS="root" gradle test jacocoTestReport printCoverage
     needs: ["package"]
     dependencies:
         - package
@@ -78,7 +78,7 @@ new_commands:
         - echo "$PRIVATE_TOKEN" > token
         - apt update
         - apt -y install curl
-        - gradle run --args="dumpcommands"
+        - DB="test" HOST="127.0.0.1:3306" USER="root" PASS="root" gradle run --args="dumpcommands"
         - bash push_commands_to_gitlab.sh
     only:
         - master

@@ -1,7 +1,7 @@
 [Unit]
 Description=MCHelper
 After=network.target
-Require=mariadb.service
+Requires=mariadb.service
 
 [Service]
 User=discord
@@ -11,6 +11,8 @@ PrivateTmp=true
 ProtectHome=true
 ProtectKernelTunables=true
 ProtectControlGroups=true
+Environment="HOST=127.0.0.1:3306" "DB=mchelper" "USER=root" "PASS=password"
+
 # You will need to modify this line to match where the mchelper jar is located. Needs to be able to at least read Config.json
 WorkingDirectory=/opt/mchelper
 # You will need to modify this line to match where your JVM is installed (or just do java)

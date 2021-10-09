@@ -19,14 +19,6 @@ public class Settings {
     private String finnhubKey;
     @JsonProperty("riotApiKey")
     private String riotApiKey;
-    @JsonProperty("databaseUsername")
-    private String databaseUsername;
-    @JsonProperty("databasePassword")
-    private String databasePassword;
-    @JsonProperty("databaseHostAndPort")
-    private String databaseHostAndPort;
-    @JsonProperty("databaseName")
-    private String databaseName;
     @JsonProperty("recordCommandAndRegexStatistics")
     private Boolean recordCommandAndRegexStatistics = false; // default value, TODO maybe fix others above too?
     @JsonProperty("elasticsearchMessageEndpoint")
@@ -111,58 +103,6 @@ public class Settings {
     @JsonProperty("riotApiKey")
     public void setRiotApiKey(String riotApiKey) {
         this.riotApiKey = riotApiKey;
-    }
-
-    @JsonProperty("databaseUsername")
-    public String getDatabaseUsername() {
-        if (databaseUsername != null && databaseUsername.equals(defaultSettings.databaseUsername)) {
-            return null;
-        }
-        return databaseUsername;
-    }
-
-    @JsonProperty("databaseUsername")
-    public void setDatabaseUsername(String databaseUsername) {
-        this.databaseUsername = databaseUsername;
-    }
-
-    @JsonProperty("databasePassword")
-    public String getDatabasePassword() {
-        if (databasePassword != null && databasePassword.equals(defaultSettings.databasePassword)) {
-            return null;
-        }
-        return databasePassword;
-    }
-
-    @JsonProperty("databasePassword")
-    public void setDatabasePassword(String databasePassword) {
-        this.databasePassword = databasePassword;
-    }
-
-    @JsonProperty("databaseHostAndPort")
-    public String getDatabaseHostAndPort() {
-        if (databaseHostAndPort != null && databaseHostAndPort.equals(defaultSettings.databaseHostAndPort)) {
-            return null;
-        }
-        return databaseHostAndPort;
-    }
-
-    @JsonProperty("databaseHostAndPort")
-    public void setDatabaseHostAndPort(String databaseHostAndPort) {
-        this.databaseHostAndPort = databaseHostAndPort;
-    }
-
-    @JsonProperty("databaseName")
-    public String getDatabaseName() {
-        if (databaseName != null && databaseName.equals(defaultSettings.databaseName)) {
-            return null;
-        }
-        return databaseName;
-    }
-
-    @JsonProperty("databaseName")
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
     }
 
     @JsonProperty("recordCommandAndRegexStatistics")

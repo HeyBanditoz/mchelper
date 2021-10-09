@@ -27,7 +27,7 @@ public class ConvertBlackjackToProperWinnings {
 
     public static void main(String[] args) {
         Settings s = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings();
-        Database db = new Database(s);
+        Database db = new Database();
 
         List<Transaction> txns = new ArrayList<>(); // hacky
         try (Connection c = db.getConnection()) {

@@ -59,10 +59,6 @@ public class SettingsManager {
         defaultSettings.setCommandThreads(2);
         defaultSettings.setFinnhubKey("Alpha Vantage API key here.");
         defaultSettings.setRiotApiKey("Riot Api Key here.");
-        defaultSettings.setDatabaseName("Name of the database.");
-        defaultSettings.setDatabaseHostAndPort("Host and port of the database.");
-        defaultSettings.setDatabaseUsername("Database username.");
-        defaultSettings.setDatabasePassword("Database password.");
         defaultSettings.setRecordCommandAndRegexStatistics(true);
         defaultSettings.setElasticsearchMessageEndpoint("http://endpoint:9200/thing/_doc");
         defaultSettings.setLoggedChannels(Collections.emptyList());

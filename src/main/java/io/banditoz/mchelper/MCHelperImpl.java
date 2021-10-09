@@ -100,8 +100,8 @@ public class MCHelperImpl implements MCHelper {
         JDA.awaitReady();
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completed.
-        if (SETTINGS.getDatabaseHostAndPort() != null && !SETTINGS.getDatabaseHostAndPort().equals("Host and port of the database.")) {
-            DB = new Database(SETTINGS);
+        if (Database.isConfigured()) {
+            DB = new Database();
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
             RRL = new RoleReactionListener(this);

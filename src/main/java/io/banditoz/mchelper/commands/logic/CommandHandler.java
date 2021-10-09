@@ -6,6 +6,7 @@ import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
 import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -87,7 +88,7 @@ public class CommandHandler extends ListenerAdapter {
                 continue;
             }
             if (r.database()) {
-                if (MCHelper.getSettings().getDatabaseHostAndPort() != null) {
+                if (Database.isConfigured()) {
                     commands.put(c.commandName(), c);
                 }
                 else {
