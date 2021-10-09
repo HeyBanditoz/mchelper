@@ -1,10 +1,7 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
-import io.banditoz.mchelper.commands.logic.CommandTests;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
@@ -14,8 +11,6 @@ public class RemoveCommandCommandTests extends BaseCommandTest {
     private final RemoveCommandCommand rcc;
 
     public RemoveCommandCommandTests() throws Exception {
-        MCHelper mcHelper = Mockito.mock(MCHelper.class);
-        Mockito.when(mcHelper.getSettings()).thenReturn(CommandTests.getMockSettings());
         CommandHandler ch = new CommandHandler(mcHelper);
         when(mcHelper.getCommandHandler()).thenReturn(ch);
         this.rcc = spy(new RemoveCommandCommand());

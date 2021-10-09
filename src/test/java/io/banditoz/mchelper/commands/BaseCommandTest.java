@@ -1,12 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.CommandTests;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
 
@@ -21,6 +24,8 @@ public abstract class BaseCommandTest {
     protected final ArgumentCaptor<String> stringCaptor;
     /** The {@link ArgumentCaptor} for capturing {@link CommandEvent#sendEmbedReply(MessageEmbed)} */
     protected final ArgumentCaptor<MessageEmbed> embedCaptor;
+    /** The {@link MCHelper} instance. */
+    protected final MCHelper mcHelper;
 
     public BaseCommandTest() {
         this.ce = mock(CommandEvent.class);
@@ -33,5 +38,7 @@ public abstract class BaseCommandTest {
         when(ce.getEvent().getJDA()).thenReturn(mock(JDA.class));
         Guild g = Mocks.getMockedGuild();
         when(ce.getGuild()).thenReturn(g);
+        this.mcHelper = mock(MCHelper.class);
+        Mockito.when(mcHelper.getSettings()).thenReturn(CommandTests.getMockSettings());
     }
 }

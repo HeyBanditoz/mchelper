@@ -1,6 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.BaseCommandTest;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
@@ -15,14 +15,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CommandTests {
-    private final MCHelper mcHelper;
-
+public class CommandTests extends BaseCommandTest {
     public CommandTests() {
-        mcHelper = Mockito.mock(MCHelper.class);
-        Settings settings = getMockSettings();
         Mockito.when(mcHelper.getDatabase()).thenReturn(Mockito.mock(Database.class));
-        Mockito.when(mcHelper.getSettings()).thenReturn(settings);
     }
 
     @Test
