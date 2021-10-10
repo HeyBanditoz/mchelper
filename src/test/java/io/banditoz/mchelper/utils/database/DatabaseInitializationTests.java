@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@Test(groups = {"DatabaseInitializationTests"})
 public class DatabaseInitializationTests {
     @Test
     public void testTableCreation() {

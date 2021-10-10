@@ -1,7 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 import java.awt.*;
@@ -16,8 +14,6 @@ public class ServerStatusCommandTests extends BaseCommandTest {
     public ServerStatusCommandTests() throws Exception {
         this.ssc = spy(new ServerStatusCommand());
         doNothing().when(ce).sendEmbedThumbnailReply(embedCaptor.capture(), any(), any());
-        ObjectMapper om = new ObjectMapper();
-        Mockito.when(mcHelper.getObjectMapper()).thenReturn(om);
         when(ce.getMCHelper()).thenReturn(mcHelper);
     }
 
