@@ -1,10 +1,9 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.TestUtils;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -20,7 +19,7 @@ public class PickCommandTests extends BaseCommandTest {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!pick", "this"});
         when(ce.getCommandArgsString()).thenReturn("this that these those");
         pc.onCommand(ce);
-        assertTrue(TestUtils.containsString(new String[]{"this", "that", "these", "those"}, stringCaptor.getValue()));
+        assertThat(stringCaptor.getValue()).containsAnyOf("this", "that", "these", "those");
     }
 
     @Test
@@ -28,8 +27,7 @@ public class PickCommandTests extends BaseCommandTest {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!pick", "2"});
         when(ce.getCommandArgsString()).thenReturn("this that");
         pc.onCommand(ce);
-        String s = stringCaptor.getValue();
-        assertTrue(s.equals("this, that") || s.equals("that, this"));
+        assertThat(stringCaptor.getValue()).containsAnyOf("this, that", "that, this");
     }
 
     @Test
@@ -37,13 +35,13 @@ public class PickCommandTests extends BaseCommandTest {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!pick", "this"});
         when(ce.getCommandArgsString()).thenReturn("this or that or these or those");
         pc.onCommand(ce);
-        assertTrue(TestUtils.containsString(new String[]{"this", "that", "these", "those"}, stringCaptor.getValue()));
+        assertThat(stringCaptor.getValue()).containsAnyOf("this", "that", "these", "those");
     }
 
     @Test
     public void testPickCommandWithInvalidCount() {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!pick", "8"});
         when(ce.getCommandArgsString()).thenReturn("this that these those");
-        assertThrows(Exception.class, () -> pc.onCommand(ce));
+        assertThatThrownBy(() -> pc.onCommand(ce));
     }
 }

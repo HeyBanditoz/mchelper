@@ -1,11 +1,16 @@
 package io.banditoz.mchelper.utils.database;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.testng.SkipException;
+import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class DatabaseInitializationTests {
     @Test
     public void testTableCreation() {
-        Assertions.assertDoesNotThrow(Database::new);
+        if (!Database.isConfigured()) {
+            throw new SkipException("The database is not configured.");
+        }
+        assertThatCode(Database::new).doesNotThrowAnyException();
     }
 }

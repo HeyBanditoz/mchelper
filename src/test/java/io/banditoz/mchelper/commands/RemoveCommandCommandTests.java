@@ -1,9 +1,9 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandHandler;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -21,13 +21,13 @@ public class RemoveCommandCommandTests extends BaseCommandTest {
     public void testRemoveCommandCommand() throws Exception {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!remove", "flip"});
         rcc.onCommand(ce);
-        assertEquals("Command successfully removed for this runtime.", stringCaptor.getValue());
+        assertThat(stringCaptor.getValue()).isEqualTo("Command successfully removed for this runtime.");
     }
 
     @Test
     public void testRemoveBogusCommand() throws Exception {
         when(ce.getCommandArgs()).thenReturn(new String[]{"!remove", "bogus"});
         rcc.onCommand(ce);
-        assertEquals("Command not found.", stringCaptor.getValue());
+        assertThat(stringCaptor.getValue()).isEqualTo("Command not found.");
     }
 }

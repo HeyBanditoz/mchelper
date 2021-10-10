@@ -4,39 +4,40 @@ import io.banditoz.mchelper.commands.BaseCommandTest;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.fail;
 
 public class CommandTests extends BaseCommandTest {
+    private CommandHandler ch;
+
     public CommandTests() {
         Mockito.when(mcHelper.getDatabase()).thenReturn(Mockito.mock(Database.class));
     }
 
     @Test
+    @BeforeClass
     public void testCommandInitialization() {
-        assertDoesNotThrow(() -> new CommandHandler(mcHelper));
+        assertThatCode(() -> ch = new CommandHandler(mcHelper)).doesNotThrowAnyException();
     }
 
     @Test
     public void testRegexableInitialization() {
-        assertDoesNotThrow(() -> new RegexableHandler(mcHelper));
+        assertThatCode(() -> new RegexableHandler(mcHelper)).doesNotThrowAnyException();
     }
 
     @Test
     public void noCommandShallHaveNullHelp() {
-        AtomicReference<CommandHandler> ch = new AtomicReference<>();
-        assertDoesNotThrow(() -> ch.set(new CommandHandler(mcHelper)), "Exception initializing the CommandHandler. Cannot continue test.");
         StringJoiner nullHelps = new StringJoiner(", ");
         int nullHelpsCounter = 0;
-        for (Command command : ch.get().getCommands()) {
+        for (Command command : ch.getCommands()) {
             if (command.getHelp() == null) {
                 nullHelps.add(command.getClass().toString());
                 nullHelpsCounter++;
@@ -49,9 +50,7 @@ public class CommandTests extends BaseCommandTest {
 
     @Test
     public void testHelpToStringDoesNotException() {
-        AtomicReference<CommandHandler> ch = new AtomicReference<>();
-        assertDoesNotThrow(() -> ch.set(new CommandHandler(mcHelper)), "Exception initializing the CommandHandler. Cannot continue test.");
-        for (Command command : ch.get().getCommands()) {
+        for (Command command : ch.getCommands()) {
             command.getHelp().toString();
         }
     }

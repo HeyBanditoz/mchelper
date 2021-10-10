@@ -1,11 +1,11 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.money.AccountManager;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 public class AccountManagerFormattingTests {
     @Test
