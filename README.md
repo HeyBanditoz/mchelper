@@ -23,9 +23,15 @@ and [GuildMemberLeaveEvent.](https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/
 
 ## Configuration
 
-On first run the bot will generate one for you. The bot expects a MariaDB database instance to be available, but it
-isn't required. Some functionality will be disabled if the `databaseHostAndPort` field in the configuration is null or
-default.
+On first run the bot will generate one for you. All external services the bot can access will be configured here, except
+the SQL database. To configure that, you'll need to pass the following environment variables to Java:
+* HOST
+* DB
+* USER
+* PASS
+
+An example of a systemd unit file is available in the repository [here.](mchelper.service)
 
 ## Documentation
+
 Some documentation is available in the [documentation folder.](docs)

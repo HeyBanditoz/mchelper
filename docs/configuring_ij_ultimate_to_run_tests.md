@@ -17,8 +17,8 @@ data source):
 1. Create a new *Database Script* run configuration against your target data source with the following SQL script:
 
 ```sql
-DROP DATABASE automation;
-CREATE DATABASE automation COLLATE utf8mb4_general_ci;
+DROP DATABASE qa;
+CREATE DATABASE qa COLLATE utf8mb4_general_ci;
 ```
 
 2. Right-click the `test` package, and do `More Run/Debug -> Modify Run Configuration...`. This will create a default
