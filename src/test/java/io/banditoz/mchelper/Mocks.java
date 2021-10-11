@@ -76,6 +76,7 @@ public class Mocks {
         when(g.getMembers()).thenReturn(List.of(m1, m2));
 
         when(g.getRoles()).thenReturn(List.of(R));
+        when(g.getName()).thenReturn("QA Guild");
 
         when(g.getMemberById(163094867910590464L)).thenReturn(m1);
         when(g.getMemberById("163094867910590464")).thenReturn(m1);

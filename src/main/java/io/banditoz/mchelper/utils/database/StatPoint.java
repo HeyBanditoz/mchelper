@@ -70,7 +70,7 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
         Objects.requireNonNull(thingFormatter, "The thingFormatter cannot be null!");
         Objects.requireNonNull(countFormatter, "The countFormatter cannot be null!");
 
-        StringBuilder sb = new StringBuilder("\n```Rank  Name\n");
+        StringBuilder sb = new StringBuilder("\n```\nRank  Name\n");
         for (int i = 1; i <= list.size(); i++) {
             StatPoint<T, V> point = list.get(i - 1);
             String name = padZeros(truncate(thingFormatter.apply(point.thing), thingLength, false), thingLength + 4);
