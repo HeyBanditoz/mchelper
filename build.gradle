@@ -68,7 +68,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.3.0_333') {
+    implementation('net.dv8tion:JDA:4.3.0_339') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -88,13 +88,13 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.8.0') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
-    implementation 'org.reflections:reflections:0.9.12'
+    implementation 'org.reflections:reflections:0.10.1'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 
     testImplementation 'org.testng:testng:7.4.0'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
     testImplementation 'org.assertj:assertj-core:3.21.0'
 }
 
