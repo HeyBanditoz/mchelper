@@ -9,8 +9,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
-import java.time.format.DateTimeFormatter;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,10 +64,11 @@ public class UserInfoCommand extends Command {
         MessageEmbed me = new EmbedBuilder()
                 .setTitle(m.getUser().getAsTag())
                 .setThumbnail(m.getUser().getEffectiveAvatarUrl())
+                .setColor(m.getUser().isBot() ? Color.CYAN : Color.GREEN)
                 .addField("ID", m.getUser().getId(), false)
                 .addField("Nickname", m.getNickname() == null ? "<no nickname>" : m.getNickname(), false)
-                .addField("Creation Date", m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME), false)
-                .addField("Join Date", m.getTimeJoined().format(DateTimeFormatter.RFC_1123_DATE_TIME), false)
+                .addField("Creation Date", TimeFormat.DATE_TIME_LONG.format(m.getTimeCreated()), false)
+                .addField("Join Date", TimeFormat.DATE_TIME_LONG.format(m.getTimeJoined()), false)
                 .addField("Join Order (" + (ourIndex + 1) + " of " + joinSortedMembers.size() + ")", membersJoined.toString(), false)
                 .addField("Roles", roles.toString().isEmpty() ? "<no roles>": roles.toString(), false)
                 .build();

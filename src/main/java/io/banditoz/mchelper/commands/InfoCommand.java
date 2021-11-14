@@ -4,17 +4,16 @@ import com.sun.management.OperatingSystemMXBean;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDao;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -41,8 +40,9 @@ public class InfoCommand extends Command {
         OperatingSystemMXBean bean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         long usedJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
         long totalJVMMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() >> 20;
+        long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
 
-        String uptime = DateUtils.humanReadableDuration(Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime()));
+        String uptime = TimeFormat.DATE_TIME_LONG.format(startTime) + "\nStarted " + TimeFormat.RELATIVE.format(startTime);
 
         List<User> users = new ArrayList<>();
         ce.getEvent().getJDA().getGuilds().forEach(guild -> guild.getMembers().forEach(member -> users.add(member.getUser())));
