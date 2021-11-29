@@ -24,13 +24,17 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
 
     public void replaceAll(List<User> users) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
+            c.setAutoCommit(false);
+            PreparedStatement ps = c.prepareStatement("REPLACE INTO username_cache VALUES (?, ?)");
             for (User user : users) {
-                PreparedStatement ps = c.prepareStatement("REPLACE INTO username_cache VALUES (?, ?)");
                 ps.setLong(1, user.getIdLong());
                 ps.setString(2, user.getName());
-                ps.execute();
-                ps.close();
+                ps.addBatch();
             }
+            ps.executeBatch();
+            c.commit();
+            c.setAutoCommit(true);
+            ps.close();
         }
     }
 
@@ -40,12 +44,16 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
         List<FakeUser> cachedUsers = users.stream().map(user -> new FakeUser(user.getIdLong(), null)).collect(Collectors.toList());
         dbUsers.removeAll(cachedUsers);
         try (Connection c = DATABASE.getConnection()) {
+            c.setAutoCommit(false);
+            PreparedStatement ps = c.prepareStatement("DELETE FROM username_cache WHERE id = ?");
             for (FakeUser dbUser : dbUsers) {
-                PreparedStatement ps = c.prepareStatement("DELETE FROM username_cache WHERE id = ?");
                 ps.setLong(1, dbUser.getId());
-                ps.execute();
-                ps.close();
+                ps.addBatch();
             }
+            ps.executeBatch();
+            c.commit();
+            c.setAutoCommit(true);
+            ps.close();
         }
     }
 
