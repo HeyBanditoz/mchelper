@@ -1,7 +1,7 @@
 package io.banditoz.mchelper.utils.database;
 
+import com.zaxxer.hikari.HikariDataSource;
 import io.banditoz.mchelper.utils.database.dao.*;
-import org.mariadb.jdbc.MariaDbPoolDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Database {
-    private final MariaDbPoolDataSource POOL;
+    private final HikariDataSource POOL;
     private final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
     public Database() {
@@ -22,9 +22,11 @@ public class Database {
         String url = "jdbc:mariadb://" + env.get("HOST") +
                 "/" + env.get("DB") +
                 "?user=" + env.get("USER") +
-                "&password=" + env.get("PASS") +
-                "&useUnicode=true&pool&maxPoolSize=5&maxIdleTime=1800";
-        POOL = new MariaDbPoolDataSource(url);
+                "&password=" + env.get("PASS");
+        POOL = new HikariDataSource();
+        POOL.setMaximumPoolSize(2);
+        POOL.setDriverClassName("org.mariadb.jdbc.Driver");
+        POOL.setJdbcUrl(url);
 
         // we have a connection, generate tables!
         ArrayList<Dao> daos = new ArrayList<>();
@@ -39,11 +41,22 @@ public class Database {
         daos.add(new TasksDaoImpl(this));
         daos.add(new UserCacheDaoImpl(this));
         daos.forEach(Dao::generateTable);
-        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds.");
+        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds in the config.");
     }
 
+    /**
+     * @return A new {@link Connection} to use.
+     * @throws SQLException If a database access error occurs
+     */
     public Connection getConnection() throws SQLException {
         return POOL.getConnection();
+    }
+
+    /**
+     * Closes the underlying {@link HikariDataSource}
+     */
+    public void close() {
+        POOL.close();
     }
 
     /**

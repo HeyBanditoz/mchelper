@@ -138,6 +138,7 @@ public class MCHelperImpl implements MCHelper {
         if (SES != null) SES.shutdown();
         if (TPE != null) TPE.shutdown();
         if (JDA != null) JDA.shutdown();
+        if (getDatabase() != null) getDatabase().close();
     }
 
     @Override
