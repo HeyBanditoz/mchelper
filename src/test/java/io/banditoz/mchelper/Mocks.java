@@ -1,13 +1,11 @@
 package io.banditoz.mchelper;
 
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
-import java.util.EnumSet;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -20,7 +18,6 @@ public class Mocks {
         R = mock(Role.class);
         when(R.getName()).thenReturn("Role");
         when(R.getColor()).thenReturn(Color.RED);
-        when(R.getPermissionsExplicit()).thenReturn(EnumSet.of(Permission.MESSAGE_READ, Permission.MESSAGE_WRITE));
         when(R.getId()).thenReturn("732863308738330636");
         when(R.getIdLong()).thenReturn(732863308738330636L);
     }

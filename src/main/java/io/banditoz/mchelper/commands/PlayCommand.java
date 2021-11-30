@@ -33,7 +33,7 @@ public class PlayCommand extends Command {
         if (ce.getEvent().getMember().getVoiceState().getChannel() != null) {
             GuildVoiceState vs = ce.getEvent().getMember().getVoiceState();
             if (vs.getChannel().getGuild().equals(ce.getEvent().getGuild())) {
-                channel = Optional.ofNullable(ce.getEvent().getMember().getVoiceState().getChannel());
+                channel = Optional.ofNullable((VoiceChannel) vs.getChannel());
             }
             else {
                 channel = findFirstJoinableVoiceChannelInGuild(ce);

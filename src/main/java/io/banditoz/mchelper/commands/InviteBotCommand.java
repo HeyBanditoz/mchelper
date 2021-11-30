@@ -21,9 +21,7 @@ public class InviteBotCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         ce.sendReply("<" + ce.getEvent().getJDA().getInviteUrl(
-                Permission.MESSAGE_READ,
                 Permission.MESSAGE_ADD_REACTION,
-                Permission.MESSAGE_WRITE,
                 Permission.MESSAGE_ATTACH_FILES) + ">");
         return Status.SUCCESS;
     }

@@ -61,7 +61,6 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     mavenCentral()
-    maven { url 'https://jitpack.io' }
     maven {
         url 'https://m2.dv8tion.net/releases'
         name 'm2-dv8tion'
@@ -69,7 +68,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:4.3.0_346') {
+    implementation('net.dv8tion:JDA:5.0.0-alpha.1') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'

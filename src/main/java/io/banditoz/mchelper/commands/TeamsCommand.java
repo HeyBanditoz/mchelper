@@ -26,7 +26,7 @@ public class TeamsCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        VoiceChannel vc = ce.getEvent().getMember().getVoiceState().getChannel();
+        VoiceChannel vc = (VoiceChannel) ce.getEvent().getMember().getVoiceState().getChannel();
         if (vc == null) {
             ce.sendReply("You are not in a voice channel.");
             return Status.FAIL;

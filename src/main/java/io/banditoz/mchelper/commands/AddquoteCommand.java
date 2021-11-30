@@ -13,7 +13,7 @@ import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 @Requires(database = true)
 public class AddquoteCommand extends Command {
 
-    private final EventHandler<MessageReactionAddEvent> handler = new EventHandler<MessageReactionAddEvent>() {
+    private final EventHandler<MessageReactionAddEvent> handler = new EventHandler<>() {
         @Override
         public void eventConsumer(GenericEvent event) {
             MessageReactionAddEvent messageReactionAddEvent = (MessageReactionAddEvent)event;
@@ -37,19 +37,19 @@ public class AddquoteCommand extends Command {
             }
         }
     };
-    private final EventHandler<GuildMessageReceivedEvent> listener = new EventHandler<GuildMessageReceivedEvent>() {
+    private final EventHandler<MessageReceivedEvent> listener = new EventHandler<>() {
         private final Pattern QUOTE_PARSER = Pattern.compile("^\"(.*?)\"\\s+");
 
         @Override
         public void eventConsumer(GenericEvent event) {
-            GuildMessageReceivedEvent guildMessageReceivedEvent = (GuildMessageReceivedEvent)event;
-            if (!events.containsKey(guildMessageReceivedEvent.getAuthor().getId())) {
+            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent)event;
+            if (!events.containsKey(messageReceivedEvent.getAuthor().getId())) {
                 return;
             }
-            if (!QUOTE_PARSER.matcher(guildMessageReceivedEvent.getMessage().getContentDisplay()).find()) {
+            if (!QUOTE_PARSER.matcher(messageReceivedEvent.getMessage().getContentDisplay()).find()) {
                 return;
             }
-            events.get(guildMessageReceivedEvent.getAuthor().getId()).accept(guildMessageReceivedEvent);
+            events.get(messageReceivedEvent.getAuthor().getId()).accept(messageReceivedEvent);
         }
     };
 
