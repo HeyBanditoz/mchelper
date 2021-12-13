@@ -276,6 +276,7 @@ public class MCHelperImpl implements MCHelper {
 
     private Response placeRequest(Request request) throws HttpResponseException, IOException {
         LOGGER.debug(request.toString());
+        request = request.newBuilder().addHeader("User-Agent", "MCHelper/" + Version.GIT_SHA + ' ' + okhttp3.internal.Version.userAgent() + " (+https://gitlab.com/HeyBanditoz/mchelper)").build();
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {
             response.close();
