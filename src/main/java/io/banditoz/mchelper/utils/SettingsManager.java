@@ -63,6 +63,9 @@ public class SettingsManager {
         defaultSettings.setElasticsearchMessageEndpoint("http://endpoint:9200/thing/_doc");
         defaultSettings.setLoggedChannels(Collections.emptyList());
         defaultSettings.setTarkovMarketApiKey("https://tarkov-market.com API key here.");
+        defaultSettings.setPasteGgApiEndpoint("https://api.paste.gg");
+        defaultSettings.setPasteGgBaseUrl("https://paste.gg/");
+        defaultSettings.setPasteGgApiKey("<not required>");
         return defaultSettings;
     }
 

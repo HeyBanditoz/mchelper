@@ -27,6 +27,12 @@ public class Settings {
     private List<String> loggedChannels;
     @JsonProperty("tarkovMarketApiKey")
     private String tarkovMarketApiKey;
+    @JsonProperty("pasteGgApiEndpoint")
+    private String pasteGgApiEndpoint;
+    @JsonProperty("pasteGgApiKey")
+    private String pasteGgApiKey;
+    @JsonProperty("pasteGgBaseUrl")
+    private String pasteGgBaseUrl;
 
     private final static Settings defaultSettings = SettingsManager.getDefaultSettings();
 
@@ -152,5 +158,36 @@ public class Settings {
     @JsonProperty("tarkovMarketApiKey")
     public void setTarkovMarketApiKey(String tarkovMarketApiKey) {
         this.tarkovMarketApiKey = tarkovMarketApiKey;
+    }
+
+    @JsonProperty("pasteGgApiEndpoint")
+    public String getPasteGgApiEndpoint() {
+
+        return pasteGgApiEndpoint;
+    }
+
+    @JsonProperty("pasteGgApiEndpoint")
+    public void setPasteGgApiEndpoint(String pasteGgApiEndpoint) {
+        this.pasteGgApiEndpoint = pasteGgApiEndpoint;
+    }
+
+    @JsonProperty("pasteGgApiKey")
+    public String getPasteGgApiKey() {
+        return pasteGgApiKey;
+    }
+
+    @JsonProperty("pasteGgApiKey")
+    public void setPasteGgApiKey(String pasteGgApiKey) {
+        this.pasteGgApiKey = pasteGgApiKey;
+    }
+
+    @JsonProperty("pasteGgApiUrl")
+    public String getPasteGgBaseUrl() {
+        return pasteGgBaseUrl;
+    }
+
+    @JsonProperty("pasteGgApiUrl")
+    public void setPasteGgBaseUrl(String pasteGgBaseUrl) {
+        this.pasteGgBaseUrl = pasteGgBaseUrl;
     }
 }
