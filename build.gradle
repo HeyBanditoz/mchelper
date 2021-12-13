@@ -68,11 +68,11 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.1') {
+    implementation('net.dv8tion:JDA:5.0.0-alpha.2') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'com.udojava:EvalEx:2.6'
+    implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:3.13.0'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
