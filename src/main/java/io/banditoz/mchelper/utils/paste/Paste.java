@@ -9,6 +9,22 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class Paste {
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("description")
+    private String description;
+    @JsonProperty("visibility")
+    private String visibility;
+    @JsonProperty("expires")
+    private String expires;
+    @JsonProperty("files")
+    private List<File> files;
+
+    public Paste(String message, String fileName) {
+        this(message);
+        getFiles().get(0).setName(fileName);
+    }
+
     public Paste(String message) {
         this.setVisibility("unlisted");
         File file = new File();
@@ -39,17 +55,6 @@ public class Paste {
 
         this.setExpires(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(c.getTime()));
     }
-
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("description")
-    private String description;
-    @JsonProperty("visibility")
-    private String visibility;
-    @JsonProperty("expires")
-    private String expires;
-    @JsonProperty("files")
-    private List<File> files = null;
 
     @JsonProperty("name")
     public String getName() {
@@ -99,84 +104,5 @@ public class Paste {
     @JsonProperty("files")
     public void setFiles(List<File> files) {
         this.files = files;
-    }
-
-}
-
-class Content {
-    @JsonProperty("format")
-    private String format;
-    @JsonProperty("highlight_language")
-    private Object highlightLanguage;
-    @JsonProperty("value")
-    private String value;
-    @JsonProperty("content")
-    private String content;
-
-    @JsonProperty("format")
-    public String getFormat() {
-        return format;
-    }
-
-    @JsonProperty("format")
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    @JsonProperty("highlight_language")
-    public Object getHighlightLanguage() {
-        return highlightLanguage;
-    }
-
-    @JsonProperty("highlight_language")
-    public void setHighlightLanguage(Object highlightLanguage) {
-        this.highlightLanguage = highlightLanguage;
-    }
-
-    @JsonProperty("value")
-    public String getValue() {
-        return value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @JsonProperty("content")
-    public String getContent() {
-        return content;
-    }
-
-    @JsonProperty("content")
-    public void setContent(String content) {
-        this.content = content;
-    }
-}
-
-class File {
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("content")
-    private Content content;
-
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @JsonProperty("content")
-    public Content getContent() {
-        return content;
-    }
-
-    @JsonProperty("content")
-    public void setContent(Content content) {
-        this.content = content;
     }
 }
