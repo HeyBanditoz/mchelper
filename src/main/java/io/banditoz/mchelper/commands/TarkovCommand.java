@@ -2,9 +2,8 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.tarkovmarket.TarkovMarketResult;
+import io.banditoz.mchelper.tarkovmarket.Item;
 import io.banditoz.mchelper.tarkovmarket.TarkovMarketSearcher;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,7 +12,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.util.ArrayList;
 import java.util.List;
 
-@Requires(settingsMethod = "getTarkovMarketApiKey")
 public class TarkovCommand extends Command {
     @Override
     public String commandName() {
@@ -30,7 +28,7 @@ public class TarkovCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         TarkovMarketSearcher searcher = new TarkovMarketSearcher(ce.getMCHelper());
-        List<TarkovMarketResult> results = searcher.getMarketResultsBySearch(ce.getCommandArgsString());
+        List<Item> results = searcher.getMarketResultsBySearch(ce.getCommandArgsString());
         if (results.isEmpty()) {
             ce.sendReply("No matches found.");
             return Status.FAIL;

@@ -1,6 +1,7 @@
 package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
@@ -12,6 +13,7 @@ import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -26,9 +28,13 @@ public class MCHelperTestImpl implements MCHelper {
     private final CommandHandler CH;
     private final RegexableHandler RH;
     private final ObjectMapper OM;
+    private final OkHttpClient CLIENT = new OkHttpClient.Builder()
+            .followRedirects(false)
+            .followSslRedirects(false) // for reddit.app.link fetching
+            .build(); // singleton http client
 
     public MCHelperTestImpl() throws Exception {
-        this.OM = new ObjectMapper();
+        this.OM = new ObjectMapper().registerModule(new JavaTimeModule());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
     }
@@ -100,17 +106,36 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
-        return null;
-    }
-
-    @Override
-    public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
+        String s;
+        try (Response r = placeRequest(request)) {
+            s = r.body().string();
+        }
+        return s;
     }
 
     @Override
     public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
-        return null;
+        try (Response r = placeRequest(request)) {
+            return r;
+        }
     }
+
+    @Override
+    public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
+        try (Response ignored = placeRequest(request)) {
+        }
+    }
+
+    private Response placeRequest(Request request) throws HttpResponseException, IOException {
+        request = request.newBuilder().addHeader("User-Agent", "MCHelper/" + Version.GIT_SHA + ' ' + okhttp3.internal.Version.userAgent() + " (+https://gitlab.com/HeyBanditoz/mchelper)").build();
+        Response response = CLIENT.newCall(request).execute();
+        if (response.code() >= 400) {
+            response.close();
+            throw new HttpResponseException(response.code());
+        }
+        return response;
+    }
+
 
     private Settings getMockSettings() {
         Settings settings = new Settings();

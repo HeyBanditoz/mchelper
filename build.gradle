@@ -90,6 +90,7 @@ dependencies {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     implementation 'org.reflections:reflections:0.10.2'
+    implementation 'me.xdrop:fuzzywuzzy:1.3.1'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise

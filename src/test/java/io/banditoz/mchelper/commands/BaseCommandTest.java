@@ -1,7 +1,7 @@
 package io.banditoz.mchelper.commands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.MCHelperTestImpl;
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.CommandTests;
@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -31,6 +31,8 @@ public abstract class BaseCommandTest {
     protected final ArgumentCaptor<String> stringCaptor;
     /** The {@link ArgumentCaptor} for capturing {@link CommandEvent#sendEmbedReply(MessageEmbed)} */
     protected final ArgumentCaptor<MessageEmbed> embedCaptor;
+    /** The {@link ArgumentCaptor} for capturing {@link CommandEvent#sendEmbedPaginatedReply(List)} */
+    protected final ArgumentCaptor<List<MessageEmbed>> embedsCaptor;
     /** The {@link MCHelper} instance. */
     protected final MCHelper mcHelper;
     protected final static Database DB;
@@ -54,8 +56,10 @@ public abstract class BaseCommandTest {
         User u = Mocks.getMockedMember().getUser();
         this.stringCaptor = ArgumentCaptor.forClass(String.class);
         this.embedCaptor = ArgumentCaptor.forClass(MessageEmbed.class);
+        this.embedsCaptor = ArgumentCaptor.forClass(List.class);
         doNothing().when(ce).sendReply(stringCaptor.capture());
         doNothing().when(ce).sendEmbedReply(embedCaptor.capture());
+        doNothing().when(ce).sendEmbedPaginatedReply(embedsCaptor.capture());
         doNothing().when(ce).sendPastableReply(stringCaptor.capture());
         when(mre.getMessage()).thenReturn(m);
         when(mre.getAuthor()).thenReturn(u);
@@ -65,11 +69,10 @@ public abstract class BaseCommandTest {
         when(ce.getDatabase()).thenReturn(DB);
         Guild g = Mocks.getMockedGuild();
         when(ce.getGuild()).thenReturn(g);
-        this.mcHelper = mock(MCHelper.class);
+        this.mcHelper = spy(MCHelperTestImpl.class);
         when(mcHelper.getSettings()).thenReturn(CommandTests.getMockSettings());
         when(mcHelper.getDatabase()).thenReturn(DB);
         when(mcHelper.getAccountManager()).thenReturn(AM);
-        Mockito.when(mcHelper.getObjectMapper()).thenReturn(new ObjectMapper());
         when(ce.getMCHelper()).thenReturn(mcHelper);
     }
 }
