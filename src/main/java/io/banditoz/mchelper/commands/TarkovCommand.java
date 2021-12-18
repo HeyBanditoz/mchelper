@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TarkovCommand extends Command {
+    private TarkovMarketSearcher SEARCHER;
+
     @Override
     public String commandName() {
         return "tarkov";
@@ -27,8 +29,11 @@ public class TarkovCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        TarkovMarketSearcher searcher = new TarkovMarketSearcher(ce.getMCHelper());
-        List<Item> results = searcher.getMarketResultsBySearch(ce.getCommandArgsString());
+        if (SEARCHER == null) {
+            // TODO should rework this as a constructor instead, need to rewrite part of CommandHandler for that.
+            SEARCHER = new TarkovMarketSearcher(ce.getMCHelper());
+        }
+        List<Item> results = SEARCHER.getMarketResultsBySearch(ce.getCommandArgsString());
         if (results.isEmpty()) {
             ce.sendReply("No matches found.");
             return Status.FAIL;
