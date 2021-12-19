@@ -36,7 +36,9 @@ public record Item(@JsonProperty("imageLink") String imageLink,
         Optional<TraderPrice> bestTraderPrice = getBestTraderPrice();
         if (bestTraderPrice.isPresent()) {
             TraderPrice tp = bestTraderPrice.get();
-            bestPrice = "**" + tp.trader().name() + ":** " + DecimalFormat.getInstance().format(tp.price()) + '₽';
+            String traderName = tp.trader().trader().name();
+            traderName = traderName.substring(0, 1).toUpperCase() + traderName.substring(1).toLowerCase();
+            bestPrice = "**" + traderName + ":** " + DecimalFormat.getInstance().format(tp.price()) + '₽';
         }
         return new EmbedBuilder()
                 .setTitle(name, wikiLink)
