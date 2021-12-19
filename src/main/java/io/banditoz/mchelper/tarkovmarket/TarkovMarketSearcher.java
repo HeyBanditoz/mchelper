@@ -28,7 +28,7 @@ public class TarkovMarketSearcher {
 
     public List<Item> getMarketResultsBySearch(final String search) throws IOException, HttpResponseException {
         if (refreshAgain == null || Instant.now().isAfter(refreshAgain)) {
-            refreshAgain = Instant.now().plus(1, ChronoUnit.MINUTES);
+            refreshAgain = Instant.now().plus(15, ChronoUnit.MINUTES);
             ObjectMapper om = MCHELPER.getObjectMapper();
             String query = """
                     {
