@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class CommandUtils {
      */
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l) {
         l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
-        String reply = "**Status: Calamitous:** " + StringUtils.truncate(ex.toString(), 300, true);
+        String reply = "**Status: Calamitous:** " + StringUtils.truncate(MarkdownSanitizer.escape(ex.toString()), 500, true);
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }
@@ -36,7 +37,7 @@ public class CommandUtils {
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
         l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
-        String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(t.toString(), 300, true);
+        String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(MarkdownSanitizer.escape(t.toString()), 500, true);
         _sendReply(reply, e, true, true);
     }
 
