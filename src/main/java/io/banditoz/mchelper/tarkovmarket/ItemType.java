@@ -7,6 +7,8 @@ public enum ItemType {
     ANY,
     @JsonProperty("ammo")
     AMMO,
+    @JsonProperty("ammoBox")
+    AMMO_BOX,
     @JsonProperty("armor")
     ARMOR,
     @JsonProperty("backpack")
