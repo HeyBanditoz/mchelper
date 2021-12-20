@@ -17,10 +17,26 @@ public class EvalCommandTests extends BaseCommandTest {
     @Test
     public void testEvalCommand() throws Exception {
         when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getCommandArgsString()).thenReturn("```groovy\nint x = 5;\nreturn x;");
+        when(ce.getCommandArgsString()).thenReturn("""
+                ```java
+                int x = 5;
+                return x;""");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("```\n5```");
     }
+
+    @Test
+    public void testEvalCommandExternalClass() throws Exception {
+        when(ce.getEvent().isFromType(any())).thenReturn(true);
+        when(ce.getCommandArgsString()).thenReturn("""
+                ```java
+                import com.udojava.evalex.Expression;
+                
+                return new Expression("1+1").eval()""");
+        ec.onCommand(ce);
+        assertThat(stringCaptor.getValue()).contains("2");
+    }
+
 
     @Test
     public void testEvalCommandNull() throws Exception {
