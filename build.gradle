@@ -71,7 +71,7 @@ dependencies {
     implementation('net.dv8tion:JDA:5.0.0-alpha.2') {
         exclude module: 'opus-java'
     }
-    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'ch.qos.logback:logback-classic:1.2.9'
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:3.13.0'
@@ -96,7 +96,7 @@ dependencies {
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 
     testImplementation 'org.testng:testng:7.4.0'
-    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-core:4.1.0'
     testImplementation 'org.assertj:assertj-core:3.21.0'
 }
 
