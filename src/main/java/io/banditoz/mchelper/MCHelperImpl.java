@@ -86,13 +86,6 @@ public class MCHelperImpl implements MCHelper {
 
         STATS = new StatsRecorder(this, TPE);
 
-        if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-            JDA.addEventListener(new GuildJoinLeaveListener(this));
-        }
-        else {
-            LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
-        }
-
         // Shut things down gracefully.
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
@@ -110,6 +103,13 @@ public class MCHelperImpl implements MCHelper {
                     10,
                     43200,
                     TimeUnit.SECONDS);
+            if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
+                JDA.addEventListener(new GuildJoinLeaveListener(DB));
+            }
+            else {
+                LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
+            }
+
         }
         else {
             DB = null;

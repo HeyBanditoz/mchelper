@@ -11,15 +11,15 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
-import java.awt.Color;
+import java.awt.*;
 import java.time.Instant;
 
 public class GuildJoinLeaveListener extends ListenerAdapter {
     private static final String DEFAULT_AVATAR = "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
     private final Database DATABASE;
 
-    public GuildJoinLeaveListener(MCHelper mcHelper) {
-        this.DATABASE = mcHelper.getDatabase();
+    public GuildJoinLeaveListener(Database database) {
+        this.DATABASE = database;
     }
 
     @Override
