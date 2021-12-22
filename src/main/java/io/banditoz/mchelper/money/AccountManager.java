@@ -41,7 +41,7 @@ public class AccountManager {
             return dao.queryBalance(id);
         }
         else {
-            throw new MoneyException(id + " does not have an account");
+            throw new MoneyException(id + " does not have an account. Use the bal command to create one.");
         }
     }
 
