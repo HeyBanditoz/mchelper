@@ -18,7 +18,7 @@ public class TarkovCommandTests extends BaseCommandTest {
     @Test
     public void testTarkovCommandBogusItem() throws Exception {
         // take that fuzzy matching!
-        when(ce.getCommandArgsString()).thenReturn("SAYGTJMNw4907yuwrsjhygpiomtvuit6yqwh34W)*V(J^r9m,y90mu8w4p98tuy6jiopgfetu7%*(Q#T%^yhueowrs4j8853uiwoeaoipmt");
+        when(ce.getCommandArgsString()).thenReturn("*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("No matches found.");
     }

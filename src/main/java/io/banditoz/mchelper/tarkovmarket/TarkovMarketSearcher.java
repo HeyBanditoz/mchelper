@@ -70,7 +70,7 @@ public class TarkovMarketSearcher {
                 CACHE,
                 Item::name,
                 FuzzySearch::tokenSortPartialRatio,
-                75
+                60
         );
         LinkedList<Item> sortedItems = new LinkedList<>();
         // put guns first, the order of things the API returns is undefined
