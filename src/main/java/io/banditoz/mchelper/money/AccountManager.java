@@ -5,32 +5,25 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
 import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
-import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class AccountManager {
     private final AccountsDao dao;
-    private final TasksDaoImpl tasks;
     private final static DecimalFormat DF;
 
     static {
         DF = new DecimalFormat("#,###.##");
         DF.setMaximumFractionDigits(2); // 0.1 becomes 0.10 instead of 0.1 when formatted
         DF.setMinimumFractionDigits(0);
-//        DF.setPositivePrefix("");
-//        DF.setGroupingSize(3);
-//        DF.setDecimalSeparatorAlwaysShown(false);
     }
 
     public AccountManager(Database database) {
         dao = new AccountsDaoImpl(database);
-        tasks = new TasksDaoImpl(database);
     }
 
     public BigDecimal queryBalance(long id, boolean allowCreation) throws Exception {
@@ -129,25 +122,12 @@ public class AccountManager {
     }
 
     /**
-     * Get a list of all user IDs that have a balance.
+     * Ensures we are changing more than zero from a number, and the account couldn't go under because of the
+     * transaction.
      *
-     * @return A list of all user IDs.
-     * @throws SQLException If there was a problem fetching all the IDs.
-     */
-    public List<Long> getAllAccounts() throws SQLException {
-        return dao.getAllAccounts();
-    }
-
-    public LocalDateTime whenCanDoTask(long id, Task t) throws SQLException {
-        return tasks.getWhenCanExecute(id, t);
-    }
-
-    /**
-     * Ensures
-     *
-     * @param base
-     * @param subtrahend
-     * @throws MoneyException
+     * @param base The left-hand.
+     * @param subtrahend The right-hand.
+     * @throws MoneyException If the conditions aren't met.
      */
     private void checkAmount(BigDecimal base, BigDecimal subtrahend) throws MoneyException {
         if (subtrahend.compareTo(BigDecimal.ZERO) <= 0) {
