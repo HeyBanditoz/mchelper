@@ -63,7 +63,7 @@ public class ManageRolesCommand extends Command {
             return Status.FAIL;
         } else if (args.get("deactivate") != null && args.getBoolean("deactivate")) {
             Map.Entry<String,String> entry = rd.deactivate(ce.getGuild());
-            ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).queue(s -> {s.delete().queue();});
+            ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).queue(s -> s.delete().queue());
             ce.getMCHelper().getRRL().getMessages().remove(entry.getKey());
             ce.sendReply("Guild deactivated!");
         } else if (args.get("add_role") != null && args.getBoolean("add_role")) {

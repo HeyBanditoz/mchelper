@@ -88,11 +88,10 @@ public class QuoteCommand extends Command {
                 eb.setColor(Color.GREEN);
                 eb.setDescription(nq.format(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
                 if (args.get("include_author")) {
-                    ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(user -> {
-                        eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
-                    }, throwable -> {
-                        eb.setFooter("Added by " + nq.getAuthorId(), "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png");
-                    });
+                    ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(
+                            user -> eb.setFooter("Added by " + user.getName(), user.getAvatarUrl()),
+                            throwable -> eb.setFooter("Added by " + nq.getAuthorId(), "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png")
+                    );
                 }
                 embeds.add(eb.build());
             }

@@ -34,13 +34,13 @@ public class RoleReactionListener {
                 if (events.containsKey(":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":")) {
                     events.get(":" + messageReactionAddEvent.getReactionEmote().getEmote().getName() + ":").accept(messageReactionAddEvent);
                 } else {
-                    messageReactionAddEvent.retrieveMessage().queue(message -> {message.removeReaction(messageReactionAddEvent.getReactionEmote().getEmote(),messageReactionAddEvent.getUser()).queue();});
+                    messageReactionAddEvent.retrieveMessage().queue(message -> message.removeReaction(messageReactionAddEvent.getReactionEmote().getEmote(),messageReactionAddEvent.getUser()).queue());
                 }
             } catch (IllegalStateException ex) {
                 if (events.containsKey(messageReactionAddEvent.getReactionEmote().getName())) {
                     events.get(messageReactionAddEvent.getReactionEmote().getName()).accept(messageReactionAddEvent);
                 } else {
-                    messageReactionAddEvent.retrieveMessage().queue(message -> {message.removeReaction(messageReactionAddEvent.getReactionEmote().getAsReactionCode(), messageReactionAddEvent.getUser()).queue();});
+                    messageReactionAddEvent.retrieveMessage().queue(message -> message.removeReaction(messageReactionAddEvent.getReactionEmote().getAsReactionCode(), messageReactionAddEvent.getUser()).queue());
                 }
             }
         }
