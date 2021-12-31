@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.awt.*;
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;

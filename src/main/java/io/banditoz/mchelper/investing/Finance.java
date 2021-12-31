@@ -16,7 +16,7 @@ import org.knowm.xchart.OHLCChart;
 import org.knowm.xchart.OHLCChartBuilder;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

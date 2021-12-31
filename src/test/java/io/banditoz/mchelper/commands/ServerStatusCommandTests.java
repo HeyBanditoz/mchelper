@@ -2,7 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import org.testng.annotations.Test;
 
-import java.awt.*;
+import java.awt.Color;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

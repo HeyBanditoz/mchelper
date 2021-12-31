@@ -19,7 +19,7 @@ import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 import java.util.Map;
 
