@@ -27,16 +27,11 @@ public enum Suit {
      * @return The String value.
      */
     public String getStringValue() {
-        switch (this) {
-            case SPADES:
-                return "♠";
-            case HEARTS:
-                return "♥";
-            case DIAMONDS:
-                return "♦";
-            case CLUBS:
-                return "♣";
-        }
-        return null;
+        return switch (this) {
+            case SPADES -> "♠";
+            case HEARTS -> "♥";
+            case DIAMONDS -> "♦";
+            case CLUBS -> "♣";
+        };
     }
 }

@@ -94,22 +94,21 @@ public abstract class Command {
         ISnowflake entity = null;
         if (cooldown != null) {
             switch (cooldown.getType()) {
-                case PER_USER:
+                case PER_USER -> {
                     entity = e.getAuthor();
                     if (!cooldown.handle(e.getAuthor())) {
                         e.getMessage().addReaction("⏲️").queue();
                         return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
                     }
-                    break;
-                case PER_GUILD:
+                }
+                case PER_GUILD -> {
                     entity = e.getGuild();
                     if (!cooldown.handle(e.getGuild())) {
                         e.getMessage().addReaction("⏲️").queue();
                         return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
                     }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + cooldown.getType());
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + cooldown.getType());
             }
         }
         e.getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off

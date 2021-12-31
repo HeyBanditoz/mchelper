@@ -16,20 +16,16 @@ public enum Task {
      * @return The delay in seconds.
      */
     public int getDelay() {
-        switch (this) {
-            case WORK:
-                return 86400; // seconds in one day
-            default:
-                return 0;
-        }
+        return switch (this) {
+            case WORK -> 86400; // seconds in one day
+            default -> 0;
+        };
     }
 
     public BigDecimal getRandomAmount() {
-        switch (this) {
-            case WORK:
-                return BigDecimal.valueOf((rand.nextDouble() * (1500 - 500)) + 500).setScale(2, RoundingMode.HALF_UP);
-            default:
-                return BigDecimal.ZERO;
-        }
+        return switch (this) {
+            case WORK -> BigDecimal.valueOf((rand.nextDouble() * (1500 - 500)) + 500).setScale(2, RoundingMode.HALF_UP);
+            default -> BigDecimal.ZERO;
+        };
     }
 }

@@ -29,14 +29,10 @@ public enum Type {
      * @return The String value.
      */
     public String getStringValue() {
-        switch (this) {
-            case TRANSFER:
-                return "Transfer";
-            case GRANT:
-                return "Grant";
-            case REVOKE:
-                return "Revoke";
-        }
-        return null;
+        return switch (this) {
+            case TRANSFER -> "Transfer";
+            case GRANT -> "Grant";
+            case REVOKE -> "Revoke";
+        };
     }
 }

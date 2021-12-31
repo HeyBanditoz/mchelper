@@ -202,46 +202,46 @@ public class LoadoutCommand extends Command {
         ArrayList<ReforgedRuneSlot> primary = precision, secondary = domination;
         int keystone = 0, slot1 = 0, slot2 = 0, slot3 = 0;
         switch (primaryInt) {
-            case 0:
+            case 0 -> {
                 builder.append("***Precision*** with ");
                 primary = precision;
                 keystone = 4;
                 slot1 = 3;
                 slot2 = 3;
                 slot3 = 3;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 builder.append("***Domination*** with ");
                 primary = domination;
                 keystone = 4;
                 slot1 = 3;
                 slot2 = 3;
                 slot3 = 4;
-                break;
-            case 2:
+            }
+            case 2 -> {
                 builder.append("***Sorcery*** with ");
                 primary = sorcery;
                 keystone = 3;
                 slot1 = 3;
                 slot2 = 3;
                 slot3 = 3;
-                break;
-            case 3:
+            }
+            case 3 -> {
                 builder.append("***Resolve*** with ");
                 primary = resolve;
                 keystone = 3;
                 slot1 = 3;
                 slot2 = 3;
                 slot3 = 3;
-                break;
-            case 4:
+            }
+            case 4 -> {
                 builder.append("***Inspiration*** with ");
                 primary = inspiration;
                 keystone = 3;
                 slot1 = 3;
                 slot2 = 3;
                 slot3 = 3;
-                break;
+            }
         }
         builder.append(primary.get(0).get((int) (Math.random() * (keystone))).getName()).append(", ");
         builder.append(primary.get(1).get((int) (Math.random() * (slot1))).getName()).append(", ");
@@ -249,26 +249,26 @@ public class LoadoutCommand extends Command {
         builder.append(primary.get(3).get((int) (Math.random() * (slot3))).getName()).append(".\n Your secondary will be ");
 
         switch (secondaryInt) {
-            case 0:
+            case 0 -> {
                 builder.append("***Precision*** with ");
                 secondary = precision;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 builder.append("***Domination*** with ");
                 secondary = domination;
-                break;
-            case 2:
+            }
+            case 2 -> {
                 builder.append("***Sorcery*** with ");
                 secondary = sorcery;
-                break;
-            case 3:
+            }
+            case 3 -> {
                 builder.append("***Resolve*** with ");
                 secondary = resolve;
-                break;
-            case 4:
+            }
+            case 4 -> {
                 builder.append("***Inspiration*** with ");
                 secondary = inspiration;
-                break;
+            }
         }
         builder.append(secondary.get(1).get((int) (Math.random() * (3))).getName()).append(" and ");
         builder.append(secondary.get(2).get((int) (Math.random() * (3))).getName()).append(".");

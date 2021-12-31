@@ -224,17 +224,13 @@ public class BlackJackCommand extends Command {
         String image = "", won = "You won $" + AccountManager.format(currentAmount) + "! Good job!";
         Color c = Color.GREEN;
         switch (state) {
-            case 0:
-                image = "https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif";
-                break;
-            case 1:
-                image = "https://media1.giphy.com/media/l2SpK57WpLOP845Rm/giphy.gif";
-                break;
-            case 2:
+            case 0 -> image = "https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif";
+            case 1 -> image = "https://media1.giphy.com/media/l2SpK57WpLOP845Rm/giphy.gif";
+            case 2 -> {
                 won = "You hit a stand off and got your $" + AccountManager.format(currentAmount) + " back!";
                 c = Color.YELLOW;
                 image = "https://media1.tenor.com/images/70d670f744495cc6c02b50efbc14a1ca/tenor.gif?itemid=15805326";
-                break;
+            }
         }
         return new EmbedBuilder()
                 .setTitle("Blackjack!")

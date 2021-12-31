@@ -36,34 +36,20 @@ public enum Rank {
      * @return The String value.
      */
     public String getStringValue() {
-        switch (this) {
-            case ACE:
-                return "A";
-            case TWO:
-                return "2";
-            case THREE:
-                return "3";
-            case FOUR:
-                return "4";
-            case FIVE:
-                return "5";
-            case SIX:
-                return "6";
-            case SEVEN:
-                return "7";
-            case EIGHT:
-                return "8";
-            case NINE:
-                return "9";
-            case TEN:
-                return "10";
-            case JACK:
-                return "J";
-            case QUEEN:
-                return "Q";
-            case KING:
-                return "K";
-        }
-        return null;
+        return switch (this) {
+            case ACE -> "A";
+            case TWO -> "2";
+            case THREE -> "3";
+            case FOUR -> "4";
+            case FIVE -> "5";
+            case SIX -> "6";
+            case SEVEN -> "7";
+            case EIGHT -> "8";
+            case NINE -> "9";
+            case TEN -> "10";
+            case JACK -> "J";
+            case QUEEN -> "Q";
+            case KING -> "K";
+        };
     }
 }
