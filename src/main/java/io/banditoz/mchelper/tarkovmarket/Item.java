@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +22,7 @@ public record Item(@JsonProperty("imageLink") String imageLink,
                    @JsonProperty("updated") LocalDateTime updated,
                    @JsonProperty("wikiLink") String wikiLink,
                    @JsonProperty("changeLast48h") double changeLast48h,
-                   @JsonProperty("types") List<ItemType> types) {
+                   @JsonProperty("types") EnumSet<ItemType> types) {
 
     public String getFormattedInt(int i) {
         return DecimalFormat.getInstance().format(i) + '₽';
@@ -40,7 +42,7 @@ public record Item(@JsonProperty("imageLink") String imageLink,
             traderName = traderName.substring(0, 1).toUpperCase() + traderName.substring(1).toLowerCase();
             bestPrice = "**" + traderName + ":** " + DecimalFormat.getInstance().format(tp.price()) + '₽';
         }
-        return new EmbedBuilder()
+        EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(name, wikiLink)
                 .setDescription("[Market Link](" + link + ")")
                 .setThumbnail(imageLink == null || imageLink.isEmpty() ? "https://tarkov-tools.com/images/unknown-item-icon.jpg" : imageLink)
@@ -49,7 +51,10 @@ public record Item(@JsonProperty("imageLink") String imageLink,
                 .addField("Price Difference", "2 days: **" + sDiff48h + "**", true)
                 .addField("Best To", bestPrice, true)
                 .addField("Types", types.toString(), true)
-                .setTimestamp(updated)
-                .build();
+                .setTimestamp(updated);
+        if (types.contains(ItemType.NO_FLEA)) {
+            builder.setColor(Color.RED);
+        }
+        return builder.build();
     }
 }
