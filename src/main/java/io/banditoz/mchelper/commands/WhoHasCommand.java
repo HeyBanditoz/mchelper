@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Role;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class WhoHasCommand extends Command {
     @Override
@@ -34,7 +33,7 @@ public class WhoHasCommand extends Command {
                 .stream()
                 .filter(member -> member.getRoles().contains(r))
                 .sorted(Comparator.comparing(Member::getEffectiveName))
-                .collect(Collectors.toList());
+                .toList();
         StringJoiner memberMentions = new StringJoiner(", ");
         members.forEach(member -> memberMentions.add(member.getAsMention()));
         MessageEmbed e = new EmbedBuilder()

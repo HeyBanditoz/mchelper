@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserCacheDaoImpl extends Dao implements UserCacheDao {
     public UserCacheDaoImpl(Database database) {
@@ -41,7 +40,7 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
     public void deleteNonexistentUsers(List<User> users) throws SQLException {
         List<FakeUser> dbUsers = getAllCachedUsers();
         // second constructor parameter is null here as we don't need to assign it a value
-        List<FakeUser> cachedUsers = users.stream().map(user -> new FakeUser(user.getIdLong(), null)).collect(Collectors.toList());
+        List<FakeUser> cachedUsers = users.stream().map(user -> new FakeUser(user.getIdLong(), null)).toList();
         dbUsers.removeAll(cachedUsers);
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);

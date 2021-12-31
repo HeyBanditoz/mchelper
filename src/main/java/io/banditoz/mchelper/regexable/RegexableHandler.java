@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 public class RegexableHandler extends ListenerAdapter {
     private final List<Regexable> regexables;
@@ -70,8 +69,7 @@ public class RegexableHandler extends ListenerAdapter {
 
     protected List<Regexable> getRegexableByEvent(MessageReceivedEvent e) {
         return regexables.stream()
-                .filter(r -> r.containsRegexable(e.getMessage().getContentRaw()))
-                .collect(Collectors.toUnmodifiableList());
+                .filter(r -> r.containsRegexable(e.getMessage().getContentRaw())).toList();
     }
 
     public List<Regexable> getRegexables() {

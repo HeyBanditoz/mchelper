@@ -78,7 +78,7 @@ public class QuoteCommand extends Command {
                             m = p.matcher(namedQuote.getQuoteAuthor());
                             return m.find();
                         }
-                    }).collect(Collectors.toUnmodifiableList());
+                    }).toList();
                 }
             }
             EmbedBuilder eb = new EmbedBuilder();
