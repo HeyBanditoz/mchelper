@@ -22,7 +22,8 @@ public record Item(@JsonProperty("imageLink") String imageLink,
                    @JsonProperty("updated") LocalDateTime updated,
                    @JsonProperty("wikiLink") String wikiLink,
                    @JsonProperty("changeLast48h") double changeLast48h,
-                   @JsonProperty("types") EnumSet<ItemType> types) {
+                   @JsonProperty("types") EnumSet<ItemType> types,
+                   @JsonProperty("shortName") String shortName) {
 
     public String getFormattedInt(int i) {
         return DecimalFormat.getInstance().format(i) + '₽';
