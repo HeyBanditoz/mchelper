@@ -15,6 +15,8 @@ public enum ItemType {
     BACKPACK,
     @JsonProperty("barter")
     BARTER,
+    @JsonProperty("container")
+    CONTAINER,
     @JsonProperty("glasses")
     GLASSES,
     @JsonProperty("grenade")
