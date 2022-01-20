@@ -21,7 +21,7 @@ public class DadRegexable extends Regexable {
 
     @Override
     protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
-        if (ThreadLocalRandom.current().nextBoolean()) {
+        if (ThreadLocalRandom.current().nextDouble() <= 0.20) {
             Matcher m = PATTERN.matcher(re.getEvent().getMessage().getContentRaw());
             re.sendReplyWithoutPing("Hi" + m.replaceFirst("") + ", I'm Dad!");
         }

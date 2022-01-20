@@ -21,7 +21,9 @@ public class BetRegexable extends Regexable {
 
     @Override
     protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
-        re.sendReplyWithoutPing(BETS[ThreadLocalRandom.current().nextInt(BETS.length)]);
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            re.sendReplyWithoutPing(BETS[ThreadLocalRandom.current().nextInt(BETS.length)]);
+        }
         return Status.SUCCESS;
     }
 }
