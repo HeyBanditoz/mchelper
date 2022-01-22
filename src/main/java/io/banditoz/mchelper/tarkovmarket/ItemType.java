@@ -25,10 +25,14 @@ public enum ItemType {
     GUN,
     @JsonProperty("helmet")
     HELMET,
+    @JsonProperty("injectors")
+    INJECTORS,
     @JsonProperty("keys")
     KEYS,
     @JsonProperty("markedOnly")
     MARKED_ONLY,
+    @JsonProperty("meds")
+    MEDS,
     @JsonProperty("mods")
     MODS,
     @JsonProperty("noFlea")
