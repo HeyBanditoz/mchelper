@@ -35,7 +35,7 @@ public class FileUploadListener extends ListenerAdapter {
                 for (Message.Attachment a : attachments) {
                     try {
                         String c = a.getContentType();
-                        if (c.contains("text") || c.contains("json") || c.contains("xml") | c.contains("html")) {
+                        if (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html")) {
                             Request r = new Request.Builder()
                                     .url(a.getUrl())
                                     .build();
