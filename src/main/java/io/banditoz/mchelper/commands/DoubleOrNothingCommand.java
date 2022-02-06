@@ -15,9 +15,9 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.awt.Color;
 import java.math.BigDecimal;
@@ -83,7 +83,7 @@ public class DoubleOrNothingCommand extends Command {
      * Method called when a user intends to play for more money.
      */
     private void bet(WrappedButtonClickEvent wrappedEvent) {
-        ButtonClickEvent event = wrappedEvent.getEvent();
+        ButtonInteractionEvent event = wrappedEvent.getEvent();
         User user = event.getUser();
 
         DoubleOrNothingGame game = GAMES.get(user);
@@ -101,7 +101,7 @@ public class DoubleOrNothingCommand extends Command {
      * Method called when a user intends to cash out their winnings.
      */
     private void stop(WrappedButtonClickEvent wrappedEvent) {
-        ButtonClickEvent event = wrappedEvent.getEvent();
+        ButtonInteractionEvent event = wrappedEvent.getEvent();
         User user = event.getUser();
 
         DoubleOrNothingGame game = GAMES.remove(event.getUser());

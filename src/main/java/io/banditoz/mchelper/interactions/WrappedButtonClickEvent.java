@@ -2,20 +2,20 @@ package io.banditoz.mchelper.interactions;
 
 import io.banditoz.mchelper.MCHelper;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class WrappedButtonClickEvent {
-    private final ButtonClickEvent event;
+    private final ButtonInteractionEvent event;
     private final ButtonInteractable bi;
     private final MCHelper MCHelper;
 
-    public WrappedButtonClickEvent(ButtonClickEvent event, ButtonInteractable bi, MCHelper MCHelper) {
+    public WrappedButtonClickEvent(ButtonInteractionEvent event, ButtonInteractable bi, MCHelper MCHelper) {
         this.event = event;
         this.bi = bi;
         this.MCHelper = MCHelper;
     }
 
-    public ButtonClickEvent getEvent() {
+    public ButtonInteractionEvent getEvent() {
         return event;
     }
 
