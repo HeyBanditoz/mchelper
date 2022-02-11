@@ -1,5 +1,5 @@
 # Commands
-There are a total of 59 commands and 4 regex listeners.
+There are a total of 58 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -18,8 +18,6 @@ There are a total of 59 commands and 4 regex listeners.
 `cooldowns` - [user as mention] - Returns the cooldowns for you or another user.
 ### CoordCommand
 `coords` - <save|add,show|list,delete|remove,help> - Saves coordinates to the database. See !coords help
-### DefaultChannelCommand
-`defaultchannel` - (channel ID) - Gets or sets the default channel for this guild.
 ### DeleteQuoteCommand
 `delquote` - <quote ID> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
 ### DeleteReminderCommand
@@ -40,6 +38,8 @@ There are a total of 59 commands and 4 regex listeners.
 `flood` - [num] <message> - Floods this channel with a message.
 ### FromMorseCommand
 `frommorse` - <morse> - Converts morse to text. Use / for spaces between words.
+### GuildConfigCommand
+`config` - <key> <value> - Configure the bot for this guild. No arguments to view the configuration.
 ### HeapDumpCommand
 `heapdump` - <boolean> - Dumps the heap. (ELEVATED)
 ### HelpCommand
@@ -81,8 +81,6 @@ named arguments:
 `play` - <no parameters>  - Play some games from Discord.
 ### PlotCommand
 `plot` - <expression> - Plots a function, use x
-### PrefixCommand
-`prefix` - (prefix) - Gets or sets the prefix for this guild. (By default, it is a '!' and must be a char.
 ### QuoteCommand
 ```
 usage: quote [-s] [-i] [-a] [-d] [quoteAndAuthor [quoteAndAuthor ...]]
