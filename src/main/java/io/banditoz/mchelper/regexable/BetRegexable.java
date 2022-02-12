@@ -1,6 +1,9 @@
 package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -21,7 +24,9 @@ public class BetRegexable extends Regexable {
 
     @Override
     protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
-        if (ThreadLocalRandom.current().nextBoolean()) {
+        GuildConfigDao dao = new GuildConfigDaoImpl(re.getMCHelper().getDatabase());
+        GuildConfig gc = dao.getConfig(re.getEvent().getGuild());
+        if (ThreadLocalRandom.current().nextDouble() <= gc.getBetBotChance()) {
             re.sendReplyWithoutPing(BETS[ThreadLocalRandom.current().nextInt(BETS.length)]);
         }
         return Status.SUCCESS;

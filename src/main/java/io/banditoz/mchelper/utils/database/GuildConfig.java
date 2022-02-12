@@ -11,12 +11,18 @@ public class GuildConfig {
     private long defaultChannel;
     /** Whether or not we should deliver the quote of the day to the default channel. */
     private boolean postQotdToDefaultChannel;
+    /** The chance for dad bot to fire when someone says `I'm` or `Imma` or `I am` or `Im`. */
+    private double dadBotChance;
+    /** The chance for bet bot to fire when someone says `bet`. */
+    private double betBotChance;
     private Timestamp lastModified;
 
     public GuildConfig(long id) {
         this.id = id;
         this.prefix = '!';
         this.postQotdToDefaultChannel = false;
+        this.dadBotChance = 0;
+        this.betBotChance = 0;
     }
 
     public GuildConfig() {
@@ -56,6 +62,22 @@ public class GuildConfig {
 
     public void setPostQotdToDefaultChannel(boolean postQotdToDefaultChannel) {
         this.postQotdToDefaultChannel = postQotdToDefaultChannel;
+    }
+
+    public double getDadBotChance() {
+        return dadBotChance;
+    }
+
+    public void setDadBotChance(double dadBotChance) {
+        this.dadBotChance = dadBotChance;
+    }
+
+    public double getBetBotChance() {
+        return betBotChance;
+    }
+
+    public void setBetBotChance(double betBotChance) {
+        this.betBotChance = betBotChance;
     }
 
     public Timestamp getLastModified() {

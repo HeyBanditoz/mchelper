@@ -30,7 +30,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public void saveConfig(GuildConfig config) {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, (SELECT NOW()))");
+            PreparedStatement ps = c.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, ?, ?, (SELECT NOW()))");
             ps.setLong(1, config.getId());
             ps.setString(2, String.valueOf(config.getPrefix()));
             if (config.getDefaultChannel() == 0) {
@@ -40,6 +40,8 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
                 ps.setLong(3, config.getDefaultChannel());
             }
             ps.setBoolean(4, config.getPostQotdToDefaultChannel());
+            ps.setDouble(5, config.getDadBotChance());
+            ps.setDouble(6, config.getBetBotChance());
             ps.execute();
             ps.close();
             cache.put(config.getId(), config);
@@ -120,6 +122,8 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
         gc.setPrefix(rs.getString("prefix").charAt(0)); // oh boy
         gc.setDefaultChannel(rs.getLong("default_channel"));
         gc.setPostQotdToDefaultChannel(rs.getBoolean("post_qotd_to_default_channel"));
+        gc.setDadBotChance(rs.getDouble("dadbot_chance"));
+        gc.setBetBotChance(rs.getDouble("betbot_chance"));
         gc.setLastModified(rs.getTimestamp("last_modified"));
         return gc;
     }

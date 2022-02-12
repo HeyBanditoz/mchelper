@@ -1,6 +1,9 @@
 package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.database.GuildConfig;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
@@ -21,7 +24,9 @@ public class DadRegexable extends Regexable {
 
     @Override
     protected Status onRegexCommand(RegexCommandEvent re) throws Exception {
-        if (ThreadLocalRandom.current().nextDouble() <= 0.20) {
+        GuildConfigDao dao = new GuildConfigDaoImpl(re.getMCHelper().getDatabase());
+        GuildConfig gc = dao.getConfig(re.getEvent().getGuild());
+        if (ThreadLocalRandom.current().nextDouble() <= gc.getDadBotChance()) {
             Matcher m = PATTERN.matcher(re.getEvent().getMessage().getContentRaw());
             re.sendReplyWithoutPing("Hi" + m.replaceFirst("") + ", I'm Dad!");
         }

@@ -38,9 +38,13 @@ public class GuildConfigCommand extends Command {
                         current value: <#%s>
                     postQotdToDefaultChannel <boolean>: whether or not to post the QOTD at 16:00 UTC.
                         current value: %s
+                    dadBotChance <percent>: the chance dad bot will respond to an `i'm` message.
+                        current value: %s percent
+                    betBotChance <percent>: the chance bet bot will respond to a `bet` messsage.
+                        current value: %s percent
                     prefix <character>: the prefix character to invoke commands.
                         current value: `%c`
-                    """.formatted(gc.getDefaultChannel(), gc.getPostQotdToDefaultChannel(), gc.getPrefix()));
+                    """.formatted(gc.getDefaultChannel(), gc.getPostQotdToDefaultChannel(), gc.getDadBotChance(), gc.getBetBotChance(), gc.getPrefix()));
             return Status.SUCCESS;
         }
         else if (ce.getEvent().getMember().hasPermission(Permission.ADMINISTRATOR)) {
@@ -68,6 +72,16 @@ public class GuildConfigCommand extends Command {
                     gc.setPostQotdToDefaultChannel(qotd);
                     reply = "Quotes of the day *will" + (qotd ? "" : " not") + "* be posted to <#" + channel + ">";
                 }
+                case "dadBotChance" -> {
+                    double percent = parsePercent(value);
+                    gc.setDadBotChance(percent);
+                    reply = "Dad bot chance set to " + percent * 100 + "%.";
+                }
+                case "betBotChance" -> {
+                    double percent = parsePercent(value);
+                    gc.setBetBotChance(percent);
+                    reply = "Bet bot chance set to " + percent * 100 + "%.";
+                }
                 case "prefix" -> {
                     char prefix = value.charAt(0);
                     gc.setPrefix(prefix);
@@ -84,5 +98,13 @@ public class GuildConfigCommand extends Command {
             ce.sendReply("You must be an administrator of this guild to edit its config.");
             return Status.NO_PERMISSION;
         }
+    }
+
+    private double parsePercent(String s) {
+        double percent = Double.parseDouble(s) / 100;
+        if (percent < 0 || percent > 1) {
+            throw new IllegalArgumentException("Must be within 0 and 100!");
+        }
+        return percent;
     }
 }
