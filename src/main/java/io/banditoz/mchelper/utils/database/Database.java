@@ -28,6 +28,13 @@ public class Database {
         POOL.setDriverClassName("org.mariadb.jdbc.Driver");
         POOL.setJdbcUrl(url);
 
+        try (Connection c = getConnection()) {
+            // empty to call close()
+        } catch (Exception ex) {
+            LOGGER.error("Could not get connection from pool! Cowardly stopping.", ex);
+            System.exit(1);
+        }
+
         // we have a connection, generate tables!
         ArrayList<Dao> daos = new ArrayList<>();
         daos.add(new GuildConfigDaoImpl(this));
