@@ -220,6 +220,7 @@ public class MCHelperImpl implements MCHelper {
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableCache(CacheFlag.VOICE_STATE)
                     .setChunkingFilter(ChunkingFilter.ALL)
+                    .setMaxReconnectDelay(32)
                     .build();
         } catch (Exception ex) {
             LOGGER.error("Couldn't build JDA. Exiting!", ex);
