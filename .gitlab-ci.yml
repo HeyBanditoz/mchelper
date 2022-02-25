@@ -57,16 +57,12 @@ coverage:
             cobertura: build/reports/cobertura.xml
 
 create_image:
-    stage: deploy
+    stage: build
     image: docker:19.03.13
     services:
         - docker:19.03.12-dind
     variables:
         IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    needs: ["coverage", "package"]
-    dependencies:
-        - coverage
-        - package
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build -t $IMAGE_TAG .
