@@ -38,7 +38,7 @@ public class AddquoteCommand extends Command {
         }
     };
     private final EventHandler<MessageReceivedEvent> listener = new EventHandler<>() {
-        private final Pattern QUOTE_PARSER = Pattern.compile("^\"(.*?)\"\\s+");
+        private final Pattern QUOTE_PARSER = Pattern.compile("^[\"“”](.*?)[\"“”]\\s+");
 
         @Override
         public void eventConsumer(GenericEvent event) {

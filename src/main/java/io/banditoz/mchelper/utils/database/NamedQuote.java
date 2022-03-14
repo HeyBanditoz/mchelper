@@ -90,7 +90,7 @@ public class NamedQuote {
      */
     public static NamedQuote parseString(String s) {
         // fuck you, apple!
-        s = s.replace('“', '"').replace('”', '"');
+        s = fixAppleOddities(s);
 
         NamedQuote nq = new NamedQuote();
         Matcher m = QUOTE_PARSER.matcher(s);
@@ -116,8 +116,8 @@ public class NamedQuote {
     public static NamedQuote parseMessageId(long id, TextChannel c) {
         Message m = c.retrieveMessageById(id).complete();
         NamedQuote nq = new NamedQuote();
-        nq.setQuote(m.getContentDisplay());
-        nq.setQuoteAuthor(m.getAuthor().getName());
+        nq.setQuote(fixAppleOddities(m.getContentDisplay()));
+        nq.setQuoteAuthor(fixAppleOddities(m.getAuthor().getName()));
         nq.setGuildId(c.getGuild().getIdLong());
         return nq;
     }
@@ -138,5 +138,13 @@ public class NamedQuote {
 
     public String formatPlain() {
         return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
+    }
+
+    private static String fixAppleOddities(String s) {
+        return s.replace('“', '"')     // U+201C
+                .replace('”', '"')     // U+201D
+                .replace('‘', '\'')    // U+2018
+                .replace('’', '\'')    // U+2019
+                .replace("…", "...");  // U+2026 Horizontal Ellipsis
     }
 }
