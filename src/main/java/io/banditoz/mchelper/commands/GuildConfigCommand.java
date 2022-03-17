@@ -9,6 +9,7 @@ import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 @Requires(database = true)
@@ -44,10 +45,12 @@ public class GuildConfigCommand extends Command {
                         current value: %s percent
                     prefix <character>: the prefix character to invoke commands.
                         current value: `%c`
-                    """.formatted(gc.getDefaultChannel(), gc.getPostQotdToDefaultChannel(), gc.getDadBotChance(), gc.getBetBotChance(), gc.getPrefix()));
+                    voiceRoleId <id>: the role the bot will assign to people in VCs.
+                        current value: `%s`
+                    """.formatted(gc.getDefaultChannel(), gc.getPostQotdToDefaultChannel(), gc.getDadBotChance() * 100, gc.getBetBotChance() * 100, gc.getPrefix(), gc.getVoiceRoleId()));
             return Status.SUCCESS;
         }
-        else if (ce.getEvent().getMember().hasPermission(Permission.ADMINISTRATOR)) {
+        else if (ce.getEvent().getMember().hasPermission(Permission.MANAGE_SERVER)) {
             String value = ce.getRawCommandArgs()[2];
             String reply;
             switch (ce.getRawCommandArgs()[1]) {
@@ -86,6 +89,20 @@ public class GuildConfigCommand extends Command {
                     char prefix = value.charAt(0);
                     gc.setPrefix(prefix);
                     reply = "Guild prefix set to `" + prefix + "`";
+                }
+                case "voiceRoleId" -> {
+                    long roleId = Long.parseLong(value.replaceAll("[^0-9]", ""));
+                    Role r = ce.getEvent().getGuild().getRoleById(roleId);
+                    if (r == null) {
+                        ce.sendReply("There is no role by that ID!");
+                        return Status.FAIL;
+                    }
+                    if (!ce.getEvent().getGuild().getMemberById(ce.getEvent().getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+                        ce.sendReply("I need MANAGE_ROLES to do this.");
+                        return Status.FAIL;
+                    }
+                    gc.setVoiceRoleId(roleId);
+                    reply = "The bot will assign this role to members in VCs: " + r.getAsMention();
                 }
                 default -> reply = "No key by supplied name.";
             }

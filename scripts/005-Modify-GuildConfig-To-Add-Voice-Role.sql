@@ -1,0 +1,1 @@
+ALTER TABLE guild_config ADD COLUMN voice_role_id BIGINT(18) AFTER betbot_chance;

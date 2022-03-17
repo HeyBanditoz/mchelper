@@ -15,6 +15,8 @@ public class GuildConfig {
     private double dadBotChance;
     /** The chance for bet bot to fire when someone says `bet`. */
     private double betBotChance;
+    /**  The role to assign members currently in a voice channel. */
+    private long voiceRoleId;
     private Timestamp lastModified;
 
     public GuildConfig(long id) {
@@ -86,5 +88,13 @@ public class GuildConfig {
 
     public void setLastModified(Timestamp lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public long getVoiceRoleId() {
+        return voiceRoleId;
+    }
+
+    public void setVoiceRoleId(long voiceRoleId) {
+        this.voiceRoleId = voiceRoleId;
     }
 }

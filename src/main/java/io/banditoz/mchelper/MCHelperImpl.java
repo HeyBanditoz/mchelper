@@ -109,7 +109,9 @@ public class MCHelperImpl implements MCHelper {
             else {
                 LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
             }
-
+            GuildVoiceListener voiceListener = new GuildVoiceListener(this);
+            voiceListener.updateAll();
+            JDA.addEventListener(voiceListener);
         }
         else {
             DB = null;
