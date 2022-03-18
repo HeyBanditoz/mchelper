@@ -3,10 +3,12 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.utils.database.GuildConfig;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +27,9 @@ public class GuildVoiceListener extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
+        if (event.getMember().getUser().isBot()) {
+            return;
+        }
         Guild g = event.getGuild();
         GuildConfig conf = dao.getConfig(g);
         if (conf == null) {
@@ -54,6 +59,13 @@ public class GuildVoiceListener extends ListenerAdapter {
         }
     }
 
+    @Override
+    public void onStatusChange(@NotNull StatusChangeEvent event) {
+        if (event.getNewStatus() == JDA.Status.CONNECTED) {
+            updateAll();
+        }
+    }
+
     public void updateAll() {
         int i = 0;
         for (GuildConfig config : dao.getAllGuildConfigs()) {
@@ -69,6 +81,9 @@ public class GuildVoiceListener extends ListenerAdapter {
                         continue;
                     }
                     for (GuildVoiceState vs : g.getVoiceStates()) {
+                        if (vs.getMember().getUser().isBot()) {
+                            continue;
+                        }
                         if (vs.inAudioChannel()) {
                             g.addRoleToMember(vs.getMember(), toChange)
                                     .reason("This member was in a voice channel on bot startup, and was granted the assigned voice role.")
