@@ -66,6 +66,7 @@ public class SettingsManager {
         defaultSettings.setPasteGgApiEndpoint("https://api.paste.gg");
         defaultSettings.setPasteGgBaseUrl("https://paste.gg/");
         defaultSettings.setPasteGgApiKey("<not required>");
+        defaultSettings.setTarkovToolsApiEndpoint("https://api.tarkov.dev/graphql");
         return defaultSettings;
     }
 

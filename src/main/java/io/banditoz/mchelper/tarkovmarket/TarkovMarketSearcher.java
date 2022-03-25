@@ -56,7 +56,7 @@ public class TarkovMarketSearcher {
             Map<String, String> jsonIntermediate = Map.of("query", query);
             String jsonQuery = om.writeValueAsString(jsonIntermediate);
             Request request = new Request.Builder()
-                    .url("https://tarkov-tools.com/graphql")
+                    .url(MCHELPER.getSettings().getTarkovToolsApiEndpoint())
                     .post(RequestBody.create(MediaType.get("application/json"), jsonQuery))
                     .header("Content-Type", "application/json")
                     .header("Accept", "application/json")

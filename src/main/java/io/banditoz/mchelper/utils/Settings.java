@@ -33,6 +33,8 @@ public class Settings {
     private String pasteGgApiKey;
     @JsonProperty("pasteGgBaseUrl")
     private String pasteGgBaseUrl;
+    @JsonProperty("tarkovToolsApiEndpoint")
+    private String tarkovToolsApiEndpoint;
 
     private final static Settings defaultSettings = SettingsManager.getDefaultSettings();
 
@@ -189,5 +191,15 @@ public class Settings {
     @JsonProperty("pasteGgApiUrl")
     public void setPasteGgBaseUrl(String pasteGgBaseUrl) {
         this.pasteGgBaseUrl = pasteGgBaseUrl;
+    }
+
+    @JsonProperty("tarkovToolsApiEndpoint")
+    public String getTarkovToolsApiEndpoint() {
+        return tarkovToolsApiEndpoint;
+    }
+
+    @JsonProperty("tarkovToolsApiEndpoint")
+    public void setTarkovToolsApiEndpoint(String tarkovToolsApiEndpoint) {
+        this.tarkovToolsApiEndpoint = tarkovToolsApiEndpoint;
     }
 }

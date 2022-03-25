@@ -66,6 +66,7 @@ public class CommandTests extends BaseCommandTest {
         settings.setFinnhubKey("35uy7ewsgfhed");
         settings.setRiotApiKey("we98ytfghioned.");
         settings.setTarkovMarketApiKey("sgfjklw4epoitju");
+        settings.setTarkovToolsApiEndpoint("https://api.tarkov.dev/graphql");
         return settings;
     }
 
