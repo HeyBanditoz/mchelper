@@ -8,8 +8,15 @@ import io.banditoz.mchelper.utils.ClassUtils;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,22 +32,72 @@ public class CommandHandler extends ListenerAdapter {
     private final MCHelper MCHELPER;
     private int commandsRun;
 
+    private final Random random = new Random();
+    private final BidiMap<Long, Captcha> captchas = new DualHashBidiMap<>();
+
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong())
             return; // don't execute own commands
         getCommandByEvent(event).ifPresent(c -> {
-            if (c.canExecute(event, MCHELPER)) {
-                MCHELPER.getThreadPoolExecutor().execute(() -> {
-                    Stat s = c.execute(event, MCHELPER);
-                    if (s.getStatus() == Status.SUCCESS) {
-                        commandsRun++;
-                    }
-                    LOGGER.info(s.getLogMessage());
-                    MCHELPER.getStatsRecorder().record(s);
-                });
+            if (captchas.get(event.getAuthor().getIdLong()) == null) {
+                if (random.nextBoolean()) {
+                    // uh oh! due to extremely intelligent bot detection algorithms we have proof beyond a reasonable doubt
+                    // that the user attempting to execute a command is a BOT! we must check and make sure!
+                    LOGGER.info("User {} caught by captcha check.", event.getAuthor());
+                    Captcha captcha = new Captcha(event.getAuthor(), c, event);
+                    captchas.put(event.getAuthor().getIdLong(), captcha);
+                }
+                else {
+                    // they're free to go this time!
+                    execute(event, c);
+                }
             }
         });
+    }
+
+    @Override
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        BidiMap<Captcha, Long> local = captchas.inverseBidiMap();
+        for (Captcha captcha : local.keySet()) {
+            if (captcha.getCorrectUUID().toString().equals(event.getButton().getId())) {
+                if (captcha.getChallenger() == event.getUser()) { // the original capt?pcha invoker is the only one that can attempt to pass it
+                    local.remove(captcha);
+                    String oldText = event.getMessage().getContentRaw();
+                    event.getMessage()
+                            .editMessage(oldText + '\n' + "*Captcha passed.* Great job!")
+                            .setActionRows(Collections.emptyList())
+                            .queue();
+                    LOGGER.info("User {} PASSED the captcha check.", captcha.getEvent().getAuthor());
+                    execute(captcha.getEvent(), captcha.getCommand());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+        BidiMap<Captcha, Long> local = captchas.inverseBidiMap();
+        for (Captcha captcha : local.keySet()) {
+            if (captcha.getMessage().getIdLong() == event.getMessageIdLong()) {
+                captcha.sendMessage(true);
+                LOGGER.warn("User {} IS A BOT SUPPORTER!!!!11!1!11!!11!", captcha.getEvent().getAuthor());
+                return;
+            }
+        }
+    }
+
+    private void execute(MessageReceivedEvent event, Command c) {
+        if (c.canExecute(event, MCHELPER)) {
+            MCHELPER.getThreadPoolExecutor().execute(() -> {
+                Stat s = c.execute(event, MCHELPER);
+                if (s.getStatus() == Status.SUCCESS) {
+                    commandsRun++;
+                }
+                LOGGER.info(s.getLogMessage());
+                MCHELPER.getStatsRecorder().record(s);
+            });
+        }
     }
 
     protected Optional<Command> getCommandByEvent(MessageReceivedEvent e) {
