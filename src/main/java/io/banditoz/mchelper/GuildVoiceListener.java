@@ -38,7 +38,7 @@ public class GuildVoiceListener extends ListenerAdapter {
         long roleId = conf.getVoiceRoleId();
         Role toChange = g.getRoleById(dao.getConfig(g).getVoiceRoleId());
         if (toChange == null) {
-            LOGGER.error("There is no role in guild " + g + " by id " + roleId + ". Skipping role update.");
+            LOGGER.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
             return;
         }
         if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
@@ -77,7 +77,7 @@ public class GuildVoiceListener extends ListenerAdapter {
                     long roleId = dao.getConfig(g).getVoiceRoleId();
                     Role toChange = g.getRoleById(roleId);
                     if (toChange == null) {
-                        LOGGER.error("There is no role in guild " + g + " by id " + roleId + ". Skipping role update.");
+                        LOGGER.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
                         continue;
                     }
                     for (GuildVoiceState vs : g.getVoiceStates()) {
@@ -99,6 +99,6 @@ public class GuildVoiceListener extends ListenerAdapter {
                 }
             }
         }
-        LOGGER.info("Updated voice roles for " + i + " guild(s).");
+        LOGGER.info("Updated voice roles for {} guild(s).", i);
     }
 }
