@@ -13,6 +13,7 @@ import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
+import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -127,7 +128,7 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     private Response placeRequest(Request request) throws HttpResponseException, IOException {
-        request = request.newBuilder().addHeader("User-Agent", "MCHelper/" + Version.GIT_SHA + ' ' + okhttp3.internal.Version.userAgent() + " (+https://gitlab.com/HeyBanditoz/mchelper)").build();
+        request = request.newBuilder().addHeader("User-Agent", "MCHelper/" + Version.GIT_SHA + " okhttp/" + OkHttp.VERSION + " (+https://gitlab.com/HeyBanditoz/mchelper)").build();
         Response response = CLIENT.newCall(request).execute();
         if (response.code() >= 400) {
             response.close();
