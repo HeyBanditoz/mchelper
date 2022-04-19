@@ -54,7 +54,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     public List<NamedQuote> getQuotesByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RANDOM()");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? AND (quote ILIKE ? OR quote_author ILIKE ?) ORDER BY RANDOM()");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
             ps.setString(3, search);
