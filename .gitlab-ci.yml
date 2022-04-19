@@ -26,12 +26,19 @@ package:
 test:
     stage: test
     script:
+        # Bootstrap required tools to install Postgres' signing key.
         - apt-get update
-        - apt-get -y install mariadb-server
-        - service mysql start
-        - mysql -uroot --password="" -e "CREATE DATABASE test COLLATE utf8mb4_general_ci" # don't prompt for password
-        - mysql -uroot --password="" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'pass'"
-        - DB="test" HOST="127.0.0.1:3306" USER="root" PASS="pass" gradle test jacocoTestReport printCoverage
+        - apt-get -y install gnupg software-properties-common
+        - sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        # Install their signing key
+        - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+        - apt-get update
+        # Install and start postgres
+        - apt-get -y install postgresql
+        - service postgresql start
+        # We love bash so much, this looks crazy, but you're just gonna have to trust me.
+        - su -c "psql --command 'ALTER USER postgres WITH PASSWORD \$\$postgres\$\$;'" postgres
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle test jacocoTestReport printCoverage
     needs: ["package"]
     dependencies:
         - package
@@ -80,7 +87,7 @@ new_commands:
         - echo "$PRIVATE_TOKEN" > token
         - apt update
         - apt -y install curl
-        - DB="test" HOST="127.0.0.1:3306" USER="root" PASS="root" gradle run --args="dumpcommands"
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle run --args="dumpcommands"
         - bash push_commands_to_gitlab.sh
     only:
         - master

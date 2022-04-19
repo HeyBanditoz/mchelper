@@ -17,13 +17,24 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `statistics`( `guild_id` bigint(18) DEFAULT NULL, `channel_id` bigint(18) DEFAULT NULL, `author_id` bigint(18) NOT NULL, `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL, `arguments` varchar(1997) COLLATE utf8mb4_unicode_ci NOT NULL, `return_code` tinyint(4) NOT NULL, `execution_time` int(11) NOT NULL, `executed_at` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return """
+                CREATE TABLE IF NOT EXISTS statistics (
+                    guild_id bigint,
+                    channel_id bigint,
+                    author_id bigint NOT NULL,
+                    name character varying(50) NOT NULL,
+                    arguments character varying(1997) NOT NULL,
+                    return_code smallint NOT NULL,
+                    execution_time bigint NOT NULL,
+                    executed_at timestamp with time zone NOT NULL
+                );
+                """;
     }
 
     @Override
     public void log(Stat s) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `statistics` VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO statistics VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             if (s.getEvent().isFromGuild()) {
                 ps.setLong(1, s.getEvent().getGuild().getIdLong());
             }
@@ -46,10 +57,10 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps;
             if (g == null) {
-                ps = c.prepareStatement("SELECT name, COUNT(name) AS 'count' FROM `statistics` GROUP BY name ORDER BY COUNT(name) DESC;");
+                ps = c.prepareStatement("SELECT name, COUNT(name) AS \"count\" FROM statistics GROUP BY name ORDER BY COUNT(name) DESC;");
             }
             else {
-                ps = c.prepareStatement("SELECT name, COUNT(name) AS 'count' FROM `statistics` WHERE guild_id=? GROUP BY name ORDER BY COUNT(name) DESC;");
+                ps = c.prepareStatement("SELECT name, COUNT(name) AS \"count\" FROM statistics WHERE guild_id=? GROUP BY name ORDER BY COUNT(name) DESC;");
                 ps.setLong(1, g.getIdLong());
             }
             ps.execute();

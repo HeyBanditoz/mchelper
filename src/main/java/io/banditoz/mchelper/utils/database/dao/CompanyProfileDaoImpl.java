@@ -20,13 +20,27 @@ public class CompanyProfileDaoImpl extends Dao implements CompanyProfileDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `company_profiles`( `country` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `exchange` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL, `industry` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL, `ipo` date NOT NULL, `logo` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `market_capitalization` float NOT NULL, `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL, `shares_outstanding` float NOT NULL, `ticker` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL, `weburl` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL, `updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), UNIQUE KEY `ticker` (`ticker`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return """
+                CREATE TABLE IF NOT EXISTS company_profiles (
+                    country character varying(10) NOT NULL,
+                    exchange character varying(50) NOT NULL,
+                    industry character varying(40) NOT NULL,
+                    ipo date NOT NULL,
+                    logo character varying(200) NOT NULL,
+                    market_capitalization double precision NOT NULL,
+                    name character varying(80) NOT NULL,
+                    shares_outstanding double precision NOT NULL,
+                    ticker character varying(10) NOT NULL,
+                    weburl character varying(200) NOT NULL,
+                    updated timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+                );
+                """;
     }
 
     @Override
     public void addCompanyProfileIfNotExists(CompanyProfile companyProfile) {
         try (Connection c = DATABASE.getConnection()) {
-            try (PreparedStatement ps = c.prepareStatement("INSERT IGNORE INTO `company_profiles` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT NOW()))")) {
+            try (PreparedStatement ps = c.prepareStatement("INSERT INTO company_profiles VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING")) {
                 ps.setString(1, companyProfile.getCountry());
                 ps.setString(2, companyProfile.getExchange());
                 ps.setString(3, companyProfile.getFinnhubIndustry());
@@ -47,11 +61,10 @@ public class CompanyProfileDaoImpl extends Dao implements CompanyProfileDao {
     @Override
     public Optional<CompanyProfile> getCompanyProfile(String ticker) {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `company_profiles` WHERE ticker=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM company_profiles WHERE ticker=?");
             ps.setString(1, ticker);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return Optional.empty();
-                ps.close();
                 Optional<CompanyProfile> companyProfile = buildCompanyProfileFromResultSet(rs);
                 if (companyProfile.isPresent()) {
                     if (companyProfile.get().isExpired()) {

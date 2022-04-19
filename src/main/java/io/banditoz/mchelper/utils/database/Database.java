@@ -1,13 +1,15 @@
 package io.banditoz.mchelper.utils.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.banditoz.mchelper.utils.database.dao.*;
+import io.banditoz.mchelper.utils.ClassUtils;
+import io.banditoz.mchelper.utils.database.dao.Dao;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class Database {
@@ -19,13 +21,13 @@ public class Database {
             throw new IllegalStateException("The database is not configured.");
         }
         Map<String, String> env = System.getenv();
-        String url = "jdbc:mariadb://" + env.get("HOST") +
+        String url = "jdbc:postgresql://" + env.get("HOST") +
                 "/" + env.get("DB") +
                 "?user=" + env.get("USER") +
-                "&password=" + env.get("PASS");
+                "&password=" + env.get("PASS") +
+                "&useSSL=false&currentSchema=" + env.get("SCHEMA");
         POOL = new HikariDataSource();
         POOL.setMaximumPoolSize(2);
-        POOL.setDriverClassName("org.mariadb.jdbc.Driver");
         POOL.setJdbcUrl(url);
 
         try (Connection c = getConnection()) {
@@ -36,18 +38,15 @@ public class Database {
         }
 
         // we have a connection, generate tables!
-        ArrayList<Dao> daos = new ArrayList<>();
-        daos.add(new GuildConfigDaoImpl(this));
-        daos.add(new CoordsDaoImpl(this));
-        daos.add(new RemindersDaoImpl(this));
-        daos.add(new QuotesDaoImpl(this));
-        daos.add(new CompanyProfileDaoImpl(this));
-        daos.add(new StatisticsDaoImpl(this));
-        daos.add(new RolesDaoImpl(this));
-        daos.add(new AccountsDaoImpl(this));
-        daos.add(new TasksDaoImpl(this));
-        daos.add(new UserCacheDaoImpl(this));
-        daos.forEach(Dao::generateTable);
+        ClassUtils.getAllSubtypesOf(Dao.class).stream()
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .forEach(clazz -> {
+                    try {
+                        clazz.getDeclaredConstructor(Database.class).newInstance(this).generateTable();
+                    } catch (Exception ex) {
+                        LOGGER.error("Error while instantiating {}!", clazz, ex);
+                    }
+                });
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds in the config.");
     }
 
@@ -71,6 +70,6 @@ public class Database {
      */
     public static boolean isConfigured() {
         Map<String, String> env = System.getenv();
-        return env.containsKey("HOST") && env.containsKey("DB") && env.containsKey("USER") && env.containsKey("PASS");
+        return env.containsKey("HOST") && env.containsKey("DB") && env.containsKey("USER") && env.containsKey("PASS") && env.containsKey("SCHEMA");
     }
 }

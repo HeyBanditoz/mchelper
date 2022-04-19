@@ -14,13 +14,25 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `reminders`( `id` int(11) AUTO_INCREMENT PRIMARY KEY, `channel_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `reminder` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `remind_when` datetime NOT NULL, `reminded` tinyint(1) NOT NULL DEFAULT 0, `is_dm` tinyint(1) NOT NULL, `deleted` tinyint(1) NOT NULL DEFAULT 0) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return """
+                CREATE TABLE IF NOT EXISTS reminders (
+                    id serial,
+                    channel_id bigint NOT NULL,
+                    author_id bigint NOT NULL,
+                    reminder character varying(1500) NOT NULL,
+                    remind_when timestamp with time zone NOT NULL,
+                    reminded boolean DEFAULT false NOT NULL,
+                    is_dm boolean NOT NULL,
+                    deleted boolean DEFAULT false NOT NULL,
+                    PRIMARY KEY (id)
+                );
+                """;
     }
 
     @Override
     public void markReminded(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE `reminders` SET reminded = 1 WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET reminded = true WHERE id=?");
             ps.setInt(1, id);
             ps.execute();
             ps.close();
@@ -30,7 +42,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public void markDeleted(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE `reminders` SET deleted = 1 WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET deleted = true WHERE id=?");
             ps.setInt(1, id);
             ps.execute();
             ps.close();
@@ -40,17 +52,16 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public int schedule(Reminder r) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `reminders` VALUES (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setNull(1, Types.INTEGER);
-            ps.setLong(2, r.getChannelId());
-            ps.setLong(3, r.getAuthorId());
-            ps.setString(4, r.getReminder());
-            ps.setTimestamp(5, r.getRemindWhen());
-            ps.setInt(6, 0);
-            ps.setInt(7, r.isFromDm() ? 1 : 0);
-            ps.setInt(8, 0);
-            ps.execute();
-            ResultSet rs = ps.getGeneratedKeys();
+            PreparedStatement ps = c.prepareStatement("INSERT INTO reminders (channel_id, author_id, reminder, remind_when, reminded, is_dm, deleted) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id");
+//            ps.setNull(1, Types.INTEGER);
+            ps.setLong(1, r.getChannelId());
+            ps.setLong(2, r.getAuthorId());
+            ps.setString(3, r.getReminder());
+            ps.setTimestamp(4, r.getRemindWhen());
+            ps.setBoolean(5, false);
+            ps.setBoolean(6, r.isFromDm());
+            ps.setBoolean(7, false);
+            ResultSet rs = ps.executeQuery();
             rs.next();
             int id = rs.getInt(1);
             ps.close();
@@ -63,7 +74,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     public List<Reminder> getAllActiveReminders() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             ArrayList<Reminder> reminders = new ArrayList<>();
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `reminders` WHERE !(reminded || deleted)");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE NOT (reminded OR deleted)");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 reminders.add(buildReminderFromResultSet(rs));
@@ -77,7 +88,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public boolean isStillActiveOrNotDeleted(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT !(deleted || reminded) AS active FROM `reminders` WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT NOT (deleted Or reminded) AS active FROM reminders WHERE id=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             rs.next();
@@ -90,7 +101,7 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public Reminder getReminderById(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `reminders` WHERE id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE id=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             rs.next();

@@ -18,13 +18,30 @@ public class RolesDaoImpl extends Dao implements RolesDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `guild_roles`( `id` INT(10) unsigned PRIMARY KEY AUTO_INCREMENT, `guild_id` bigint(18) NOT NULL, `channel_id` bigint(18) NOT NULL, `message_id` bigint(18) NOT NULL) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci; CREATE TABLE IF NOT EXISTS `roles`( `id` INT(10) unsigned PRIMARY KEY AUTO_INCREMENT, `guild_id` bigint(18) NOT NULL, `emote` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `role_id` bigint(18) NOT NULL) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
+        return """
+                CREATE TABLE IF NOT EXISTS roles (
+                    id serial,
+                    guild_id bigint NOT NULL,
+                    emote character varying(100) NOT NULL,
+                    name character varying(100) NOT NULL,
+                    role_id bigint NOT NULL,
+                    PRIMARY KEY (id)
+                );
+                
+                CREATE TABLE IF NOT EXISTS guild_roles (
+                     id         serial,
+                     guild_id   bigint NOT NULL,
+                     channel_id bigint NOT NULL,
+                     message_id bigint NOT NULL,
+                     PRIMARY KEY (id)
+                );
+                """;
     }
 
     @Override
     public void init(@NotNull TextChannel channel, @NotNull Message message, @NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `guild_roles` (guild_id,channel_id,message_id) VALUES (?, ?, ?)");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO guild_roles (guild_id, channel_id, message_id) VALUES (?, ?, ?)");
             ps.setLong(1, g.getIdLong());
             ps.setLong(2, channel.getIdLong());
             ps.setLong(3, message.getIdLong());
@@ -37,17 +54,17 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     public Map.Entry<String,String> deactivate(@NotNull Guild g) throws SQLException {
         Map.Entry<String,String> id = null;
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_roles` WHERE guild_id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=?");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 id = new AbstractMap.SimpleEntry<>(rs.getString("channel_id"),rs.getString("message_id"));
             }
-            PreparedStatement ps2 = c.prepareStatement("DELETE FROM `roles` WHERE guild_id = ?");
+            PreparedStatement ps2 = c.prepareStatement("DELETE FROM roles WHERE guild_id = ?");
             ps2.setLong(1, g.getIdLong());
             ps2.execute();
             ps2.close();
-            PreparedStatement ps3 = c.prepareStatement("DELETE FROM `guild_roles` WHERE guild_id = ?");
+            PreparedStatement ps3 = c.prepareStatement("DELETE FROM guild_roles WHERE guild_id = ?");
             ps3.setLong(1, g.getIdLong());
             ps3.execute();
             ps3.close();
@@ -58,7 +75,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public boolean addRole(String emote, String name, @NotNull Guild g, Role role) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM `roles` WHERE guild_id=? AND emote = ? OR name = ? OR role_id = ?");
+            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND emote = ? OR roles.name = ? OR role_id = ?");
             ps2.setLong(1, g.getIdLong());
             ps2.setString(2, emote);
             ps2.setString(3, name);
@@ -66,7 +83,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
             try (ResultSet rs = ps2.executeQuery()) {
                 if (rs.next()) return false;
             }
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `roles` (guild_id,emote,name,role_id) VALUES (?, ?, ?, ?)");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO roles (guild_id, emote, name, role_id) VALUES (?, ?, ?, ?)");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, emote);
             ps.setString(3, name);
@@ -81,14 +98,14 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     public String removeRole(String name, @NotNull Guild g) throws SQLException {
         String s = "";
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM `roles` WHERE guild_id=? AND name=?");
+            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND roles.name=?");
             ps2.setLong(1, g.getIdLong());
             ps2.setString(2, name);
             try (ResultSet rs = ps2.executeQuery()) {
                 rs.next();
                 s = rs.getString("emote");
             }
-            PreparedStatement ps = c.prepareStatement("DELETE FROM `roles` WHERE name = ? AND guild_id = ?");
+            PreparedStatement ps = c.prepareStatement("DELETE FROM roles WHERE roles.name = ? AND guild_id = ?");
             ps.setString(1, name);
             ps.setLong(2, g.getIdLong());
             ps.execute();
@@ -100,12 +117,12 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public boolean containsGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_roles` WHERE guild_id=? LIMIT 1");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=? LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return false;
+                boolean b = rs.next();
                 ps.close();
-                return true;
+                return b;
             }
         }
     }
@@ -113,7 +130,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public boolean containsName(String n, Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `roles` WHERE guild_id=? AND name = ?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND name = ?");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, n);
             try (ResultSet rs = ps.executeQuery()) {
@@ -127,12 +144,11 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public RoleObject getRoleByEmote(Guild g, String emote) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `roles` WHERE guild_id=? AND emote=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND emote=?");
             ps.setLong(1, g.getIdLong());
             ps.setString(2,emote);
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
-                ps.close();
                 return new RoleObject(rs.getString("emote"),rs.getString("name"),rs.getString("role_id"));
             }
         }
@@ -141,7 +157,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public List<RoleObject> getRoles(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `roles` WHERE guild_id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=?");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 List<RoleObject> hm = new ArrayList<>();
@@ -158,11 +174,10 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public Map.Entry<String, String> getChannelAndMessageId(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_roles` WHERE guild_id=?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=?");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
-                ps.close();
                 return new AbstractMap.SimpleEntry<>(rs.getString("channel_id"), rs.getString("message_id"));
             }
         }

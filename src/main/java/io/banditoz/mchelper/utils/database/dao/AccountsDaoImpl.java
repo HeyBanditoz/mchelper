@@ -26,7 +26,23 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `accounts`( `id` bigint(18) NOT NULL, `balance` decimal(13,2) DEFAULT NULL, `created_at` datetime NOT NULL DEFAULT current_timestamp(), PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; CREATE TABLE IF NOT EXISTS `transactions`( `from_id` bigint(18) DEFAULT NULL, `to_id` bigint(18) DEFAULT NULL, `before` decimal(13,2) NOT NULL, `amount` decimal(13,2) NOT NULL, `memo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `when` datetime NOT NULL DEFAULT current_timestamp()) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        return """
+                CREATE TABLE IF NOT EXISTS accounts (
+                    id bigint NOT NULL,
+                    balance numeric(13,2) DEFAULT NULL::numeric,
+                    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    PRIMARY KEY (id)
+                );
+                
+                CREATE TABLE IF NOT EXISTS transactions (
+                    from_id bigint,
+                    to_id bigint,
+                    before numeric(13,2) NOT NULL,
+                    amount numeric(13,2) NOT NULL,
+                    memo character varying(100) NOT NULL,
+                    "when" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+                );
+                """;
     }
 
     @Override
@@ -116,7 +132,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     private void log(Transaction t, Connection c) throws SQLException {
-        PreparedStatement ps = c.prepareStatement("INSERT INTO transactions VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP())");
+        PreparedStatement ps = c.prepareStatement("INSERT INTO transactions VALUES (?, ?, ?, ?, ?)");
         if (t.getFrom() == null) {
             ps.setNull(1, Types.BIGINT);
         }
@@ -143,7 +159,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         }
         List<Transaction> txns = new ArrayList<>(Math.min(n, 10000)); // hacky
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? ORDER BY `when` DESC LIMIT ?");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? ORDER BY \"when\" DESC LIMIT ?");
             ps.setLong(1, id);
             ps.setLong(2, id);
             ps.setLong(3, n);
@@ -184,7 +200,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
      * @throws SQLException If there was a problem creating the account.
      */
     private void createAccount(Connection c, long id) throws SQLException {
-        PreparedStatement ps = c.prepareStatement("INSERT INTO accounts VALUES (?, ?, CURRENT_TIMESTAMP())");
+        PreparedStatement ps = c.prepareStatement("INSERT INTO accounts VALUES (?, ?)");
         ps.setLong(1, id);
         ps.setBigDecimal(2, BigDecimal.ZERO);
         ps.execute();

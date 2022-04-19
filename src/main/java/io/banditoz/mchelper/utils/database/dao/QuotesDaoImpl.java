@@ -19,21 +19,31 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `quotes`( `guild_id` bigint(18) NOT NULL, `author_id` bigint(18) NOT NULL, `quote` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL, `quote_author` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp(), `id` INT(10) unsigned PRIMARY KEY AUTO_INCREMENT) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;";
+        return """
+                CREATE TABLE IF NOT EXISTS quotes (
+                    guild_id bigint NOT NULL,
+                    author_id bigint NOT NULL,
+                    quote character varying(1500) NOT NULL,
+                    quote_author character varying(100) NOT NULL,
+                    last_modified timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    id SERIAL,
+                    PRIMARY KEY (id),
+                    UNIQUE (guild_id, quote, quote_author)
+                );
+                """;
     }
 
     @Override
     public int saveQuote(NamedQuote nq) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO `quotes` (guild_id,author_id,quote,quote_author,last_modified) VALUES (?, ?, ?, ?, (SELECT NOW()))", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = c.prepareStatement("INSERT INTO quotes (guild_id, author_id, quote, quote_author) VALUES (?, ?, ?, ?) RETURNING id");
             ps.setLong(1, nq.getGuildId());
             ps.setLong(2, nq.getAuthorId());
             ps.setString(3, nq.getQuote());
             ps.setString(4, nq.getQuoteAuthor());
-            ps.execute();
-            ResultSet rs = ps.getGeneratedKeys();
+            ResultSet rs = ps.executeQuery();
             rs.next();
-            int id = rs.getInt(1);
+            int id = rs.getInt("id");
             ps.close();
             rs.close();
             return id;
@@ -44,7 +54,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     public List<NamedQuote> getQuotesByMatch(String search, @NotNull Guild g) throws SQLException {
         search = "%" + search + "%";
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RAND()");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? AND (quote LIKE ? OR quote_author LIKE ?) ORDER BY RANDOM()");
             ps.setLong(1, g.getIdLong());
             ps.setString(2, search);
             ps.setString(3, search);
@@ -55,7 +65,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
     public List<NamedQuote> getAllQuotesForGuild(@NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND()");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? ORDER BY RANDOM()");
             ps.setLong(1, g.getIdLong());
             return buildNamedQuotesFromResultSet(ps);
         }
@@ -65,11 +75,10 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
     public Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `quotes` WHERE guild_id=? ORDER BY RAND() LIMIT 1");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? ORDER BY RANDOM() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return Optional.empty();
-                ps.close();
                 return buildQuoteFromResultSet(rs);
             }
         }
@@ -78,7 +87,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
     public List<StatPoint<Long, Integer>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT author_id, COUNT(author_id) AS 'count' FROM `quotes` WHERE guild_id=? GROUP BY author_id ORDER BY COUNT(author_id) DESC");
+            PreparedStatement ps = c.prepareStatement("SELECT author_id, COUNT(author_id) AS \"count\" FROM quotes WHERE guild_id=? GROUP BY author_id ORDER BY COUNT(author_id) DESC");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.isLast()) {
@@ -146,13 +155,11 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
     private List<NamedQuote> buildNamedQuotesFromResultSet(PreparedStatement ps) throws SQLException {
         try (ResultSet rs = ps.executeQuery()) {
-            ps.close();
             List<NamedQuote> quotes = new ArrayList<>();
             while (rs.next()) {
                 Optional<NamedQuote> onq = buildQuoteFromResultSet(rs);
                 onq.ifPresent(quotes::add);
             }
-            rs.close();
             return quotes;
         }
     }

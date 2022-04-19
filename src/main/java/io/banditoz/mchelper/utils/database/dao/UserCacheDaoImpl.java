@@ -18,13 +18,19 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `username_cache`( `id` bigint(18) NOT NULL, `username` varchar(32) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+        return """
+                CREATE TABLE IF NOT EXISTS username_cache (
+                    id bigint NOT NULL,
+                    username character varying(32) NOT NULL,
+                    PRIMARY KEY (id)
+                );
+                """;
     }
 
     public void replaceAll(List<User> users) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);
-            PreparedStatement ps = c.prepareStatement("REPLACE INTO username_cache VALUES (?, ?)");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO username_cache VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET username = excluded.username");
             for (User user : users) {
                 ps.setLong(1, user.getIdLong());
                 ps.setString(2, user.getName());

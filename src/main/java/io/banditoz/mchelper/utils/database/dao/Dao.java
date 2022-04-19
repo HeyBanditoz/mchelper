@@ -23,7 +23,7 @@ public abstract class Dao {
                 c.prepareStatement(s).execute();
             }
         } catch (SQLException e) {
-            LOGGER.error("Failed to create table!", e);
+            LOGGER.error("Failed to create table for {}!", this.getClass() ,e);
         }
     }
 }

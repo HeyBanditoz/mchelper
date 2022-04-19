@@ -24,13 +24,25 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `guild_config`( `guild_id` bigint(18) NOT NULL, `prefix` varchar(1) COLLATE utf8mb4_unicode_ci NOT NULL, `default_channel` bigint(18) DEFAULT NULL, `post_qotd_to_default_channel` tinyint(1) DEFAULT NULL, `last_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), PRIMARY KEY (`guild_id`), UNIQUE KEY `default_channel` (`default_channel`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ";
+        return """
+                CREATE TABLE IF NOT EXISTS guild_config (
+                    guild_id bigint,
+                    prefix character varying(1) NOT NULL,
+                    default_channel bigint,
+                    post_qotd_to_default_channel boolean,
+                    dadbot_chance double precision,
+                    betbot_chance double precision,
+                    voice_role_id bigint,
+                    last_modified timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    PRIMARY KEY (guild_id)
+                );
+                """;
     }
 
     @Override
     public void saveConfig(GuildConfig config) {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("REPLACE INTO `guild_config` VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT NOW()))");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO guild_config VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (guild_id) DO UPDATE SET prefix = excluded.prefix, default_channel = excluded.default_channel, post_qotd_to_default_channel = excluded.post_qotd_to_default_channel, dadbot_chance = excluded.dadbot_chance, betbot_chance = excluded.betbot_chance, voice_role_id = excluded.voice_role_id");
             ps.setLong(1, config.getId());
             ps.setString(2, String.valueOf(config.getPrefix()));
             if (config.getDefaultChannel() == 0) {
@@ -67,7 +79,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
                 return new GuildConfig(); // hackily return the default GuildConfig if no database is configured
             }
             try (Connection c = DATABASE.getConnection()) {
-                PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config` WHERE `guild_id` = ?");
+                PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_config WHERE guild_id = ?");
                 ps.setLong(1, g.getIdLong());
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -96,7 +108,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     public List<GuildConfig> getAllGuildConfigs() {
         ArrayList<GuildConfig> guilds = new ArrayList<>();
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM `guild_config`");
+            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_config");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 GuildConfig gc = buildGuildConfigFromResultSet(rs);
@@ -113,7 +125,7 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     @Override
     public int getGuildCount() {
         try (Connection c = DATABASE.getConnection()) {
-            ResultSet rs = c.prepareStatement("SELECT COUNT(*) FROM `guild_config`").executeQuery();
+            ResultSet rs = c.prepareStatement("SELECT COUNT(*) FROM guild_config").executeQuery();
             rs.next();
             return rs.getInt(1);
         } catch (SQLException e) {

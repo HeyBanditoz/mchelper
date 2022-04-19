@@ -14,7 +14,14 @@ public class TasksDaoImpl extends Dao implements TasksDao {
 
     @Override
     public String getSqlTableGenerator() {
-        return "CREATE TABLE IF NOT EXISTS `tasks`( `id` bigint(18) DEFAULT NULL, `task_id` tinyint(4) DEFAULT NULL, `can_run_again` datetime DEFAULT NULL, UNIQUE KEY `unique_task` (`id`,`task_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        return """
+                CREATE TABLE IF NOT EXISTS tasks (
+                    id bigint,
+                    task_id smallint,
+                    can_run_again timestamp with time zone,
+                    UNIQUE (id, task_id)
+                );
+                """;
     }
 
     @Override
@@ -39,7 +46,7 @@ public class TasksDaoImpl extends Dao implements TasksDao {
     @Override
     public void putOrUpdateTask(long id, Task t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("REPLACE INTO tasks VALUES (?, ?, ?);");
+            PreparedStatement ps = c.prepareStatement("INSERT INTO tasks VALUES (?, ?, ?) ON CONFLICT (id, task_id) DO UPDATE SET can_run_again = excluded.can_run_again");
             ps.setLong(1, id);
             ps.setInt(2, t.ordinal());
             Timestamp time = Timestamp.from(Instant.now().plusSeconds(t.getDelay()));
