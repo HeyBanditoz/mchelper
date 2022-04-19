@@ -38,8 +38,10 @@ public class QotdRunnable implements Runnable {
                 Guild g = MCHELPER.getJDA().getGuildById(guild.getId());
                 if (g != null) {
                     try {
-                        Optional<NamedQuote> nq = dao.getRandomQuote(g);
-                        nq.ifPresent(namedQuote -> g.getTextChannelById(guild.getDefaultChannel()).sendMessageEmbeds(formatQuote(namedQuote)).queue());
+                        NamedQuote nq = dao.getRandomQuote(g);
+                        if (nq != null) {
+                            g.getTextChannelById(guild.getDefaultChannel()).sendMessageEmbeds(formatQuote(nq)).queue();
+                        }
                     } catch (Exception e) {
                         LOGGER.error("Could not send QOTD to " + guild.getId() + " as there was an exception fetching one or sending to the channel.", e);
                     }

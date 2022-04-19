@@ -6,6 +6,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,12 +74,12 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
 
 
     @Override
-    public Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException {
+    public @Nullable NamedQuote getRandomQuote(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("SELECT * FROM quotes WHERE guild_id=? ORDER BY RANDOM() LIMIT 1");
             ps.setLong(1, g.getIdLong());
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return Optional.empty();
+                if (!rs.next()) return null;
                 return buildQuoteFromResultSet(rs);
             }
         }
@@ -124,25 +125,18 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                 if (!rs.next()) {
                     return false;
                 }
-                Optional<NamedQuote> nq = buildQuoteFromResultSet(rs);
-                if (nq.isPresent()) {
-                    NamedQuote quote = nq.get();
-                    LOGGER.info("Deleting quote #" + quote.getId() + " from guild \"" + g.getName() + "\" with content: " + quote.formatPlain());
-                    ps = c.prepareStatement("DELETE FROM quotes WHERE id=?");
-                    ps.setInt(1, id);
-                    ps.execute();
-                    ps.close();
-                    return true;
-                }
-                else {
-                    ps.close();
-                    return false;
-                }
+                NamedQuote nq = buildQuoteFromResultSet(rs);
+                LOGGER.info("Deleting quote #" + nq.getId() + " from guild \"" + g.getName() + "\" with content: " + nq.formatPlain());
+                ps = c.prepareStatement("DELETE FROM quotes WHERE id=?");
+                ps.setInt(1, id);
+                ps.execute();
+                ps.close();
+                return true;
             }
         }
     }
 
-    private Optional<NamedQuote> buildQuoteFromResultSet(ResultSet rs) throws SQLException {
+    private NamedQuote buildQuoteFromResultSet(ResultSet rs) throws SQLException {
         NamedQuote nq = new NamedQuote();
         nq.setGuildId(rs.getLong("guild_id"));
         nq.setAuthorId(rs.getLong("author_id"));
@@ -150,15 +144,14 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         nq.setQuoteAuthor(rs.getString("quote_author"));
         nq.setLastModified(rs.getTimestamp("last_modified"));
         nq.setId(rs.getInt("id"));
-        return Optional.of(nq);
+        return nq;
     }
 
     private List<NamedQuote> buildNamedQuotesFromResultSet(PreparedStatement ps) throws SQLException {
         try (ResultSet rs = ps.executeQuery()) {
             List<NamedQuote> quotes = new ArrayList<>();
             while (rs.next()) {
-                Optional<NamedQuote> onq = buildQuoteFromResultSet(rs);
-                onq.ifPresent(quotes::add);
+                quotes.add(buildQuoteFromResultSet(rs));
             }
             return quotes;
         }

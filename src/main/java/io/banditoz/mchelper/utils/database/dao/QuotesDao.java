@@ -4,6 +4,7 @@ import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
 
+import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public interface QuotesDao {
      * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
      * @throws SQLException If there was an error getting the quote.
      */
-    Optional<NamedQuote> getRandomQuote(Guild g) throws SQLException;
+    @Nullable NamedQuote getRandomQuote(Guild g) throws SQLException;
     /**
      * Returns a {@link Map} containing a list of keys of author IDs, that match to values on how many quotes that
      * author has added. Ideally, this {@link Map} should be ordered, as the command that invokes it expects it to be.

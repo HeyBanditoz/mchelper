@@ -56,7 +56,8 @@ public class QuoteCommand extends Command {
                 quotes = dao.getAllQuotesForGuild(ce.getGuild());
             }
             else if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
-                dao.getRandomQuote(ce.getGuild()).ifPresent(quotes::add);
+                NamedQuote nq = dao.getRandomQuote(ce.getGuild());
+                quotes.add(nq);
             }
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
