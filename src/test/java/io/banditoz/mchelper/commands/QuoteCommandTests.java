@@ -3,6 +3,8 @@ package io.banditoz.mchelper.commands;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -56,4 +58,39 @@ public class QuoteCommandTests extends BaseCommandTest {
         assertThat(stringCaptor.getValue()).isEqualTo("Quote successfully deleted.");
     }
 
+    @Test(dependsOnMethods = {"testAddquote", "testQuote", "testQuoteWithQuoteSearch", "testQuoteWithAuthorSearch"})
+    public void testDeleteNonExistentQuote() throws Exception {
+        when(ce.getCommandArgs()).thenReturn(new String[]{"!delquote", "100"});
+        dqc.onCommand(ce);
+        assertThat(stringCaptor.getValue()).isEqualTo("Quote was not deleted.");
+    }
+
+    @Test(dependsOnMethods = {"testDeleteQuote"})
+    public void testAddAndFetchMany() throws Exception {
+        when(ce.getCommandArgsString()).thenReturn("\"123\" 123");
+        when(ce.getCommandArgs()).thenReturn(new String[]{"\"123\"", "123"});
+        ac.onCommand(ce);
+        when(ce.getCommandArgsString()).thenReturn("\"456\" 456");
+        when(ce.getCommandArgs()).thenReturn(new String[]{"\"456\"", "456"});
+        ac.onCommand(ce);
+
+        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{""});
+        qc.onCommand(ce);
+
+        List<MessageEmbed> embeds = embedsCaptor.getValue();
+        assertThat(embeds.get(0).getDescription()).contains("1 of 2");
+        assertThat(embeds.size()).isEqualTo(2);
+    }
+
+    @Test(dependsOnMethods = "testAddAndFetchMany")
+    public void testQuoteStats() throws Exception {
+        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{"-s"});
+        qc.onCommand(ce);
+        assertThat(embedCaptor.getValue().getDescription()).contains("""
+                ```
+                Rank  Name
+                1.    NFoo                 2
+                ```""");
+
+    }
 }

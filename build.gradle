@@ -82,6 +82,7 @@ dependencies {
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
     implementation 'org.postgresql:postgresql:42.3.3'
     implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'io.jenetics:facilejdbc:2.0.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
     implementation 'net.sourceforge.argparse4j:argparse4j:0.9.0'
     implementation('org.knowm.xchart:xchart:3.8.1') {
