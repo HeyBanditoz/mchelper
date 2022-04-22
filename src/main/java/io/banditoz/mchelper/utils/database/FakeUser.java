@@ -1,34 +1,19 @@
 package io.banditoz.mchelper.utils.database;
 
-import java.util.Objects;
+import net.dv8tion.jda.api.entities.User;
 
-public class FakeUser {
-    private final long id;
-    private final String username;
-
-    public FakeUser(long id, String username) {
-        this.id = id;
-        this.username = username;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FakeUser fakeUser = (FakeUser) o;
-        return id == fakeUser.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username);
+/**
+ * Represents a user from the username cache.
+ *
+ * @param id       The user's snowflake ID. Unique!
+ * @param username The user's username. Not unique.
+ */
+public record FakeUser(long id, String username) {
+    /**
+     * @param u The {@link User} to create into a {@link FakeUser}.
+     * @return A new {@link FakeUser}.
+     */
+    public static FakeUser of(User u) {
+        return new FakeUser(u.getIdLong(), u.getName());
     }
 }

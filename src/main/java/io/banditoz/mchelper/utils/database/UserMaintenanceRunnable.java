@@ -27,7 +27,7 @@ public class UserMaintenanceRunnable implements Runnable {
             DAO.replaceAll(users);
             DAO.deleteNonexistentUsers(users);
             int diff = users.size() - dbCount;
-            LOGGER.info(String.format("Successfully performed maintenance on the user cache. Cache: %d, Difference: %d.", users.size(), diff));
+            LOGGER.info(String.format("Successfully performed maintenance on the user cache. Cache: %d, Change: %d.", users.size(), diff));
         } catch (Exception ex) {
             LOGGER.error("Error while performing user cache maintenance!", ex);
         }
