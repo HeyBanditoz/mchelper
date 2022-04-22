@@ -39,6 +39,8 @@ public enum ItemType {
     NO_FLEA,
     @JsonProperty("pistolGrip")
     PISTOL_GRIP,
+    @JsonProperty("preset")
+    PRESET,
     @JsonProperty("provisions")
     PROVISIONS,
     @JsonProperty("unLootable")
