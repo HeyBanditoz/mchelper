@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,6 +148,11 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             NamedQuote nq = parseOne(rs, c);
             if (nq != null) {
                 quotes.add(nq);
+            }
+            // this branch will cover an empty ResultSet, I believe rs.isLast() should return true, but doesn't in the
+            // case of an empty ResultSet, may be a library bug, will need to investigate further.
+            else {
+                break;
             }
         }
         return quotes;

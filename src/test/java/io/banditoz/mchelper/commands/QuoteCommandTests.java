@@ -27,6 +27,13 @@ public class QuoteCommandTests extends BaseCommandTest {
         assertThat(messageCaptor.getValue().getContentRaw()).isEqualTo("Quote added.");
     }
 
+    @Test(timeOut = 5000L) // 5 second timeout
+    public void testFetchNonExistentQuote() throws Exception {
+        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{"1984"});
+        qc.onCommand(ce);
+        assertThat(embedCaptor.getValue().getDescription()).contains("No quote found.");
+    }
+
     @Test(dependsOnMethods = {"testAddquote"})
     public void testQuote() throws Exception {
         when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{""});
