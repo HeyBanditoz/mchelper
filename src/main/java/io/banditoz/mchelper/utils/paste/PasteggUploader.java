@@ -23,7 +23,7 @@ public class PasteggUploader {
      */
     public String uploadToPastegg(Paste paste) throws IOException, HttpResponseException {
         String responseString;
-        RequestBody body = RequestBody.create(JSON, MCHELPER.getObjectMapper().writeValueAsString(paste));
+        RequestBody body = RequestBody.create(MCHELPER.getObjectMapper().writeValueAsString(paste), JSON);
         Request.Builder builder = new Request.Builder()
                 .url(MCHELPER.getSettings().getPasteGgApiEndpoint() + "/v1/pastes/")
                 .post(body);

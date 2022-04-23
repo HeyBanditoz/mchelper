@@ -43,7 +43,7 @@ public class MessageLogger extends ListenerAdapter {
                 String json = MCHELPER.getObjectMapper().writeValueAsString(new LoggableMessage(m));
                 Request request = new Request.Builder()
                         .url(MCHELPER.getSettings().getElasticsearchMessageEndpoint())
-                        .post(RequestBody.create(MediaType.get("application/json"), json))
+                        .post(RequestBody.create(json, MediaType.get("application/json")))
                         .build();
                 MCHELPER.performHttpRequestIgnoreResponse(request);
             } catch (Exception ex) {
