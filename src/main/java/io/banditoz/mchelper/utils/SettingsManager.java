@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
@@ -49,6 +50,11 @@ public class SettingsManager {
 
     public void saveSettings() throws IOException {
         OM.writeValue(CONFIG_FILE.toFile(), this.settings);
+    }
+
+    public static void outputSettings(Settings s) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        System.out.println(om.writeValueAsString(s));
     }
 
     public static Settings getDefaultSettings() {

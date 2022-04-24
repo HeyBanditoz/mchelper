@@ -23,6 +23,36 @@ leave the guild. See
 [GuildMemberJoinEvent](https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/events/guild/member/GuildMemberJoinEvent.html)
 and [GuildMemberLeaveEvent.](https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/events/guild/member/GuildMemberLeaveEvent.html)
 
+## Quickly getting started
+In the repository is a [docker-compose.yml](docker-compose.yml) file you can use to start up a MCHelper instance with a
+Postgres-database configured. It will use the latest Docker image from the
+[master](https://gitlab.com/HeyBanditoz/mchelper/-/tree/master) branch.
+
+To try it out, you will first need to output the default config to a file:
+
+`docker run --rm registry.gitlab.com/heybanditoz/mchelper:master --entrypoint java -jar /app/bot.jar gensettings > Config.json`
+
+Then edit the resulting `Config.json` file. When you've added your bot token, you can finally run
+
+`docker-compose up`
+
+**Note!** Postgres isn't configured with its data directory to persist. If you remove the container, the database will 
+be destroyed.
+
+### Local Development
+
+For development with a database, remove the entire `mchelper` block under `services` in the docker-compose file, and
+set up your system environment variables like so:
+`HOST=127.0.0.1;DB=postgres;USER=postgres;PASS=SuperSecret;SCHEMA=public`
+
+You will also need to add this under the `postgres` block:
+```yaml
+ports:
+      - 5432:5432/tcp
+```
+
+You can access the postgres shell by running `docker exec -u 70 -it postgres psql`.
+
 ## Configuration
 
 On first run the bot will generate one for you. All external services the bot can access will be configured here, except

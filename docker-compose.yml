@@ -1,0 +1,23 @@
+---
+version: '3.3'
+services:
+    mchelper:
+        container_name: mchelper
+        volumes:
+            - './Config.json:/app/Config.json'
+        environment:
+            - HOST=postgres
+            - DB=postgres
+            - USER=postgres
+            - PASS=SuperSecret
+            - SCHEMA=public
+            - TZ=America/Denver  # swap this for your timezone, affects logging and dates in SQL
+        image: registry.gitlab.com/heybanditoz/mchelper:master
+        entrypoint: [ 'java', '-Xmx64M', '-Xms64M', '-jar', '/app/bot.jar' ]
+
+    postgres:
+        container_name: postgres
+        environment:
+            - TZ=America/Denver
+            - POSTGRES_PASSWORD=SuperSecret
+        image: postgres:14.2-alpine
