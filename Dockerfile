@@ -9,10 +9,11 @@ COPY . /build
 RUN apk add git
 RUN gradle shadowJar --no-daemon
 
-FROM ibm-semeru-runtimes:open-17-jdk-centos7
+FROM ibm-semeru-runtimes:open-17-jdk-focal
 WORKDIR /app
 
-#RUN yum install units
+RUN apt-get update && apt-get --no-install-recommends install -y units && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /build/build/libs/*all.jar bot.jar
 
 ENTRYPOINT ["java", "-jar", "bot.jar"]
