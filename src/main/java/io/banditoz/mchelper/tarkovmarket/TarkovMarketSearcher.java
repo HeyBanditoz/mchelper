@@ -38,7 +38,7 @@ public class TarkovMarketSearcher {
                           trader {
                             name
                           }
-                          price
+                          priceRUB
                         }
                         avg24hPrice
                         high24hPrice
