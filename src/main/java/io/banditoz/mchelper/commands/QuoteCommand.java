@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,15 +50,23 @@ public class QuoteCommand extends Command {
                     .build());
         }
         else {
-            List<NamedQuote> quotes = new ArrayList<>();
+            List<NamedQuote> quotes;
             List<MessageEmbed> embeds = new ArrayList<>();
 
             if (args.getBoolean("all") != null && args.getBoolean("all")) {
                 quotes = dao.getAllQuotesForGuild(ce.getGuild());
             }
+            else if (!ce.getEvent().getMessage().getMentionedUsers().isEmpty()) {
+                quotes = dao.getAllQuotesByAuthorInGuild(ce.getEvent().getMessage().getMentionedUsers().get(0).getIdLong(), ce.getGuild());
+            }
             else if (args.getList("quoteAndAuthor") != null && args.getList("quoteAndAuthor").isEmpty()) {
                 NamedQuote nq = dao.getRandomQuote(ce.getGuild());
-                quotes.add(nq);
+                if (nq == null) {
+                    quotes = Collections.emptyList();
+                }
+                else {
+                    quotes = Collections.singletonList(nq);
+                }
             }
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));

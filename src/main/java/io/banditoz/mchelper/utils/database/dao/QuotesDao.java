@@ -43,7 +43,19 @@ public interface QuotesDao {
      * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
      * @throws SQLException If there was an error getting the quote.
      */
-    @Nullable NamedQuote getRandomQuote(Guild g) throws SQLException;
+    @Nullable
+    NamedQuote getRandomQuote(Guild g) throws SQLException;
+
+    /**
+     * Returns a list of all quotes by a certain {@link net.dv8tion.jda.api.entities.User} in a {@link Guild}.
+     *
+     * @param u The {@link net.dv8tion.jda.api.entities.User} ID to search by
+     * @param g The {@link Guild} to search in.
+     * @return A {@link List} that may or may not contain {@link NamedQuote}s for the guild.
+     * @throws SQLException If there was an error getting the quote.
+     */
+    List<NamedQuote> getAllQuotesByAuthorInGuild(long u, Guild g) throws SQLException;
+
     /**
      * Returns a {@link Map} containing a list of keys of author IDs, that match to values on how many quotes that
      * author has added. Ideally, this {@link Map} should be ordered, as the command that invokes it expects it to be.
