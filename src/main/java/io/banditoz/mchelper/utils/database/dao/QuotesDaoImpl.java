@@ -96,12 +96,12 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public List<StatPoint<Long, Integer>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
+    public List<StatPoint<Long>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT author_id, COUNT(author_id) AS \"count\" FROM quotes WHERE guild_id=:g GROUP BY author_id ORDER BY COUNT(author_id) DESC")
                     .on(Param.value("g", g.getIdLong()))
                     .as((rs, conn) -> {
-                        List<StatPoint<Long, Integer>> stats = new ArrayList<>();
+                        List<StatPoint<Long>> stats = new ArrayList<>();
                         while (rs.next()) {
                             stats.add(new StatPoint<>(rs.getLong("author_id"), rs.getInt("count")));
                         }

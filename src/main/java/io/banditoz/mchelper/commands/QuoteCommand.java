@@ -128,7 +128,7 @@ public class QuoteCommand extends Command {
      * @throws SQLException If there was an error with the database.
      */
     private String getStatsString(CommandEvent ce, QuotesDao dao) throws SQLException {
-        List<StatPoint<Long, Integer>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
+        List<StatPoint<Long>> quotes = dao.getUniqueAuthorQuoteCountPerGuild(ce.getGuild());
         return StatPoint.statsToPrettyLeaderboard(quotes, 16,
                 id -> tryGetEffectiveMemberNameById(id, ce.getGuild()).replace("`", ""),
                 count -> DecimalFormat.getInstance().format(count));

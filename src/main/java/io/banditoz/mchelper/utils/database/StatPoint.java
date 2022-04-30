@@ -2,6 +2,7 @@ package io.banditoz.mchelper.utils.database;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -15,26 +16,36 @@ import static io.banditoz.mchelper.utils.StringUtils.truncate;
  *
  * @param <T> The type of this statistic point.
  */
-public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> implements Comparable<StatPoint<T, V>> {
+public class StatPoint<T extends Comparable<T>> implements Comparable<StatPoint<T>> {
     private final T thing;
-    private final V count;
+    private final BigDecimal count;
 
-    public StatPoint(T thing, V count) {
+    public StatPoint(T thing, BigDecimal count) {
         this.thing = thing;
         this.count = count;
+    }
+
+    public StatPoint(T thing, int count) {
+        this.thing = thing;
+        this.count = BigDecimal.valueOf(count);
+    }
+
+    public StatPoint(T thing, double count) {
+        this.thing = thing;
+        this.count = BigDecimal.valueOf(count);
     }
 
     public T getThing() {
         return thing;
     }
 
-    public V getCount() {
+    public BigDecimal getCount() {
         return count;
     }
 
     @Override
-    public int compareTo(@NotNull StatPoint<T, V> o) {
-        if (count == o.count) {
+    public int compareTo(@NotNull StatPoint<T> o) {
+        if (count.equals(o.count)) {
             return thing.compareTo(o.thing);
         }
         else {
@@ -45,10 +56,11 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
     /**
      * Generates a pretty formatted table containing a leaderboard for an already sorted StatPoint list, with
      * customization. It is recommended you pad zeroes in your thingFormatter. For example, a table could look like this
-     * (see {@link io.banditoz.mchelper.commands.StatisticsCommand}'s generateStatsTable for how this was exactly done.
+     * (see {@link io.banditoz.mchelper.commands.StatisticsCommand}'s generateStatsTable for how this was exactly done.)
      * Note that these tables look best if in an {@link net.dv8tion.jda.api.entities.MessageEmbed}'s description field.
      * <pre>
-     * ```Rank  Name
+     * ```
+     * Rank  Name
      * 1.    DoubleOrNothing      391
      * 2.    Balance              205
      * 3.    Transfer             141
@@ -62,22 +74,44 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
      * @param thingFormatter How to format the Thing in the leaderboard.
      * @param countFormatter How to format the Count in the leaderboard.
      * @param <T>            The Thing type.
-     * @param <V>            The Count type.
      * @return A pretty formatted table (ideally for use in an embed.)
      */
-    public static <T extends Comparable<T>, V extends Comparable<V>> String statsToPrettyLeaderboard(List<StatPoint<T, V>> list, int thingLength, Function<T, String> thingFormatter, Function<V, String> countFormatter) {
-        Objects.requireNonNull(list, "The list cannot be null!");
-        Objects.requireNonNull(thingFormatter, "The thingFormatter cannot be null!");
-        Objects.requireNonNull(countFormatter, "The countFormatter cannot be null!");
-
+    public static <T extends Comparable<T>> String statsToPrettyLeaderboard(
+            @NotNull List<StatPoint<T>> list,
+            int thingLength,
+            @NotNull Function<T, String> thingFormatter,
+            @NotNull Function<BigDecimal, String> countFormatter
+    ) {
+        int highestThingLength = getHighestThingLength(list, countFormatter);
         StringBuilder sb = new StringBuilder("\n```\nRank  Name\n");
         for (int i = 1; i <= list.size(); i++) {
-            StatPoint<T, V> point = list.get(i - 1);
+            StatPoint<T> point = list.get(i - 1);
             String name = padZeros(truncate(thingFormatter.apply(point.thing), thingLength, false), thingLength + 4);
             sb.append(padZeros(String.valueOf(i) + '.', 5)).append(name);
             sb.append(countFormatter.apply(point.count)).append('\n');
         }
-        return sb.toString() + "```";
+        sb.append("_".repeat(thingLength + highestThingLength + 12))
+                .append("\nTotal ")
+                .append(padZeros(" ", thingLength + 4))
+                .append(getCountSum(list, countFormatter))
+                .append('\n');
+        return sb + "```";
+    }
+
+    private static <T extends Comparable<T>> String getCountSum(List<StatPoint<T>> list, Function<BigDecimal, String> countFormatter) {
+        BigDecimal sum = list.stream()
+                .map(StatPoint::getCount)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
+        return countFormatter.apply(sum);
+    }
+
+    private static <T extends Comparable<T>> int getHighestThingLength(List<StatPoint<T>> list, Function<BigDecimal, String> countFormatter) {
+        BigDecimal sum = list.stream()
+                .map(StatPoint::getCount)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+        return countFormatter.apply(sum).length();
     }
 
     @Override
@@ -88,8 +122,8 @@ public class StatPoint<T extends Comparable<T>, V extends Comparable<V>> impleme
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        StatPoint<?, ?> point = (StatPoint<?, ?>) o;
-        return count == point.count &&
+        StatPoint<?> point = (StatPoint<?>) o;
+        return count.equals(point.count) &&
                 thing.equals(point.thing);
     }
 

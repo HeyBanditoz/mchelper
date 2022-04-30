@@ -10,7 +10,6 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ public class BaltopCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        List<StatPoint<String, BigDecimal>> organized = ce.getMCHelper().getAccountManager().getAllBalances().stream()
+        List<StatPoint<String>> organized = ce.getMCHelper().getAccountManager().getAllBalances().stream()
                 .map(point -> {
                     Member m = ce.getGuild().getMemberById(point.getThing());
                     if (m == null) {
@@ -49,7 +48,7 @@ public class BaltopCommand extends Command {
         return Status.SUCCESS;
     }
 
-    private String generateBaltopTable(List<StatPoint<String, BigDecimal>> stats) {
+    private String generateBaltopTable(List<StatPoint<String>> stats) {
         return StatPoint.statsToPrettyLeaderboard(stats, 16,
                 s -> s.replace("`", ""),
                 bd -> "$" + AccountManager.format(bd));

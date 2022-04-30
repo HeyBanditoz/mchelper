@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Locale;
 
 public class StatPointTests {
-    private final List<StatPoint<String, BigDecimal>> amounts;
+    private final List<StatPoint<String>> amounts;
 
     public StatPointTests() {
-        List<StatPoint<String, BigDecimal>> localAmounts = new ArrayList<>(List.of(
+        List<StatPoint<String>> localAmounts = new ArrayList<>(List.of(
                 new StatPoint<>("Mr. Foo", new BigDecimal("5.352")),
                 new StatPoint<>("Ms. Bar", new BigDecimal("2.689")),
                 new StatPoint<>("Mrs. Baz", new BigDecimal("19.23"))));
@@ -28,12 +28,16 @@ public class StatPointTests {
                 10,
                 s -> s,
                 BigDecimal::toPlainString);
-        Assertions.assertThat(leaderboard).isEqualTo("\n```\n" +
-                "Rank  Name\n" +
-                "1.    Mrs. Baz       19.23\n" +
-                "2.    Mr. Foo        5.352\n" +
-                "3.    Ms. Bar        2.689\n" +
-                "```");
+        Assertions.assertThat(leaderboard).isEqualTo("""
+
+                ```
+                Rank  Name
+                1.    Mrs. Baz       19.23
+                2.    Mr. Foo        5.352
+                3.    Ms. Bar        2.689
+                ___________________________
+                Total                27.271
+                ```""");
     }
 
     @Test
@@ -42,12 +46,16 @@ public class StatPointTests {
                 10,
                 s -> s,
                 AccountManager::format);
-        Assertions.assertThat(leaderboard).isEqualTo("\n```\n" +
-                "Rank  Name\n" +
-                "1.    Mrs. Baz       19.23\n" +
-                "2.    Mr. Foo        5.35\n" +
-                "3.    Ms. Bar        2.69\n" +
-                "```");
+        Assertions.assertThat(leaderboard).isEqualTo("""
+
+                ```
+                Rank  Name
+                1.    Mrs. Baz       19.23
+                2.    Mr. Foo        5.35
+                3.    Ms. Bar        2.69
+                ___________________________
+                Total                27.27
+                ```""");
     }
 
     @Test
@@ -56,12 +64,16 @@ public class StatPointTests {
                 10,
                 s -> s.toUpperCase(Locale.ROOT),
                 BigDecimal::toPlainString);
-        Assertions.assertThat(leaderboard).isEqualTo("\n```\n" +
-                "Rank  Name\n" +
-                "1.    MRS. BAZ       19.23\n" +
-                "2.    MR. FOO        5.352\n" +
-                "3.    MS. BAR        2.689\n" +
-                "```");
+        Assertions.assertThat(leaderboard).isEqualTo("""
+
+                ```
+                Rank  Name
+                1.    MRS. BAZ       19.23
+                2.    MR. FOO        5.352
+                3.    MS. BAR        2.689
+                ___________________________
+                Total                27.271
+                ```""");
     }
 
     @Test
@@ -70,11 +82,15 @@ public class StatPointTests {
                 2,
                 s -> s,
                 BigDecimal::toPlainString);
-        Assertions.assertThat(leaderboard).isEqualTo("\n```\n" +
-                "Rank  Name\n" +
-                "1.    Mr...  19.23\n" +
-                "2.    Mr...  5.352\n" +
-                "3.    Ms...  2.689\n" +
-                "```");
+        Assertions.assertThat(leaderboard).isEqualTo("""
+
+                ```
+                Rank  Name
+                1.    Mr...  19.23
+                2.    Mr...  5.352
+                3.    Ms...  2.689
+                ___________________
+                Total        27.271
+                ```""");
     }
 }

@@ -53,7 +53,7 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     }
 
     @Override
-    public List<StatPoint<String, Integer>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
+    public List<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps;
             if (g == null) {
@@ -66,7 +66,7 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
             ps.execute();
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.isLast()) {
-                    ArrayList<StatPoint<String, Integer>> stats = new ArrayList<>();
+                    ArrayList<StatPoint<String>> stats = new ArrayList<>();
                     while (rs.next()) {
                         stats.add(new StatPoint<>(rs.getString("name"), rs.getInt("count")));
                     }

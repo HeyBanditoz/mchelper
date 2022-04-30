@@ -29,7 +29,7 @@ public class StatisticsCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         StatisticsDao dao = new StatisticsDaoImpl(ce.getDatabase());
-        List<StatPoint<String, Integer>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
+        List<StatPoint<String>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
         if (stats.isEmpty()) {
             ce.sendReply("No commands run for this guild, somehow.");
             return Status.FAIL;
@@ -41,7 +41,7 @@ public class StatisticsCommand extends Command {
         return Status.SUCCESS;
     }
 
-    private String generateStatsTable(List<StatPoint<String, Integer>> list) {
+    private String generateStatsTable(List<StatPoint<String>> list) {
         return StatPoint.statsToPrettyLeaderboard(list, 16,
                 s -> s.replace("Command", "").replace("Regexable", ""),
                 count -> DecimalFormat.getInstance().format(count));

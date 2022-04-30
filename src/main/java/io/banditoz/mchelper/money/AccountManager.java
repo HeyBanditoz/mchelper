@@ -117,7 +117,7 @@ public class AccountManager {
      * @return A List of {@link StatPoint} which contain user IDs and their balance.
      * @throws SQLException If there was a problem fetching all the balances.
      */
-    public List<StatPoint<Long, BigDecimal>> getAllBalances() throws SQLException {
+    public List<StatPoint<Long>> getAllBalances() throws SQLException {
         return dao.getLeaderboard();
     }
 

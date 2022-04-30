@@ -13,7 +13,7 @@ public interface AccountsDao {
     boolean accountExists(long id) throws SQLException;
     void transferTo(BigDecimal amount, long from, long to, Transaction t) throws SQLException;
     void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException;
-    List<StatPoint<Long, BigDecimal>> getLeaderboard() throws SQLException;
+    List<StatPoint<Long>> getLeaderboard() throws SQLException;
     List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException, MoneyException;
     List<Long> getAllAccounts() throws SQLException;
 }

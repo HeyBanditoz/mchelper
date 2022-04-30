@@ -97,6 +97,8 @@ public class QuoteCommandTests extends BaseCommandTest {
                 ```
                 Rank  Name
                 1.    NFoo                 2
+                _____________________________
+                Total                      2
                 ```""");
 
     }
