@@ -17,8 +17,8 @@ public class EvalCommandTests extends BaseCommandTest {
     @Test
     public void testEvalCommand() throws Exception {
         when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getCommandArgsString()).thenReturn("""
-                ```java
+        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("""
+                ?eval ```java
                 int x = 5;
                 return x;""");
         ec.onCommand(ce);
@@ -28,8 +28,8 @@ public class EvalCommandTests extends BaseCommandTest {
     @Test
     public void testEvalCommandExternalClass() throws Exception {
         when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getCommandArgsString()).thenReturn("""
-                ```java
+        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("""
+                ?eval ```java
                 import com.udojava.evalex.Expression;
                 
                 return new Expression("1+1").eval()""");
@@ -41,7 +41,7 @@ public class EvalCommandTests extends BaseCommandTest {
     @Test
     public void testEvalCommandNull() throws Exception {
         when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getCommandArgsString()).thenReturn("null");
+        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("null");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("<null output>");
     }

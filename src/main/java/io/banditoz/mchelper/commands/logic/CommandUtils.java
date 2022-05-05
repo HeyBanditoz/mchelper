@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.script.ScriptException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,10 @@ public class CommandUtils {
      */
     public static void sendExceptionMessage(MessageReceivedEvent e, Exception ex, Logger l) {
         l.error("Exception! Offending message: " + buildMessageAndAuthor(e), ex);
-        String reply = "**Status: Calamitous:** " + StringUtils.truncate(MarkdownSanitizer.escape(ex.toString()), 500, true);
+        // Good lord, I hate putting responsibilities of another class in here, this shouldn't be done.
+        // TODO. Make it so I don't do this. Help me.
+        boolean isScriptException = ex instanceof ScriptException;
+        String reply = "**Status: Calamitous:** " + StringUtils.truncate(!isScriptException ? MarkdownSanitizer.escape(ex.toString()) : ex.toString(), 500, true);
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }

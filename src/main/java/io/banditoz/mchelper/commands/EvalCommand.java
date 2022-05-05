@@ -34,12 +34,10 @@ public class EvalCommand extends ElevatedCommand {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         ScriptEngine engine = manager.getEngineByName("java");
-        String args;
-        if (ce.getCommandArgsString().startsWith("```java")) {
-            args = ce.getCommandArgsString().replace("```java", "").replace("```", "");
-        }
-        else {
-            args = ce.getCommandArgsString();
+        // quick n' dirty zeroth (command prefix and name) removal.
+        String args = ce.getEvent().getMessage().getContentRaw().replaceFirst("." + commandName() + "\\s+", "");
+        if (args.startsWith("```java")) {
+            args = args.replace("```java", "").replace("```", "");
         }
         if (!args.contains("return ")) {
             args = "return " + args;
@@ -47,6 +45,7 @@ public class EvalCommand extends ElevatedCommand {
         StringBuilder imports = new StringBuilder("""
                 import java.util.*;
                 import io.banditoz.mchelper.utils.database.*;
+                import io.banditoz.mchelper.utils.database.dao.*;
                 import io.banditoz.mchelper.commands.logic.*;
                 import net.dv8tion.jda.api.*;
                 import net.dv8tion.jda.api.entities.*;
@@ -69,6 +68,7 @@ public class EvalCommand extends ElevatedCommand {
 
                 public class Script {
                     public CommandEvent ce;
+                    public Database db;
                     public String[] args;
                     public JDA jda;
                     public Guild guild;
@@ -82,10 +82,18 @@ public class EvalCommand extends ElevatedCommand {
 
         Compilable c = (Compilable) engine;
         long before = System.currentTimeMillis();
-        CompiledScript cs = c.compile(initial);
+        CompiledScript cs = null;
+        try {
+            cs = c.compile(initial);
+        } catch (ScriptException e) {
+            ScriptException ex = new ScriptException("```\n" + e.getMessage() + "```");
+            ex.initCause(e);
+            throw ex;
+        }
         long compileDuration = System.currentTimeMillis() - before;
         Bindings b = engine.createBindings();
         b.put("ce", ce);
+        b.put("db", ce.getDatabase());
         b.put("args", ce.getCommandArgs());
         b.put("jda", ce.getEvent().getJDA());
         if (ce.getEvent().isFromType(ChannelType.TEXT)) {
