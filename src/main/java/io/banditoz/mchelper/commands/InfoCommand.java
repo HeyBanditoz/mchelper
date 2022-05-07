@@ -55,8 +55,8 @@ public class InfoCommand extends Command {
 
         ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
         String version = """
-                %s
-                %s %s""".formatted(System.getProperty("java.runtime.name"), System.getProperty("java.vm.name"), System.getProperty("java.vm.version"));
+                %s %s
+                %s %s""".formatted(System.getProperty("java.runtime.name"), System.getProperty("java.runtime.version"), System.getProperty("java.vm.name"), System.getProperty("java.version"));
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Bot Statistics")
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
