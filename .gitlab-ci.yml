@@ -61,7 +61,9 @@ coverage:
         - test
     artifacts:
         reports:
-            cobertura: build/reports/cobertura.xml
+            coverage_report:
+                coverage_format: cobertura
+                path: build/reports/cobertura.xml
 
 create_image:
     stage: build
