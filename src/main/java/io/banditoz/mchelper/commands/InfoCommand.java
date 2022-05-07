@@ -54,6 +54,9 @@ public class InfoCommand extends Command {
         int commandsRunEver = dao == null ? 0 : dao.getTotalCommandsRun();
 
         ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
+        String version = """
+                %s
+                %s %s""".formatted(System.getProperty("java.runtime.name"), System.getProperty("java.vm.name"), System.getProperty("java.vm.version"));
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Bot Statistics")
                 .addField("Heap Usage", String.format("%dMB/%dMB", usedJVMMemory, totalJVMMemory), true)
@@ -64,7 +67,8 @@ public class InfoCommand extends Command {
                 .addField("Users (guild/distinct/total)", String.format("%d/%d/%d", ce.getGuild().getMembers().size(), distinctUsers, totalUsers), true)
                 .addField("Running Commands", String.format("%d/%d", tpe.getActiveCount(), tpe.getMaximumPoolSize()), true)
                 .addField("Commands Run (session/forever)", String.format("%d/%d", commandsRun, commandsRunEver), true)
-                .addField("Uptime", uptime, true);
+                .addField("Uptime", uptime, true)
+                .addField("Java Version", version, true);
         ce.sendEmbedReply(eb.build());
         return Status.SUCCESS;
     }

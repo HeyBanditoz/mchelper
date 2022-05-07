@@ -13,6 +13,7 @@ import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -102,6 +103,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public ButtonListener getButtonListener() {
+        return null;
+    }
+
+    @Override
+    public User getOwner() {
         return null;
     }
 

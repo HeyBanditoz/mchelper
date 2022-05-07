@@ -18,6 +18,7 @@ import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.UserMaintenanceRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -53,6 +54,7 @@ public class MCHelperImpl implements MCHelper {
     private final RoleReactionListener RRL;
     private final AccountManager AM;
     private final ButtonListener BL;
+    private final User OWNER;
 
     public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -134,6 +136,8 @@ public class MCHelperImpl implements MCHelper {
                 TimeUnit.DAYS.toSeconds(1),
                 TimeUnit.SECONDS);
 
+        OWNER = JDA.retrieveApplicationInfo().complete().getOwner();
+
         LOGGER.info("MCHelper initialization finished.");
     }
 
@@ -208,6 +212,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public ButtonListener getButtonListener() {
         return BL;
+    }
+
+    @Override
+    public User getOwner() {
+        return OWNER;
     }
 
     /**

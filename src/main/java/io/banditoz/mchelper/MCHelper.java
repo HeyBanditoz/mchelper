@@ -11,6 +11,7 @@ import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -33,6 +34,7 @@ public interface MCHelper {
     RoleReactionListener getRRL();
     AccountManager getAccountManager();
     ButtonListener getButtonListener();
+    User getOwner();
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one.

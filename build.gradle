@@ -17,7 +17,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 
     // Distribute latest git information in jar
-    id 'com.peterabeles.gversion' version '1.5.2'
+    id 'com.peterabeles.gversion' version '1.10'
 
     // Clean testing output
     id 'com.adarshr.test-logger' version '2.1.0'
@@ -44,7 +44,6 @@ gversion {
     srcDir = "src/main/java/"
     classPackage = "io.banditoz.mchelper"
     className = "Version"
-    dateFormat = "yyyy-MM-dd HH:mm:ss"
     timeZone = "UTC"
     debug = false
     language = "java"
