@@ -46,27 +46,18 @@ public class ButtonListener extends ListenerAdapter {
         SES.execute(() -> {
             try {
                 LOGGER.debug("We have " + INTERACTABLES.size() + " interactables.");
-                boolean found = false;
-                for (ButtonInteractable i : INTERACTABLES) {
-                    if (i.containsButton(event.getButton())) {
-                        ScheduledFuture<?> future = i.getTimeoutFuture();
-                        if (future != null) {
-                            LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getId()
-                                    + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
-                            future.cancel(false);
-                            i.setTimeoutFuture(SES.schedule(() -> {
-                                i.destroy();
-                                INTERACTABLES.remove(i);
-                            }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
-                        }
-                        i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER));
-                        found = true;
-                        break; // don't bother continuing to iterate when buttons are unique
+                INTERACTABLES.stream().filter(i -> i.containsButton(event.getButton())).findFirst().ifPresentOrElse(i -> {
+                    ScheduledFuture<?> future = i.getTimeoutFuture();
+                    if (future != null) {
+                        LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getId() + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
+                        future.cancel(false);
+                        i.setTimeoutFuture(SES.schedule(() -> {
+                            i.destroy();
+                            INTERACTABLES.remove(i);
+                        }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                     }
-                }
-                if (!found) {
-                    event.deferEdit().queue(); // probably a bugged button somewhere, just don't fail on the interaction
-                }
+                    i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER));
+                }, event.deferEdit()::queue);
             } catch (Exception ex) {
                 LOGGER.error("Error when handling the button!", ex);
                 event.reply("Error handling the button! " + ex).setEphemeral(true).queue();
