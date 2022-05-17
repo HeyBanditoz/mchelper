@@ -2,8 +2,12 @@ package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.money.Task;
 import io.banditoz.mchelper.utils.database.Database;
+import io.jenetics.facilejdbc.Param;
+import io.jenetics.facilejdbc.Query;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -27,32 +31,27 @@ public class TasksDaoImpl extends Dao implements TasksDao {
     @Override
     public LocalDateTime getWhenCanExecute(long id, Task t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT can_run_again FROM tasks WHERE id = ? AND task_id = ?;");
-            ps.setLong(1, id);
-            ps.setInt(2, t.ordinal());
-            ResultSet rs = ps.executeQuery();
-            if (!rs.next()) {
-                ps.close();
-                rs.close();
-                return LocalDateTime.now().minusSeconds(1); // hacky?
-            }
-            LocalDateTime ldt = rs.getTimestamp(1).toLocalDateTime();
-            ps.close();
-            rs.close();
-            return ldt;
+            return Query.of("SELECT can_run_again FROM tasks WHERE id=:i AND task_id=:t;")
+                    .on(
+                            Param.value("i", id),
+                            Param.value("t", t.ordinal())
+                    ).as((rs, conn) -> {
+                        if (!rs.next()) return LocalDateTime.now().minusSeconds(1); // hacky?
+                        return rs.getTimestamp(1).toLocalDateTime();
+                    }, c);
         }
     }
 
     @Override
     public void putOrUpdateTask(long id, Task t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO tasks VALUES (?, ?, ?) ON CONFLICT (id, task_id) DO UPDATE SET can_run_again = excluded.can_run_again");
-            ps.setLong(1, id);
-            ps.setInt(2, t.ordinal());
             Timestamp time = Timestamp.from(Instant.now().plusSeconds(t.getDelay()));
-            ps.setTimestamp(3, time);
-            ps.execute();
-            ps.close();
+            Query.of("INSERT INTO tasks VALUES (:i, :t, :c) ON CONFLICT (id, task_id) DO UPDATE SET can_run_again = excluded.can_run_again")
+                    .on(
+                            Param.value("i", id),
+                            Param.value("t", t.ordinal()),
+                            Param.value("c", time)
+                    ).executeUpdate(c);
         }
     }
 }
