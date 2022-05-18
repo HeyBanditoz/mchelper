@@ -3,12 +3,17 @@ package io.banditoz.mchelper.utils.database.dao;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.StatPoint;
+import io.jenetics.facilejdbc.Param;
+import io.jenetics.facilejdbc.Query;
 import net.dv8tion.jda.api.entities.Guild;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     public StatisticsDaoImpl(Database database) {
@@ -34,37 +39,32 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     @Override
     public void log(Stat s) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO statistics VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            if (s.getEvent().isFromGuild()) {
-                ps.setLong(1, s.getEvent().getGuild().getIdLong());
-            }
-            else {
-                ps.setNull(1, Types.INTEGER);
-            }
-            ps.setLong(2, s.getEvent().getChannel().getIdLong());
-            ps.setLong(3, s.getEvent().getAuthor().getIdLong());
-            ps.setString(4, s.getClassName());
-            ps.setString(5, s.getArgs());
-            ps.setInt(6, s.getStatus().getValue());
-            ps.setInt(7, s.getExecutionTime());
-            ps.setTimestamp(8, Timestamp.valueOf(s.getExecutedWhen()));
-            ps.execute();
+            Query.of("INSERT INTO statistics VALUES (:a, :b, :c, :d, :e, :f, :g, :h)")
+                    .on(
+                            Param.value("a", s.getEvent().isFromGuild() ? s.getEvent().getGuild().getIdLong() : Optional.empty()),
+                            Param.value("b", s.getEvent().getChannel().getIdLong()),
+                            Param.value("c", s.getEvent().getAuthor().getIdLong()),
+                            Param.value("d", s.getClassName()),
+                            Param.value("e", s.getArgs()),
+                            Param.value("f", s.getStatus().getValue()),
+                            Param.value("g", s.getExecutionTime()),
+                            Param.value("h", Timestamp.valueOf(s.getExecutedWhen()))
+                    ).execute(c);
         }
     }
 
     @Override
     public List<StatPoint<String>> getUniqueCommandCountPerGuildOrGlobally(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps;
+            Query q;
             if (g == null) {
-                ps = c.prepareStatement("SELECT name, COUNT(name) AS \"count\" FROM statistics GROUP BY name ORDER BY COUNT(name) DESC;");
+                q = Query.of("SELECT name, COUNT(name) AS \"count\" FROM statistics GROUP BY name ORDER BY COUNT(name) DESC");
             }
             else {
-                ps = c.prepareStatement("SELECT name, COUNT(name) AS \"count\" FROM statistics WHERE guild_id=? GROUP BY name ORDER BY COUNT(name) DESC;");
-                ps.setLong(1, g.getIdLong());
+                q = Query.of("SELECT name, COUNT(name) AS \"count\" FROM statistics WHERE guild_id=:g GROUP BY name ORDER BY COUNT(name) DESC;")
+                        .on(Param.value("g", g.getIdLong()));
             }
-            ps.execute();
-            try (ResultSet rs = ps.executeQuery()) {
+            return q.as((rs, conn) -> {
                 if (!rs.isLast()) {
                     ArrayList<StatPoint<String>> stats = new ArrayList<>();
                     while (rs.next()) {
@@ -73,22 +73,19 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
                     stats.sort(StatPoint::compareTo);
                     return stats;
                 }
-            }
+                return Collections.emptyList();
+            }, c);
         }
-        return Collections.emptyList();
     }
 
     @Override
     public int getTotalCommandsRun() throws SQLException {
-        int commandsRun = -1;
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM statistics WHERE name LIKE '%Command%';");
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            commandsRun = rs.getInt(1);
-            rs.close();
-            ps.close();
+            return Query.of("SELECT COUNT(*) FROM statistics WHERE name LIKE '%Command%';")
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return rs.getInt(1);
+                    }, c);
         }
-        return commandsRun;
     }
 }
