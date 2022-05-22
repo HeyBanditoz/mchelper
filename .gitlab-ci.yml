@@ -42,6 +42,7 @@ test:
     needs: ["package"]
     dependencies:
         - package
+    coverage: '/Coverage: \d+\.\d+/'
     artifacts:
         when: always
         paths:
