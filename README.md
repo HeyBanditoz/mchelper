@@ -53,6 +53,13 @@ ports:
 
 You can access the postgres shell by running `docker exec -u 70 -it postgres psql`.
 
+### Building a Docker Image
+
+The Dockerfile is kept lean to quicken building in CI/CD. You will need to first produce a shadow JAR in the project by
+running the shadowJar task either from the IDE or commandline. From the project root, you can run
+`DOCKER_BUILDKIT=1 docker build -t mchelper_local .` to build a local MCHelper image, and can reference it accordingly
+in Docker commands.
+
 ## Configuration
 
 On first run the bot will generate one for you. All external services the bot can access will be configured here, except

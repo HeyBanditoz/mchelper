@@ -1,13 +1,9 @@
 # syntax=docker/dockerfile:1
 
-FROM gradle:7.4.0-jdk17-alpine AS build
+FROM scratch AS build
 WORKDIR /build
 
-COPY . /build
-
-# Required for createVersionFile Gradle task to run
-RUN apk add git
-RUN gradle shadowJar --no-daemon
+COPY ./build /build
 
 FROM ibm-semeru-runtimes:open-17-jdk-focal
 WORKDIR /app
@@ -23,6 +19,6 @@ RUN tar xvf /app/oxipng.tar.gz
 RUN mv oxipng-5.0.1-x86_64-unknown-linux-musl/oxipng /usr/bin/oxipng
 RUN rm -rf /app/oxipng.tar.gz /app/oxipng-5.0.1-x86_64-unknown-linux-musl
 
-COPY --from=build /build/build/libs/*all.jar bot.jar
+COPY --from=build /build/libs/io.banditoz.mchelper-all.jar bot.jar
 
 ENTRYPOINT ["java", "-jar", "bot.jar"]
