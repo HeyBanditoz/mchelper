@@ -58,9 +58,9 @@ public class AccountManager {
         }
         BigDecimal priorBalance;
         synchronized (this) {
-            priorBalance = queryBalance(from, true);
+            priorBalance = queryBalance(from, false);
             checkAmount(priorBalance, amount);
-            dao.transferTo(amount, from, to, new Transaction(from, to, priorBalance, amount.negate(), null, memo));
+            dao.transferTo(amount, from, to, Transaction.of(from, to, priorBalance, amount.negate(), null, memo));
         }
         return priorBalance.subtract(amount);
     }
@@ -76,14 +76,10 @@ public class AccountManager {
      */
     public BigDecimal add(BigDecimal amount, long to, String memo) throws Exception {
         amount = scale(amount);
-        if (!dao.accountExists(to)) {
-            throw new MoneyException(to + " does not have an account");
-        }
         BigDecimal priorBalance;
         synchronized (this) {
             priorBalance = queryBalance(to, false);
-            //checkAmount(priorBalance, amount);
-            dao.change(amount, to, new Transaction(null, to, priorBalance, amount, null, memo), true);
+            dao.change(amount, to, Transaction.of(null, to, priorBalance, amount, null, memo), true);
         }
         return priorBalance.add(amount);
     }
@@ -99,16 +95,13 @@ public class AccountManager {
      */
     public BigDecimal remove(BigDecimal amount, long from, String memo) throws Exception {
         amount = scale(amount);
-        if (!dao.accountExists(from)) {
-            throw new MoneyException(from + " does not have an account");
-        }
         BigDecimal priorBalance;
         synchronized (this) {
             priorBalance = queryBalance(from, false);
             checkAmount(priorBalance, amount);
-            dao.change(amount, from, new Transaction(from, null, priorBalance, amount.negate(), null, memo), false);
+            dao.change(amount, from, Transaction.of(from, null, priorBalance, amount.negate(), null, memo), false);
         }
-        return priorBalance.add(amount);
+        return priorBalance.subtract(amount);
     }
 
     /**
