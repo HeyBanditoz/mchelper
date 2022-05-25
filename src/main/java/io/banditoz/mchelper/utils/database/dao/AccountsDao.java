@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface AccountsDao {
-    BigDecimal queryBalance(long id) throws SQLException;
+    BigDecimal queryBalance(long id, boolean allowCreation) throws SQLException;
     boolean accountExists(long id) throws SQLException;
     void transferTo(BigDecimal amount, long from, long to, Transaction t) throws SQLException;
     void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException;

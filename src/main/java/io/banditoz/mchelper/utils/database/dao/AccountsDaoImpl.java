@@ -51,16 +51,20 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     @Override
-    public BigDecimal queryBalance(long id) throws SQLException {
+    public BigDecimal queryBalance(long id, boolean allowCreation) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            if (!accountExists(id)) {
-                createAccount(c, id);
-            }
             return Query.of("SELECT * FROM accounts WHERE id=:i;")
                     .on(Param.value("i", id))
                     .as((rs, conn) -> {
-                        rs.next();
-                        return rs.getBigDecimal(2);
+                        if (rs.next()) {
+                            return rs.getBigDecimal(2);
+                        }
+                        else if (allowCreation) {
+                            return createAccount(c, id);
+                        }
+                        else {
+                            return null;
+                        }
                     }, c);
         }
     }
@@ -183,13 +187,14 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
      * @param id The ID to associate the account with.
      * @throws SQLException If there was a problem creating the account.
      */
-    private void createAccount(Connection c, long id) throws SQLException {
+    private BigDecimal createAccount(Connection c, long id) throws SQLException {
         Query.of("INSERT INTO accounts VALUES (:i, :b);")
                 .on(
                         Param.value("i", id),
                         Param.value("b", BigDecimal.ZERO)
                 ).execute(c);
         change(SEED_MONEY, id, Transaction.of(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"), true);
+        return SEED_MONEY;
     }
 
     public static Transaction createTransactionFromResultSet(ResultSet rs) throws SQLException {

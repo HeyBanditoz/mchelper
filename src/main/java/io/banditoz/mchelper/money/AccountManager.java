@@ -27,14 +27,12 @@ public class AccountManager {
     }
 
     public BigDecimal queryBalance(long id, boolean allowCreation) throws Exception {
-        if (allowCreation) {
-            return dao.queryBalance(id);
-        }
-        else if (dao.accountExists(id)) {
-            return dao.queryBalance(id);
+        BigDecimal bal = dao.queryBalance(id, allowCreation);
+        if (bal != null) {
+            return bal;
         }
         else {
-            throw new MoneyException(id + " does not have an account. Use the bal command to create one.");
+            throw new MoneyException("<@!" + id + "> does not have an account. Use the bal command to create one.");
         }
     }
 
