@@ -12,8 +12,15 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
 
+/**
+ * The class that handles monetary user accounts and their transactions. Use this class
+ * (from {@link io.banditoz.mchelper.MCHelper#getAccountManager()}) instead of creating a new one, as this class does
+ * synchronization to ensure money remains the same while a thread operates on a user's account.<br><br>
+ * In the comments, user and accounts are used synonymously to represent a user's account, which holds a balance.
+ */
 public class AccountManager {
     private final AccountsDao dao;
+    /** The {@link DecimalFormat} to cleanly format {@link BigDecimal BigDecimals} as {@link String Strings}. */
     private final static DecimalFormat DF;
 
     static {
@@ -26,6 +33,15 @@ public class AccountManager {
         dao = new AccountsDaoImpl(database);
     }
 
+    /**
+     * Returns a user's balance.
+     *
+     * @param id            The user ID to check.
+     * @param allowCreation If we should create an account and returning the new account's balance.
+     * @return The balance.
+     * @throws Exception If there was a database error, or if the user doesn't have an account (when allowCreation
+     *                   is false).
+     */
     public BigDecimal queryBalance(long id, boolean allowCreation) throws Exception {
         BigDecimal bal = dao.queryBalance(id, allowCreation);
         if (bal != null) {
@@ -48,11 +64,11 @@ public class AccountManager {
      */
     public BigDecimal transferTo(BigDecimal amount, long from, long to, String memo) throws Exception {
         if (from == to) {
-            throw new MoneyException("cannot transfer to self");
+            throw new MoneyException("Cannot transfer to self.");
         }
         amount = scale(amount);
         if (!dao.accountExists(to)) {
-            throw new MoneyException("cannot transfer to " + to + " as they do not have an account");
+            throw new MoneyException("Cannot transfer to <@!" + to + "> as they do not have an account.");
         }
         BigDecimal priorBalance;
         synchronized (this) {
@@ -116,7 +132,7 @@ public class AccountManager {
      * Ensures we are changing more than zero from a number, and the account couldn't go under because of the
      * transaction.
      *
-     * @param base The left-hand.
+     * @param base       The left-hand.
      * @param subtrahend The right-hand.
      * @throws MoneyException If the conditions aren't met.
      */
@@ -130,6 +146,12 @@ public class AccountManager {
         }
     }
 
+    /**
+     * Ensure a {@link BigDecimal} does not exceed a scale of two.
+     *
+     * @param d The {@link BigDecimal} to check.
+     * @return A scaled {@link BigDecimal}.
+     */
     private BigDecimal scale(BigDecimal d) {
         return d.setScale(2, RoundingMode.HALF_UP);
     }
