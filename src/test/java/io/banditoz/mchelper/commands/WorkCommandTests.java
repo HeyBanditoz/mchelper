@@ -30,12 +30,12 @@ public class WorkCommandTests extends BaseCommandTest {
         AccountsDao dao = new AccountsDaoImpl(DB);
         long id = ce.getEvent().getAuthor().getIdLong();
         List<Transaction> txns = dao.getNTransactionsForUser(id, 100);
-        Optional<Transaction> work = txns.stream().filter(transaction -> transaction.getMemo().contains("work")).findAny();
+        Optional<Transaction> work = txns.stream().filter(transaction -> transaction.memo().contains("work")).findAny();
         assertThat(work).isNotEmpty();
         Transaction txn = work.get();
-        assertThat(txn.getTo()).isEqualByComparingTo(id);
-        assertThat(txn.getFrom()).isNull();
-        assertThat(txn.getDate()).isAfter(LocalDateTime.now().minusSeconds(60)); // should always pass
+        assertThat(txn.to()).isEqualByComparingTo(id);
+        assertThat(txn.from()).isNull();
+        assertThat(txn.date()).isAfter(LocalDateTime.now().minusSeconds(60)); // should always pass
     }
 
     @Test(dependsOnMethods = {"testHasAWorkTransaction"})

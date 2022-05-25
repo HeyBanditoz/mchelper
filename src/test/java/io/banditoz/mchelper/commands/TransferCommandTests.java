@@ -35,15 +35,15 @@ public class TransferCommandTests extends BaseCommandTest {
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Transfer of $400 to <@!163094867910590464> complete. You have $600 left.");
 
-        Optional<Transaction> transfer = dao.getNTransactionsForUser(member.getIdLong(), 100).stream().filter(transaction -> transaction.getMemo().contains("transfer")).findAny();
+        Optional<Transaction> transfer = dao.getNTransactionsForUser(member.getIdLong(), 100).stream().filter(transaction -> transaction.memo().contains("transfer")).findAny();
 
         // assertions on the transactions
         assertThat(transfer).isNotEmpty();
         Transaction t = transfer.get();
-        assertThat(t.getFrom()).isEqualByComparingTo(otherUser.getIdLong());
-        assertThat(t.getTo()).isEqualByComparingTo(member.getIdLong());
-        assertThat(t.getAmount()).isEqualByComparingTo(new BigDecimal("-400.00"));
-        assertThat(t.getMemo()).isEqualTo("transfer");
+        assertThat(t.from()).isEqualByComparingTo(otherUser.getIdLong());
+        assertThat(t.to()).isEqualByComparingTo(member.getIdLong());
+        assertThat(t.amount()).isEqualByComparingTo(new BigDecimal("-400.00"));
+        assertThat(t.memo()).isEqualTo("transfer");
 
         // make sure balances of the test accounts are good too
         assertThat(AM.queryBalance(otherUser.getIdLong(), false)).isEqualByComparingTo(new BigDecimal("600"));

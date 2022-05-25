@@ -31,7 +31,7 @@ public class TransactionHistoryPlotter {
      */
     public ByteArrayOutputStream plot() throws IOException {
         double[] y = transactions.stream()
-                .filter(transaction -> transaction.getType() != Type.TRANSFER) // TODO make this in SQL instead
+                .filter(transaction -> transaction.type() != Type.TRANSFER) // TODO make this in SQL instead
                 .map(Transaction::getFinalAmount)
                 .mapToDouble(BigDecimal::doubleValue)
                 .toArray();

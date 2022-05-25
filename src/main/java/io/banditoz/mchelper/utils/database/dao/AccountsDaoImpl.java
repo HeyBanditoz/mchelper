@@ -97,8 +97,8 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
 
     @Override
     public void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException {
-        if (t.getAmount().abs().compareTo(amount.abs()) != 0) {
-            throw new IllegalArgumentException("The transaction amount (" + t.getAmount() + ") does not match the amount (" + amount + ")!");
+        if (t.amount().abs().compareTo(amount.abs()) != 0) {
+            throw new IllegalArgumentException("The transaction amount (" + t.amount() + ") does not match the amount (" + amount + ")!");
         }
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);
@@ -129,11 +129,11 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     private void log(Transaction t, Connection c) throws SQLException {
         Query.of("INSERT INTO transactions VALUES (:f, :t, :b, :a, :m)")
                 .on(
-                        Param.value("f", Optional.ofNullable(t.getFrom())),
-                        Param.value("t", Optional.ofNullable(t.getTo())),
-                        Param.value("b", t.getBefore()),
-                        Param.value("a", t.getAmount()),
-                        Param.value("m", t.getMemo())
+                        Param.value("f", Optional.ofNullable(t.from())),
+                        Param.value("t", Optional.ofNullable(t.to())),
+                        Param.value("b", t.before()),
+                        Param.value("a", t.amount()),
+                        Param.value("m", t.memo())
                 ).execute(c);
     }
 
@@ -189,7 +189,7 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
                         Param.value("i", id),
                         Param.value("b", BigDecimal.ZERO)
                 ).execute(c);
-        change(SEED_MONEY, id, new Transaction(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"), true);
+        change(SEED_MONEY, id, Transaction.of(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"), true);
     }
 
     public static Transaction createTransactionFromResultSet(ResultSet rs) throws SQLException {
@@ -199,6 +199,6 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         BigDecimal amount = rs.getBigDecimal(4);
         String memo = rs.getString(5);
         LocalDateTime time = rs.getTimestamp(6).toLocalDateTime();
-        return new Transaction(from == 0 ? null : from, to == 0 ? null : to, before, amount, time, memo);
+        return Transaction.of(from == 0 ? null : from, to == 0 ? null : to, before, amount, time, memo);
     }
 }
