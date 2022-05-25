@@ -4,17 +4,22 @@ import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
+import io.jenetics.facilejdbc.Param;
+import io.jenetics.facilejdbc.Query;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The Dao which holds methods to manipulate monetary accounts.
  *
- * Do <i>not</i> instantiate destructive methods this class. It is not synchronized. Use the synchronous
+ * Do <i>not</i> instantiate this class. It is not synchronized. Use the synchronous
  * {@link io.banditoz.mchelper.MCHelper#getAccountManager()} instead.
  */
 public class AccountsDaoImpl extends Dao implements AccountsDao {
@@ -51,47 +56,38 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
             if (!accountExists(id)) {
                 createAccount(c, id);
             }
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM accounts WHERE id=?");
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            BigDecimal balance = rs.getBigDecimal(2);
-            rs.close();
-            ps.close();
-            return balance;
+            return Query.of("SELECT * FROM accounts WHERE id=:i;")
+                    .on(Param.value("i", id))
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return rs.getBigDecimal(2);
+                    }, c);
         }
     }
 
     @Override
     public boolean accountExists(long id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM accounts WHERE id=?");
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            boolean exist = rs.isBeforeFirst();
-            rs.close();
-            ps.close();
-            return exist;
+            return Query.of("SELECT id FROM accounts WHERE id=:i")
+                    .on(Param.value("i", id))
+                    .as((rs, conn) -> rs.isBeforeFirst(), c);
         }
     }
 
     @Override
     public void transferTo(BigDecimal amount, long from, long to, Transaction t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            // TODO ensure Transaction matches the amount?
             c.setAutoCommit(false);
-            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance - ? WHERE id = ?");
-            ps.setBigDecimal(1, amount);
-            ps.setLong(2, from);
-            ps.execute();
-            ps.close();
-
-            ps = c.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE id = ?");
-            ps.setBigDecimal(1, amount);
-            ps.setLong(2, to);
-            ps.execute();
-            ps.close();
-
+            Query.of("UPDATE accounts SET balance = balance - :b WHERE id = :i;")
+                    .on(
+                            Param.value("b", amount),
+                            Param.value("i", from)
+                    ).executeUpdate(c);
+            Query.of("UPDATE accounts SET balance = balance + :b WHERE id = :i;")
+                    .on(
+                            Param.value("b", amount),
+                            Param.value("i", to)
+                    ).executeUpdate(c);
             if (t != null) {
                 log(t, c);
             }
@@ -101,55 +97,44 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
 
     @Override
     public void change(BigDecimal amount, long id, Transaction t, boolean add) throws SQLException {
-        // TODO ensure Transaction matches the amount?
+        if (t.getAmount().abs().compareTo(amount.abs()) != 0) {
+            throw new IllegalArgumentException("The transaction amount (" + t.getAmount() + ") does not match the amount (" + amount + ")!");
+        }
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);
-            PreparedStatement ps = c.prepareStatement("UPDATE accounts SET balance = balance " + (add ? '+' : '-') + " ? WHERE id = ?");
-            ps.setBigDecimal(1, amount);
-            ps.setLong(2, id);
-            ps.execute();
-            ps.close();
-            if (t != null) {
-                log(t, c);
-            }
+            Query.of("UPDATE accounts SET balance = balance " + (add ? '+' : '-') + " :a WHERE id = :i")
+                    .on(
+                            Param.value("a", amount),
+                            Param.value("i", id)
+                    ).execute(c);
+            log(t, c);
             c.commit();
         }
     }
 
     @Override
     public List<StatPoint<Long>> getLeaderboard() throws SQLException {
-        List<StatPoint<Long>> leaderboard = new ArrayList<>();
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT id, balance FROM accounts ORDER BY balance DESC;");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                leaderboard.add(new StatPoint<>(rs.getLong(1), rs.getBigDecimal(2)));
-            }
-            ps.close();
-            rs.close();
+            return Query.of("SELECT id, balance FROM accounts ORDER BY balance DESC;")
+                    .as((rs, conn) -> {
+                        List<StatPoint<Long>> leaderboard = new ArrayList<>();
+                        while (rs.next()) {
+                            leaderboard.add(new StatPoint<>(rs.getLong(1), rs.getBigDecimal(2)));
+                        }
+                        return leaderboard;
+                    }, c);
         }
-        return leaderboard;
     }
 
     private void log(Transaction t, Connection c) throws SQLException {
-        PreparedStatement ps = c.prepareStatement("INSERT INTO transactions VALUES (?, ?, ?, ?, ?)");
-        if (t.getFrom() == null) {
-            ps.setNull(1, Types.BIGINT);
-        }
-        else {
-            ps.setLong(1, t.getFrom());
-        }
-        if (t.getTo() == null) {
-            ps.setNull(2, Types.BIGINT);
-        }
-        else {
-            ps.setLong(2, t.getTo());
-        }
-        ps.setBigDecimal(3, t.getBefore());
-        ps.setBigDecimal(4, t.getAmount());
-        ps.setString(5, t.getMemo());
-        ps.execute();
-        ps.close();
+        Query.of("INSERT INTO transactions VALUES (:f, :t, :b, :a, :m)")
+                .on(
+                        Param.value("f", Optional.ofNullable(t.getFrom())),
+                        Param.value("t", Optional.ofNullable(t.getTo())),
+                        Param.value("b", t.getBefore()),
+                        Param.value("a", t.getAmount()),
+                        Param.value("m", t.getMemo())
+                ).execute(c);
     }
 
     @Override
@@ -157,39 +142,38 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         if (n <= 0) {
             throw new IllegalArgumentException("Need to fetch at least one transaction!");
         }
-        List<Transaction> txns = new ArrayList<>(Math.min(n, 10000)); // hacky
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM transactions WHERE from_id=? OR to_id=? ORDER BY \"when\" DESC LIMIT ?");
-            ps.setLong(1, id);
-            ps.setLong(2, id);
-            ps.setLong(3, n);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                txns.add(createTransactionFromResultSet(rs));
+            List<Transaction> txns = Query.of("SELECT * FROM transactions WHERE from_id=:f OR to_id=:f ORDER BY \"when\" DESC LIMIT :l;")
+                    .on(
+                            Param.value("f", id),
+                            Param.value("l", n)
+                    ).as((rs, conn) -> {
+                        List<Transaction> l = new ArrayList<>(Math.min(n, 10000)); // hacky
+                        while (rs.next()) {
+                            l.add(createTransactionFromResultSet(rs));
+                        }
+                        return l;
+                    }, c);
+            if (txns.isEmpty()) {
+                throw new MoneyException("There is no transaction history for " + id);
             }
-            rs.close();
-            ps.close();
+            txns.sort(Transaction::compareTo);
+            return txns;
         }
-        if (txns.isEmpty()) {
-            throw new MoneyException("There is no transaction history for " + id);
-        }
-        txns.sort(Transaction::compareTo);
-        return txns;
     }
 
     @Override
     public List<Long> getAllAccounts() throws SQLException {
-        List<Long> accs = new ArrayList<>();
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT id FROM accounts");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                accs.add(rs.getLong(1));
-            }
-            rs.close();
-            ps.close();
+            return Query.of("SELECT id FROM accounts;")
+                    .as((rs, conn) -> {
+                        List<Long> accs = new ArrayList<>();
+                        while (rs.next()) {
+                            accs.add(rs.getLong(1));
+                        }
+                        return accs;
+                    }, c);
         }
-        return accs;
     }
 
     /**
@@ -200,17 +184,17 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
      * @throws SQLException If there was a problem creating the account.
      */
     private void createAccount(Connection c, long id) throws SQLException {
-        PreparedStatement ps = c.prepareStatement("INSERT INTO accounts VALUES (?, ?)");
-        ps.setLong(1, id);
-        ps.setBigDecimal(2, BigDecimal.ZERO);
-        ps.execute();
-        ps.close();
+        Query.of("INSERT INTO accounts VALUES (:i, :b);")
+                .on(
+                        Param.value("i", id),
+                        Param.value("b", BigDecimal.ZERO)
+                ).execute(c);
         change(SEED_MONEY, id, new Transaction(null, id, BigDecimal.ZERO, SEED_MONEY, null, "seed money"), true);
     }
 
     public static Transaction createTransactionFromResultSet(ResultSet rs) throws SQLException {
-        Long from = rs.getLong(1);
-        Long to = rs.getLong(2);
+        long from = rs.getLong(1);
+        long to = rs.getLong(2);
         BigDecimal before = rs.getBigDecimal(3);
         BigDecimal amount = rs.getBigDecimal(4);
         String memo = rs.getString(5);

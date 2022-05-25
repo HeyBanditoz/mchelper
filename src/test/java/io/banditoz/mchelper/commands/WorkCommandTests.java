@@ -5,6 +5,10 @@ import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import org.testng.annotations.Test;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Test(dependsOnGroups = {"DatabaseInitializationTests", "BalanceCommandTests"})
@@ -25,7 +29,13 @@ public class WorkCommandTests extends BaseCommandTest {
     public void testHasAWorkTransaction() throws Exception {
         AccountsDao dao = new AccountsDaoImpl(DB);
         long id = ce.getEvent().getAuthor().getIdLong();
-        assertThat(dao.getNTransactionsForUser(id, 100)).map(Transaction::getMemo).containsAnyOf("daily work");
+        List<Transaction> txns = dao.getNTransactionsForUser(id, 100);
+        Optional<Transaction> work = txns.stream().filter(transaction -> transaction.getMemo().contains("work")).findAny();
+        assertThat(work).isNotEmpty();
+        Transaction txn = work.get();
+        assertThat(txn.getTo()).isEqualByComparingTo(id);
+        assertThat(txn.getFrom()).isNull();
+        assertThat(txn.getDate()).isAfter(LocalDateTime.now().minusSeconds(60)); // should always pass
     }
 
     @Test(dependsOnMethods = {"testHasAWorkTransaction"})

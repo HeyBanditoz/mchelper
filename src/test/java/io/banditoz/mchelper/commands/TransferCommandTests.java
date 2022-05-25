@@ -2,11 +2,15 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.money.MoneyException;
+import io.banditoz.mchelper.utils.database.Transaction;
+import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,10 +29,25 @@ public class TransferCommandTests extends BaseCommandTest {
 
     @Test
     public void testTransferCommand() throws Exception {
+        AccountsDaoImpl dao = new AccountsDaoImpl(DB);
         when(ce.getEvent().getAuthor()).thenReturn(otherUser);
         when(ce.getEvent().getMessage().getMentionedMembers()).thenReturn(List.of(member));
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Transfer of $400 to <@!163094867910590464> complete. You have $600 left.");
+
+        Optional<Transaction> transfer = dao.getNTransactionsForUser(member.getIdLong(), 100).stream().filter(transaction -> transaction.getMemo().contains("transfer")).findAny();
+
+        // assertions on the transactions
+        assertThat(transfer).isNotEmpty();
+        Transaction t = transfer.get();
+        assertThat(t.getFrom()).isEqualByComparingTo(otherUser.getIdLong());
+        assertThat(t.getTo()).isEqualByComparingTo(member.getIdLong());
+        assertThat(t.getAmount()).isEqualByComparingTo(new BigDecimal("-400.00"));
+        assertThat(t.getMemo()).isEqualTo("transfer");
+
+        // make sure balances of the test accounts are good too
+        assertThat(AM.queryBalance(otherUser.getIdLong(), false)).isEqualByComparingTo(new BigDecimal("600"));
+        assertThat(AM.queryBalance(member.getIdLong(), false)).isGreaterThanOrEqualTo(new BigDecimal("1400"));
     }
 
     @Test(dependsOnMethods = {"testTransferCommand"})
