@@ -65,6 +65,8 @@ public abstract class BaseCommandTest {
         doNothing().when(ce).sendEmbedReply(embedCaptor.capture());
         doNothing().when(ce).sendEmbedPaginatedReply(embedsCaptor.capture());
         doNothing().when(ce).sendPastableReply(stringCaptor.capture());
+        when(ce.getMentionedUsers()).thenReturn(Collections.emptyList());
+        when(ce.getMentionedMembers()).thenReturn(Collections.emptyList());
         when(j.getRegisteredListeners()).thenReturn(Collections.emptyList());
         when(mre.getMessage()).thenReturn(m);
         when(mre.getAuthor()).thenReturn(u);
@@ -74,7 +76,6 @@ public abstract class BaseCommandTest {
         MessageAction ma = mock(MessageAction.class);
         when(mc.sendMessage(stringCaptor.capture())).thenReturn(ma);
         when(mc.sendMessage(messageCaptor.capture())).thenReturn(ma);
-        when(m.getMentionedMembers()).thenReturn(Collections.emptyList());
         when(m.addReaction(anyString())).thenReturn(mock(RestAction.class));
         when(m.clearReactions()).thenReturn(mock(RestAction.class));
         when(ce.getEvent()).thenReturn(mre);

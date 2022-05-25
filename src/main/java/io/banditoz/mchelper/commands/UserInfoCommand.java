@@ -31,7 +31,7 @@ public class UserInfoCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         Member m;
-        List<Member> mentionedMembers = ce.getEvent().getMessage().getMentionedMembers();
+        List<Member> mentionedMembers = ce.getMentionedMembers();
         List<Member> joinSortedMembers = new ArrayList<>(ce.getGuild().getMembers()); // JDA returns an immutable list, make a new ArrayList so we can sort it instead
         joinSortedMembers.sort(Comparator.comparing(Member::getTimeJoined));
         if (mentionedMembers.isEmpty()) {

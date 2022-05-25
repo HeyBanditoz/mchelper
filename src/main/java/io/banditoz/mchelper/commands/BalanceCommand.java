@@ -23,8 +23,8 @@ public class BalanceCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (ce.getEvent().getMessage().getMentionedMembers().size() > 0) {
-            Member m = ce.getEvent().getMessage().getMentionedMembers().get(0);
+        if (ce.getMentionedMembers().size() > 0) {
+            Member m = ce.getMentionedMembers().get(0);
             ce.sendReply(m.getAsMention() + "'s balance: $" + AccountManager.format(ce.getMCHelper().getAccountManager().queryBalance(m.getIdLong(), false)));
         }
         else {

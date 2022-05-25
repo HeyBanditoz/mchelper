@@ -22,7 +22,7 @@ public class CooldownsCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        List<User> mentionedUsers = ce.getEvent().getMessage().getMentionedUsers();
+        List<User> mentionedUsers = ce.getMentionedUsers();
         User u;
         if (mentionedUsers.isEmpty()) {
             u = ce.getEvent().getAuthor();

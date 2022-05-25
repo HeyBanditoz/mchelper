@@ -31,11 +31,11 @@ public class BalanceGraphCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         AccountsDao dao = new AccountsDaoImpl(ce.getDatabase());
         User u;
-        if (ce.getEvent().getMessage().getMentionedUsers().isEmpty()) {
+        if (ce.getMentionedUsers().isEmpty()) {
             u = ce.getEvent().getAuthor();
         }
         else {
-            u = ce.getEvent().getMessage().getMentionedUsers().get(0);
+            u = ce.getMentionedUsers().get(0);
         }
         int count = Integer.MAX_VALUE;
         if (ce.getCommandArgs().length > 1) {

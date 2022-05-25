@@ -25,7 +25,7 @@ public class TransferCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        long to = ce.getEvent().getMessage().getMentionedMembers().get(0).getIdLong();
+        long to = ce.getMentionedMembers().get(0).getIdLong();
         BigDecimal amount = new BigDecimal(ce.getRawCommandArgs()[2]);
         BigDecimal remainingAmount = ce.getMCHelper().getAccountManager().transferTo(
                 amount,

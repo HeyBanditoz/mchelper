@@ -23,7 +23,7 @@ public class TransferCommandTests extends BaseCommandTest {
     private final User otherUser = Mocks.getDifferentMockedMember().getUser();
 
     public TransferCommandTests() {
-        when(ce.getEvent().getMessage().getMentionedMembers()).thenReturn(List.of(member));
+        when(ce.getMentionedMembers()).thenReturn(List.of(member));
         when(ce.getRawCommandArgs()).thenReturn(new String[]{"!transfer", "", "400"});
     }
 
@@ -31,7 +31,7 @@ public class TransferCommandTests extends BaseCommandTest {
     public void testTransferCommand() throws Exception {
         AccountsDaoImpl dao = new AccountsDaoImpl(DB);
         when(ce.getEvent().getAuthor()).thenReturn(otherUser);
-        when(ce.getEvent().getMessage().getMentionedMembers()).thenReturn(List.of(member));
+        when(ce.getMentionedMembers()).thenReturn(List.of(member));
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Transfer of $400 to <@!163094867910590464> complete. You have $600 left.");
 
@@ -60,7 +60,7 @@ public class TransferCommandTests extends BaseCommandTest {
     public void testCannotTransferToSelf() {
         User u = member.getUser();
         when(ce.getEvent().getAuthor()).thenReturn(u);
-        when(ce.getEvent().getMessage().getMentionedMembers()).thenReturn(List.of(member));
+        when(ce.getMentionedMembers()).thenReturn(List.of(member));
         assertThatThrownBy(() -> tc.onCommand(ce)).isInstanceOf(MoneyException.class); // can't transfer to self
     }
 }

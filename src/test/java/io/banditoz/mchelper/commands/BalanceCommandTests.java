@@ -51,7 +51,7 @@ public class BalanceCommandTests extends BaseCommandTest {
     public void testInvalidUser() {
         Member m = mock(Member.class);
         when(m.getIdLong()).thenReturn(1234L);
-        when(ce.getEvent().getMessage().getMentionedMembers()).thenReturn(List.of(m));
+        when(ce.getMentionedMembers()).thenReturn(List.of(m));
         assertThatThrownBy(() -> bc.onCommand(ce)).isInstanceOf(MoneyException.class); // the other mocked member has no account
     }
 }
