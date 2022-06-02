@@ -19,14 +19,14 @@ public class RemoveCommandCommandTests extends BaseCommandTest {
 
     @Test
     public void testRemoveCommandCommand() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!remove", "flip"});
+        setArgs("flip");
         rcc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Command successfully removed for this runtime.");
     }
 
     @Test
     public void testRemoveBogusCommand() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!remove", "bogus"});
+        setArgs("bogus");
         rcc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Command not found.");
     }

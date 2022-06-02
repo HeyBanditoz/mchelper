@@ -13,15 +13,17 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.mockito.ArgumentCaptor;
+import org.testng.annotations.BeforeMethod;
 
 import java.util.Collections;
 import java.util.List;
 
+import static io.banditoz.mchelper.Whitebox.setInternalState;
 import static org.mockito.Mockito.*;
 
 /**
- * The base class that all command-based tests should extend. If you want to add functionality to a command, if it can
- * be shared across multiple commands, you should add it here.
+ * The base class that all command-based tests should extend. If you want to add functionality to a test, if it can be
+ * shared across multiple tests, you should add it here.
  */
 public abstract class BaseCommandTest {
     /** The mocked {@link CommandEvent}. */
@@ -36,6 +38,8 @@ public abstract class BaseCommandTest {
     protected final ArgumentCaptor<Message> messageCaptor;
     /** The {@link MCHelper} instance. */
     protected final MCHelper mcHelper;
+    protected final MessageReceivedEvent mre;
+    protected final Message m;
     protected final static Database DB;
     protected final static AccountManager AM;
 
@@ -52,8 +56,8 @@ public abstract class BaseCommandTest {
 
     public BaseCommandTest() {
         this.ce = mock(CommandEvent.class);
-        MessageReceivedEvent mre = mock(MessageReceivedEvent.class);
-        Message m = mock(Message.class);
+        mre = mock(MessageReceivedEvent.class);
+        m = mock(Message.class);
         User u = Mocks.getMockedMember().getUser();
         Member me = Mocks.getMockedMember();
         JDA j = mock(JDA.class);
@@ -89,5 +93,38 @@ public abstract class BaseCommandTest {
         when(mcHelper.getAccountManager()).thenReturn(AM);
         when(mcHelper.getJDA()).thenReturn(j);
         when(ce.getMCHelper()).thenReturn(mcHelper);
+    }
+
+    /**
+     * Sets the command arguments for this mocked {@link CommandEvent}.<br>
+     * <i>Note!</i> Do not include the command name! (i.e. !command) It will be inserted at the beginning.<br>
+     * If you need to call this method more than once in a single test, call {@link BaseCommandTest#clearArgs()}.
+     *
+     * @param s The arguments to use.
+     */
+    protected void setArgs(String s) {
+        s = "!commandundertest" + (s.isEmpty() ? "" : " ") + s;
+        setInternalState(ce, "EVENT", mre);
+        when(m.getContentRaw()).thenReturn(s);
+        when(m.getContentDisplay()).thenReturn(s);
+        when(ce.getCommandArgsString()).thenCallRealMethod();
+        when(ce.getCommandArgs()).thenCallRealMethod();
+        when(ce.getRawCommandArgs()).thenCallRealMethod();
+        when(ce.getRawCommandArgsString()).thenCallRealMethod();
+        when(ce.getCommandArgsWithoutName()).thenCallRealMethod();
+    }
+
+    /**
+     * Clears and resets the command arguments for this test method.
+     * <i>Note!</i> This is called after the end of each method.
+     */
+    @BeforeMethod
+    protected void clearArgs() {
+        when(m.getContentRaw()).thenReturn("!commandundertest");
+        when(m.getContentDisplay()).thenReturn("!commandundertest");
+        setInternalState(ce, "COMMAND_ARGS_STRING", null);
+        setInternalState(ce, "RAW_COMMAND_ARGS_STRING", null);
+        setInternalState(ce, "COMMAND_ARGS", null);
+        setInternalState(ce, "RAW_ARGS", null);
     }
 }

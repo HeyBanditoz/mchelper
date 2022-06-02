@@ -35,7 +35,7 @@ public class EvalCommand extends ElevatedCommand {
     protected Status onCommand(CommandEvent ce) throws Exception {
         ScriptEngine engine = manager.getEngineByName("java");
         // quick n' dirty zeroth (command prefix and name) removal.
-        String args = ce.getEvent().getMessage().getContentRaw().replaceFirst("." + commandName() + "\\s+", "");
+        String args = ce.getEvent().getMessage().getContentRaw().replaceFirst(".\\w+\\s+", "");
         if (args.startsWith("```java")) {
             args = args.replace("```java", "").replace("```", "");
         }

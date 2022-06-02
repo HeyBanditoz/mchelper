@@ -19,14 +19,14 @@ public class ServerStatusCommandTests extends BaseCommandTest {
 
     @Test
     public void testMinecraftServerStatusCommand() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!status", "mc.hypixel.net"}); // this should always be up, hopefully...
+        setArgs("mc.hypixel.net");
         ssc.onCommand(ce);
         assertThat(embedCaptor.getValue().getColor()).isEqualTo(Color.GREEN);
     }
 
     @Test
     public void testMinecraftServerStatusCommandBadServer() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!status", "127.0.0.1"}); // shouldn't work
+        setArgs("127.0.0.1");
         ssc.onCommand(ce);
         assertThat(embedCaptor.getValue().getColor()).isEqualTo(Color.RED);
     }

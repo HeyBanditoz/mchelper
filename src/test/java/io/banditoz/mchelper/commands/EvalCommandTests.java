@@ -12,27 +12,28 @@ public class EvalCommandTests extends BaseCommandTest {
 
     public EvalCommandTests() {
         this.ec = spy(new EvalCommand());
+        when(ce.getEvent().isFromType(any())).thenReturn(true);
     }
 
     @Test
     public void testEvalCommand() throws Exception {
-        when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("""
-                ?eval ```java
+        setArgs("""
+                ```java
                 int x = 5;
-                return x;""");
+                return x;
+                ```""");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("```\n5```");
     }
 
     @Test
     public void testEvalCommandExternalClass() throws Exception {
-        when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("""
-                ?eval ```java
+        setArgs("""
+                ```java
                 import com.udojava.evalex.Expression;
                 
-                return new Expression("1+1").eval()""");
+                return new Expression("1+1").eval()
+                ```""");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("2");
     }
@@ -40,8 +41,7 @@ public class EvalCommandTests extends BaseCommandTest {
 
     @Test
     public void testEvalCommandNull() throws Exception {
-        when(ce.getEvent().isFromType(any())).thenReturn(true);
-        when(ce.getEvent().getMessage().getContentRaw()).thenReturn("null");
+        setArgs("null");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("<null output>");
     }

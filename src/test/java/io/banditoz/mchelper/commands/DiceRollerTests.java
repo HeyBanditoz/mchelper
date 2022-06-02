@@ -4,7 +4,6 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 public class DiceRollerTests extends BaseCommandTest {
     private final DiceRollerCommand drc;
@@ -15,7 +14,7 @@ public class DiceRollerTests extends BaseCommandTest {
 
     @Test
     public void testDiceRollerCommand() throws Exception {
-        when(ce.getCommandArgsString()).thenReturn("1d20");
+        setArgs("1d20");
         drc.onCommand(ce);
         assertThat(stringCaptor.getValue()).matches("\\d+ = \\d+\\[\\d+]");
     }

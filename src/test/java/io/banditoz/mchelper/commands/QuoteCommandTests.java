@@ -6,7 +6,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @Test(dependsOnGroups = {"DatabaseInitializationTests"})
 public class QuoteCommandTests extends BaseCommandTest {
@@ -21,22 +20,20 @@ public class QuoteCommandTests extends BaseCommandTest {
     }
 
     public void testAddquote() throws Exception {
-        when(ce.getCommandArgsString()).thenReturn("\"test\" quote");
-        when(ce.getCommandArgs()).thenReturn(new String[]{"\"test\"", "quote"});
+        setArgs("\"test\" quote");
         ac.onCommand(ce);
         assertThat(messageCaptor.getValue().getContentRaw()).isEqualTo("Quote added.");
     }
 
     @Test(timeOut = 5000L) // 5 second timeout
     public void testFetchNonExistentQuote() throws Exception {
-        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{"1984"});
+        setArgs("1984");
         qc.onCommand(ce);
         assertThat(embedCaptor.getValue().getDescription()).contains("No quote found.");
     }
 
     @Test(dependsOnMethods = {"testAddquote"})
     public void testQuote() throws Exception {
-        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{""});
         qc.onCommand(ce);
         MessageEmbed me = embedsCaptor.getValue().get(0);
         assertThat(me.getDescription()).contains("test", "quote");
@@ -44,7 +41,7 @@ public class QuoteCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testAddquote"})
     public void testQuoteWithQuoteSearch() throws Exception {
-        when(ce.getCommandArgsString()).thenReturn("test");
+        setArgs("test");
         qc.onCommand(ce);
         MessageEmbed me = embedsCaptor.getValue().get(0);
         assertThat(me.getDescription()).contains("test", "quote");
@@ -52,7 +49,7 @@ public class QuoteCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testAddquote"})
     public void testQuoteWithAuthorSearch() throws Exception {
-        when(ce.getCommandArgsString()).thenReturn("quote");
+        setArgs("quote");
         qc.onCommand(ce);
         MessageEmbed me = embedsCaptor.getValue().get(0);
         assertThat(me.getDescription()).contains("test", "quote");
@@ -60,28 +57,30 @@ public class QuoteCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testAddquote", "testQuote", "testQuoteWithQuoteSearch", "testQuoteWithAuthorSearch"})
     public void testDeleteQuote() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!delquote", "1"});
+        setArgs("1");
         dqc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Quote successfully deleted.");
     }
 
     @Test(dependsOnMethods = {"testAddquote", "testQuote", "testQuoteWithQuoteSearch", "testQuoteWithAuthorSearch"})
     public void testDeleteNonExistentQuote() throws Exception {
-        when(ce.getCommandArgs()).thenReturn(new String[]{"!delquote", "100"});
+        setArgs("100");
         dqc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Quote was not deleted.");
     }
 
     @Test(dependsOnMethods = {"testDeleteQuote"})
-    public void testAddAndFetchMany() throws Exception {
-        when(ce.getCommandArgsString()).thenReturn("\"123\" 123");
-        when(ce.getCommandArgs()).thenReturn(new String[]{"\"123\"", "123"});
+    public void testAddMany() throws Exception {
+        setArgs("\"123\" 123");
         ac.onCommand(ce);
-        when(ce.getCommandArgsString()).thenReturn("\"456\" 456");
-        when(ce.getCommandArgs()).thenReturn(new String[]{"\"456\"", "456"});
+        clearArgs();
+        setArgs("\"456\" 456");
         ac.onCommand(ce);
+    }
 
-        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{""});
+    @Test(dependsOnMethods = {"testAddMany"})
+    public void testFetchMany() throws Exception {
+        setArgs("-a");
         qc.onCommand(ce);
 
         List<MessageEmbed> embeds = embedsCaptor.getValue();
@@ -89,9 +88,9 @@ public class QuoteCommandTests extends BaseCommandTest {
         assertThat(embeds.size()).isEqualTo(2);
     }
 
-    @Test(dependsOnMethods = "testAddAndFetchMany")
+    @Test(dependsOnMethods = "testAddMany")
     public void testQuoteStats() throws Exception {
-        when(ce.getCommandArgsWithoutName()).thenReturn(new String[]{"-s"});
+        setArgs("-s");
         qc.onCommand(ce);
         assertThat(embedCaptor.getValue().getDescription()).contains("""
                 ```

@@ -52,12 +52,13 @@ public class TransferCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testTransferCommand"})
     public void cannotTransferNegativeAmount() {
-        when(ce.getRawCommandArgs()).thenReturn(new String[]{"!transfer", "", "-400"});
+        setArgs("a -400");
         assertThatThrownBy(() -> tc.onCommand(ce)).isInstanceOf(MoneyException.class); // can't transfer negative amount
     }
 
     @Test(dependsOnMethods = {"testTransferCommand"})
     public void testCannotTransferToSelf() {
+        setArgs("a 400");
         User u = member.getUser();
         when(ce.getEvent().getAuthor()).thenReturn(u);
         when(ce.getMentionedMembers()).thenReturn(List.of(member));
