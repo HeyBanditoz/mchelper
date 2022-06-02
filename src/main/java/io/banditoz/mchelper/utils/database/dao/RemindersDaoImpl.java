@@ -2,8 +2,12 @@ package io.banditoz.mchelper.utils.database.dao;
 
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.Reminder;
+import io.jenetics.facilejdbc.Param;
+import io.jenetics.facilejdbc.Query;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,83 +36,75 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     @Override
     public void markReminded(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET reminded = true WHERE id=?");
-            ps.setInt(1, id);
-            ps.execute();
-            ps.close();
+            Query.of("UPDATE reminders SET reminded = true WHERE id=:i;")
+                    .on(Param.value("i", id))
+                    .executeUpdate(c);
         }
     }
 
     @Override
     public void markDeleted(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("UPDATE reminders SET deleted = true WHERE id=?");
-            ps.setInt(1, id);
-            ps.execute();
-            ps.close();
+            Query.of("UPDATE reminders SET deleted = true WHERE id=:i;")
+                    .on(Param.value("i", id))
+                    .executeUpdate(c);
         }
     }
 
     @Override
     public int schedule(Reminder r) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO reminders (channel_id, author_id, reminder, remind_when, reminded, is_dm, deleted) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id");
-//            ps.setNull(1, Types.INTEGER);
-            ps.setLong(1, r.getChannelId());
-            ps.setLong(2, r.getAuthorId());
-            ps.setString(3, r.getReminder());
-            ps.setTimestamp(4, r.getRemindWhen());
-            ps.setBoolean(5, false);
-            ps.setBoolean(6, r.isFromDm());
-            ps.setBoolean(7, false);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            int id = rs.getInt(1);
-            ps.close();
-            rs.close();
-            return id;
+            return Query.of("INSERT INTO reminders (channel_id, author_id, reminder, remind_when, reminded, is_dm, deleted) VALUES (:c, :a, :r, :w, :e, :i, :d) RETURNING id")
+                    .on(
+                            Param.value("c", r.getChannelId()),
+                            Param.value("a", r.getAuthorId()),
+                            Param.value("r", r.getReminder()),
+                            Param.value("w", r.getRemindWhen()),
+                            Param.value("e", false),
+                            Param.value("i", r.isFromDm()),
+                            Param.value("d", false)
+                    ).as((rs, conn) -> {
+                        rs.next();
+                        return rs.getInt(1);
+                    }, c);
         }
     }
 
     @Override
     public List<Reminder> getAllActiveReminders() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            ArrayList<Reminder> reminders = new ArrayList<>();
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE NOT (reminded OR deleted)");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                reminders.add(buildReminderFromResultSet(rs));
-            }
-            ps.close();
-            rs.close();
-            return reminders;
+            return Query.of("SELECT * FROM reminders WHERE NOT (reminded OR deleted);")
+                    .as((rs, conn) -> {
+                        ArrayList<Reminder> reminders = new ArrayList<>();
+                        while (rs.next()) {
+                            reminders.add(buildReminderFromResultSet(rs));
+                        }
+                        return reminders;
+                    }, c);
         }
     }
 
     @Override
     public boolean isStillActiveOrNotDeleted(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT NOT (deleted Or reminded) AS active FROM reminders WHERE id=?");
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            boolean active = rs.getBoolean("active");
-            rs.close();
-            return active;
+            return Query.of("SELECT NOT (deleted OR reminded) AS active FROM reminders WHERE id=:i;")
+                    .on(Param.value("i", id))
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return rs.getBoolean("active");
+                    }, c);
         }
     }
 
     @Override
     public Reminder getReminderById(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM reminders WHERE id=?");
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            Reminder r = buildReminderFromResultSet(rs);
-            rs.close();
-            ps.close();
-            return r;
+            return Query.of("SELECT * FROM reminders WHERE id=:i;")
+                    .on(Param.value("i", id))
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return buildReminderFromResultSet(rs);
+                    }, c);
         }
     }
 
