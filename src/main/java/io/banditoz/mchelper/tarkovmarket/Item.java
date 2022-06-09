@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record Item(@JsonProperty("imageLink") String imageLink,
-                   @JsonProperty("traderPrices") List<TraderPrice> traderPrices,
+                   @JsonProperty("sellFor") List<VendorPrice> vendorPrices,
                    @JsonProperty("name") String name,
                    @JsonProperty("link") String link,
                    @JsonProperty("avg24hPrice") int avg24hPrice,
@@ -29,17 +29,17 @@ public record Item(@JsonProperty("imageLink") String imageLink,
         return DecimalFormat.getInstance().format(i) + '₽';
     }
 
-    private Optional<TraderPrice> getBestTraderPrice() {
-        return traderPrices.stream().min(TraderPrice::compareTo);
+    private Optional<VendorPrice> getBestTraderPrice() {
+        return vendorPrices.stream().min(VendorPrice::compareTo);
     }
 
     public MessageEmbed getAsEmbed() {
         String bestPrice = "<unknown>";
         String sDiff48h = (changeLast48h > 0 ? changeLast48h + "%" : "(" + changeLast48h * -1 + "%)");
-        Optional<TraderPrice> bestTraderPrice = getBestTraderPrice();
+        Optional<VendorPrice> bestTraderPrice = getBestTraderPrice();
         if (bestTraderPrice.isPresent()) {
-            TraderPrice tp = bestTraderPrice.get();
-            String traderName = tp.trader().trader().name();
+            VendorPrice tp = bestTraderPrice.get();
+            String traderName = tp.vendor().vendorName().name();
             traderName = traderName.substring(0, 1).toUpperCase() + traderName.substring(1).toLowerCase();
             bestPrice = "**" + traderName + ":** " + DecimalFormat.getInstance().format(tp.price()) + '₽';
         }

@@ -2,10 +2,7 @@ package io.banditoz.mchelper.tarkovmarket;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record Trader(@JsonProperty("name") TraderName trader) {
-}
-
-enum TraderName {
+public enum VendorName {
     @JsonProperty("Prapor")
     PRAPOR,
     @JsonProperty("Therapist")
@@ -21,5 +18,7 @@ enum TraderName {
     @JsonProperty("Ragman")
     RAGMAN,
     @JsonProperty("Jaeger")
-    JAEGER;
+    JAEGER,
+    @JsonProperty("Flea Market")
+    FLEA
 }

@@ -28,14 +28,13 @@ public class TarkovMarketSearcher {
 
     public List<Item> getMarketResultsBySearch(final String search) throws IOException, HttpResponseException {
         if (refreshAgain == null || Instant.now().isAfter(refreshAgain)) {
-            refreshAgain = Instant.now().plus(15, ChronoUnit.MINUTES);
             ObjectMapper om = MCHELPER.getObjectMapper();
             String query = """
                     {
-                      itemsByName(name: "") {
+                      items {
                         name
-                        traderPrices {
-                          trader {
+                        sellFor {
+                          vendor {
                             name
                           }
                           priceRUB
@@ -62,8 +61,14 @@ public class TarkovMarketSearcher {
                     .build();
             String json = MCHELPER.performHttpRequest(request);
             Response data = om.readValue(json, Response.class);
+            // filter out flea market from all results
+            for (Item item : data.data().items()) {
+                item.vendorPrices().removeIf(vendorPrice -> vendorPrice.vendor().vendorName() == VendorName.FLEA);
+            }
             CACHE.clear();
             CACHE.addAll(data.data().items());
+            // phew, adding items succeeded! now update the refresh time
+            refreshAgain = Instant.now().plus(15, ChronoUnit.MINUTES);
         }
         // so it would have been better to have a Map of Item#shortName, Item, but we can't do that because
         // shortName is not guaranteed to be unique. when I ran it, there were 11 hits of GEN3, so we have to do these
