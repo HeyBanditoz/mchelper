@@ -1,5 +1,5 @@
 # Commands
-There are a total of 58 commands and 4 regex listeners.
+There are a total of 59 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -28,6 +28,8 @@ There are a total of 58 commands and 4 regex listeners.
 `define` - <word> - Finds the definition of a word using Owlbot's API.
 ### DoubleOrNothingCommand
 `don` - <ante (with range 5 <= x <= 200000)> - Play double or nothing to win some money!
+### DuelCommand
+`duel` - <ante> - Duel with your channel for money!
 ### EangleCommand
 `eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
 ### EightBallCommand
