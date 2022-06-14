@@ -84,7 +84,6 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     }
 
     private CoordinatePoint buildPointFromResultSet(ResultSet rs) throws SQLException {
-        rs.next();
         CoordinatePoint point = new CoordinatePoint();
         point.setGuildId(rs.getLong("guild_id"));
         point.setAuthorId(rs.getLong("author_id"));
