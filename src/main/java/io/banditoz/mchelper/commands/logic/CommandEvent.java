@@ -6,10 +6,7 @@ import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.paste.Paste;
 import io.banditoz.mchelper.utils.paste.PasteggUploader;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -274,5 +271,9 @@ public class CommandEvent {
 
     public List<User> getMentionedUsers() {
         return EVENT.getMessage().getMentions().getUsers();
+    }
+
+    public ChannelType getChannelType() {
+        return EVENT.getChannel().getType();
     }
 }

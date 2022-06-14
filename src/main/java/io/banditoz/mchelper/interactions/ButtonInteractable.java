@@ -3,6 +3,7 @@ package io.banditoz.mchelper.interactions;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -98,6 +99,13 @@ public class ButtonInteractable {
         message.editMessageComponents(Collections.emptyList()).setEmbeds(me).queue();
     }
 
+    public void destroyAndAddNewButtons(ActionRow... rows) {
+        LOGGER.debug("Removing AND REPLACING buttons for " + message);
+        if (timeoutFuture != null) {
+            timeoutFuture.cancel(true);
+        }
+        message.editMessageComponents(rows).queue();
+    }
 
     /**
      * @return The timeout of this {@link ButtonInteractable}, in seconds.
