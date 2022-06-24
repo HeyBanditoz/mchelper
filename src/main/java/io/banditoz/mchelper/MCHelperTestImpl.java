@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -103,6 +104,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public ButtonListener getButtonListener() {
+        return null;
+    }
+
+    @Override
+    public GameManager getGameManager() {
         return null;
     }
 

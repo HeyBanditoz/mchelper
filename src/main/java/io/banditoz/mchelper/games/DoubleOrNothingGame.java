@@ -1,23 +1,28 @@
 package io.banditoz.mchelper.games;
 
+import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Random;
 
-public class DoubleOrNothingGame {
+public class DoubleOrNothingGame extends Game {
     private BigDecimal currentBet;
     private final Random rand = new Random();
-    private final AccountManager accs;
     private int times = 0;
-    private final User player;
-    private static final BigDecimal TWO = new BigDecimal("2");
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoubleOrNothingGame.class);
 
-    public DoubleOrNothingGame(BigDecimal initialBet, User player, AccountManager accs) {
+    public DoubleOrNothingGame(BigDecimal initialBet, User player, MCHelper mcHelper) {
+        super(5, 20_000, mcHelper, player, initialBet);
         this.currentBet = initialBet;
-        this.player = player;
-        this.accs = accs;
     }
 
     /**
@@ -36,11 +41,66 @@ public class DoubleOrNothingGame {
         }
     }
 
-    public void payout() throws Exception {
-        accs.add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ")");
+    /**
+     * Method called when a user intends to play for more money.
+     */
+    public void bet(WrappedButtonClickEvent wrappedEvent) {
+        ButtonInteractionEvent event = wrappedEvent.getEvent();
+
+        if (play()) {
+            event.editMessageEmbeds(generate(currentBet , player)).queue();
+        }
+        else {
+            wrappedEvent.removeListenerAndDestroy(lose(currentBet , player));
+            gm.stopPlaying(player);
+        }
     }
 
-    public BigDecimal getCurrentBet() {
-        return currentBet;
+    /**
+     * Method called when a user intends to cash out their winnings.
+     */
+    public void stop(WrappedButtonClickEvent wrappedEvent) {
+        stopPlaying();
+        // TODO better exception handling
+        try {
+            payout();
+        } catch (Exception ex) {
+            LOGGER.error("Error while paying out!", ex);
+        } finally {
+            wrappedEvent.removeListenerAndDestroy(cashout(currentBet , player));
+        }
+    }
+
+    public void payout() throws Exception {
+        am.add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ")");
+    }
+
+    public MessageEmbed generate(BigDecimal currentAmount, User u) {
+        return new EmbedBuilder()
+                .setTitle("Double or Nothing!")
+                .setColor(Color.GREEN)
+                .setDescription("You currently have $" + AccountManager.format(currentAmount) + "!")
+                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .build();
+    }
+
+    private MessageEmbed lose(BigDecimal currentAmount, User u) {
+        return new EmbedBuilder()
+                .setTitle("Double or Nothing!")
+                .setColor(Color.RED)
+                .setDescription("You lost $" + AccountManager.format(currentAmount) + "!")
+//                .setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/421/797/f5a.gif")
+                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .build();
+    }
+
+    private MessageEmbed cashout(BigDecimal currentAmount, User u) {
+        return new EmbedBuilder()
+                .setTitle("Double or Nothing!")
+                .setColor(Color.GREEN)
+                .setDescription("You cashed in $" + AccountManager.format(currentAmount) + "! Good job!")
+//                .setImage("https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif")
+                .setFooter(u.getName(), u.getEffectiveAvatarUrl())
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -34,6 +35,9 @@ public interface MCHelper {
     RoleReactionListener getRRL();
     AccountManager getAccountManager();
     ButtonListener getButtonListener();
+
+    GameManager getGameManager();
+
     User getOwner();
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own

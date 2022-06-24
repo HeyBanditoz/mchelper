@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -54,6 +55,7 @@ public class MCHelperImpl implements MCHelper {
     private final RoleReactionListener RRL;
     private final AccountManager AM;
     private final ButtonListener BL;
+    private final GameManager GM;
     private final User OWNER;
 
     public MCHelperImpl() throws InterruptedException {
@@ -80,6 +82,7 @@ public class MCHelperImpl implements MCHelper {
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
         SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
                 .build());
+        GM = new GameManager();
         JDA = buildJDA();
 
         if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
@@ -212,6 +215,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public ButtonListener getButtonListener() {
         return BL;
+    }
+
+    @Override
+    public GameManager getGameManager() {
+        return GM;
     }
 
     @Override
