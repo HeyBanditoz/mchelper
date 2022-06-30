@@ -265,12 +265,35 @@ public class CommandEvent {
         return EXECUTED_WHEN;
     }
 
+    /**
+     * @return A list of {@link Member Members}, ignoring the reply mention if it's present. It's only considered a reply
+     * mention if the user had the switched flipped ON at the time of replying.
+     */
     public List<Member> getMentionedMembers() {
-        return EVENT.getMessage().getMentions().getMembers();
+        List<Member> m = EVENT.getMessage().getMentions().getMembers();
+        Message refMessage = EVENT.getMessage().getReferencedMessage();
+        if (m.size() == 0) {
+            return m; // no mentioned users, don't continue
+        }
+        if (refMessage != null) {
+            if (m.get(0).getUser().equals(refMessage.getAuthor())) {
+                return m.subList(1, m.size());
+            }
+            else {
+                return m;
+            }
+        }
+        else {
+            return m;
+        }
     }
 
+    /**
+     * @return A list of {@link User Users}, ignoring the reply mention if it's present. It's only considered a reply
+     * mention if the user had the switched flipped ON at the time of replying.
+     */
     public List<User> getMentionedUsers() {
-        return EVENT.getMessage().getMentions().getUsers();
+        return getMentionedMembers().stream().map(Member::getUser).toList();
     }
 
     public ChannelType getChannelType() {
