@@ -39,6 +39,8 @@ public interface MCHelper {
     GameManager getGameManager();
 
     User getOwner();
+
+    void messageOwner(String s);
     /**
      * Performs an HTTP request and returns the String. This is preferable to use over making your own
      * OkHttpClient or implementing one.

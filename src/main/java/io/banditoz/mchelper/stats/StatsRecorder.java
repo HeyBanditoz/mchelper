@@ -26,6 +26,7 @@ public class StatsRecorder {
                 new StatisticsDaoImpl(MCHELPER.getDatabase()).log(s);
             } catch (Exception ex) {
                 LOGGER.error("Error while recording a Stat!", ex);
+                MCHELPER.messageOwner("Error while recording a Stat! " + ex);
             }
         });
     }

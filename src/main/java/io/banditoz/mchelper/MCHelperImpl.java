@@ -272,6 +272,12 @@ public class MCHelperImpl implements MCHelper {
         return null;
     }
 
+    @Override
+    public void messageOwner(String s) {
+        JDA.openPrivateChannelById(getOwner().getIdLong())
+                .flatMap(channel -> channel.sendMessage(s))
+                .queue(message -> {}, throwable -> LOGGER.error("Could not message the owner {}!", getOwner(), throwable));
+    }
 
     @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {

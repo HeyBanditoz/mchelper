@@ -118,6 +118,9 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
+    public void messageOwner(String s) {}
+
+    @Override
     public String performHttpRequest(Request request) throws HttpResponseException, IOException {
         String s;
         try (Response r = placeRequest(request)) {
