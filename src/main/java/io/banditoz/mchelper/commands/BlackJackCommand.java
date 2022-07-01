@@ -38,7 +38,7 @@ public class BlackJackCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         User u = ce.getEvent().getAuthor();
-        BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1]);
+        BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1].replace(",", ""));
         BlackJackGame game = new BlackJackGame(u, ante, ce.getMCHelper());
         game.tryAndRemoveAnte("blackjack ante");
         game.startPlaying();
@@ -48,7 +48,7 @@ public class BlackJackCommand extends Command {
         if (game.getPlayersSum() == 21) {
             try {
                 game.payout(true);
-                ce.sendEmbedReply(game.win(BlackJackGame.WinState.NORMAL));
+                ce.sendEmbedReply(game.win(BlackJackGame.WinState.BLACKJACK));
                 game.stopPlaying();
                 return Status.SUCCESS;
             } catch (Exception ex) {

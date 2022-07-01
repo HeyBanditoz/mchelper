@@ -37,7 +37,7 @@ public class DoubleOrNothingCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         User u = ce.getEvent().getAuthor();
-        BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1]);
+        BigDecimal ante = new BigDecimal(ce.getCommandArgs()[1].replace(",", ""));
         // shall we play a game?
         DoubleOrNothingGame game = new DoubleOrNothingGame(ante, u, ce.getMCHelper());
         game.tryAndRemoveAnte("double or nothing ante");

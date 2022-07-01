@@ -89,7 +89,7 @@ public class DoubleOrNothingGame extends Game {
                 .setTitle("Double or Nothing!")
                 .setColor(Color.RED)
                 .setDescription("You lost $" + AccountManager.format(currentAmount) + "!")
-//                .setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/421/797/f5a.gif")
+                .setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/421/797/f5a.gif")
                 .setFooter(u.getName(), u.getEffectiveAvatarUrl())
                 .build();
     }
@@ -99,7 +99,7 @@ public class DoubleOrNothingGame extends Game {
                 .setTitle("Double or Nothing!")
                 .setColor(Color.GREEN)
                 .setDescription("You cashed in $" + AccountManager.format(currentAmount) + "! Good job!")
-//                .setImage("https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif")
+                .setImage("https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif")
                 .setFooter(u.getName(), u.getEffectiveAvatarUrl())
                 .build();
     }

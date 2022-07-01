@@ -44,7 +44,7 @@ public class DuelCommand extends Command {
             return Status.FAIL;
         }
         User u = ce.getEvent().getAuthor();
-        BigDecimal ante = new BigDecimal(ce.getCommandArgsString());
+        BigDecimal ante = new BigDecimal(ce.getCommandArgsString().replace(",", ""));
         DuelGame game = new DuelGame(ante, u, ce.getMCHelper());
         game.tryAndRemoveAnte("duel ante");
         game.startPlaying();

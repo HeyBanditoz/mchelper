@@ -217,7 +217,7 @@ public class BlackJackGame extends Game {
                         + "\n*Your hand: " + getPlayersSum() + "*\n" + playerString
                         + "\n*Their hand: " + getDealerSum() + "*\n" + dealerString)
                 .setImage(image)
-                .setFooter(player + " (" + getRemainingCards() + " cards left in deck.)", player.getEffectiveAvatarUrl())
+                .setFooter(player.getName() + " (" + getRemainingCards() + " cards left in deck.)", player.getEffectiveAvatarUrl())
                 .build();
     }
 
