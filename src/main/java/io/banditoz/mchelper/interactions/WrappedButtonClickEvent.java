@@ -44,6 +44,13 @@ public class WrappedButtonClickEvent {
     }
 
     /**
+     * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list.
+     */
+    public void removeListener() {
+        this.MCHelper.getButtonListener().removeInteractableByButton(event.getButton());
+    }
+
+    /**
      * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list, and removes all
      * buttons
      *
