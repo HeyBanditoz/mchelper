@@ -21,7 +21,7 @@ public record Item(@JsonProperty("imageLink") String imageLink,
                    @JsonProperty("lastLowPrice") int lastLowPrice,
                    @JsonProperty("updated") LocalDateTime updated,
                    @JsonProperty("wikiLink") String wikiLink,
-                   @JsonProperty("changeLast48h") double changeLast48h,
+                   @JsonProperty("changeLast48hPercent") double changeLast48h,
                    @JsonProperty("types") EnumSet<ItemType> types,
                    @JsonProperty("shortName") String shortName) {
 

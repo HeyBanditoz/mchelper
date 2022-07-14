@@ -47,7 +47,7 @@ public class TarkovMarketSearcher {
                         link
                         updated
                         imageLink
-                        changeLast48h
+                        changeLast48hPercent
                         types
                         shortName
                       }
