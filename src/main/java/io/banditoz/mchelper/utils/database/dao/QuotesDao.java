@@ -3,6 +3,7 @@ package io.banditoz.mchelper.utils.database.dao;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.StatPoint;
 import net.dv8tion.jda.api.entities.Guild;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
@@ -28,6 +29,19 @@ public interface QuotesDao {
      * @throws SQLException If there was an error getting the quote.
      */
     List<NamedQuote> getQuotesByMatch(String search, Guild g) throws SQLException;
+
+    /**
+     * Returns a list of quotes by a {@link Guild} by a fulltext search. See
+     * <a href="https://www.crunchydata.com/blog/postgres-full-text-search-a-search-engine-in-a-database">here</a>
+     * for details.
+     *
+     * @param search The {@link String} to search for in the database.
+     * @param g      The {@link Guild} to search by.
+     * @return A {@link List} that may or may not contain {@link NamedQuote}s for the guild.
+     * @throws SQLException If there was an error getting the quote.
+     */
+    List<NamedQuote> getQuotesByFulltextSearch(String search, @NotNull Guild g) throws SQLException;
+
     /**
      * Returns a list of all quotes by a {@link Guild}.
      *

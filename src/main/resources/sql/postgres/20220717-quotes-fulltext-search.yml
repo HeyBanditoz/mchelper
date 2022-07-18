@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: quotes-fulltext-search
+      author: Hayden
+      comment: Adds fulltext search support to the quotes table. Fulltext is done on both the quote and quote_author
+        column via concatenation.
+      changes:
+        - addColumn:
+            tableName: quotes
+            columns:
+              - column:
+                  name: ts
+                  type: >
+                    tsvector GENERATED ALWAYS AS (to_tsvector('english', (quote || ' ' || quote_author))) STORED

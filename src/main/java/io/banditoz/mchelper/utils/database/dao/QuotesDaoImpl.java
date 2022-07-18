@@ -50,6 +50,17 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
+    public List<NamedQuote> getQuotesByFulltextSearch(String search, @NotNull Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND ts @@ phraseto_tsquery('english', :s)")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("s", search))
+                    .as(this::parseMany, c);
+        }
+    }
+
+    @Override
     public List<NamedQuote> getAllQuotesForGuild(@NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT * FROM quotes WHERE guild_id=:g ORDER BY RANDOM()")

@@ -23,8 +23,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Requires(database = true)
@@ -68,28 +66,13 @@ public class QuoteCommand extends Command {
                     quotes = Collections.singletonList(nq);
                 }
             }
+            else if (args.getBoolean("exact") != null && args.getBoolean("exact")) {
+                String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
+                quotes = dao.getQuotesByMatch(s, ce.getGuild());
+            }
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
-                if (!(s.startsWith("`") && s.endsWith("`"))) {
-                    quotes = dao.getQuotesByMatch(s, ce.getGuild());
-                }
-                else {
-                    s = s.substring(1, s.length() - 1);
-                    quotes = dao.getAllQuotesForGuild(ce.getGuild());
-                    // do regex processing on java side as opposed to SQL, so user gets feedback if their regex is invalid
-                    // it's probably extremely inefficient to do it here, but fight me
-                    Pattern p = Pattern.compile(s);
-                    quotes = quotes.stream().filter(namedQuote -> {
-                        Matcher m = p.matcher(namedQuote.getQuote());
-                        if (m.find()) {
-                            return true;
-                        }
-                        else {
-                            m = p.matcher(namedQuote.getQuoteAuthor());
-                            return m.find();
-                        }
-                    }).toList();
-                }
+                quotes = dao.getQuotesByFulltextSearch(s, ce.getGuild());
             }
             EmbedBuilder eb = new EmbedBuilder();
             for (int i = 0; i < quotes.size(); i++) {
@@ -163,8 +146,11 @@ public class QuoteCommand extends Command {
         parser.addArgument("-d", "--id")
                 .action(Arguments.storeTrue())
                 .help("include the internal quote ID");
+        parser.addArgument("-e", "--exact")
+                .action(Arguments.storeTrue())
+                .help("search exactly (by default it performs a fulltext search on quote and quote author)");
         parser.addArgument("quoteAndAuthor")
-                .help("quote content and quote attribution to search by (wrap with ` to do a regex search)")
+                .help("quote content and quote attribution to search by")
                 .nargs("*");
         return parser;
     }

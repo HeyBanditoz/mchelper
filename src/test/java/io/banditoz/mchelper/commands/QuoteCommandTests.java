@@ -40,8 +40,17 @@ public class QuoteCommandTests extends BaseCommandTest {
     }
 
     @Test(dependsOnMethods = {"testAddquote"})
-    public void testQuoteWithQuoteSearch() throws Exception {
+    public void testQuoteWithExactQuoteSearch() throws Exception {
         setArgs("test");
+        qc.onCommand(ce);
+        MessageEmbed me = embedsCaptor.getValue().get(0);
+        assertThat(me.getDescription()).contains("test", "quote");
+    }
+
+    @Test(dependsOnMethods = {"testAddquote"})
+    public void testQuoteWithQuoteSearch() throws Exception {
+        // just for sanity
+        setArgs("-e test");
         qc.onCommand(ce);
         MessageEmbed me = embedsCaptor.getValue().get(0);
         assertThat(me.getDescription()).contains("test", "quote");
