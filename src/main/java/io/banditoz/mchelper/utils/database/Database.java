@@ -1,13 +1,16 @@
 package io.banditoz.mchelper.utils.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.banditoz.mchelper.utils.ClassUtils;
-import io.banditoz.mchelper.utils.database.dao.Dao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
+import liquibase.Liquibase;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -37,17 +40,19 @@ public class Database {
             System.exit(1);
         }
 
-        // we have a connection, generate tables!
-        ClassUtils.getAllSubtypesOf(Dao.class).stream()
-                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
-                .forEach(clazz -> {
-                    try {
-                        clazz.getDeclaredConstructor(Database.class).newInstance(this).generateTable();
-                    } catch (Exception ex) {
-                        LOGGER.error("Error while instantiating {}!", clazz, ex);
-                    }
-                });
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds in the config.");
+    }
+
+    public void migrate() throws Exception {
+        LOGGER.info("!!!! RUNNING DATABASE MIGRATIONS !!!!");
+        LOGGER.info("Waiting 5 seconds before continuing. If you did not mean to do this, exit now!");
+        Thread.sleep(5000);
+
+        try (Connection c = getConnection()) {
+            liquibase.database.Database mgDb = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
+            Liquibase liquibase = new Liquibase("sql/postgres/master.yml", new ClassLoaderResourceAccessor(), mgDb);
+            liquibase.update(new Contexts(), new LabelExpression());
+        }
     }
 
     /**

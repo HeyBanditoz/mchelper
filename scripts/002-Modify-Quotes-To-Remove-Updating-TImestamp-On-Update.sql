@@ -1,1 +1,0 @@
-ALTER TABLE quotes CHANGE last_modified last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP();

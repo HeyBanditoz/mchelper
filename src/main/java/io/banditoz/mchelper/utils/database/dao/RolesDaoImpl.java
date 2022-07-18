@@ -8,34 +8,18 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RolesDaoImpl extends Dao implements RolesDao {
     public RolesDaoImpl(Database database) {
         super(database);
-    }
-
-    @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS roles (
-                    id serial,
-                    guild_id bigint NOT NULL,
-                    emote character varying(100) NOT NULL,
-                    name character varying(100) NOT NULL,
-                    role_id bigint NOT NULL,
-                    PRIMARY KEY (id)
-                );
-                
-                CREATE TABLE IF NOT EXISTS guild_roles (
-                     id         serial,
-                     guild_id   bigint NOT NULL,
-                     channel_id bigint NOT NULL,
-                     message_id bigint NOT NULL,
-                     PRIMARY KEY (id)
-                );
-                """;
     }
 
     @Override

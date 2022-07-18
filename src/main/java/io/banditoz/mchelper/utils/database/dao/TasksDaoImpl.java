@@ -17,18 +17,6 @@ public class TasksDaoImpl extends Dao implements TasksDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS tasks (
-                    id bigint,
-                    task_id smallint,
-                    can_run_again timestamp with time zone,
-                    UNIQUE (id, task_id)
-                );
-                """;
-    }
-
-    @Override
     public LocalDateTime getWhenCanExecute(long id, Task t) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT can_run_again FROM tasks WHERE id=:i AND task_id=:t;")

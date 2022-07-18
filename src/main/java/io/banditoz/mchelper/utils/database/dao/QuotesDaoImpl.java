@@ -21,22 +21,6 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS quotes (
-                    guild_id bigint NOT NULL,
-                    author_id bigint NOT NULL,
-                    quote character varying(1500) NOT NULL,
-                    quote_author character varying(100) NOT NULL,
-                    last_modified timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                    id SERIAL,
-                    PRIMARY KEY (id),
-                    UNIQUE (guild_id, quote, quote_author)
-                );
-                """;
-    }
-
-    @Override
     public int saveQuote(NamedQuote nq) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("INSERT INTO quotes (guild_id, author_id, quote, quote_author) VALUES (:g, :a, :q, :qa) RETURNING id")

@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 20220717-initial-schema.yml
+      relativeToChangelogFile: true

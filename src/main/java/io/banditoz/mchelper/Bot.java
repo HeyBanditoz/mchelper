@@ -2,6 +2,7 @@ package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
+import io.banditoz.mchelper.utils.database.Database;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +14,17 @@ public class Bot {
             CommandsToMarkdown.commandsToMarkdown();
             System.exit(0);
         }
-        else if (args.length > 0 && argsList.contains("gensettings")) {
+        else if (argsList.size() > 0 && argsList.contains("gensettings")) {
             Settings s = SettingsManager.getDefaultSettings();
             SettingsManager.outputSettings(s);
             System.exit(0);
+        }
+        else if (argsList.size() > 0 && argsList.contains("migrate")) {
+            new Database().migrate();
+            System.exit(0);
+        }
+        else if (argsList.size() > 0) {
+            System.err.println("Unknown argument " + argsList.get(0));
         }
         else {
             new MCHelperImpl();

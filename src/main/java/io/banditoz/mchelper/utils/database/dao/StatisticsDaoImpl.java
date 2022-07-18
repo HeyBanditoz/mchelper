@@ -21,22 +21,6 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS statistics (
-                    guild_id bigint,
-                    channel_id bigint,
-                    author_id bigint NOT NULL,
-                    name character varying(50) NOT NULL,
-                    arguments character varying(1997) NOT NULL,
-                    return_code smallint NOT NULL,
-                    execution_time bigint NOT NULL,
-                    executed_at timestamp with time zone NOT NULL
-                );
-                """;
-    }
-
-    @Override
     public void log(Stat s) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             Query.of("INSERT INTO statistics VALUES (:a, :b, :c, :d, :e, :f, :g, :h)")

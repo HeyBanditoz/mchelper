@@ -86,3 +86,6 @@ log.html
 
 # Temporary files
 COMMANDS_OLD.md
+
+# Liquibase
+liquibase.properties

@@ -17,23 +17,6 @@ public class RemindersDaoImpl extends Dao implements RemindersDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS reminders (
-                    id serial,
-                    channel_id bigint NOT NULL,
-                    author_id bigint NOT NULL,
-                    reminder character varying(1500) NOT NULL,
-                    remind_when timestamp with time zone NOT NULL,
-                    reminded boolean DEFAULT false NOT NULL,
-                    is_dm boolean NOT NULL,
-                    deleted boolean DEFAULT false NOT NULL,
-                    PRIMARY KEY (id)
-                );
-                """;
-    }
-
-    @Override
     public void markReminded(int id) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             Query.of("UPDATE reminders SET reminded = true WHERE id=:i;")

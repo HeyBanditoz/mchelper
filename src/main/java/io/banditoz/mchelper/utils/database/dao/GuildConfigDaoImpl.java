@@ -23,23 +23,6 @@ public class GuildConfigDaoImpl extends Dao implements GuildConfigDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS guild_config (
-                    guild_id bigint,
-                    prefix character varying(1) NOT NULL,
-                    default_channel bigint,
-                    post_qotd_to_default_channel boolean,
-                    dadbot_chance double precision,
-                    betbot_chance double precision,
-                    voice_role_id bigint,
-                    last_modified timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                    PRIMARY KEY (guild_id)
-                );
-                """;
-    }
-
-    @Override
     public void saveConfig(GuildConfig config) {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("INSERT INTO guild_config VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (guild_id) DO UPDATE SET prefix = excluded.prefix, default_channel = excluded.default_channel, post_qotd_to_default_channel = excluded.post_qotd_to_default_channel, dadbot_chance = excluded.dadbot_chance, betbot_chance = excluded.betbot_chance, voice_role_id = excluded.voice_role_id");

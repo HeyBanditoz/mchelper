@@ -30,27 +30,6 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS accounts (
-                    id bigint NOT NULL,
-                    balance numeric(13,2) DEFAULT NULL::numeric,
-                    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                    PRIMARY KEY (id)
-                );
-                
-                CREATE TABLE IF NOT EXISTS transactions (
-                    from_id bigint,
-                    to_id bigint,
-                    before numeric(13,2) NOT NULL,
-                    amount numeric(13,2) NOT NULL,
-                    memo character varying(100) NOT NULL,
-                    "when" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-                );
-                """;
-    }
-
-    @Override
     public BigDecimal queryBalance(long id, boolean allowCreation) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT * FROM accounts WHERE id=:i;")

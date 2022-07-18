@@ -17,21 +17,6 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS coordinates (
-                    guild_id bigint NOT NULL,
-                    author_id bigint NOT NULL,
-                    name character varying(100) NOT NULL,
-                    x bigint NOT NULL,
-                    z bigint NOT NULL,
-                    last_modified timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                    UNIQUE (guild_id, name)
-                );
-                """;
-    }
-
-    @Override
     public void savePoint(CoordinatePoint point) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             PreparedStatement ps = c.prepareStatement("INSERT INTO coordinates VALUES (?, ?, ?, ?, ?, (SELECT NOW()))");

@@ -25,6 +25,34 @@ plugins {
     // Code coverage
     id 'jacoco'
     id 'de.jansauer.printcoverage' version '2.0.0'
+
+    // Database version control
+    id 'org.liquibase.gradle' version '2.1.1'
+}
+
+liquibase {
+    def props = new Properties()
+    def propsFile = file("liquibase.properties")
+    if (propsFile.exists()) {
+        propsFile.withInputStream {
+            props.load(it)
+        }
+    }
+    else {
+        logger.warn("$propsFile.name doesn't exist. Reading from environment variables instead.")
+        props.setProperty("url", "jdbc:postgresql://$System.env.HOST/$System.env.DB?currentSchema=$System.env.SCHEMA")
+        props.setProperty("username", "$System.env.USER")
+        props.setProperty("password", "$System.env.PASS")
+    }
+    println("Executing Liquibase against " + props.get("url"))
+    activities {
+        main {
+            changelogfile "sql/postgres/master.yml"
+            url props.getProperty("url")
+            username props.getProperty("username")
+            password props.getProperty("password")
+        }
+    }
 }
 
 shadowJar {
@@ -90,6 +118,9 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
     implementation 'ch.obermuhlner:java-scriptengine:2.0.0'
+    implementation 'org.liquibase:liquibase-core:4.11.0'
+    implementation 'com.mattbertolini:liquibase-slf4j:4.1.0'
+    implementation 'org.yaml:snakeyaml:1.30'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
@@ -97,6 +128,12 @@ dependencies {
     testImplementation 'org.testng:testng:7.6.0'
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.assertj:assertj-core:3.23.1'
+
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.11.0'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
+    liquibaseRuntime 'info.picocli:picocli:4.6.3'
+    liquibaseRuntime 'org.yaml:snakeyaml:1.30'
+    liquibaseRuntime 'org.postgresql:postgresql:42.3.3'
 }
 
 test {

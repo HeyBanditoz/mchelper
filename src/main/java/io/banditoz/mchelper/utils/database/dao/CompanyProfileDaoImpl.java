@@ -19,25 +19,6 @@ public class CompanyProfileDaoImpl extends Dao implements CompanyProfileDao {
     }
 
     @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS company_profiles (
-                    country character varying(10) NOT NULL,
-                    exchange character varying(50) NOT NULL,
-                    industry character varying(40) NOT NULL,
-                    ipo date NOT NULL,
-                    logo character varying(200) NOT NULL,
-                    market_capitalization double precision NOT NULL,
-                    name character varying(80) NOT NULL,
-                    shares_outstanding double precision NOT NULL,
-                    ticker character varying(10) NOT NULL,
-                    weburl character varying(200) NOT NULL,
-                    updated timestamp with time zone DEFAULT CURRENT_TIMESTAMP
-                );
-                """;
-    }
-
-    @Override
     public void addCompanyProfileIfNotExists(CompanyProfile companyProfile) {
         try (Connection c = DATABASE.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement("INSERT INTO company_profiles VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING")) {

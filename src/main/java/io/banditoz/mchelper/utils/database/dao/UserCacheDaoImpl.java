@@ -25,17 +25,6 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
         super(database);
     }
 
-    @Override
-    public String getSqlTableGenerator() {
-        return """
-                CREATE TABLE IF NOT EXISTS username_cache (
-                    id bigint NOT NULL,
-                    username character varying(32) NOT NULL,
-                    PRIMARY KEY (id)
-                );
-                """;
-    }
-
     public void replaceAll(List<User> users) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);

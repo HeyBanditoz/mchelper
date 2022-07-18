@@ -32,7 +32,12 @@ To try it out, you will first need to output the default config to a file:
 
 `docker run --rm registry.gitlab.com/heybanditoz/mchelper:master --entrypoint java -jar /app/bot.jar gensettings > Config.json`
 
-Then edit the resulting `Config.json` file. When you've added your bot token, you can finally run
+Then edit the resulting `Config.json` file. Set your environment variables for the database (see below for what you
+need,) then you can run the database migration. This will create tables, or, if you updated it, update the tables.
+
+`docker run --rm registry.gitlab.com/heybanditoz/mchelper:master --entrypoint java -jar /app/bot.jar migrate`
+
+Finally, bring up the bot.
 
 `docker-compose up`
 
@@ -52,6 +57,23 @@ ports:
 ```
 
 You can access the postgres shell by running `docker exec -u 70 -it postgres psql`.
+
+### Liquibase
+MCHelper uses Liquibase to handle database migrations. TODO add more details!
+
+If you want to prevent silent errors where rollbacks or updates don't happen if you ran the initial migration changelogs
+(created the initial schema) from the Main class, and then are testing your new changelogs from your dev environment, 
+you will  need to create a symbolic link to the SQL directory, like this in Powershell (this requires admin!):
+
+`New-Item -ItemType SymbolicLink -Path "sql" -Target ".\src\main\resources\sql\"`
+
+Or, in Bash:
+
+`ln -s sql src/main/resources/sql`
+
+This is because the file paths from the jar will show up in the `databasechangelog` as `sql/postgres/changelog-file.yml`
+(because Java resources) whereas running it locally will show up as
+`src/main/resources/sql/postgres/changelog-file.yml`, so the symlink is needed for consistency.
 
 ### Building a Docker Image
 

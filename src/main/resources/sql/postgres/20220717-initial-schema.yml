@@ -1,0 +1,459 @@
+databaseChangeLog:
+  - changeSet:
+      id: initial-1
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: accounts_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  defaultValueComputed: NULL::numeric
+                  name: balance
+                  type: numeric(13, 2)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: accounts
+  - changeSet:
+      id: initial-2
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quote
+                  type: VARCHAR(1500)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quote_author
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: last_modified
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: quotes_pkey
+                  name: id
+                  type: INTEGER
+            tableName: quotes
+  - changeSet:
+      id: initial-3
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: reminders_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: channel_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: reminder
+                  type: VARCHAR(1500)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: remind_when
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: reminded
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_dm
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: deleted
+                  type: BOOLEAN
+            tableName: reminders
+  - changeSet:
+      id: initial-4
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: roles_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: emote
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role_id
+                  type: BIGINT
+            tableName: roles
+  - changeSet:
+      id: initial-5
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: from_id
+                  type: BIGINT
+              - column:
+                  name: to_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: before
+                  type: numeric(13, 2)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount
+                  type: numeric(13, 2)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: memo
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: when
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: transactions
+  - changeSet:
+      id: initial-6
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: country
+                  type: VARCHAR(10)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: exchange
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: industry
+                  type: VARCHAR(40)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: ipo
+                  type: date
+              - column:
+                  constraints:
+                    nullable: false
+                  name: logo
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: market_capitalization
+                  type: FLOAT8
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(80)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: shares_outstanding
+                  type: FLOAT8
+              - column:
+                  constraints:
+                    nullable: false
+                  name: ticker
+                  type: VARCHAR(10)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: weburl
+                  type: VARCHAR(200)
+              - column:
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: updated
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: company_profiles
+  - changeSet:
+      id: initial-7
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: x
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: z
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: last_modified
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: coordinates
+  - changeSet:
+      id: initial-8
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: guild_config_pkey
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prefix
+                  type: VARCHAR(1)
+              - column:
+                  name: default_channel
+                  type: BIGINT
+              - column:
+                  name: post_qotd_to_default_channel
+                  type: BOOLEAN
+              - column:
+                  name: dadbot_chance
+                  type: FLOAT8
+              - column:
+                  name: betbot_chance
+                  type: FLOAT8
+              - column:
+                  name: voice_role_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: last_modified
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: guild_config
+  - changeSet:
+      id: initial-9
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: guild_roles_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: channel_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: message_id
+                  type: BIGINT
+            tableName: guild_roles
+  - changeSet:
+      id: initial-10
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: task_id
+                  type: SMALLINT
+              - column:
+                  name: can_run_again
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: tasks
+  - changeSet:
+      id: initial-11
+      author: Hayden
+      changes:
+        - addUniqueConstraint:
+            columnNames: guild_id, quote, quote_author
+            constraintName: quotes_guild_id_quote_quote_author_key
+            tableName: quotes
+  - changeSet:
+      id: initial-12
+      author: Hayden
+      changes:
+        - addUniqueConstraint:
+            columnNames: guild_id, name
+            constraintName: coordinates_guild_id_name_key
+            tableName: coordinates
+  - changeSet:
+      id: initial-13
+      author: Hayden
+      changes:
+        - addUniqueConstraint:
+            columnNames: id, task_id
+            constraintName: tasks_id_task_id_key
+            tableName: tasks
+  - changeSet:
+      id: initial-14
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  name: channel_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: arguments
+                  type: VARCHAR(1997)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: return_code
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: execution_time
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: executed_at
+                  type: TIMESTAMP WITH TIME ZONE
+            tableName: statistics
+  - changeSet:
+      id: initial-15
+      author: Hayden
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: username_cache_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  type: VARCHAR(32)
+            tableName: username_cache
+
