@@ -43,10 +43,12 @@ public class Database {
         LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds in the config.");
     }
 
-    public void migrate() throws Exception {
+    public void migrate(boolean wait) throws Exception {
         LOGGER.info("!!!! RUNNING DATABASE MIGRATIONS !!!!");
-        LOGGER.info("Waiting 5 seconds before continuing. If you did not mean to do this, exit now!");
-        Thread.sleep(5000);
+        if (wait) {
+            LOGGER.info("Waiting 5 seconds before continuing. If you did not mean to do this, exit now!");
+            Thread.sleep(5000);
+        }
 
         try (Connection c = getConnection()) {
             liquibase.database.Database mgDb = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));

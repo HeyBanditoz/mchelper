@@ -12,6 +12,9 @@ public class DatabaseInitializationTests {
         if (!Database.isConfigured()) {
             throw new SkipException("The database is not configured.");
         }
-        assertThatCode(Database::new).doesNotThrowAnyException();
+        assertThatCode(() -> {
+            Database d = new Database();
+            d.migrate(false);
+        }).doesNotThrowAnyException();
     }
 }

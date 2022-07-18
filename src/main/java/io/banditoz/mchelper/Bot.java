@@ -20,7 +20,7 @@ public class Bot {
             System.exit(0);
         }
         else if (argsList.size() > 0 && argsList.contains("migrate")) {
-            new Database().migrate();
+            new Database().migrate(true);
             System.exit(0);
         }
         else if (argsList.size() > 0) {
