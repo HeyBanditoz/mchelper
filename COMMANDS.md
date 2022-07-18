@@ -85,17 +85,18 @@ named arguments:
 `plot` - <expression> - Plots a function, use x
 ### QuoteCommand
 ```
-usage: quote [-s] [-i] [-a] [-d] [quoteAndAuthor [quoteAndAuthor ...]]
+usage: quote [-s] [-i] [-a] [-d] [-e] [quoteAndAuthor [quoteAndAuthor ...]]
 
 positional arguments:
-  quoteAndAuthor         quote content and quote  attribution  to search by
-                         (wrap with ` to do a regex search)
+  quoteAndAuthor         quote content and quote attribution to search by
 
 named arguments:
   -s, --stats            retrieve stats instead
   -i, --include-author   include who added the quote
   -a, --all              get all quotes by a guild, skipping quoteAndAuthor
   -d, --id               include the internal quote ID
+  -e, --exact            search exactly (by default  it performs a fulltext
+                         search on quote and quote author)
 ```
 ### RemindmeCommand
 `remindme` - <duration> <reminder> - Creates a reminder. It is accurate give or take a second.
