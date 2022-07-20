@@ -87,6 +87,9 @@ named arguments:
 ```
 usage: quote [-s] [-i] [-a] [-d] [-e] [quoteAndAuthor [quoteAndAuthor ...]]
 
+Retrieves a random quote. If fulltext search  fails, it falls back to SQL'S
+ILIKE, and changes the embed color to be a little darker.
+
 positional arguments:
   quoteAndAuthor         quote content and quote attribution to search by
 
