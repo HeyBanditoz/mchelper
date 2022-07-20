@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 
 @Requires(database = true)
 public class QuoteCommand extends Command {
+    private static final Color EMPTY = new Color(44, 100, 42);
+    private static final Color GREEN = new Color(35, 197, 35);
+
     @Override
     public String commandName() {
         return "quote";
@@ -50,6 +53,7 @@ public class QuoteCommand extends Command {
         else {
             List<NamedQuote> quotes;
             List<MessageEmbed> embeds = new ArrayList<>();
+            boolean wasEmpty = false;
 
             if (args.getBoolean("all") != null && args.getBoolean("all")) {
                 quotes = dao.getAllQuotesForGuild(ce.getGuild());
@@ -73,12 +77,17 @@ public class QuoteCommand extends Command {
             else {
                 String s = args.getList("quoteAndAuthor").stream().map(Object::toString).collect(Collectors.joining(" "));
                 quotes = dao.getQuotesByFulltextSearch(s, ce.getGuild());
+                if (quotes.isEmpty()) {
+                    // fallback to match search
+                    quotes = dao.getQuotesByMatch(s, ce.getGuild());
+                    wasEmpty = true;
+                }
             }
             EmbedBuilder eb = new EmbedBuilder();
             for (int i = 0; i < quotes.size(); i++) {
                 NamedQuote nq = quotes.get(i);
                 eb.clear();
-                eb.setColor(Color.GREEN);
+                eb.setColor(wasEmpty ? EMPTY : GREEN);
                 eb.setDescription(nq.format(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
                 if (args.get("include_author")) {
                     ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).queue(
@@ -134,6 +143,8 @@ public class QuoteCommand extends Command {
 
     private ArgumentParser getDefaultArgs() {
         ArgumentParser parser = ArgumentParsers.newFor("quote").addHelp(false).build();
+        parser.description("Retrieves a random quote. If fulltext search fails, it falls back to SQL'S ILIKE, and" +
+                " changes the embed color to be a little darker.");
         parser.addArgument("-s", "--stats")
                 .action(Arguments.storeTrue())
                 .help("retrieve stats instead");
