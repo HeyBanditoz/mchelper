@@ -30,6 +30,10 @@ plugins {
     id 'org.liquibase.gradle' version '2.1.1'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
 liquibase {
     def props = new Properties()
     def propsFile = file("liquibase.properties")
@@ -92,10 +96,14 @@ repositories {
         url 'https://m2.dv8tion.net/releases'
         name 'm2-dv8tion'
     }
+    maven {
+        url 'https://jitpack.io'
+        name 'jitpack'
+    }
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.12') {
+    implementation('net.dv8tion:JDA:5.0.0-alpha.17') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11'
@@ -121,6 +129,7 @@ dependencies {
     implementation 'org.liquibase:liquibase-core:4.11.0'
     implementation 'com.mattbertolini:liquibase-slf4j:4.1.0'
     implementation 'org.yaml:snakeyaml:1.30'
+    implementation 'com.github.minndevelopment:emoji-java:6.1.0'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
@@ -138,10 +147,12 @@ dependencies {
 
 test {
     useTestNG()
+    jvmArgs("--enable-preview")
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.compilerArgs.add("--enable-preview")
 }
 
 // Define the main class for the application

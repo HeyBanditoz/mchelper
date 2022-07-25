@@ -34,7 +34,7 @@ public class Database {
         POOL.setJdbcUrl(url);
 
         try (Connection c = getConnection()) {
-            // empty to call close()
+            LOGGER.info("getConnection() succeeded! {}", c.toString());
         } catch (Exception ex) {
             LOGGER.error("Could not get connection from pool! Cowardly stopping.", ex);
             System.exit(1);

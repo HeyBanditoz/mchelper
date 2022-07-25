@@ -10,7 +10,6 @@ import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
@@ -40,11 +39,6 @@ public class MCHelperTestImpl implements MCHelper {
         this.OM = new ObjectMapper().registerModule(new JavaTimeModule());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
-    }
-
-    @Override
-    public RoleReactionListener getRRL() {
-        return null;
     }
 
     @Override

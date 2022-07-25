@@ -13,6 +13,7 @@ import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -84,7 +85,7 @@ public class AddquoteCommand extends Command {
             if (ce.getCommandArgs()[1].length() != 18) {
                 throw new NumberFormatException("Not the proper current snowflake length of 18!");
             }
-            NamedQuote nq = NamedQuote.parseMessageId(messageId, ce.getEvent().getTextChannel());
+            NamedQuote nq = NamedQuote.parseMessageId(messageId, (TextChannel) ce.getEvent().getChannel());
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
             id = qd.saveQuote(nq);
             message = new MessageBuilder("Quote (from message ID) added.");

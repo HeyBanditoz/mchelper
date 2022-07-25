@@ -6,6 +6,7 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public abstract class Command {
         // bot owners can bypass permission checks
         if (!CommandPermissions.isBotOwner(e.getAuthor(), MCHelper.getSettings())) {
             if (e.isFromGuild() && !e.getMember().getPermissions().containsAll(getRequiredPermissions())) {
-                e.getMessage().addReaction("\uD83D\uDD34").queue();
+                e.getMessage().addReaction(Emoji.fromUnicode("\uD83D\uDD34")).queue();
                 return new LoggableCommandEvent(ce, (int) ((System.nanoTime()) - before) / 1000000, Status.NO_PERMISSION);
             }
         }
@@ -97,14 +98,14 @@ public abstract class Command {
                 case PER_USER -> {
                     entity = e.getAuthor();
                     if (!cooldown.handle(e.getAuthor())) {
-                        e.getMessage().addReaction("⏲️").queue();
+                        e.getMessage().addReaction(Emoji.fromUnicode("⏲️")).queue();
                         return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
                     }
                 }
                 case PER_GUILD -> {
                     entity = e.getGuild();
                     if (!cooldown.handle(e.getGuild())) {
-                        e.getMessage().addReaction("⏲️").queue();
+                        e.getMessage().addReaction(Emoji.fromUnicode("⏲️")).queue();
                         return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
                     }
                 }

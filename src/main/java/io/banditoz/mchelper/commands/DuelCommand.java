@@ -10,7 +10,11 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 

@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: 20220717-quotes-fulltext-search.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20220724-guild-roles-constraints.yml
+      relativeToChangelogFile: true

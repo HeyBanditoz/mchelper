@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: guild-roles-constraints
+      author: Hayden
+      comment: Adds some unique constraints to the reaction role tables.
+      changes:
+        - addUniqueConstraint:
+            columnNames: guild_id
+            constraintName: guild_roles_guild_id_key
+            tableName: guild_roles
+        - addUniqueConstraint:
+            columnNames: guild_id, name
+            constraintName: roles_guild_id_name_key
+            tableName: roles
+        - addUniqueConstraint:
+            columnNames: guild_id, emote
+            constraintName: roles_guild_id_emote_key
+            tableName: roles
+        - addUniqueConstraint:
+            columnNames: role_id
+            constraintName: roles_role_id_key
+            tableName: roles

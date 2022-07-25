@@ -1,21 +1,23 @@
 package io.banditoz.mchelper.utils.database.dao;
 
-import io.banditoz.mchelper.utils.RoleObject;
+import io.banditoz.mchelper.utils.ReactionRole;
+import io.banditoz.mchelper.utils.ReactionRoleMessage;
 import io.banditoz.mchelper.utils.database.Database;
+import io.jenetics.facilejdbc.Param;
+import io.jenetics.facilejdbc.Query;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RolesDaoImpl extends Dao implements RolesDao {
     public RolesDaoImpl(Database database) {
@@ -25,145 +27,176 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public void init(@NotNull TextChannel channel, @NotNull Message message, @NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("INSERT INTO guild_roles (guild_id, channel_id, message_id) VALUES (?, ?, ?)");
-            ps.setLong(1, g.getIdLong());
-            ps.setLong(2, channel.getIdLong());
-            ps.setLong(3, message.getIdLong());
-            ps.execute();
-            ps.close();
+            Query.of("INSERT INTO guild_roles (guild_id, channel_id, message_id) VALUES (:g, :c, :m)")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("c", channel.getIdLong()),
+                            Param.value("m", message.getIdLong())
+                    ).executeUpdate(c);
         }
     }
 
     @Override
-    public Map.Entry<String,String> deactivate(@NotNull Guild g) throws SQLException {
-        Map.Entry<String,String> id = null;
+    public List<Long> getRoleReactions() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=?");
-            ps.setLong(1, g.getIdLong());
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                id = new AbstractMap.SimpleEntry<>(rs.getString("channel_id"),rs.getString("message_id"));
-            }
-            PreparedStatement ps2 = c.prepareStatement("DELETE FROM roles WHERE guild_id = ?");
-            ps2.setLong(1, g.getIdLong());
-            ps2.execute();
-            ps2.close();
-            PreparedStatement ps3 = c.prepareStatement("DELETE FROM guild_roles WHERE guild_id = ?");
-            ps3.setLong(1, g.getIdLong());
-            ps3.execute();
-            ps3.close();
-        }
-        return id;
-    }
-
-    @Override
-    public boolean addRole(String emote, String name, @NotNull Guild g, Role role) throws SQLException {
-        try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND emote = ? OR roles.name = ? OR role_id = ?");
-            ps2.setLong(1, g.getIdLong());
-            ps2.setString(2, emote);
-            ps2.setString(3, name);
-            ps2.setLong(4, role.getIdLong());
-            try (ResultSet rs = ps2.executeQuery()) {
-                if (rs.next()) return false;
-            }
-            PreparedStatement ps = c.prepareStatement("INSERT INTO roles (guild_id, emote, name, role_id) VALUES (?, ?, ?, ?)");
-            ps.setLong(1, g.getIdLong());
-            ps.setString(2, emote);
-            ps.setString(3, name);
-            ps.setLong(4, role.getIdLong());
-            ps.execute();
-            ps.close();
-            return true;
+            return Query.of("SELECT message_id FROM guild_roles")
+                    .as((rs, conn) -> {
+                        List<Long> messages = new ArrayList<>();
+                        while (rs.next()) {
+                            messages.add(rs.getLong("message_id"));
+                        }
+                        return messages;
+                    }, c);
         }
     }
 
     @Override
-    public String removeRole(String name, @NotNull Guild g) throws SQLException {
-        String s = "";
+    public ReactionRole getByEmote(Emoji emoji, Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps2 = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND roles.name=?");
-            ps2.setLong(1, g.getIdLong());
-            ps2.setString(2, name);
-            try (ResultSet rs = ps2.executeQuery()) {
-                rs.next();
-                s = rs.getString("emote");
-            }
-            PreparedStatement ps = c.prepareStatement("DELETE FROM roles WHERE roles.name = ? AND guild_id = ?");
-            ps.setString(1, name);
-            ps.setLong(2, g.getIdLong());
-            ps.execute();
-            ps.close();
+            return Query.of("SELECT * FROM roles WHERE emote=:e AND guild_id=:g")
+                    .on(
+                            Param.value("e", emoji.getFormatted()),
+                            Param.value("g", g.getIdLong())
+                    ).as(this::parseOneReactionRole, c);
         }
-        return s;
+    }
+
+    @Override
+    public void deactivate(@NotNull Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            c.setAutoCommit(false);
+            Query.of("DELETE FROM roles WHERE guild_id=:g")
+                    .on(Param.value("g", g.getIdLong()))
+                    .executeUpdate(c);
+            Query.of("DELETE FROM guild_roles WHERE guild_id=:g")
+                    .on(Param.value("g", g.getIdLong()))
+                    .executeUpdate(c);
+            c.commit();
+            c.setAutoCommit(true);
+        }
     }
 
     @Override
     public boolean containsGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=? LIMIT 1");
-            ps.setLong(1, g.getIdLong());
-            try (ResultSet rs = ps.executeQuery()) {
-                boolean b = rs.next();
-                ps.close();
-                return b;
-            }
+            return Query.of("SELECT 1 FROM guild_roles WHERE guild_id=:g LIMIT 1")
+                    .on(Param.value("g", g.getIdLong()))
+                    .as((rs, conn) -> rs.next(), c);
         }
     }
 
     @Override
-    public boolean containsName(String n, Guild g) throws SQLException {
+    public ReactionRoleMessage getMessageRole(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND name = ?");
-            ps.setLong(1, g.getIdLong());
-            ps.setString(2, n);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return false;
-                ps.close();
-                return true;
-            }
+            return Query.of("SELECT * FROM guild_roles WHERE guild_id=:g LIMIT 1")
+                    .on(Param.value("g", g.getIdLong()))
+                    .as(this::parseOneReactionRoleMessage, c);
         }
     }
 
     @Override
-    public RoleObject getRoleByEmote(Guild g, String emote) throws SQLException {
+    public void addRole(Emoji emoji, String name, Guild g, Role r) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=? AND emote=?");
-            ps.setLong(1, g.getIdLong());
-            ps.setString(2,emote);
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return new RoleObject(rs.getString("emote"),rs.getString("name"),rs.getString("role_id"));
-            }
+            Query.of("INSERT INTO roles (guild_id, emote, name, role_id) VALUES (:g, :e, :n, :r)")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("e", emoji.getFormatted()),
+                            Param.value("n", name),
+                            Param.value("r", r.getIdLong())
+                    ).executeUpdate(c);
         }
     }
 
     @Override
-    public List<RoleObject> getRoles(Guild g) throws SQLException {
+    public List<ReactionRole> getRoles(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM roles WHERE guild_id=?");
-            ps.setLong(1, g.getIdLong());
-            try (ResultSet rs = ps.executeQuery()) {
-                List<RoleObject> hm = new ArrayList<>();
-                while (rs.next()) {
-                    hm.add(new RoleObject(rs.getString("emote"),rs.getString("name"),rs.getString("role_id")));
-                }
-                ps.close();
-                rs.close();
-                return hm;
-            }
+            return Query.of("SELECT * FROM roles WHERE guild_id=:g")
+                    .on(Param.value("g", g.getIdLong()))
+                    .as(this::parseManyReactionRoles, c);
         }
     }
 
     @Override
-    public Map.Entry<String, String> getChannelAndMessageId(Guild g) throws SQLException {
+    public int getRoleCount(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM guild_roles WHERE guild_id=?");
-            ps.setLong(1, g.getIdLong());
-            try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return new AbstractMap.SimpleEntry<>(rs.getString("channel_id"), rs.getString("message_id"));
+            return Query.of("SELECT COUNT(*) FROM roles WHERE guild_id=:g")
+                    .on(Param.value("g", g.getIdLong()))
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return rs.getInt(1);
+                    }, c);
+        }
+    }
+
+    @Override
+    public boolean guildContainsName(Guild g, String name) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("SELECT 1 FROM roles WHERE guild_id=:g AND NAME=:n")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("n", name)
+                    ).as((rs, conn) -> rs.next(), c);
+        }
+    }
+
+    @Override
+    public Emoji removeRoleAndReturnEmoji(Guild g, String name) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            Emoji e = Query.of("SELECT emote FROM roles WHERE guild_id=:g AND name=:n")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("n", name)
+                    )
+                    .as((rs, conn) -> {
+                        // should never have to check next
+                        rs.next();
+                        return Emoji.fromFormatted(rs.getString("emote"));
+                    }, c);
+            Query.of("DELETE FROM roles WHERE guild_id=:g AND name=:n")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.value("n", name)
+                    ).executeUpdate(c);
+            return e;
+        }
+    }
+
+    private @Nullable ReactionRole parseOneReactionRole(ResultSet rs, Connection c) throws SQLException {
+        if (!rs.next()) {
+            return null;
+        }
+        return new ReactionRole(
+                rs.getInt("id"),
+                rs.getLong("guild_id"),
+                rs.getString("emote"),
+                rs.getString("name"),
+                rs.getLong("role_id")
+        );
+    }
+
+    private @Nullable ReactionRoleMessage parseOneReactionRoleMessage(ResultSet rs, Connection c) throws SQLException {
+        if (!rs.next()) {
+            return null;
+        }
+        return new ReactionRoleMessage(
+                rs.getLong("id"),
+                rs.getLong("guild_id"),
+                rs.getLong("channel_id"),
+                rs.getLong("message_Id")
+        );
+    }
+
+    private List<ReactionRole> parseManyReactionRoles(ResultSet rs, Connection c) throws SQLException {
+        List<ReactionRole> roles = new ArrayList<>();
+        while (!rs.isLast()) {
+            ReactionRole rr = parseOneReactionRole(rs, c);
+            if (rr != null) {
+                roles.add(rr);
+            }
+            else {
+                break;
             }
         }
+        return roles;
     }
 }

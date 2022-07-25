@@ -39,7 +39,7 @@ public class RemindmeCommand extends Command {
         Instant in = t.toInstant();
         Reminder r = new Reminder();
         r.setAuthorId(ce.getEvent().getAuthor().getIdLong());
-        r.setChannelId(ce.getEvent().isFromGuild() ? ce.getEvent().getChannel().getIdLong() : ce.getEvent().getPrivateChannel().getIdLong());
+        r.setChannelId(ce.getEvent().getChannel().getIdLong());
         r.setReminder(ce.getCommandArgsString().replaceFirst("\\S+\\s+", ""));
         r.setRemindWhen(t);
         r.setIsFromDm(!ce.getEvent().isFromGuild());

@@ -8,7 +8,6 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
@@ -32,7 +31,7 @@ public interface MCHelper {
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();
     ScheduledExecutorService getSES();
-    RoleReactionListener getRRL();
+//    RoleReactionListener getRRL();
     AccountManager getAccountManager();
     ButtonListener getButtonListener();
 

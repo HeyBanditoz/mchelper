@@ -1,27 +1,34 @@
 package io.banditoz.mchelper.commands;
 
+import com.vdurmont.emoji.EmojiManager;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.RoleObject;
+import io.banditoz.mchelper.utils.ReactionRole;
+import io.banditoz.mchelper.utils.ReactionRoleMessage;
+import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
 import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.awt.Color;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Requires(database = true)
 public class ManageRolesCommand extends Command {
@@ -41,62 +48,88 @@ public class ManageRolesCommand extends Command {
             ce.sendReply("You are not an Administrator!");
             return Status.FAIL;
         }
-        Namespace args = getDefaultArgs().parseArgs(ce.getCommandArgsWithoutName());
-        RolesDao rd = new RolesDaoImpl(ce.getDatabase());
+        String[] rawArgs = ce.getRawCommandArgs();
+        String[] slicedArgs = Arrays.copyOfRange(rawArgs, 1, rawArgs.length);
+        Namespace args = getDefaultArgs().parseArgs(slicedArgs);
+
+        RolesDao dao = new RolesDaoImpl(ce.getDatabase());
+        char thisPrefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
         if (args.get("init") != null && args.getBoolean("init")) {
-            if (rd.containsGuild(ce.getGuild())) {
+            if (dao.containsGuild(ce.getGuild())) {
                 ce.sendReply("This guild already has a message setup!");
                 return Status.FAIL;
-            } else if (args.getList("params") != null && args.getList("params").isEmpty()) {
+            }
+            else if (args.getList("params") != null && args.getList("params").isEmpty()) {
                 ce.sendReply("Please specify channel id!");
                 return Status.FAIL;
-            } else {
-                TextChannel channel = ce.getGuild().getTextChannelById(args.getList("params").get(0).toString());
-                MessageEmbed me = new EmbedBuilder().setDescription("React to be added to a role, remove your reaction to lose the role.\n\n**Use `!manageroles -a <emote> <name> <role_id>` to add.**").setColor(Color.CYAN).build();
-                Message message = channel.sendMessageEmbeds(me).complete();
-                rd.init(channel,message,ce.getGuild());
-                ce.getMCHelper().getRRL().getMessages().put(channel.getId(),message.getId());
-                ce.sendReply("Guild initialized!");
             }
-        } else if (!rd.containsGuild(ce.getGuild())) {
-            ce.sendReply("This guild is not registered, use `!manageroles -i <channel_id>`");
+            else {
+                TextChannel channel = ce.getGuild().getTextChannelById(args.getList("params").get(0).toString());
+                MessageEmbed me = new EmbedBuilder()
+                        .setDescription("""
+                                React to be added to a role, remove your reaction to lose the role.
+
+                                **Use `%cmanageroles -a <emote> <name> <role_id>` to add.**""".formatted(thisPrefix))
+                        .setColor(Color.CYAN)
+                        .build();
+                channel.sendMessageEmbeds(me).queue(message -> {
+                    try {
+                        dao.init(channel, message, ce.getGuild());
+                        ce.sendReply("Guild initialized!");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, throwable -> {
+                    ce.sendExceptionMessage((Exception) throwable); // lol
+                });
+            }
+        }
+        else if (!dao.containsGuild(ce.getGuild())) {
+            ce.sendReply("This guild is not registered, use `" + thisPrefix + " manageroles -i <channel_id>`");
             return Status.FAIL;
-        } else if (args.get("deactivate") != null && args.getBoolean("deactivate")) {
-            Map.Entry<String,String> entry = rd.deactivate(ce.getGuild());
-            ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).queue(s -> s.delete().queue());
-            ce.getMCHelper().getRRL().getMessages().remove(entry.getKey());
+        }
+        else if (args.get("deactivate") != null && args.getBoolean("deactivate")) {
+            ReactionRoleMessage r = dao.getMessageRole(ce.getGuild());
+            ce.getGuild().getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).queue(s -> s.delete().queue());
+            dao.deactivate(ce.getGuild());
             ce.sendReply("Guild deactivated!");
-        } else if (args.get("add_role") != null && args.getBoolean("add_role")) {
-            if (rd.addRole(args.getList("params").get(0).toString(),args.getList("params").get(1).toString(),ce.getGuild(),ce.getGuild().getRoleById(args.getList("params").get(2).toString()))) {
-                ce.getMCHelper().getRRL().addEvent(args.getList("params").get(0).toString());
-                Map.Entry<String, String> entry = rd.getChannelAndMessageId(ce.getGuild());
-                Message message = ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).complete();
-                MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(rd.getRoles(ce.getGuild()), message, ce.getGuild().getEmotes())).setColor(Color.CYAN).build();
-                message.editMessageEmbeds(me).queue();
-                ce.sendReply("Role " + args.getList("params").get(1).toString() + " has been added!");
-            } else {
-                ce.sendReply("There is already a role with duplicate emote, name, or role_id");
+        }
+        else if (args.get("add_role") != null && args.getBoolean("add_role")) {
+            Emoji userAddedEmoji = Emoji.fromFormatted(args.getList("params").get(0).toString());
+            if (userAddedEmoji instanceof UnicodeEmoji ue && !EmojiManager.isEmoji(ue.getFormatted())) {
+                ce.sendReply("Emoji " + ue + " is not an emoji!");
                 return Status.FAIL;
             }
-        } else if (args.get("remove_role") != null && args.getBoolean("remove_role")) {
-            if (rd.containsName(args.getList("params").get(0).toString(), ce.getGuild())) {
-                String emoteName = rd.removeRole(args.getList("params").get(0).toString(), ce.getGuild());
-                boolean contains = false;
-                Map.Entry<String, String> entry = rd.getChannelAndMessageId(ce.getGuild());
-                Message message = ce.getGuild().getTextChannelById(entry.getKey()).retrieveMessageById(entry.getValue()).complete();
-                for (Emote emote : ce.getGuild().getEmotes()) {
-                    if (emote.getName().equals(emoteName.replace(":", ""))) {
-                        contains = true;
-                        message.clearReactions(emote).queue();
-                    }
-                }
-                if (!contains) {
-                    message.clearReactions(emoteName).queue();
-                }
-                MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(rd.getRoles(ce.getGuild()), message, ce.getGuild().getEmotes())).setColor(Color.CYAN).build();
+            boolean guildContainsEmoji = emojiIsInGuild(userAddedEmoji, ce.getGuild());
+            if (!guildContainsEmoji) {
+                ce.sendReply("This guild does not contain emoji " + userAddedEmoji.getAsReactionCode() + ". Refusing to add.");
+                return Status.FAIL;
+            }
+            if (dao.getRoleCount(ce.getGuild()) > 20) {
+                ce.sendReply("Adding would go over the limit of 20 reactions. Refusing to add. (Someday I'll split it between multiple messages.)");
+                return Status.FAIL;
+            }
+            ReactionRoleMessage r = dao.getMessageRole(ce.getGuild());
+            dao.addRole(
+                    userAddedEmoji,
+                    args.getList("params").get(1).toString(),
+                    ce.getGuild(),
+                    ce.getGuild().getRoleById(args.getList("params").get(2).toString())
+            );
+            Message message = ce.getGuild().getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
+            MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(ce.getGuild()), message)).setColor(Color.CYAN).build();
+            message.editMessageEmbeds(me).queue();
+            ce.sendReply("Role " + args.getList("params").get(1).toString() + " has been added!");
+        }
+        else if (args.get("remove_role") != null && args.getBoolean("remove_role")) {
+            if (dao.guildContainsName(ce.getGuild(), args.getList("params").get(0).toString())) {
+                Emoji emoji = dao.removeRoleAndReturnEmoji(ce.getGuild(), args.getList("params").get(0).toString());
+                ReactionRoleMessage r = dao.getMessageRole(ce.getGuild());
+                Message message = ce.getGuild().getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
+                message.clearReactions(emoji).queue();
+                MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(ce.getGuild()), message)).setColor(Color.CYAN).build();
                 message.editMessageEmbeds(me).queue();
                 ce.sendReply("Removed role " + args.getList("params").get(0).toString() + "!");
-                ce.getMCHelper().getRRL().addEvent(emoteName);
             } else {
                 ce.sendReply("The role " + args.getList("params").get(0).toString() + " does not exist!");
                 return Status.FAIL;
@@ -105,26 +138,25 @@ public class ManageRolesCommand extends Command {
         return Status.SUCCESS;
     }
 
-    private String buildMessage(List<RoleObject> map, Message message, List<Emote> emotes) {
-        StringBuilder sb = new StringBuilder("React to be added to a role, remove your reaction to loose the role.\n");
-        for (RoleObject e : map) {
-            sb.append("\n");
-            boolean contains = false;
-            for (Emote emote : emotes) {
-                if (emote.getName().equals(e.getEmote().replace(":",""))) {
-                    contains = true;
-                    sb.append(emote.getAsMention());
-                    message.addReaction(emote).queue();
-                }
-            }
-            if (!contains) {
-                sb.append(e.getEmote());
-                message.addReaction(e.getEmote()).queue();
-            }
-            sb.append(" ");
-            sb.append(e.getName());
+    private String buildMessage(List<ReactionRole> roles, Message message) {
+        StringBuilder sb = new StringBuilder("React to be added to a role, remove your reaction to lose the role.\n");
+        for (ReactionRole r : roles) {
+            sb.append("\n").append(r.emoji().getFormatted()).append(" ").append(r.name());
+            message.addReaction(r.emoji()).queue();
         }
         return sb.toString();
+    }
+
+    private boolean emojiIsInGuild(Emoji e, Guild g) {
+        if (e instanceof UnicodeEmoji) {
+            return true; // unicode emojis are global
+        }
+        for (RichCustomEmoji emoji : g.getEmojis()) {
+            if (emoji.getFormatted().equals(e.getFormatted())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ArgumentParser getDefaultArgs() {

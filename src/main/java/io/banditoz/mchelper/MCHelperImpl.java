@@ -12,7 +12,6 @@ import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import io.banditoz.mchelper.utils.RoleReactionListener;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
@@ -52,7 +51,6 @@ public class MCHelperImpl implements MCHelper {
     private final Database DB;
     private final Settings SETTINGS;
     private final StatsRecorder STATS;
-    private final RoleReactionListener RRL;
     private final AccountManager AM;
     private final ButtonListener BL;
     private final GameManager GM;
@@ -103,8 +101,7 @@ public class MCHelperImpl implements MCHelper {
             DB = new Database();
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
-            RRL = new RoleReactionListener(this);
-            JDA.addEventListener(RRL.getAddHandler(), RRL.getRemoveHandler());
+            JDA.addEventListener(new RoleReactionListener(this));
             SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
                     10,
                     43200,
@@ -123,7 +120,6 @@ public class MCHelperImpl implements MCHelper {
             DB = null;
             RS = null;
             AM = null;
-            RRL = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         this.CH = buildCommandHandler();
@@ -208,11 +204,6 @@ public class MCHelperImpl implements MCHelper {
     }
 
     @Override
-    public RoleReactionListener getRRL() {
-        return RRL;
-    }
-
-    @Override
     public ButtonListener getButtonListener() {
         return BL;
     }
@@ -236,9 +227,9 @@ public class MCHelperImpl implements MCHelper {
     private JDA buildJDA() {
         try {
             return JDABuilder.createDefault(SETTINGS.getDiscordToken())
-                    .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .enableCache(CacheFlag.VOICE_STATE)
+                    .enableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOJI)
                     .setChunkingFilter(ChunkingFilter.ALL)
                     .setMaxReconnectDelay(32)
                     .build();
