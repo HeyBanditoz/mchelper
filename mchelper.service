@@ -16,7 +16,7 @@ Environment="HOST=127.0.0.1:5432" "DB=mchelper" "USER=postgres" "PASS=password" 
 # You will need to modify this line to match where the mchelper jar is located. Needs to be able to at least read Config.json
 WorkingDirectory=/opt/mchelper
 # You will need to modify this line to match where your JVM is installed (or just do java)
-ExecStart=/usr/lib/jvm/adoptopenjdk-11-jdk-openj9/bin/java -Xmx64M -jar io.banditoz.mchelper-all.jar
+ExecStart=/usr/lib/jvm/adoptopenjdk-11-jdk-openj9/bin/java -Xmx64M --enable-preview -jar io.banditoz.mchelper-all.jar
 Restart=always
 
 [Install]
