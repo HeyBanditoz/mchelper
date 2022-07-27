@@ -53,7 +53,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public ReactionRole getByEmote(Emoji emoji, Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM roles WHERE emote=:e AND guild_id=:g")
+            return Query.of("SELECT * FROM roles WHERE emote=:e AND guild_id=:g ORDER BY id")
                     .on(
                             Param.value("e", emoji.getFormatted()),
                             Param.value("g", g.getIdLong())
@@ -110,7 +110,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     @Override
     public List<ReactionRole> getRoles(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM roles WHERE guild_id=:g")
+            return Query.of("SELECT * FROM roles WHERE guild_id=:g ORDER BY id")
                     .on(Param.value("g", g.getIdLong()))
                     .as(this::parseManyReactionRoles, c);
         }
