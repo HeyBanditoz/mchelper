@@ -14,10 +14,12 @@ import java.util.List;
 public class RoleReactionUtils {
     public static void removeRoleAndUpdateMessage(RolesDao dao, Emoji emoji, Guild guild) throws SQLException {
         ReactionRoleMessage r = dao.getMessageRole(guild);
-        Message message = guild.getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
-        message.clearReactions(emoji).queue();
-        MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(guild), message)).setColor(Color.CYAN).build();
-        message.editMessageEmbeds(me).queue();
+        if (r != null) {
+            Message message = guild.getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
+            message.clearReactions(emoji).queue();
+            MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(guild), message)).setColor(Color.CYAN).build();
+            message.editMessageEmbeds(me).queue();
+        }
     }
 
     public static String buildMessage(List<ReactionRole> roles, Message message) {

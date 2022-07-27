@@ -1,6 +1,7 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.utils.ReactionRole;
+import io.banditoz.mchelper.utils.ReactionRoleMessage;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
 import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -73,7 +74,10 @@ public class RoleReactionListener extends ListenerAdapter {
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {
         mcHelper.getThreadPoolExecutor().execute(() -> {
             try {
-                dao.deactivate(event.getGuild());
+                ReactionRoleMessage messageRole = dao.getMessageRole(event.getGuild());
+                if (messageRole != null && messageRole.messageId() == event.getMessageIdLong()) {
+                    dao.deactivate(event.getGuild());
+                }
             } catch (Exception ex) {
                 LOGGER.error("Could not deactivate guild!", ex);
             }
@@ -84,7 +88,17 @@ public class RoleReactionListener extends ListenerAdapter {
     public void onMessageBulkDelete(@NotNull MessageBulkDeleteEvent event) {
         mcHelper.getThreadPoolExecutor().execute(() -> {
             try {
-                dao.deactivate(event.getGuild());
+                ReactionRoleMessage messageRole = dao.getMessageRole(event.getGuild());
+                if (messageRole == null) {
+                    return;
+                }
+                for (String messageId : event.getMessageIds()) {
+                    long messageIdLong = Long.parseLong(messageId);
+                    if (messageRole.messageId() == messageIdLong) {
+                        dao.deactivate(event.getGuild());
+                        break;
+                    }
+                }
             } catch (Exception ex) {
                 LOGGER.error("Could not deactivate guild!", ex);
             }
