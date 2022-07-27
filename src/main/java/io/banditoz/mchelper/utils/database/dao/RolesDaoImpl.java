@@ -140,7 +140,7 @@ public class RolesDaoImpl extends Dao implements RolesDao {
     }
 
     @Override
-    public Emoji removeRoleAndReturnEmoji(Guild g, String name) throws SQLException {
+    public Emoji removeRole(Guild g, String name) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             Emoji e = Query.of("SELECT emote FROM roles WHERE guild_id=:g AND name=:n")
                     .on(
@@ -157,6 +157,23 @@ public class RolesDaoImpl extends Dao implements RolesDao {
                             Param.value("g", g.getIdLong()),
                             Param.value("n", name)
                     ).executeUpdate(c);
+            return e;
+        }
+    }
+
+    @Override
+    public Emoji removeRole(Role r) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            Emoji e = Query.of("SELECT emote FROM roles WHERE role_id=:r")
+                    .on(Param.value("r", r.getIdLong()))
+                    .as((rs, conn) -> {
+                        // should never have to check next
+                        rs.next();
+                        return Emoji.fromFormatted(rs.getString("emote"));
+                    }, c);
+            Query.of("DELETE FROM roles WHERE role_id=:r")
+                    .on(Param.value("r", r.getIdLong()))
+                    .executeUpdate(c);
             return e;
         }
     }

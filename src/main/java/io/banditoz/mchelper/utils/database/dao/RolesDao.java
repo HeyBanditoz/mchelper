@@ -25,5 +25,6 @@ public interface RolesDao {
     List<ReactionRole> getRoles(Guild g) throws SQLException;
     int getRoleCount(Guild g) throws SQLException;
     boolean guildContainsName(Guild g, String name) throws SQLException;
-    Emoji removeRoleAndReturnEmoji(Guild g, String name) throws SQLException;
+    Emoji removeRole(Guild g, String name) throws SQLException;
+    Emoji removeRole(Role r) throws SQLException;
 }

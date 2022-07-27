@@ -7,14 +7,20 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEmojiEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
 
 public class RoleReactionListener extends ListenerAdapter {
     private final MCHelper mcHelper;
@@ -50,6 +56,42 @@ public class RoleReactionListener extends ListenerAdapter {
             }
         });
     }
+
+    @Override
+    public void onRoleDelete(@NotNull RoleDeleteEvent event) {
+        mcHelper.getThreadPoolExecutor().execute(() -> {
+            try {
+                Emoji removed = dao.removeRole(event.getRole());
+                removeRoleAndUpdateMessage(dao, removed, event.getGuild());
+            } catch (Exception ex) {
+                LOGGER.error("Could not handle role deletion!", ex);
+            }
+        });
+    }
+
+    @Override
+    public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+        mcHelper.getThreadPoolExecutor().execute(() -> {
+            try {
+                dao.deactivate(event.getGuild());
+            } catch (Exception ex) {
+                LOGGER.error("Could not deactivate guild!", ex);
+            }
+        });
+    }
+
+    @Override
+    public void onMessageBulkDelete(@NotNull MessageBulkDeleteEvent event) {
+        mcHelper.getThreadPoolExecutor().execute(() -> {
+            try {
+                dao.deactivate(event.getGuild());
+            } catch (Exception ex) {
+                LOGGER.error("Could not deactivate guild!", ex);
+            }
+        });
+    }
+
+
 
     private void giveRoleToMember(long roleId, Member m) {
         Guild g = m.getGuild();

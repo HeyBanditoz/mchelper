@@ -6,7 +6,6 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.ReactionRole;
 import io.banditoz.mchelper.utils.ReactionRoleMessage;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
@@ -28,7 +27,9 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.awt.Color;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
+
+import static io.banditoz.mchelper.utils.RoleReactionUtils.buildMessage;
+import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
 
 @Requires(database = true)
 public class ManageRolesCommand extends Command {
@@ -123,12 +124,8 @@ public class ManageRolesCommand extends Command {
         }
         else if (args.get("remove_role") != null && args.getBoolean("remove_role")) {
             if (dao.guildContainsName(ce.getGuild(), args.getList("params").get(0).toString())) {
-                Emoji emoji = dao.removeRoleAndReturnEmoji(ce.getGuild(), args.getList("params").get(0).toString());
-                ReactionRoleMessage r = dao.getMessageRole(ce.getGuild());
-                Message message = ce.getGuild().getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
-                message.clearReactions(emoji).queue();
-                MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(ce.getGuild()), message)).setColor(Color.CYAN).build();
-                message.editMessageEmbeds(me).queue();
+                Emoji emoji = dao.removeRole(ce.getGuild(), args.getList("params").get(0).toString());
+                removeRoleAndUpdateMessage(dao, emoji, ce.getGuild());
                 ce.sendReply("Removed role " + args.getList("params").get(0).toString() + "!");
             } else {
                 ce.sendReply("The role " + args.getList("params").get(0).toString() + " does not exist!");
@@ -136,15 +133,6 @@ public class ManageRolesCommand extends Command {
             }
         }
         return Status.SUCCESS;
-    }
-
-    private String buildMessage(List<ReactionRole> roles, Message message) {
-        StringBuilder sb = new StringBuilder("React to be added to a role, remove your reaction to lose the role.\n");
-        for (ReactionRole r : roles) {
-            sb.append("\n").append(r.emoji().getFormatted()).append(" ").append(r.name());
-            message.addReaction(r.emoji()).queue();
-        }
-        return sb.toString();
     }
 
     private boolean emojiIsInGuild(Emoji e, Guild g) {
