@@ -40,7 +40,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     public List<NamedQuote> getQuotesByMatch(String search, @NotNull Guild g) throws SQLException {
         search = '%' + search + '%';
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND (quote ILIKE :s OR quote_author ILIKE :t)")
+            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND (quote ILIKE :s OR quote_author ILIKE :t) ORDER BY RANDOM()")
                     .on(
                             Param.value("g", g.getIdLong()),
                             Param.value("s", search),
@@ -52,7 +52,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     @Override
     public List<NamedQuote> getQuotesByFulltextSearch(String search, @NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND ts @@ phraseto_tsquery('english', :s)")
+            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND ts @@ phraseto_tsquery('english', :s) ORDER BY RANDOM()")
                     .on(
                             Param.value("g", g.getIdLong()),
                             Param.value("s", search))
