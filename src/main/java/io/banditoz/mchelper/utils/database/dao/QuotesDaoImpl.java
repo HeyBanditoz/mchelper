@@ -45,7 +45,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                             Param.value("g", g.getIdLong()),
                             Param.value("s", search),
                             Param.value("t", search))
-                    .as(this::parseMany, c);
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
 
@@ -56,7 +56,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                     .on(
                             Param.value("g", g.getIdLong()),
                             Param.value("s", search))
-                    .as(this::parseMany, c);
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
 
@@ -65,7 +65,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT * FROM quotes WHERE guild_id=:g ORDER BY RANDOM()")
                     .on(Param.value("g", g.getIdLong()))
-                    .as(this::parseMany, c);
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
 
@@ -86,7 +86,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                             Param.value("g", g.getIdLong()),
                             Param.value("u", u)
                     )
-                    .as(this::parseMany, c);
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
 
@@ -147,21 +147,5 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         nq.setLastModified(rs.getTimestamp("last_modified"));
         nq.setId(rs.getInt("id"));
         return nq;
-    }
-
-    private List<NamedQuote> parseMany(ResultSet rs, Connection c) throws SQLException {
-        List<NamedQuote> quotes = new ArrayList<>();
-        while (!rs.isLast()) {
-            NamedQuote nq = parseOne(rs, c);
-            if (nq != null) {
-                quotes.add(nq);
-            }
-            // this branch will cover an empty ResultSet, I believe rs.isLast() should return true, but doesn't in the
-            // case of an empty ResultSet, may be a library bug, will need to investigate further.
-            else {
-                break;
-            }
-        }
-        return quotes;
     }
 }

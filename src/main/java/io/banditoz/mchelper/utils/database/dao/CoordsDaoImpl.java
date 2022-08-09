@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CoordsDaoImpl extends Dao implements CoordsDao {
@@ -59,7 +58,7 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT * FROM coordinates WHERE guild_id=:g")
                     .on(Param.value("g", g.getIdLong()))
-                    .as(this::parseMany, c);
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
 
@@ -75,22 +74,5 @@ public class CoordsDaoImpl extends Dao implements CoordsDao {
         point.setZ(rs.getLong("z"));
         point.setLastModified(rs.getTimestamp("last_modified"));
         return point;
-    }
-
-    private List<CoordinatePoint> parseMany(ResultSet rs, Connection c) throws SQLException {
-        // mostly copypasted from QuotesDaoImpl#parseMany
-        List<CoordinatePoint> points = new ArrayList<>();
-        while (!rs.isLast()) {
-            CoordinatePoint nq = parseOne(rs, c);
-            if (nq != null) {
-                points.add(nq);
-            }
-            // this branch will cover an empty ResultSet, I believe rs.isLast() should return true, but doesn't in the
-            // case of an empty ResultSet, may be a library bug, will need to investigate further.
-            else {
-                break;
-            }
-        }
-        return points;
     }
 }
