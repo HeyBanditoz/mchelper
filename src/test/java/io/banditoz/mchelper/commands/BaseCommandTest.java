@@ -12,7 +12,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 
@@ -36,7 +37,7 @@ public abstract class BaseCommandTest {
     /** The {@link ArgumentCaptor} for capturing {@link CommandEvent#sendEmbedPaginatedReply(List)} */
     protected final ArgumentCaptor<List<MessageEmbed>> embedsCaptor;
     /** The {@link ArgumentCaptor} for capturing {@link MessageChannel#sendMessage(Message)} */
-    protected final ArgumentCaptor<Message> messageCaptor;
+    protected final ArgumentCaptor<MessageCreateData> messageCaptor;
     /** The {@link MCHelper} instance. */
     protected final MCHelper mcHelper;
     protected final MessageReceivedEvent mre;
@@ -65,7 +66,7 @@ public abstract class BaseCommandTest {
         this.stringCaptor = ArgumentCaptor.forClass(String.class);
         this.embedCaptor = ArgumentCaptor.forClass(MessageEmbed.class);
         this.embedsCaptor = ArgumentCaptor.forClass(List.class);
-        this.messageCaptor = ArgumentCaptor.forClass(Message.class);
+        this.messageCaptor = ArgumentCaptor.forClass(MessageCreateData.class);
         doNothing().when(ce).sendReply(stringCaptor.capture());
         doNothing().when(ce).sendEmbedReply(embedCaptor.capture());
         doNothing().when(ce).sendEmbedPaginatedReply(embedsCaptor.capture());
@@ -78,9 +79,9 @@ public abstract class BaseCommandTest {
         when(mre.getMember()).thenReturn(me);
         MessageChannelUnion mc = mock(MessageChannelUnion.class);
         when(mre.getChannel()).thenReturn(mc);
-        MessageAction ma = mock(MessageAction.class);
-        when(mc.sendMessage(stringCaptor.capture())).thenReturn(ma);
-        when(mc.sendMessage(messageCaptor.capture())).thenReturn(ma);
+        MessageCreateAction mca = mock(MessageCreateAction.class);
+        when(mc.sendMessage(stringCaptor.capture())).thenReturn(mca);
+        when(mc.sendMessage(messageCaptor.capture())).thenReturn(mca);
         when(m.addReaction(any())).thenReturn(mock(RestAction.class));
         when(m.clearReactions()).thenReturn(mock(RestAction.class));
         when(ce.getEvent()).thenReturn(mre);

@@ -5,10 +5,11 @@ import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.database.Reminder;
 import io.banditoz.mchelper.utils.database.dao.RemindersDao;
 import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
 
 public class ReminderRunnable implements Runnable {
     private final Reminder R;
@@ -30,11 +31,7 @@ public class ReminderRunnable implements Runnable {
             if (dao.isStillActiveOrNotDeleted(R.getId())) {
                 if (!R.isFromDm()) {
                     TextChannel tc = MCHELPER.getJDA().getTextChannelById(R.getChannelId());
-                    tc.sendMessage(new MessageBuilder(format(R)).denyMentions(
-                            Message.MentionType.EVERYONE,
-                            Message.MentionType.ROLE,
-                            Message.MentionType.HERE
-                    ).build()).queue();
+                    tc.sendMessage(new MessageCreateBuilder().setContent(format(R)).setAllowedMentions(Collections.emptyList()).build()).queue();
                 }
                 else {
                     MCHELPER.getJDA().retrieveUserById(R.getAuthorId()).complete().openPrivateChannel().complete().sendMessage(format(R)).queue();

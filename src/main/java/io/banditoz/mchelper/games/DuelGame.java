@@ -57,7 +57,7 @@ public class DuelGame extends Game {
                             + "There's $" + AccountManager.format(ante) + " on the line!")
                     .setColor(Color.MAGENTA)
                     .build();
-            event.getMessage().editMessageEmbeds(me).setActionRows().queue();
+            event.getMessage().editMessageEmbeds(me).setComponents().queue();
             mcHelper.getSES().schedule(() -> {
                 Button clickMe = Button.primary(UUID.randomUUID().toString(), "Click Me!");
                 ButtonInteractable bi = new ButtonInteractable(

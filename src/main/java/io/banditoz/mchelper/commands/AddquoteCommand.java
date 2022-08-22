@@ -11,14 +11,15 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 
@@ -77,7 +78,7 @@ public class AddquoteCommand extends Command {
 
         QuotesDao qd = new QuotesDaoImpl(ce.getDatabase());
         int id;
-        MessageBuilder message;
+        MessageCreateBuilder message;
         Button b = Button.primary(UUID.randomUUID().toString(), "✏️");
 
         if (Character.isDigit(ce.getCommandArgs()[1].charAt(0))) {
@@ -88,17 +89,17 @@ public class AddquoteCommand extends Command {
             NamedQuote nq = NamedQuote.parseMessageId(messageId, (TextChannel) ce.getEvent().getChannel());
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
             id = qd.saveQuote(nq);
-            message = new MessageBuilder("Quote (from message ID) added.");
+            message = new MessageCreateBuilder().setContent("Quote (from message ID) added.");
         }
         else {
             NamedQuote nq = NamedQuote.parseString(ce.getCommandArgsString());
             nq.setGuildId(ce.getGuild().getIdLong());
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
             id = qd.saveQuote(nq);
-            message = new MessageBuilder("Quote added.");
+            message = new MessageCreateBuilder().setContent("Quote added.");
         }
         if (!cache.containsKey(ce.getEvent().getAuthor().getIdLong())) {
-            message = message.setActionRows(ActionRow.of(b));
+            message.addActionRow(b);
         }
         int finalId = id;
         ce.getEvent().getChannel().sendMessage(message.build()).queue(sentMessage -> {
@@ -117,7 +118,10 @@ public class AddquoteCommand extends Command {
 
     private void editQuote(WrappedButtonClickEvent event) {
         Message finalMessage = event.getMessage();
-        event.getEvent().editMessage(finalMessage).setActionRows(Collections.emptyList()).queue();
+        MessageEditData edit = MessageEditBuilder.fromMessage(finalMessage)
+                .setComponents(Collections.emptyList())
+                .build();
+        event.getEvent().editMessage(edit).queue();
         CommandEventAndQuote ceq = cache.get(event.getEvent().getUser().getIdLong());
         if (ceq == null) {
             event.removeListenerAndDestroy();

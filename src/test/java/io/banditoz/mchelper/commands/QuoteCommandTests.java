@@ -22,7 +22,7 @@ public class QuoteCommandTests extends BaseCommandTest {
     public void testAddquote() throws Exception {
         setArgs("\"test\" quote");
         ac.onCommand(ce);
-        assertThat(messageCaptor.getValue().getContentRaw()).isEqualTo("Quote added.");
+        assertThat(messageCaptor.getValue().getContent()).isEqualTo("Quote added.");
     }
 
     @Test(timeOut = 5000L) // 5 second timeout

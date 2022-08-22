@@ -9,14 +9,13 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.Color;
 import java.math.BigDecimal;
@@ -59,7 +58,7 @@ public class DuelCommand extends Command {
                 .build();
         Button play = Button.primary(UUID.randomUUID().toString(), CHECK);
         Button cancel = Button.danger(UUID.randomUUID().toString(), CANCEL);
-        Message m = new MessageBuilder().setActionRows(ActionRow.of(play, cancel)).setEmbeds(embed).build();
+        MessageCreateData m = new MessageCreateBuilder().setActionRow(play, cancel).setEmbeds(embed).build();
         ce.getEvent().getChannel().sendMessage(m).queue(message -> {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(play, game::enterGame, cancel, game::cancel),

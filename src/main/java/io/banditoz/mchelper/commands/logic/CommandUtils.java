@@ -1,19 +1,20 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.utils.StringUtils;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.SplitUtil;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,17 +89,21 @@ public class CommandUtils {
      */
     private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions, boolean ping) {
         msg = formatMessage(msg);
-        MessageBuilder mb = new MessageBuilder(msg);
-        if (sanitizeMentions) {
-            mb.denyMentions(Message.MentionType.values());
+        List<String> split = SplitUtil.split(msg, 2_000, SplitUtil.Strategy.WHITESPACE);
+        for (String s : split) {
+            MessageCreateBuilder mb = new MessageCreateBuilder()
+                    .setContent(s);
+            if (sanitizeMentions) {
+                mb.setAllowedMentions(Collections.emptyList());
+            }
+            c.getMessage().reply(mb.build()).mentionRepliedUser(ping).queue();
         }
-        Queue<Message> toSend = mb.buildAll(MessageBuilder.SplitPolicy.NEWLINE);
-        toSend.forEach(message -> c.getMessage().reply(message).mentionRepliedUser(ping).queue());
     }
 
     public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e, boolean sanitizeMentions) throws Exception {
         String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
         File f = new File(imageName);
+        FileUpload u = FileUpload.fromData(f);
 
         // compress image to oxipng (https://github.com/shssoichiro/oxipng)
         try (OutputStream outputStream = new FileOutputStream(imageName)) {
@@ -107,26 +112,28 @@ public class CommandUtils {
             Process p = new ProcessBuilder("oxipng", imageName).start();
             p.waitFor();
 
-            MessageBuilder m = new MessageBuilder(formatMessage(msg));
+            MessageCreateBuilder m = new MessageCreateBuilder()
+                    .setContent(formatMessage(msg))
+                    .addFiles(u);
             if (sanitizeMentions) {
-                m.denyMentions(Message.MentionType.values());
+                m.setAllowedMentions(Collections.emptyList());
             }
 
             e.getMessage().getChannel()
                     .sendMessage(m.build())
-                    .addFile(f)
                     .queue();
             image.close();
         } catch (IOException ex) {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
-            MessageBuilder m = new MessageBuilder(formatMessage(msg));
+            MessageCreateBuilder m = new MessageCreateBuilder()
+                    .setContent(formatMessage(msg))
+                    .addFiles(u);
             if (sanitizeMentions) {
-                m.denyMentions(Message.MentionType.values());
+                m.setAllowedMentions(Collections.emptyList());
             }
 
             e.getMessage().getChannel()
                     .sendMessage(m.build())
-                    .addFile(f)
                     .queue();
             image.close();
         } finally {
@@ -147,7 +154,7 @@ public class CommandUtils {
 
             e.getMessage().getChannel()
                     .sendMessageEmbeds(me)
-                    .addFile(f)
+                    .addFiles(FileUpload.fromData(f))
                     .queue();
             image.close();
         } catch (IOException ex) {
@@ -155,7 +162,7 @@ public class CommandUtils {
 
             e.getMessage().getChannel()
                     .sendMessageEmbeds(me)
-                    .addFile(f)
+                    .addFiles(FileUpload.fromData(f))
                     .queue();
             image.close();
         } finally {
@@ -174,15 +181,16 @@ public class CommandUtils {
             p.waitFor();
 
             e.getMessage().getChannel()
-                    .sendFile(f).setEmbeds(me)
+                    .sendFiles(FileUpload.fromData(f))
+                    .setEmbeds(me)
                     .queue();
             image.close();
         } catch (IOException ex) {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
 
             e.getMessage().getChannel()
-                    .sendMessageEmbeds(me)
-                    .addFile(f)
+                    .sendFiles(FileUpload.fromData(f))
+                    .setEmbeds(me)
                     .queue();
             image.close();
         } finally {
@@ -238,6 +246,6 @@ public class CommandUtils {
     }
 
     public static void sendFile(String msg, File f, MessageReceivedEvent e) {
-        e.getChannel().sendMessage(formatMessage(msg)).addFile(f).queue();
+        e.getChannel().sendMessage(formatMessage(msg)).addFiles(FileUpload.fromData(f)).queue();
     }
 }

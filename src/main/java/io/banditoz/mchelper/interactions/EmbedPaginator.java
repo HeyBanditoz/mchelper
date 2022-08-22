@@ -1,12 +1,12 @@
 package io.banditoz.mchelper.interactions;
 
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -58,7 +58,11 @@ public class EmbedPaginator {
                 stop, this::handleStop,
                 next, this::handleNext
         );
-        channel.sendMessage(new MessageBuilder(pages.get(0)).setActionRows(ActionRow.of(prev, stop, next)).build()).queue(message -> {
+        MessageCreateData messageCreate = new MessageCreateBuilder()
+                .setEmbeds(pages.get(0))
+                .addActionRow(prev, stop, next)
+                .build();
+        channel.sendMessage(messageCreate).queue(message -> {
             this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message);
             bl.addInteractable(bi);
         });
