@@ -114,7 +114,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
     implementation 'com.merakianalytics.orianna:orianna:4.0.0-rc5'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
-    implementation 'org.postgresql:postgresql:42.3.3'
+    implementation 'org.postgresql:postgresql:42.4.1'
     implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation 'io.jenetics:facilejdbc:2.0.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final' // downgrade for orianna
@@ -134,14 +134,14 @@ dependencies {
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 
     testImplementation 'org.testng:testng:7.6.1'
-    testImplementation 'org.mockito:mockito-core:4.6.1'
+    testImplementation 'org.mockito:mockito-core:4.7.0'
     testImplementation 'org.assertj:assertj-core:3.23.1'
 
     liquibaseRuntime 'org.liquibase:liquibase-core:4.14.0'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
     liquibaseRuntime 'info.picocli:picocli:4.6.3'
     liquibaseRuntime 'org.yaml:snakeyaml:1.30'
-    liquibaseRuntime 'org.postgresql:postgresql:42.3.3'
+    liquibaseRuntime 'org.postgresql:postgresql:42.4.1'
 }
 
 test {
