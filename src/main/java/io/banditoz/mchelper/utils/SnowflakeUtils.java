@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SnowflakeUtils {
-    private static final Pattern PATTERN = Pattern.compile("\\d{18}");
+    private static final Pattern PATTERN = Pattern.compile("\\d+");
 
     public static String returnDateTimesForIDs(String possibleMatches) {
         StringBuilder sb = new StringBuilder();

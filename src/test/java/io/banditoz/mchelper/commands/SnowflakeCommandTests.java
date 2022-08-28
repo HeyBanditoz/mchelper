@@ -20,6 +20,13 @@ public class SnowflakeCommandTests extends BaseCommandTest {
     }
 
     @Test
+    public void testSnowflakeCommandLongDigits() throws Exception {
+        setArgs("1013556610024624229");
+        sc.onCommand(ce);
+        assertThat(stringCaptor.getValue()).isEqualTo("1013556610024624229 -> <t:1661721126:F>\n");
+    }
+
+    @Test
     public void testSnowflakeCommandInvalidInput() throws Exception {
         setArgs("foobarman");
         sc.onCommand(ce);
