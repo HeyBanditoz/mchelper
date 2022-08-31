@@ -103,7 +103,6 @@ public class CommandUtils {
     public static void sendImageReply(String msg, ByteArrayOutputStream image, MessageReceivedEvent e, boolean sanitizeMentions) throws Exception {
         String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
         File f = new File(imageName);
-        FileUpload u = FileUpload.fromData(f);
 
         // compress image to oxipng (https://github.com/shssoichiro/oxipng)
         try (OutputStream outputStream = new FileOutputStream(imageName)) {
@@ -114,7 +113,7 @@ public class CommandUtils {
 
             MessageCreateBuilder m = new MessageCreateBuilder()
                     .setContent(formatMessage(msg))
-                    .addFiles(u);
+                    .addFiles(FileUpload.fromData(f));
             if (sanitizeMentions) {
                 m.setAllowedMentions(Collections.emptyList());
             }
@@ -127,7 +126,7 @@ public class CommandUtils {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
             MessageCreateBuilder m = new MessageCreateBuilder()
                     .setContent(formatMessage(msg))
-                    .addFiles(u);
+                    .addFiles(FileUpload.fromData(f));
             if (sanitizeMentions) {
                 m.setAllowedMentions(Collections.emptyList());
             }
