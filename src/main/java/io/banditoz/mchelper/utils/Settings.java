@@ -17,8 +17,6 @@ public class Settings {
     private Integer commandThreads;
     @JsonProperty("finnhubKey")
     private String finnhubKey;
-    @JsonProperty("riotApiKey")
-    private String riotApiKey;
     @JsonProperty("recordCommandAndRegexStatistics")
     private Boolean recordCommandAndRegexStatistics = false; // default value, TODO maybe fix others above too?
     @JsonProperty("elasticsearchMessageEndpoint")
@@ -98,19 +96,6 @@ public class Settings {
     @JsonProperty("finnhubKey")
     public void setFinnhubKey(String finnhubKey) {
         this.finnhubKey = finnhubKey;
-    }
-
-    @JsonProperty("riotApiKey")
-    public String getRiotApiKey() {
-        if (riotApiKey != null && riotApiKey.equals(defaultSettings.riotApiKey)) {
-            return null;
-        }
-        return riotApiKey;
-    }
-
-    @JsonProperty("riotApiKey")
-    public void setRiotApiKey(String riotApiKey) {
-        this.riotApiKey = riotApiKey;
     }
 
     @JsonProperty("recordCommandAndRegexStatistics")

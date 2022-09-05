@@ -156,8 +156,7 @@ public class MCHelperTestImpl implements MCHelper {
         settings.setOwlBotToken("eryhue354uh3y4ewtgs");
         settings.setCommandThreads(1);
         settings.setFinnhubKey("35uy7ewsgfhed");
-        settings.setRiotApiKey("we98ytfghioned.");
-        settings.setTarkovMarketApiKey("sgfjklw4epoitju");
+         settings.setTarkovMarketApiKey("sgfjklw4epoitju");
         settings.setTarkovToolsApiEndpoint("https://api.tarkov.dev/graphql");
         return settings;
     }
