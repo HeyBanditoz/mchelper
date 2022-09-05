@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Member;
 
 import java.security.SecureRandom;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,7 @@ public class RussianRouletteCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         GuildVoiceState vs = ce.getEvent().getMember().getVoiceState();
+        List<Member> members = vs.getChannel().getMembers();
         if (!check(ce, vs)) {
             return Status.FAIL; // bot does not have permissions or not in a voice channel
         }
@@ -41,19 +43,22 @@ public class RussianRouletteCommand extends Command {
             try {
                 if (check(ce, vs)) {
                     if (random.nextDouble() <= 0.2) {
-                        int rand0 = random.nextInt(vs.getChannel().getMembers().size());
-                        int rand1 = random.nextInt(vs.getChannel().getMembers().size());
+                        // please help me
+                        int rand0 = random.nextInt(members.size());
+                        int rand1 = random.nextInt(members.size());
                         while (rand0 == rand1) {
-                            rand1 = random.nextInt(vs.getChannel().getMembers().size());
+                            rand1 = random.nextInt(members.size());
                         }
                         int finalRand = rand1;
-                        vs.getGuild().kickVoiceMember(vs.getChannel().getMembers().get(rand0)).queue(unused ->
-                                vs.getGuild().kickVoiceMember(vs.getChannel().getMembers().get(finalRand)).queue(unused1 ->
-                                        ce.sendReply("**BANG BANG!!** The gun malfunctioned, and shot twice!")));
+                        vs.getGuild().kickVoiceMember(members.get(rand0))
+                                .queue(unused -> vs.getGuild().kickVoiceMember(members.get(finalRand))
+                                .queue(unused1 -> ce.sendReply("**BANG BANG!!** The gun malfunctioned, and shot twice!"
+                            )));
                     }
                     else {
-                        Member toKick = vs.getChannel().getMembers().get(random.nextInt(vs.getChannel().getMembers().size()));
-                        vs.getGuild().kickVoiceMember(toKick).queue(unused -> ce.sendReply("**BANG!**"));
+                        Member toKick = members.get(random.nextInt(members.size()));
+                        vs.getGuild().kickVoiceMember(toKick)
+                                .queue(unused -> ce.sendReply("**BANG!**"));
                     }
                 }
             } catch (Exception ex) {
