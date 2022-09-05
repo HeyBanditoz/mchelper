@@ -53,7 +53,7 @@ There are a total of 59 commands and 4 regex listeners.
 ### JoinOrderCommand
 `joinorder` - <no parameters>  - Sends this guild's join order.
 ### LoadoutCommand
-`loadout` - [stats] - Gives a random league champ and loadout. [stats](must be lowercase): ap = Ability Power, ad = Attack Damage, as = Attack Speed, mana = Mana, ar = Armour, crit = Critical damage or chance, hp = Health, mr = Magic Resist, ms = Movement Speed.
+`loadout` - <no parameters>  - Points to ultimate-bravery.
 ### ManageRolesCommand
 ```
 usage: roles [-i] [--deactivate] [-a] [-r] [params [params ...]]
