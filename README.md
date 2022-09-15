@@ -69,7 +69,7 @@ you will  need to create a symbolic link to the SQL directory, like this in Powe
 
 Or, in Bash:
 
-`ln -s sql src/main/resources/sql`
+`ln -s src/main/resources/sql sql`
 
 This is because the file paths from the jar will show up in the `databasechangelog` as `sql/postgres/changelog-file.yml`
 (because Java resources) whereas running it locally will show up as
