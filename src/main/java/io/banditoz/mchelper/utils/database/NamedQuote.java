@@ -1,7 +1,7 @@
 package io.banditoz.mchelper.utils.database;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.sql.Timestamp;

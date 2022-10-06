@@ -102,16 +102,16 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.18') {
+    implementation('net.dv8tion:JDA:5.0.0-alpha.20') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
     implementation 'org.postgresql:postgresql:42.4.1'
@@ -125,22 +125,22 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
     implementation 'ch.obermuhlner:java-scriptengine:2.0.0'
-    implementation 'org.liquibase:liquibase-core:4.14.0'
+    implementation 'org.liquibase:liquibase-core:4.16.1'
     implementation 'com.mattbertolini:liquibase-slf4j:4.1.0'
-    implementation 'org.yaml:snakeyaml:1.30'
+    implementation 'org.yaml:snakeyaml:1.33'
     implementation 'com.github.minndevelopment:emoji-java:6.1.0'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 
     testImplementation 'org.testng:testng:7.6.1'
-    testImplementation 'org.mockito:mockito-core:4.7.0'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
     testImplementation 'org.assertj:assertj-core:3.23.1'
 
-    liquibaseRuntime 'org.liquibase:liquibase-core:4.14.0'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.16.1'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
     liquibaseRuntime 'info.picocli:picocli:4.6.3'
-    liquibaseRuntime 'org.yaml:snakeyaml:1.30'
+    liquibaseRuntime 'org.yaml:snakeyaml:1.33'
     liquibaseRuntime 'org.postgresql:postgresql:42.4.1'
 }
 

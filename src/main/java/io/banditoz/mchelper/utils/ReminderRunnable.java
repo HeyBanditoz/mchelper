@@ -5,7 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.utils.database.Reminder;
 import io.banditoz.mchelper.utils.database.dao.RemindersDao;
 import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.slf4j.LoggerFactory;
 
