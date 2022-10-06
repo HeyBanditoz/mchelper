@@ -16,7 +16,6 @@ import java.awt.Color;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 
 public class QotdRunnable implements Runnable {
     private final Logger LOGGER = LoggerFactory.getLogger(QotdRunnable.class);
