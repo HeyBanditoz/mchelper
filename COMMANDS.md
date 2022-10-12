@@ -56,7 +56,7 @@ There are a total of 59 commands and 4 regex listeners.
 `loadout` - <no parameters>  - Points to ultimate-bravery.
 ### ManageRolesCommand
 ```
-usage: roles [-i] [--deactivate] [-a] [-r] [params [params ...]]
+usage: roles [-i] [--deactivate] [-a] [-r] [-b] [params [params ...]]
 
 positional arguments:
   params                 the rest of the parameters for previous arguments
@@ -66,6 +66,7 @@ named arguments:
   --deactivate           remove role management
   -a, --add-role         adds a role
   -r, -d, --remove-role  removes a role
+  -b, --rebuild          rebuilds reaction role message
 ```
 ### MathCommand
 `math` - <math> - Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.
