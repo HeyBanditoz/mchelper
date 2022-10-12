@@ -132,6 +132,13 @@ public class ManageRolesCommand extends Command {
                 return Status.FAIL;
             }
         }
+        else if (args.get("rebuild") != null && args.getBoolean("rebuild")) {
+            ReactionRoleMessage r = dao.getMessageRole(ce.getGuild());
+            Message message = ce.getGuild().getTextChannelById(r.channelId()).retrieveMessageById(r.messageId()).complete();
+            MessageEmbed me = new EmbedBuilder().setDescription(buildMessage(dao.getRoles(ce.getGuild()), message)).setColor(Color.CYAN).build();
+            message.editMessageEmbeds(me).queue();
+            ce.sendReply("Reaction role message rebuilt.");
+        }
         return Status.SUCCESS;
     }
 
@@ -161,6 +168,9 @@ public class ManageRolesCommand extends Command {
         parser.addArgument("-r", "-d", "--remove-role")
                 .action(Arguments.storeTrue())
                 .help("removes a role");
+        parser.addArgument("-b", "--rebuild")
+                .action(Arguments.storeTrue())
+                .help("rebuilds reaction role message");
         parser.addArgument("params")
                 .help("the rest of the parameters for previous arguments")
                 .nargs("*");
