@@ -102,16 +102,16 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.20') {
+    implementation('net.dv8tion:JDA:5.0.0-alpha.21') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.4'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.0-rc1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0-rc1'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
     implementation 'org.postgresql:postgresql:42.4.1'
@@ -119,7 +119,7 @@ dependencies {
     implementation 'io.jenetics:facilejdbc:2.0.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final'
     implementation 'net.sourceforge.argparse4j:argparse4j:0.9.0'
-    implementation('org.knowm.xchart:xchart:3.8.1') {
+    implementation('org.knowm.xchart:xchart:3.8.2') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     implementation 'org.reflections:reflections:0.10.2'
