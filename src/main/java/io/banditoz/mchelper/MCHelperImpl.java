@@ -18,6 +18,7 @@ import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.database.UserMaintenanceRunnable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -73,7 +74,7 @@ public class MCHelperImpl implements MCHelper {
         LOGGER.info("\\_|  |_/\\____/\\_| |_/\\___|_| .__/ \\___|_|   ");
         LOGGER.info("                           | |              ");
         LOGGER.info("                           |_|              ");
-        LOGGER.info("MCHelper version " + Version.GIT_SHA + " committed on " + Version.GIT_DATE);
+        LOGGER.info("MCHelper version " + Version.GIT_SHA + " using JDA " + JDAInfo.VERSION + " committed on " + Version.GIT_DATE);
 
         TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
