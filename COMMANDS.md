@@ -1,5 +1,5 @@
 # Commands
-There are a total of 59 commands and 4 regex listeners.
+There are a total of 60 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -54,6 +54,8 @@ There are a total of 59 commands and 4 regex listeners.
 `joinorder` - <no parameters>  - Sends this guild's join order.
 ### LoadoutCommand
 `loadout` - <no parameters>  - Points to ultimate-bravery.
+### LotteryCommand
+`lottery` - [amount] - Enter the lottery! They last for four hours.
 ### ManageRolesCommand
 ```
 usage: roles [-i] [--deactivate] [-a] [-r] [-b] [params [params ...]]
