@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-lottery-tables
+      author: Hayden
+      comment: Adds tables for the first pass of the guild lottery system.
+      changes:
+        - createTable:
+            tableName: lottery
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: guild_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: limit
+                  type: NUMERIC(13,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: draw_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: complete
+                  type: BOOLEAN
+                  defaultValue: 'false'
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: lottery_entrants
+            columns:
+              - column:
+                  name: lottery_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lottery_entrants_lottery
+                    references: lottery(id)
+              - column:
+                  name: author_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: NUMERIC(13,2)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: lottery_id, author_id
+            constraintName: lottery_entrants_lottery_id_author_id_key
+            tableName: lottery_entrants

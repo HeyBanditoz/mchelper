@@ -9,6 +9,7 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -19,6 +20,7 @@ import org.testng.annotations.BeforeMethod;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static io.banditoz.mchelper.Whitebox.setInternalState;
 import static org.mockito.Mockito.*;
@@ -71,14 +73,21 @@ public abstract class BaseCommandTest {
         doNothing().when(ce).sendEmbedReply(embedCaptor.capture());
         doNothing().when(ce).sendEmbedPaginatedReply(embedsCaptor.capture());
         doNothing().when(ce).sendPastableReply(stringCaptor.capture());
+        Guild g = Mocks.getMockedGuild();
+        when(me.getGuild()).thenReturn(g);
+        when(ce.getGuild()).thenReturn(g);
         when(ce.getMentionedUsers()).thenReturn(Collections.emptyList());
         when(ce.getMentionedMembers()).thenReturn(Collections.emptyList());
         when(j.getRegisteredListeners()).thenReturn(Collections.emptyList());
+        when(j.getGuildById(570771524697718808L)).thenReturn(g);
         when(mre.getMessage()).thenReturn(m);
         when(mre.getAuthor()).thenReturn(u);
         when(mre.getMember()).thenReturn(me);
         MessageChannelUnion mc = mock(MessageChannelUnion.class);
         when(mre.getChannel()).thenReturn(mc);
+        TextChannel tc = mock(TextChannel.class);
+        when(tc.getGuild()).thenReturn(g);
+        when(mc.asTextChannel()).thenReturn(tc);
         MessageCreateAction mca = mock(MessageCreateAction.class);
         when(mc.sendMessage(stringCaptor.capture())).thenReturn(mca);
         when(mc.sendMessage(messageCaptor.capture())).thenReturn(mca);
@@ -87,13 +96,12 @@ public abstract class BaseCommandTest {
         when(ce.getEvent()).thenReturn(mre);
         when(ce.getEvent().getJDA()).thenReturn(j);
         when(ce.getDatabase()).thenReturn(DB);
-        Guild g = Mocks.getMockedGuild();
-        when(ce.getGuild()).thenReturn(g);
         this.mcHelper = spy(MCHelperTestImpl.class);
         when(mcHelper.getSettings()).thenReturn(CommandTests.getMockSettings());
         when(mcHelper.getDatabase()).thenReturn(DB);
         when(mcHelper.getAccountManager()).thenReturn(AM);
         when(mcHelper.getJDA()).thenReturn(j);
+        when(mcHelper.getSES()).thenReturn(mock(ScheduledExecutorService.class));
         when(ce.getMCHelper()).thenReturn(mcHelper);
     }
 

@@ -8,3 +8,6 @@ databaseChangeLog:
   - include:
       file: 20220724-guild-roles-constraints.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20221017-add-lottery-features.yml
+      relativeToChangelogFile: true

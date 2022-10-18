@@ -6,6 +6,7 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
@@ -103,6 +104,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public GameManager getGameManager() {
+        return null;
+    }
+
+    @Override
+    public LotteryManager getLotteryManager() {
         return null;
     }
 

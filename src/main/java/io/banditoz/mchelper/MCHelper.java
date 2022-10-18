@@ -5,6 +5,7 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.HttpResponseException;
@@ -34,9 +35,8 @@ public interface MCHelper {
 //    RoleReactionListener getRRL();
     AccountManager getAccountManager();
     ButtonListener getButtonListener();
-
     GameManager getGameManager();
-
+    LotteryManager getLotteryManager();
     User getOwner();
 
     void messageOwner(String s);

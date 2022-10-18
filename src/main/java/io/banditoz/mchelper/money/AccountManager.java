@@ -5,12 +5,16 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
 import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The class that handles monetary user accounts and their transactions. Use this class
@@ -128,6 +132,26 @@ public class AccountManager {
         return dao.getLeaderboard();
     }
 
+    public List<StatPoint<String>> getTopBalancesForGuild(Guild g) throws SQLException {
+        return this.getAllBalances().stream()
+                .map(point -> {
+                    Member m = g.getMemberById(point.getThing());
+                    if (m == null) {
+                        return null;
+                    }
+                    else {
+                        return new StatPoint<>(m.getEffectiveName(), point.getCount());
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public void checkUserCanCompleteTransaction(User u, BigDecimal test) throws Exception {
+        BigDecimal currentBal = queryBalance(u.getIdLong(), false);
+        checkAmount(currentBal, test);
+    }
+
     /**
      * Ensures we are changing more than zero from a number, and the account couldn't go under because of the
      * transaction.
@@ -152,7 +176,7 @@ public class AccountManager {
      * @param d The {@link BigDecimal} to check.
      * @return A scaled {@link BigDecimal}.
      */
-    private BigDecimal scale(BigDecimal d) {
+    public BigDecimal scale(BigDecimal d) {
         return d.setScale(2, RoundingMode.HALF_UP);
     }
 

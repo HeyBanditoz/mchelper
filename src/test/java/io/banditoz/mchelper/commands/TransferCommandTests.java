@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-@Test(dependsOnGroups = {"BalanceCommandTests"})
+@Test(dependsOnGroups = {"BalanceCommandTests"}, groups = {"TransferCommandTests"})
 public class TransferCommandTests extends BaseCommandTest {
     private final TransferCommand tc = new TransferCommand();
     private final Member member = Mocks.getMockedMember();

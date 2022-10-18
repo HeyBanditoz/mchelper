@@ -7,6 +7,7 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.runnables.QotdRunnable;
@@ -55,6 +56,7 @@ public class MCHelperImpl implements MCHelper {
     private final AccountManager AM;
     private final ButtonListener BL;
     private final GameManager GM;
+    private final LotteryManager LM;
     private final User OWNER;
 
     public MCHelperImpl() throws InterruptedException {
@@ -102,6 +104,7 @@ public class MCHelperImpl implements MCHelper {
             DB = new Database();
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
+            LM = new LotteryManager(this);
             JDA.addEventListener(new RoleReactionListener(this));
             SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
                     10,
@@ -121,6 +124,7 @@ public class MCHelperImpl implements MCHelper {
             DB = null;
             RS = null;
             AM = null;
+            LM = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         this.CH = buildCommandHandler();
@@ -202,6 +206,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public AccountManager getAccountManager() {
         return AM;
+    }
+
+    @Override
+    public LotteryManager getLotteryManager() {
+        return LM;
     }
 
     @Override
