@@ -102,7 +102,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.21') {
+    implementation('com.github.DV8FromtheWorld:JDA:53856330e0') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11'
