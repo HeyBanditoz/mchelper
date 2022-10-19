@@ -75,7 +75,7 @@ public class LotteryCommand extends Command {
                 .sum();
         // summon someone using some runes
         for (LotteryEntrant entrant : entrantsForLottery) {
-            participants.append("<@!")
+            participants.append("<@")
                     .append(entrant.userId())
                     .append(">")
                     .append(": $")
