@@ -122,6 +122,7 @@ public class LotteryManager {
         List<StatPoint<String>> topBals = am.getTopBalancesForGuild(g);
         double avg = topBals.stream()
                 .mapToDouble(value -> value.getCount().doubleValue())
+                .filter(value -> value > 1000)
                 .average()
                 .orElse(0);
         return am.scale(new BigDecimal(avg / topBals.size()));
