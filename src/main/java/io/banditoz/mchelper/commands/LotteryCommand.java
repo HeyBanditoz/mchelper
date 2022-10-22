@@ -34,6 +34,8 @@ public class LotteryCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         // TODO reduce the massive amounts of copypaste in here
         LotteryManager lm = ce.getMCHelper().getLotteryManager();
+        AccountManager am = ce.getMCHelper().getAccountManager();
+
         Lottery l = lm.getLottery(ce.getGuild());
         if (ce.getCommandArgsString().isBlank()) {
             if (l != null) {
@@ -50,11 +52,13 @@ public class LotteryCommand extends Command {
             }
         }
         else {
+            BigDecimal requestedTicket = new BigDecimal(ce.getCommandArgsString());
+            am.checkUserCanCompleteTransaction(ce.getEvent().getAuthor(), requestedTicket);
             if (l == null) {
                 lm.startLotteryForGuild(ce.getEvent().getChannel().asTextChannel());
                 l = lm.getLottery(ce.getGuild());
             }
-            lm.enterMember(new BigDecimal(ce.getCommandArgsString()), ce.getEvent().getMember());
+            lm.enterMember(requestedTicket, ce.getEvent().getMember());
             List<LotteryEntrant> entrantsForLottery = lm.getEntrantsForLottery(ce.getGuild());
             BigDecimal sum = entrantsForLottery.stream()
                     .map(LotteryEntrant::amount)
