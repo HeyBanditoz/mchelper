@@ -51,15 +51,17 @@ public class UrbanDictionaryCommand extends Command {
                 definitionExampleTwo = originalDef.substring(1022);
             }
 
-            pages.add(new EmbedBuilder()
+            EmbedBuilder eb = new EmbedBuilder()
                     .setTitle(definition.getWord(), definition.getPermalink())
                     .setAuthor(definition.getAuthor() + " ↑" + definition.getThumbsUp() + " ↓" + definition.getThumbsDown())
                     .setDescription(definitionString)
                     .addField("Example", '*' + definitionExample + '*', true)
-                    .addField(definitionExampleTwo != null ? "(cont'd)" : null, (definitionExampleTwo != null ? '*' + definitionExampleTwo + '*' : null), true)
                     .setTimestamp(definition.getWrittenOn())
-                    .setFooter(i + 1 + "/" + result.getResults().size())
-                    .build());
+                    .setFooter(i + 1 + "/" + result.getResults().size());
+            if (definitionExampleTwo != null) {
+                eb.addField("(cont'd)", '*' + definitionExampleTwo + '*', true);
+            }
+            pages.add(eb.build());
         }
         return pages;
     }
