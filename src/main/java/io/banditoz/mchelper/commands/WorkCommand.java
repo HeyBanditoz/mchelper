@@ -14,6 +14,7 @@ import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -25,7 +26,10 @@ import java.util.Random;
 @Requires(database = true)
 public class WorkCommand extends Command {
     private final List<TaskResponse> workResponses = new ArrayList<>();
+    private final List<TaskResponse> rareResponses = new ArrayList<>();
     private final Random random = new SecureRandom();
+    private static final Color rareColor = new Color(219, 173, 44);
+    private static final BigDecimal five = new BigDecimal("5");
 
     @Override
     public String commandName() {
@@ -46,17 +50,28 @@ public class WorkCommand extends Command {
             List<TaskResponse> tempList = om.readValue(getClass().getClassLoader()
                     .getResource("tasks_responses.json")
                     .openStream(), om.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
-            tempList.stream().filter(taskResponse -> taskResponse.getTask() == Task.WORK).forEach(workResponses::add);
+            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::notRare).forEach(workResponses::add);
+            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::rare).forEach(rareResponses::add);
         }
         TasksDao dao = new TasksDaoImpl(ce.getDatabase());
+        AccountManager am = ce.getMCHelper().getAccountManager();
         LocalDateTime ldt = dao.getWhenCanExecute(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {
-            BigDecimal earnings = Task.WORK.getRandomAmount();
-            BigDecimal newBal = ce.getMCHelper().getAccountManager().add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work");
-            TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
-            String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
+            BigDecimal randAmount = Task.WORK.getRandomAmount();
+            if (random.nextDouble() <= 0.10) {
+                BigDecimal earnings = randAmount.multiply(five);
+                BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (rare)");
+                TaskResponse randResponse = rareResponses.get(random.nextInt(rareResponses.size()));
+                String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
+                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setColor(rareColor).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+            }
+            else {
+                BigDecimal newBal = am.add(randAmount, ce.getEvent().getAuthor().getIdLong(), "daily work");
+                TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
+                String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), randAmount, Task.WORK);
+                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+            }
             dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
-            ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
             return Status.SUCCESS;
         }
         else {

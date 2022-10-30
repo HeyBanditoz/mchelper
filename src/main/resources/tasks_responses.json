@@ -82,5 +82,25 @@
     {
         "task": 0,
         "response": "%MENTION% made %AMOUNT% in cheat sales today. Congratulations!"
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% sold their house in this overpriced economy for %AMOUNT%.",
+        "rare": true
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% robbed a bank for %AMOUNT%.",
+        "rare": true
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% sold personal information about users on their platform for the highest bidder, and earned %AMOUNT%.",
+        "rare": true
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% went back in time to buy %AMOUNT% in stock, and made it big. Just like that one movie!",
+        "rare": true
     }
 ]
