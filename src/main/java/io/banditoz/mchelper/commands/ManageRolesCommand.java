@@ -27,6 +27,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.awt.Color;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import static io.banditoz.mchelper.utils.RoleReactionUtils.buildMessage;
 import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
@@ -44,11 +45,12 @@ public class ManageRolesCommand extends Command {
     }
 
     @Override
+    protected EnumSet<Permission> getRequiredPermissions() {
+        return EnumSet.of(Permission.ADMINISTRATOR);
+    }
+
+    @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (!ce.getEvent().getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
-            ce.sendReply("You are not an Administrator!");
-            return Status.FAIL;
-        }
         String[] rawArgs = ce.getRawCommandArgs();
         String[] slicedArgs = Arrays.copyOfRange(rawArgs, 1, rawArgs.length);
         Namespace args = getDefaultArgs().parseArgs(slicedArgs);
