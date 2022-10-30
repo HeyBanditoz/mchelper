@@ -22,11 +22,11 @@ public class TaskVerificationTests {
                 .openStream(), om.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
         assertThat(responses).doesNotHaveDuplicates();
         for (TaskResponse response : responses) {
-            if (!response.getResponse().contains("%MENTION%")) {
-                failures.add("Response \"" + response.getResponse() + "\" is missing the %MENTION% key.");
+            if (!response.response().contains("%MENTION%")) {
+                failures.add("Response \"" + response.response() + "\" is missing the %MENTION% key.");
             }
-            if (!response.getResponse().contains("%AMOUNT%")) {
-                failures.add("Response \"" + response.getResponse() + "\" is missing the %AMOUNT% key.");
+            if (!response.response().contains("%AMOUNT%")) {
+                failures.add("Response \"" + response.response() + "\" is missing the %AMOUNT% key.");
             }
         }
         if (!failures.toString().isEmpty()) {
