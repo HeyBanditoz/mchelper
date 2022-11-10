@@ -64,6 +64,7 @@ shadowJar {
         exclude(dependency('ch.qos.logback:logback-classic.*:.*'))
         exclude(dependency('ch.obermuhlner:java-scriptengine.*:.*'))
         exclude(dependency('org.postgresql:postgresql.*:.*'))
+        exclude(dependency('com.github.cgoIT:logback-elasticsearch-appender.*:.*'))
     }
 }
 
@@ -129,6 +130,7 @@ dependencies {
     implementation 'com.mattbertolini:liquibase-slf4j:4.1.0'
     implementation 'org.yaml:snakeyaml:1.33'
     implementation 'com.github.minndevelopment:emoji-java:6.1.0'
+    implementation 'com.github.cgoIT:logback-elasticsearch-appender:v1.12'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
