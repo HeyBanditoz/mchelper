@@ -6,6 +6,7 @@ import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
 import io.jenetics.facilejdbc.Param;
 import io.jenetics.facilejdbc.Query;
+import net.dv8tion.jda.api.entities.User;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -156,6 +157,15 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
                         }
                         return accs;
                     }, c);
+        }
+    }
+
+    @Override
+    public boolean isUserShadowbanned(User u) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("SELECT 1 FROM money_shadowbans WHERE id = :i;")
+                    .on(Param.value("i", u.getIdLong()))
+                    .as((rs, conn) -> rs.isBeforeFirst(), c);
         }
     }
 

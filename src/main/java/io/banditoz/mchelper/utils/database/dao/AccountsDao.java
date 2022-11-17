@@ -4,6 +4,7 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.utils.database.StatPoint;
 import io.banditoz.mchelper.utils.database.Transaction;
+import net.dv8tion.jda.api.entities.User;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -77,4 +78,6 @@ public interface AccountsDao {
      * @throws SQLException If there was a database error.
      */
     List<Long> getAllAccounts() throws SQLException;
+
+    boolean isUserShadowbanned(User u) throws SQLException;
 }

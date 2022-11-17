@@ -171,6 +171,16 @@ public class AccountManager {
     }
 
     /**
+     * Checks if a {@link User} is shadowbanned.
+     *
+     * @param u The {@link User} to check.
+     * @return If they are shadowbanned or not.
+     */
+    public boolean isUserShadowbanned(User u) throws SQLException {
+        return dao.isUserShadowbanned(u);
+    }
+
+    /**
      * Ensure a {@link BigDecimal} does not exceed a scale of two.
      *
      * @param d The {@link BigDecimal} to check.

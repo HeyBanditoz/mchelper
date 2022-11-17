@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-money-shadowbans
+      author: Hayden
+      comment: Adds tables for shadowbanning users from money-related commands.
+      changes:
+        - createTable:
+            tableName: money_shadowbans
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: added_on
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reason
+                  type: TEXT
+                  constraints:
+                    nullable: false

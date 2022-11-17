@@ -11,3 +11,6 @@ databaseChangeLog:
   - include:
       file: 20221017-add-lottery-features.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20221116-add-money-shadowbans.yml
+      relativeToChangelogFile: true
