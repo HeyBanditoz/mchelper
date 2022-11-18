@@ -89,3 +89,6 @@ COMMANDS_OLD.md
 
 # Liquibase
 liquibase.properties
+
+#
+sql
