@@ -58,21 +58,32 @@ public class WorkCommand extends Command {
         LocalDateTime ldt = dao.getWhenCanExecute(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {
             BigDecimal randAmount = Task.WORK.getRandomAmount();
-            if (random.nextDouble() <= 0.10) {
-                BigDecimal earnings = randAmount.multiply(five);
-                BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (rare)");
-                TaskResponse randResponse = rareResponses.get(random.nextInt(rareResponses.size()));
+            if (am.isUserShadowbanned(ce.getEvent().getAuthor())) {
+                BigDecimal earnings = randAmount.multiply(BigDecimal.valueOf(0.25));
+                BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (shadowbanned 75% of full earnings)");
+                TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
                 String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
-                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setColor(rareColor).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                return Status.SUCCESS;
             }
             else {
-                BigDecimal newBal = am.add(randAmount, ce.getEvent().getAuthor().getIdLong(), "daily work");
-                TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
-                String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), randAmount, Task.WORK);
-                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                if (random.nextDouble() <= 0.10) {
+                    BigDecimal earnings = randAmount.multiply(five);
+                    BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (rare)");
+                    TaskResponse randResponse = rareResponses.get(random.nextInt(rareResponses.size()));
+                    String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
+                    ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setColor(rareColor).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                }
+                else {
+                    BigDecimal newBal = am.add(randAmount, ce.getEvent().getAuthor().getIdLong(), "daily work");
+                    TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
+                    String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), randAmount, Task.WORK);
+                    ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                }
+                dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                return Status.SUCCESS;
             }
-            dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
-            return Status.SUCCESS;
         }
         else {
             long unix = ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
