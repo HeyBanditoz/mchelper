@@ -85,6 +85,30 @@
     },
     {
         "task": 0,
+        "response": "%MENTION% won a MrBeast challenge and racked in %AMOUNT%."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% walked in on an... HR incident... and made %AMOUNT% in hush money."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% played Mariah Carey in their store, and earned %AMOUNT% in extra sales."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% shoplifted %AMOUNT% worth of M-LOK handguards."
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% discovered a message in the bottle, but it wasn't a message, it was %AMOUNT%!"
+    },
+    {
+        "task": 0,
+        "response": "%MENTION%, a nurse, made %AMOUNT% for their shift today because someone died in a logging truck incident."
+    },
+    {
+        "task": 0,
         "response": "%MENTION% sold their house in this overpriced economy for %AMOUNT%.",
         "rare": true
     },
@@ -101,6 +125,11 @@
     {
         "task": 0,
         "response": "%MENTION% went back in time to buy %AMOUNT% in stock, and made it big. Just like that one movie!",
+        "rare": true
+    },
+    {
+        "task": 0,
+        "response": "%MENTION% created FTX, and made %AMOUNT%.",
         "rare": true
     }
 ]
