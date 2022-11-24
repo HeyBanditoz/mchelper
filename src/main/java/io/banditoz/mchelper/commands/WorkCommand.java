@@ -61,34 +61,40 @@ public class WorkCommand extends Command {
             if (am.isUserShadowbanned(ce.getEvent().getAuthor())) {
                 BigDecimal earnings = randAmount.multiply(BigDecimal.valueOf(0.25));
                 BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (shadowbanned 75% of full earnings)");
-                TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
-                String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
-                ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
                 dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
-                return Status.SUCCESS;
+                sendMessage(ce, earnings, newBal, false);
             }
             else {
                 if (random.nextDouble() <= 0.10) {
                     BigDecimal earnings = randAmount.multiply(five);
                     BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (rare)");
-                    TaskResponse randResponse = rareResponses.get(random.nextInt(rareResponses.size()));
-                    String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
-                    ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setColor(rareColor).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                    dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                    sendMessage(ce, earnings, newBal, true);
                 }
                 else {
                     BigDecimal newBal = am.add(randAmount, ce.getEvent().getAuthor().getIdLong(), "daily work");
-                    TaskResponse randResponse = workResponses.get(random.nextInt(workResponses.size()));
-                    String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), randAmount, Task.WORK);
-                    ce.sendEmbedReply(new EmbedBuilder().appendDescription(stringResponse).setFooter("New Balance: $" + AccountManager.format(newBal)).build());
+                    dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                    sendMessage(ce, randAmount, newBal, false);
                 }
-                dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
-                return Status.SUCCESS;
             }
+            return Status.SUCCESS;
         }
         else {
             long unix = ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             ce.sendReply("You cannot work until " + TimeFormat.DATE_TIME_LONG.format(unix));
             return Status.COOLDOWN;
         }
+    }
+
+    private void sendMessage(CommandEvent ce, BigDecimal earnings, BigDecimal newBal, boolean isRare) {
+        TaskResponse randResponse = isRare ? rareResponses.get(random.nextInt(rareResponses.size())) : workResponses.get(random.nextInt(workResponses.size()));
+        String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
+        EmbedBuilder eb = new EmbedBuilder()
+                .appendDescription(stringResponse)
+                .setFooter("New Balance: $" + AccountManager.format(newBal));
+        if (isRare) {
+            eb.setColor(rareColor);
+        }
+        ce.sendEmbedReply(eb.build());
     }
 }
