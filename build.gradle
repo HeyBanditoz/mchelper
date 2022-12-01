@@ -20,7 +20,7 @@ plugins {
     id 'com.peterabeles.gversion' version '1.10'
 
     // Clean testing output
-    id 'com.adarshr.test-logger' version '2.1.0'
+    id 'com.adarshr.test-logger' version '3.2.0'
 
     // Code coverage
     id 'jacoco'
@@ -65,6 +65,7 @@ shadowJar {
         exclude(dependency('ch.obermuhlner:java-scriptengine.*:.*'))
         exclude(dependency('org.postgresql:postgresql.*:.*'))
         exclude(dependency('com.github.cgoIT:logback-elasticsearch-appender.*:.*'))
+        exclude(dependency('org.liquibase:liquibase-core.*:.*'))
     }
 }
 
@@ -103,19 +104,19 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-alpha.22') {
+    implementation('net.dv8tion:JDA:5.0.0-beta.1') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.0-rc1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0-rc1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
-    implementation 'org.postgresql:postgresql:42.4.1'
+    implementation 'org.postgresql:postgresql:42.5.1'
     implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation 'io.jenetics:facilejdbc:2.0.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final'
@@ -126,7 +127,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
     implementation 'ch.obermuhlner:java-scriptengine:2.0.0'
-    implementation 'org.liquibase:liquibase-core:4.17.1'
+    implementation 'org.liquibase:liquibase-core:4.17.2'
     implementation 'com.mattbertolini:liquibase-slf4j:4.1.0'
     implementation 'org.yaml:snakeyaml:1.33'
     implementation 'com.github.minndevelopment:emoji-java:6.1.0'
@@ -139,11 +140,11 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.8.0'
     testImplementation 'org.assertj:assertj-core:3.23.1'
 
-    liquibaseRuntime 'org.liquibase:liquibase-core:4.17.1'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.17.2'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
-    liquibaseRuntime 'info.picocli:picocli:4.6.3'
+    liquibaseRuntime 'info.picocli:picocli:4.7.0'
     liquibaseRuntime 'org.yaml:snakeyaml:1.33'
-    liquibaseRuntime 'org.postgresql:postgresql:42.4.1'
+    liquibaseRuntime 'org.postgresql:postgresql:42.5.1'
 }
 
 test {
