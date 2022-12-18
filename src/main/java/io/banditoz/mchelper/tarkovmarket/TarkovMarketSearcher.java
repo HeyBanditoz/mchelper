@@ -5,9 +5,6 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.HttpResponseException;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -54,13 +51,7 @@ public class TarkovMarketSearcher {
                     }""";
             Map<String, String> jsonIntermediate = Map.of("query", query);
             String jsonQuery = om.writeValueAsString(jsonIntermediate);
-            Request request = new Request.Builder()
-                    .url(MCHELPER.getSettings().getTarkovToolsApiEndpoint())
-                    .post(RequestBody.create(jsonQuery, MediaType.get("application/json")))
-                    .header("Accept", "application/json")
-                    .build();
-            String json = MCHELPER.performHttpRequest(request);
-            Response data = om.readValue(json, Response.class);
+            Response data = MCHELPER.getHttp().getTarkovClient().getTarkovMarketData(jsonQuery);
             // filter out flea market from all results
             for (Item item : data.data().items()) {
                 item.vendorPrices().removeIf(vendorPrice -> vendorPrice.vendor().vendorName() == VendorName.FLEA);

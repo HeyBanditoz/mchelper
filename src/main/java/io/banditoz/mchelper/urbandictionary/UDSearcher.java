@@ -3,7 +3,6 @@ package io.banditoz.mchelper.urbandictionary;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.dictionary.DictionarySearcher;
 import io.banditoz.mchelper.utils.HttpResponseException;
-import okhttp3.Request;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.slf4j.Logger;
@@ -28,12 +27,7 @@ public class UDSearcher {
             return CACHE.get(word);
         }
         else {
-            Request request = new Request.Builder()
-                    .url("https://api.urbandictionary.com/v0/define?term=" + word)
-                    .build();
-            String json = MCHELPER.performHttpRequest(request);
-            LOGGER.debug(json);
-            UDResult definition = MCHELPER.getObjectMapper().readValue(json, UDResult.class);
+            UDResult definition = MCHELPER.getHttp().getUrbanDictionaryClient().getResultsByDefinition(word);
             definition.getResults().sort(UDDefinition::compareTo); // highest votes first
             CACHE.put(word, definition);
             return definition;

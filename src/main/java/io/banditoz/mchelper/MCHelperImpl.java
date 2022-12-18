@@ -12,7 +12,6 @@ import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
@@ -25,24 +24,15 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import okhttp3.OkHttp;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.*;
 
 public class MCHelperImpl implements MCHelper {
     private final JDA JDA;
-    private final OkHttpClient CLIENT = new OkHttpClient.Builder()
-            .followRedirects(false)
-            .followSslRedirects(false) // for reddit.app.link fetching
-            .build(); // singleton http client
     private final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
     private final Logger LOGGER = LoggerFactory.getLogger(MCHelperImpl.class);
     private final ScheduledExecutorService SES;
@@ -58,6 +48,7 @@ public class MCHelperImpl implements MCHelper {
     private final GameManager GM;
     private final LotteryManager LM;
     private final User OWNER;
+    private final Http HTTP_HOLDER;
 
     public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -85,11 +76,6 @@ public class MCHelperImpl implements MCHelper {
                 .build());
         GM = new GameManager();
         JDA = buildJDA();
-
-        if (SETTINGS.getElasticsearchMessageEndpoint() != null && !SETTINGS.getElasticsearchMessageEndpoint().equals("http://endpoint:9200/thing/_doc")) {
-            LOGGER.info("Enabling the Elasticsearch message logging service for the following channels: " + SETTINGS.getLoggedChannels());
-            JDA.addEventListener(new MessageLogger(this, TPE));
-        }
 
         STATS = new StatsRecorder(this, TPE);
 
@@ -141,6 +127,7 @@ public class MCHelperImpl implements MCHelper {
                 TimeUnit.SECONDS);
 
         OWNER = JDA.retrieveApplicationInfo().complete().getOwner();
+        HTTP_HOLDER = new Http(this);
 
         LOGGER.info("MCHelper initialization finished.");
     }
@@ -228,6 +215,10 @@ public class MCHelperImpl implements MCHelper {
         return OWNER;
     }
 
+    public Http getHttp() {
+        return HTTP_HOLDER;
+    }
+
     /**
      * Builds JDA. It's in its own method so the program can quit if it can't contact Discord
      * (so systemd can restart it until it can.)
@@ -278,38 +269,5 @@ public class MCHelperImpl implements MCHelper {
         JDA.openPrivateChannelById(getOwner().getIdLong())
                 .flatMap(channel -> channel.sendMessage(s))
                 .queue(message -> {}, throwable -> LOGGER.error("Could not message the owner {}!", getOwner(), throwable));
-    }
-
-    @Override
-    public String performHttpRequest(Request request) throws HttpResponseException, IOException {
-        String s;
-        try (Response r = placeRequest(request)) {
-            s = r.body().string();
-        }
-        return s;
-    }
-
-    @Override
-    public Response performHttpRequestGetResponse(Request request) throws HttpResponseException, IOException {
-        try (Response r = placeRequest(request)) {
-            return r;
-        }
-    }
-
-    @Override
-    public void performHttpRequestIgnoreResponse(Request request) throws HttpResponseException, IOException {
-        try (Response ignored = placeRequest(request)) {
-        }
-    }
-
-    private Response placeRequest(Request request) throws HttpResponseException, IOException {
-        LOGGER.debug(request.toString());
-        request = request.newBuilder().addHeader("User-Agent", "MCHelper/" + Version.GIT_SHA + " okhttp/" + OkHttp.VERSION + " (+https://gitlab.com/HeyBanditoz/mchelper)").build();
-        Response response = CLIENT.newCall(request).execute();
-        if (response.code() >= 400) {
-            response.close();
-            throw new HttpResponseException(response.code());
-        }
-        return response;
     }
 }

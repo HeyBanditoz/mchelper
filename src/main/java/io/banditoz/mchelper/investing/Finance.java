@@ -1,16 +1,14 @@
 package io.banditoz.mchelper.investing;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.http.FinnhubClient;
 import io.banditoz.mchelper.investing.model.CompanyProfile;
 import io.banditoz.mchelper.investing.model.Quote;
 import io.banditoz.mchelper.investing.model.RawCandlestick;
-import io.banditoz.mchelper.utils.HttpResponseException;
 import io.banditoz.mchelper.utils.database.dao.CompanyProfileDao;
 import io.banditoz.mchelper.utils.database.dao.CompanyProfileDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import okhttp3.HttpUrl;
-import okhttp3.Request;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.OHLCChart;
 import org.knowm.xchart.OHLCChartBuilder;
@@ -28,56 +26,31 @@ import java.util.TimeZone;
 
 public class Finance {
     private final MCHelper MCHELPER;
-    private final String API_KEY;
+    private final FinnhubClient client;
 
     public Finance(MCHelper mcHelper) {
         this.MCHELPER = mcHelper;
-        this.API_KEY = mcHelper.getSettings().getFinnhubKey();
+        this.client = mcHelper.getHttp().getFinnhubClient();
     }
 
-    public Quote getQuote(String ticker) throws IOException, HttpResponseException {
-        HttpUrl url = new HttpUrl.Builder()
-                .scheme("https")
-                .host("finnhub.io")
-                .addPathSegment("api")
-                .addPathSegment("v1")
-                .addPathSegment("quote")
-                .addQueryParameter("symbol", ticker.toUpperCase())
-                .addQueryParameter("token", API_KEY)
-                .build();
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), Quote.class);
+    public Quote getQuote(String ticker) {
+        return client.getQuote(ticker.toUpperCase());
     }
 
-    public CompanyProfile getCompanyProfile(String ticker) throws IOException, HttpResponseException {
+    public CompanyProfile getCompanyProfile(String ticker) {
         // first, check SQL cache
         ticker = ticker.toUpperCase();
         CompanyProfileDao dao = new CompanyProfileDaoImpl(MCHELPER.getDatabase());
         Optional<CompanyProfile> companyProfile = dao.getCompanyProfile(ticker);
         // nothing, get from API
         if (companyProfile.isEmpty()) {
-            HttpUrl url = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host("finnhub.io")
-                    .addPathSegment("api")
-                    .addPathSegment("v1")
-                    .addPathSegment("stock")
-                    .addPathSegment("profile2")
-                    .addQueryParameter("symbol", ticker)
-                    .addQueryParameter("token", API_KEY)
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            companyProfile = Optional.of(MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), CompanyProfile.class));
+            companyProfile = Optional.of(client.getCompanyProfile(ticker));
             dao.addCompanyProfileIfNotExists(companyProfile.get());
         }
         return companyProfile.get();
     }
 
-    public RawCandlestick getCandlestickForTicker(String ticker, boolean yearly) throws IOException, HttpResponseException {
+    public RawCandlestick getCandlestickForTicker(String ticker, boolean yearly) {
         ticker = ticker.toUpperCase();
         Calendar open = Calendar.getInstance();
         if (!yearly) {
@@ -94,23 +67,12 @@ public class Finance {
                 open.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY); // this is god-fucking awful. I hate this so much. Gets last trading day (maybe) though. Does not account for holidays, too bad!
             }
         }
-        HttpUrl url = new HttpUrl.Builder()
-                .scheme("https")
-                .host("finnhub.io")
-                .addPathSegment("api")
-                .addPathSegment("v1")
-                .addPathSegment("stock")
-                .addPathSegment("candle")
-                .addQueryParameter("symbol", ticker)
-                .addQueryParameter("resolution", yearly ? "D" : String.valueOf(5))
-                .addQueryParameter("from", String.valueOf(yearly ? (Instant.now().minus(364, ChronoUnit.DAYS).getEpochSecond()) : open.getTimeInMillis() / 1000))
-                .addQueryParameter("to", String.valueOf(System.currentTimeMillis() / 1000))
-                .addQueryParameter("token", API_KEY)
-                .build();
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        return MCHELPER.getObjectMapper().readValue(MCHELPER.performHttpRequest(request), RawCandlestick.class);
+        return client.getCandles(
+                ticker,
+                yearly ? "D" : String.valueOf(5),
+                String.valueOf(yearly ? (Instant.now().minus(364, ChronoUnit.DAYS).getEpochSecond()) : open.getTimeInMillis() / 1000),
+                String.valueOf(System.currentTimeMillis() / 1000)
+        );
     }
 
     public static MessageEmbed generateStockMessageEmbed(Quote quote, CompanyProfile cp) {

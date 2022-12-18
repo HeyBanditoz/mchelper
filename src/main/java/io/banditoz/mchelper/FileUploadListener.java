@@ -6,11 +6,12 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import okhttp3.Request;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -36,15 +37,14 @@ public class FileUploadListener extends ListenerAdapter {
                     try {
                         String c = a.getContentType();
                         if (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html")) {
-                            Request r = new Request.Builder()
-                                    .url(a.getUrl())
-                                    .build();
-                            String pasteContent = MCHELPER.performHttpRequest(r);
-                            Paste p = new Paste(pasteContent, a.getFileName());
-                            p.setName(a.getFileName() + " by " + u.getAsTag() + " (" + u.getId() + ")");
-                            p.setDescription("Automatically generated paste from message " + event.getMessageId());
-                            String pasteUrl = UPLOADER.uploadToPastegg(p);
-                            sj.add(a.getFileName() + ": " + pasteUrl);
+                            try (InputStream is = a.getProxy().download().get()) {
+                                String pasteContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                                Paste p = new Paste(pasteContent, a.getFileName());
+                                p.setName(a.getFileName() + " by " + u.getAsTag() + " (" + u.getId() + ")");
+                                p.setDescription("Automatically generated paste from message " + event.getMessageId());
+                                String pasteUrl = UPLOADER.uploadToPastegg(p);
+                                sj.add(a.getFileName() + ": " + pasteUrl);
+                            }
                         }
                     } catch (Exception ex) {
                         LOGGER.error("Could not download/upload attachment to paste service: " + a.toString(), ex);
