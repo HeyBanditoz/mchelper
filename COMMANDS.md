@@ -1,5 +1,5 @@
 # Commands
-There are a total of 59 commands and 4 regex listeners.
+There are a total of 60 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -84,6 +84,8 @@ named arguments:
 `ping` - <no parameters>  - Returns the current websocket and API ping.
 ### PlotCommand
 `plot` - <expression> - Plots a function, use x
+### PollCommand
+`poll` - <"poll title"> <"poll type (single or multiple)"> <"questsion 1"> ["question 2"] ... - Create single-choice and multiple-choice anonymous polls.
 ### QuoteCommand
 ```
 usage: quote [-s] [-i] [-a] [-d] [-e] [quoteAndAuthor [quoteAndAuthor ...]]
