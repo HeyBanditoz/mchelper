@@ -1,0 +1,130 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-polls
+      author: Hayden
+      comment: Adds tables for anonymous polls.
+      changes:
+        - createTable:
+            tableName: poll
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(250)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: poll_type
+                  type: SMALLINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message_id
+                  type: BIGINT
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: closed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: close_button_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: poll_question
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: poll_id
+                  type: INT
+                  constraints:
+                    foreignKeyName: fk_poll_results_poll
+                    references: poll(id)
+                    nullable: false
+              - column:
+                  name: question
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: question_number
+                  type: SMALLINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: button_uuid
+                  type: UUID
+                  constraints:
+                    unique: true
+                    nullable: false
+        - createTable:
+            tableName: poll_results
+            columns:
+              - column:
+                  name: pq_id
+                  type: INT
+                  constraints:
+                    foreignKeyName: fk_poll_question_id
+                    references: poll_question(id)
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cast_on
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: poll_id, question
+            constraintName: poll_question_poll_id_question_key
+            tableName: poll_question
+        - addUniqueConstraint:
+            columnNames: pq_id, user_id
+            constraintName: poll_results_pq_id_user_id_key
+            tableName: poll_results
+        - createIndex:
+            tableName: poll_results
+            column:
+              name: pq_id
+        - createIndex:
+            tableName: poll_results
+            column:
+              name: user_id
+        - sqlFile:
+            comment: Function for toggling results of a poll.
+            dbms: 'postgresql'
+            path: 20221227-toggle-poll-result-function.sql
+            relativeToChangelogFile: true

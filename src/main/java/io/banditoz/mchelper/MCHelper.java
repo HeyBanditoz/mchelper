@@ -28,13 +28,12 @@ public interface MCHelper {
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();
     ScheduledExecutorService getSES();
-//    RoleReactionListener getRRL();
     AccountManager getAccountManager();
     ButtonListener getButtonListener();
     GameManager getGameManager();
     LotteryManager getLotteryManager();
     User getOwner();
-
     void messageOwner(String s);
     Http getHttp();
+    PollService getPollService();
 }

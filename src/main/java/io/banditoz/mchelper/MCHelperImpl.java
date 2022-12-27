@@ -20,14 +20,20 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -49,6 +55,7 @@ public class MCHelperImpl implements MCHelper {
     private final LotteryManager LM;
     private final User OWNER;
     private final Http HTTP_HOLDER;
+    private final PollService PS;
 
     public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -91,6 +98,7 @@ public class MCHelperImpl implements MCHelper {
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
             LM = new LotteryManager(this);
+            PS = new PollService(this);
             JDA.addEventListener(new RoleReactionListener(this));
             SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
                     10,
@@ -111,13 +119,63 @@ public class MCHelperImpl implements MCHelper {
             RS = null;
             AM = null;
             LM = null;
+            PS = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         this.CH = buildCommandHandler();
         this.RH = buildRegexableHandler();
         JDA.addEventListener(CH, RH);
         BL = new ButtonListener(this);
-        JDA.addEventListener(BL);
+
+        // deterministic order for onButtonInteraction handling, and all in one thread
+        // TODO clean this shit up!
+        JDA.addEventListener(new ListenerAdapter() {
+            @Override
+            public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+                TPE.execute(() -> {
+                    if (PS != null) {
+                        PS.onButtonInteraction(event);
+                    }
+                    if (BL != null) {
+                        BL.onButtonInteraction(event);
+                    }
+//                    if (!event.isAcknowledged()) {
+//                        event.reply("""
+//                                Your button interaction was not acknowledged by any listener.
+//                                It most likely doesn't exist anymore. (i.e. bot restart.)
+//                                If this is a poll, try again in a minute.""").setEphemeral(true).queue();
+//                    }
+                });
+            }
+
+            @Override
+            public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+                TPE.execute(() -> {
+                    if (PS != null) {
+                        try {
+                            PS.disablePollsByMessageId(List.of(event.getMessageIdLong()));
+                        } catch (SQLException e) {
+                            LOGGER.warn("Could not disable poll.", e);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onMessageBulkDelete(@NotNull MessageBulkDeleteEvent event) {
+                TPE.execute(() -> {
+                    if (PS != null) {
+                        try {
+                            PS.disablePollsByMessageId(event.getMessageIds().stream().map(Long::valueOf).toList());
+                        } catch (SQLException e) {
+                            LOGGER.warn("Could not disable poll.", e);
+                        }
+                    }
+                });
+                super.onMessageBulkDelete(event);
+            }
+        });
+
         JDA.addEventListener(new SelfGuildJoinLeaveListener());
         JDA.addEventListener(new FileUploadListener(this));
 
@@ -217,6 +275,11 @@ public class MCHelperImpl implements MCHelper {
 
     public Http getHttp() {
         return HTTP_HOLDER;
+    }
+
+    @Override
+    public PollService getPollService() {
+        return PS;
     }
 
     /**

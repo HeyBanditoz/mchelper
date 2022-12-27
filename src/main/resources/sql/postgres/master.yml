@@ -14,3 +14,6 @@ databaseChangeLog:
   - include:
       file: 20221116-add-money-shadowbans.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20221227-add-polls.yml
+      relativeToChangelogFile: true

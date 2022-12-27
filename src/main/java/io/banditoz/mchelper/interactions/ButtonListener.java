@@ -22,7 +22,7 @@ public class ButtonListener extends ListenerAdapter {
     private final Logger LOGGER = LoggerFactory.getLogger(ButtonListener.class);
 
     public ButtonListener(MCHelper mcHelper) {
-        this.SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("BL-%d").build());
+        this.SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("BL-Scheduled-%d").build());
         this.MCHELPER = mcHelper;
     }
 
@@ -43,25 +43,26 @@ public class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        SES.execute(() -> {
-            try {
-                LOGGER.debug("We have " + INTERACTABLES.size() + " interactables.");
-                INTERACTABLES.stream().filter(i -> i.containsButton(event.getButton())).findFirst().ifPresentOrElse(i -> {
-                    ScheduledFuture<?> future = i.getTimeoutFuture();
-                    if (future != null) {
-                        LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getId() + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
-                        future.cancel(false);
-                        i.setTimeoutFuture(SES.schedule(() -> {
-                            i.destroy();
-                            INTERACTABLES.remove(i);
-                        }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
-                    }
-                    i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER));
-                }, event.deferEdit()::queue);
-            } catch (Exception ex) {
-                LOGGER.error("Error when handling the button!", ex);
-                event.reply("Error handling the button! " + ex).setEphemeral(true).queue();
-            }
-        });
+        if (event.isAcknowledged()) {
+            return; // processed by another button interaction listener
+        }
+        try {
+            LOGGER.debug("We have " + INTERACTABLES.size() + " interactables.");
+            INTERACTABLES.stream().filter(i -> i.containsButton(event.getButton())).findFirst().ifPresent(i -> {
+                ScheduledFuture<?> future = i.getTimeoutFuture();
+                if (future != null) {
+                    LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getId() + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
+                    future.cancel(false);
+                    i.setTimeoutFuture(SES.schedule(() -> {
+                        i.destroy();
+                        INTERACTABLES.remove(i);
+                    }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
+                }
+                i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER));
+            });
+        } catch (Exception ex) {
+            LOGGER.error("Error when handling the button!", ex);
+            event.reply("Error handling the button! " + ex).setEphemeral(true).queue();
+        }
     }
 }

@@ -115,6 +115,11 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
+    public PollService getPollService() {
+        return null;
+    }
+
+    @Override
     public void messageOwner(String s) {}
 
     private Settings getMockSettings() {

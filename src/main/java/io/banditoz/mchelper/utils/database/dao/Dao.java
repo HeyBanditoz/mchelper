@@ -46,6 +46,6 @@ public abstract class Dao {
             LOGGER.error("Exception while trying to parse many elements! Returning empty list instead.", ex);
             return Collections.emptyList();
         }
-        return elements.isEmpty() ? Collections.emptyList() : elements;
+        return elements.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(elements);
     }
 }
