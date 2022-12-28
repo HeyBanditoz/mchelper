@@ -129,7 +129,6 @@ public class PollService extends ListenerAdapter {
         try {
             if (componentId.equals(p.closedButtonUuid())) {
                 handleEnd(event, p);
-                log.info("Poll ended. {}", p);
             }
             else {
                 handleVote(event, p);
@@ -148,6 +147,7 @@ public class PollService extends ListenerAdapter {
     private void handleEnd(ButtonInteractionEvent event, Poll p) throws SQLException {
         if (p.authorId() == event.getMember().getIdLong()) {
             dao.closePollById(p.id());
+            log.info("Poll ended. {}", p);
             for (PollQuestion pq : p.questions()) {
                 polls.remove(pq.buttonUuid());
             }
