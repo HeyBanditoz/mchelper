@@ -21,7 +21,7 @@ public class DoubleOrNothingGame extends Game {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoubleOrNothingGame.class);
 
     public DoubleOrNothingGame(BigDecimal initialBet, User player, MCHelper mcHelper) {
-        super(5, 20_000, mcHelper, player, initialBet);
+        super(5, 200_000, mcHelper, player, initialBet);
         this.currentBet = initialBet;
     }
 
