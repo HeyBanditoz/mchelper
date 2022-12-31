@@ -144,7 +144,7 @@ named arguments:
 ### ToMorseCommand
 `tomorse` - <string> - Encodes a message to morse code.
 ### TransactionsCommand
-`txns` - <no parameters>  - Fetches your last 10 transactions.
+`txns` - <no parameters>  - Fetches your last 20 transactions.
 ### TransferCommand
 `transfer` - <to> <amount> [memo] - Transfer money.
 ### UnitsCommand
