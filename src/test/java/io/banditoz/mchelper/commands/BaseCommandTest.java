@@ -72,6 +72,7 @@ public abstract class BaseCommandTest {
         doNothing().when(ce).sendReply(stringCaptor.capture());
         doNothing().when(ce).sendEmbedReply(embedCaptor.capture());
         doNothing().when(ce).sendEmbedPaginatedReply(embedsCaptor.capture());
+        doNothing().when(ce).sendEmbedPaginatedReplyWithPageNumber(embedsCaptor.capture());
         doNothing().when(ce).sendPastableReply(stringCaptor.capture());
         Guild g = Mocks.getMockedGuild();
         when(me.getGuild()).thenReturn(g);

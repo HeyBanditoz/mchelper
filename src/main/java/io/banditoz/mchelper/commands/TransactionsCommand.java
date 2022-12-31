@@ -5,11 +5,11 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Transaction;
 import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.StringJoiner;
+import java.util.List;
 
 @Requires(database = true)
 public class TransactionsCommand extends Command {
@@ -20,17 +20,16 @@ public class TransactionsCommand extends Command {
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), false).withDescription("Fetches your last 10 transactions.");
+        return new Help(commandName(), false).withDescription("Fetches your last 20 transactions.");
     }
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         AccountsDao dao = new AccountsDaoImpl(ce.getMCHelper().getDatabase());
-        StringJoiner sj = new StringJoiner("\n");
-        for (Transaction txn : dao.getNTransactionsForUser(ce.getEvent().getAuthor().getIdLong(), 10)) {
-            sj.add(txn.toString());
-        }
-        ce.sendReply("Here are your last ten transactions:\n```\n" + sj + "\n```");
+        List<MessageEmbed> pages = dao.getNTransactionsForUser(ce.getEvent().getAuthor().getIdLong(), 20).stream()
+                .map(transaction -> transaction.render(ce.getMCHelper().getJDA()))
+                .toList();
+        ce.sendEmbedPaginatedReplyWithPageNumber(pages);
         return Status.SUCCESS;
     }
 }

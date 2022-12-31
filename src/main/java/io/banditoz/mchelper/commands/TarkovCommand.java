@@ -6,10 +6,8 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.tarkovmarket.Item;
 import io.banditoz.mchelper.tarkovmarket.TarkovMarketSearcher;
 import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TarkovCommand extends Command {
@@ -33,19 +31,13 @@ public class TarkovCommand extends Command {
             // TODO should rework this as a constructor instead, need to rewrite part of CommandHandler for that.
             SEARCHER = new TarkovMarketSearcher(ce.getMCHelper());
         }
-        List<Item> results = SEARCHER.getMarketResultsBySearch(ce.getCommandArgsString());
+        List<MessageEmbed> results = SEARCHER.getMarketResultsBySearch(ce.getCommandArgsString()).stream().map(Item::getAsEmbed).toList();
         if (results.isEmpty()) {
             ce.sendReply("No matches found.");
             return Status.FAIL;
         }
         else {
-            List<MessageEmbed> embeds = new ArrayList<>(results.size());
-            for (int i = 0; i < results.size(); i++) {
-                MessageEmbed oldEmbed = results.get(i).getAsEmbed();
-                MessageEmbed newEmbed = new EmbedBuilder(oldEmbed).setFooter("(" + (i + 1) + " of " + results.size() + ")").build();
-                embeds.add(newEmbed);
-            }
-            ce.sendEmbedPaginatedReply(embeds);
+            ce.sendEmbedPaginatedReplyWithPageNumber(results);
         }
         return Status.SUCCESS;
     }

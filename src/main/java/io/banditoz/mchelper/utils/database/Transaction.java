@@ -1,7 +1,14 @@
 package io.banditoz.mchelper.utils.database;
 
+import io.banditoz.mchelper.money.AccountManager;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -51,6 +58,48 @@ public record Transaction(
     @Override
     public int compareTo(@Nonnull Transaction o) {
         return this.date.compareTo(o.date);
+    }
+
+    public MessageEmbed render(JDA jda) {
+        // wtf?
+        User fromUser = null;
+        User toUser = null;
+        try {
+            fromUser = jda.getUserById(from());
+        } catch (NullPointerException ignored) {}
+        try {
+            toUser = jda.getUserById(to());
+        } catch (NullPointerException ignored) {}
+        String tType = switch (type) {
+            case TRANSFER -> "Transfer";
+            case GRANT -> "Grant";
+            case REVOKE -> "Revoke";
+        };
+        return new EmbedBuilder()
+                .setTitle("Transaction")
+                .setDescription(tType)
+                .addField("From", (fromUser == null) ? jda.getSelfUser().getAsMention() : fromUser.getAsMention(), false)
+                .addField("To", (toUser == null) ? jda.getSelfUser().getAsMention() : toUser.getAsMention(), false)
+                .addField("Amount", '$' + AccountManager.format(amount.abs()), false)
+                .addField("Memo", memo(), false)
+                .setColor(getColorFromTransaction())
+                .setTimestamp(date())
+                .build();
+    }
+
+    private Color getColorFromTransaction() {
+        switch (type) {
+            case TRANSFER -> {
+                return Color.CYAN;
+            }
+            case GRANT -> {
+                return Color.GREEN;
+            }
+            case REVOKE -> {
+                return Color.RED;
+            }
+        }
+        return null;
     }
 
     @Override

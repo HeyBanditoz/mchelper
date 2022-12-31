@@ -6,6 +6,7 @@ import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.paste.Paste;
 import io.banditoz.mchelper.utils.paste.PasteggUploader;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -216,6 +218,19 @@ public class CommandEvent {
             EmbedPaginator paginator = new EmbedPaginator(MCHELPER.getButtonListener(), EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals);
             paginator.go();
         }
+    }
+
+    /**
+     * @see CommandEvent#sendEmbedPaginatedReply(List)
+     */
+    public void sendEmbedPaginatedReplyWithPageNumber(List<MessageEmbed> embeds) {
+        List<MessageEmbed> pages = new ArrayList<>(embeds.size());
+        for (int i = 0; i < embeds.size(); i++) {
+            MessageEmbed oldEmbed = embeds.get(i);
+            MessageEmbed newEmbed = new EmbedBuilder(oldEmbed).setFooter("(" + (i + 1) + " of " + embeds.size() + ")").build();
+            pages.add(newEmbed);
+        }
+        sendEmbedPaginatedReply(pages);
     }
 
     /**
