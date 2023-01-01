@@ -9,6 +9,7 @@ import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+import java.util.Collections;
 import java.util.List;
 
 @Requires(database = true)
@@ -27,6 +28,7 @@ public class TransactionsCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         AccountsDao dao = new AccountsDaoImpl(ce.getMCHelper().getDatabase());
         List<MessageEmbed> pages = dao.getNTransactionsForUser(ce.getEvent().getAuthor().getIdLong(), 20).stream()
+                .sorted(Collections.reverseOrder())
                 .map(transaction -> transaction.render(ce.getMCHelper().getJDA()))
                 .toList();
         ce.sendEmbedPaginatedReplyWithPageNumber(pages);

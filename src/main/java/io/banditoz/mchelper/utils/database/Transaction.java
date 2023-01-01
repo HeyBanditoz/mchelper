@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -83,7 +84,7 @@ public record Transaction(
                 .addField("Amount", '$' + AccountManager.format(amount.abs()), false)
                 .addField("Memo", memo(), false)
                 .setColor(getColorFromTransaction())
-                .setTimestamp(date())
+                .setTimestamp(date().atZone(ZoneId.systemDefault()))
                 .build();
     }
 
