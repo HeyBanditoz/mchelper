@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils;
+package io.banditoz.mchelper.runnables;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;

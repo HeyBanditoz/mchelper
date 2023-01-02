@@ -1,6 +1,6 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.utils.ReminderRunnable;
+import io.banditoz.mchelper.runnables.ReminderRunnable;
 import io.banditoz.mchelper.utils.database.Reminder;
 import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
 import org.slf4j.Logger;

@@ -3,9 +3,9 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.runnables.ReminderRunnable;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.ReminderRunnable;
 import io.banditoz.mchelper.utils.database.Reminder;
 import net.dv8tion.jda.api.utils.TimeFormat;
 

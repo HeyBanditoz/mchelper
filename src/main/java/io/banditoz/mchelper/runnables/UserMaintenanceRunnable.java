@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils.database;
+package io.banditoz.mchelper.runnables;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.database.dao.UserCacheDao;
