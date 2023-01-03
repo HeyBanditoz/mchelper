@@ -10,6 +10,7 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
+import io.banditoz.mchelper.runnables.PollCullerRunnable;
 import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.runnables.UserMaintenanceRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
@@ -100,10 +101,10 @@ public class MCHelperImpl implements MCHelper {
             LM = new LotteryManager(this);
             PS = new PollService(this);
             JDA.addEventListener(new RoleReactionListener(this));
-            SES.scheduleWithFixedDelay(new UserMaintenanceRunnable(this),
-                    10,
-                    43200,
-                    TimeUnit.SECONDS);
+            UserMaintenanceRunnable userMaintenanceRunnable = new UserMaintenanceRunnable(this);
+            PollCullerRunnable pollCullerRunnable = new PollCullerRunnable(this);
+            SES.scheduleWithFixedDelay(userMaintenanceRunnable,10, 43200, TimeUnit.SECONDS);
+            SES.scheduleWithFixedDelay(pollCullerRunnable, 120, 86400, TimeUnit.SECONDS);
             if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
                 JDA.addEventListener(new GuildJoinLeaveListener(DB));
             }

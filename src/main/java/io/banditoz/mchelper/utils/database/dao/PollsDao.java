@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public interface PollsDao {
     Poll createPoll(String title, List<Question> questions, PollType pollType, MessageReceivedEvent e, long botMessageId, UUID closePollUuid) throws SQLException;
@@ -22,4 +23,5 @@ public interface PollsDao {
      */
     boolean toggleVote(String buttonUuid, User u, Poll p) throws SQLException;
     Map<PollQuestion, Integer> getResults(List<PollQuestion> pqs) throws SQLException;
+    List<Poll> getPollsNotRespondedToAfter(long time, TimeUnit unit) throws SQLException;
 }

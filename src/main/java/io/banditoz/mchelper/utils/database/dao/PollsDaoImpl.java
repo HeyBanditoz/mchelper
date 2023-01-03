@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PollsDaoImpl extends Dao implements PollsDao {
     public PollsDaoImpl(Database database) {
@@ -148,6 +149,30 @@ public class PollsDaoImpl extends Dao implements PollsDao {
                 }
             }
             return pollResults;
+        }
+    }
+
+    @Override
+    public List<Poll> getPollsNotRespondedToAfter(long time, TimeUnit unit) throws SQLException {
+        long timeInSeconds = unit.toSeconds(time);
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("""
+                            SELECT DISTINCT(p.*)
+                            FROM poll p
+                                     INNER JOIN poll_question pq on p.id = pq.poll_id
+                                     INNER JOIN poll_results pr on pq.id = pr.pq_id
+                            WHERE pr.cast_on <= (NOW() - (INTERVAL '1 SECOND' * :s))
+                              AND p.closed = false
+                            UNION
+                            SELECT p.*
+                            FROM poll p
+                            WHERE p.created_on <= (NOW() - (INTERVAL '1 SECOND' * :s))
+                              AND NOT EXISTS(SELECT pr.pq_id
+                                             FROM poll_results pr
+                                                      INNER JOIN poll_question pq on pq.id = pr.pq_id
+                                             WHERE pq.poll_id = p.id);""")
+                    .on(Param.value("s", timeInSeconds))
+                    .as((rs, conn) -> parseMany(rs, c, this::parseOnePollSansQuestions), c);
         }
     }
 

@@ -176,6 +176,9 @@ public class PollService extends ListenerAdapter {
     }
 
     public void disablePollsByMessageId(List<Long> messages) throws SQLException {
+        if (messages.isEmpty()) {
+            throw new IllegalArgumentException("Messages list cannot be empty!");
+        }
         dao.closePollsByMessageIds(messages);
         // clean up button -> polls map, so we don't hold unnecessary references
         polls.values()
