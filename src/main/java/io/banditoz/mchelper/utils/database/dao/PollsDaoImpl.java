@@ -167,6 +167,7 @@ public class PollsDaoImpl extends Dao implements PollsDao {
                             SELECT p.*
                             FROM poll p
                             WHERE p.created_on <= (NOW() - (INTERVAL '1 SECOND' * :s))
+                              AND p.closed = false
                               AND NOT EXISTS(SELECT pr.pq_id
                                              FROM poll_results pr
                                                       INNER JOIN poll_question pq on pq.id = pr.pq_id
