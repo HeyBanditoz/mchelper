@@ -14,7 +14,7 @@ public class AntiTwitch extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isSystem() && event.getChannel().getId().equals(System.getenv("TARKOV_CHANNEL")) && event.getMessage().getContentRaw().contains("twitch.tv/")) {
+        if (event.getAuthor().isBot() && event.getChannel().getId().equals(System.getenv("TARKOV_CHANNEL")) && event.getMessage().getContentRaw().contains("twitch.tv/")) {
             try {
                 event.getMessage().delete().reason("This message contained a twitch.tv link from an announcement, and was deleted.").queue(
                         unused -> log.info("Deleted Tarkov message which contained a Twitch.tv link. Message content:\n" + event.getMessage().getContentRaw()),
