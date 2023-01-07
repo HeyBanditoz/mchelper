@@ -180,6 +180,12 @@ public class MCHelperImpl implements MCHelper {
         JDA.addEventListener(new SelfGuildJoinLeaveListener());
         JDA.addEventListener(new FileUploadListener(this));
 
+        // I just want patch notes, not twitch advertisements
+        if (System.getenv("TARKOV_CHANNEL") != null) {
+            LOGGER.info("Deleting messages from " + System.getenv("TARKOV_CHANNEL") + " which contain twitch.tv links...");
+            JDA.addEventListener(new AntiTwitch());
+        }
+
         SES.scheduleAtFixedRate(new QotdRunnable(this),
                 QotdRunnable.getDelay().getSeconds(),
                 TimeUnit.DAYS.toSeconds(1),
