@@ -157,9 +157,12 @@ public class CommandEvent {
     public void sendPastableReply(String msg) {
         if (msg.length() > 2000) {
             try {
-                sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(new Paste(msg)));
+                Paste p = new Paste(msg);
+                p.setName(getRawCommandArgs()[0] + " by " + EVENT.getAuthor().getAsTag() + " (" + EVENT.getAuthor().getId() + ")");
+                p.setDescription("Automatically generated paste from message " + EVENT.getMessageId());
+                sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(p));
             } catch (Exception e) {
-                sendReply(msg);
+                sendExceptionMessage(e);
             }
         }
         else {

@@ -22,7 +22,7 @@ public class DiceRollerCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         DiceExpression e = DiceExpression.parse(ce.getCommandArgsString());
-        ce.sendReply(new DiceResultPrettyPrinter().prettyPrint(e.roll()));
+        ce.sendPastableReply(new DiceResultPrettyPrinter().prettyPrint(e.roll()));
         return Status.SUCCESS;
     }
 }
