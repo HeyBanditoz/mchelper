@@ -1,5 +1,5 @@
 # Commands
-There are a total of 60 commands and 4 regex listeners.
+There are a total of 61 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -157,6 +157,8 @@ named arguments:
 `userinfo` - [mentions] - Returns information about a user.
 ### VersionCommand
 `version` - <no parameters>  - Returns the bot's version.
+### VideoPokerCommand
+`poker` - <ante (with range 100 <= x <= 500 )> - Play video poker to win some money! For the paytable, visit https://en.wikipedia.org/w/index.php?title=Video_poker&oldid=1094389801#Jacks_or_Better
 ### WhoHasCommand
 `whohas` - <role ID> - Returns who has a certain role in the guild.
 ### WorkCommand
