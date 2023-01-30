@@ -34,4 +34,13 @@ public enum Suit {
             case CLUBS -> "♣";
         };
     }
+
+    public int getScoringEngineValue() {
+        return switch (this) {
+            case SPADES -> 1;
+            case HEARTS -> 4;
+            case DIAMONDS -> 8;
+            case CLUBS -> 2;
+        };
+    }
 }
