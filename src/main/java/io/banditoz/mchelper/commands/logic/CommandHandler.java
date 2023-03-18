@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.HelpCommand;
+import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
@@ -50,7 +51,7 @@ public class CommandHandler extends ListenerAdapter {
         }
         char prefix = '!';
         if (e.isFromGuild()) {
-            prefix = new GuildConfigDaoImpl(MCHELPER.getDatabase()).getConfig(e.getGuild()).getPrefix();
+            prefix = new GuildConfigDaoImpl(MCHELPER.getDatabase()).getConfigValueForGuild(Config.PREFIX, e.getGuild().getIdLong()).charAt(0);
         }
         if (args[0].charAt(0) != prefix) {
             return Optional.empty();

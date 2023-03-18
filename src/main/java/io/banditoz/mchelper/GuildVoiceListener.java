@@ -1,7 +1,7 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.utils.database.GuildConfig;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -15,30 +15,28 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class GuildVoiceListener extends ListenerAdapter {
     private final MCHelper mcHelper;
-    private final GuildConfigDao dao;
-    private final Logger LOGGER = LoggerFactory.getLogger(GuildVoiceListener.class);
+    private static final Logger log = LoggerFactory.getLogger(GuildVoiceListener.class);
 
     public GuildVoiceListener(MCHelper mcHelper) {
         this.mcHelper = mcHelper;
-        this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
     }
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
+        GuildConfigurationProvider config = new GuildConfigurationProvider(event.getGuild(), event.getMember().getUser(), mcHelper);
         if (event.getMember().getUser().isBot()) {
             return;
         }
         Guild g = event.getGuild();
-        GuildConfig conf = dao.getConfig(g);
-        if (conf == null) {
-            return;
-        }
-        long roleId = conf.getVoiceRoleId();
-        Role toChange = g.getRoleById(dao.getConfig(g).getVoiceRoleId());
+        long roleId = Long.parseLong(config.get(Config.VOICE_ROLE_ID));
+        Role toChange = g.getRoleById(roleId);
         if (toChange == null) {
-            LOGGER.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
+            log.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
             return;
         }
         if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
@@ -67,38 +65,47 @@ public class GuildVoiceListener extends ListenerAdapter {
     }
 
     public void updateAll() {
-        int i = 0;
-        for (GuildConfig config : dao.getAllGuildConfigs()) {
-            if (config.getVoiceRoleId() != 0) {
-                for (Guild g : mcHelper.getJDA().getGuilds()) {
-                    if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
-                        continue;
-                    }
-                    long roleId = dao.getConfig(g).getVoiceRoleId();
-                    Role toChange = g.getRoleById(roleId);
-                    if (toChange == null) {
-                        LOGGER.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
-                        continue;
-                    }
-                    for (GuildVoiceState vs : g.getVoiceStates()) {
-                        if (vs.getMember().getUser().isBot()) {
-                            continue;
-                        }
-                        if (vs.inAudioChannel()) {
-                            g.addRoleToMember(vs.getMember(), toChange)
-                                    .reason("This member was in a voice channel on bot startup, and was granted the assigned voice role.")
-                                    .queue();
-                        }
-                        else {
-                            g.removeRoleFromMember(vs.getMember(), toChange)
-                                    .reason("This member is not in a voice channel on bot startup, and was revoked the assigned voice role.")
-                                    .queue();
-                        }
-                    }
-                    i++;
-                }
-            }
+        log.info("Updating all guild voice rules due to status change...");
+        AtomicInteger i = new AtomicInteger();
+        Map<Long, String> allGuildsWith;
+        try {
+            allGuildsWith = new GuildConfigDaoImpl(mcHelper.getDatabase()).getAllGuildsWith(Config.VOICE_ROLE_ID);
+        } catch (Exception e) {
+            log.error("Encountered Exception while updating all voice roles.", e);
+            return;
         }
-        LOGGER.info("Updated voice roles for {} guild(s).", i);
+        allGuildsWith.forEach((guildId, voiceRoleId) -> {
+            Guild g = mcHelper.getJDA().getGuildById(guildId);
+            if (g == null) {
+                return;
+            }
+            if (!voiceRoleId.equals("0")) {
+                if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+                    return;
+                }
+                Role toChange = g.getRoleById(voiceRoleId);
+                if (toChange == null) {
+                    log.debug("There is no role in guild {} by id {}. Skipping role update.", g, voiceRoleId);
+                    return;
+                }
+                for (GuildVoiceState vs : g.getVoiceStates()) {
+                    if (vs.getMember().getUser().isBot()) {
+                        continue;
+                    }
+                    if (vs.inAudioChannel()) {
+                        g.addRoleToMember(vs.getMember(), toChange)
+                                .reason("This member was in a voice channel on bot startup, and was granted the assigned voice role.")
+                                .queue();
+                    }
+                    else {
+                        g.removeRoleFromMember(vs.getMember(), toChange)
+                                .reason("This member is not in a voice channel on bot startup, and was revoked the assigned voice role.")
+                                .queue();
+                    }
+                }
+                i.getAndIncrement();
+            }
+        });
+        log.info("Updated voice roles for {} guild(s).", i);
     }
 }

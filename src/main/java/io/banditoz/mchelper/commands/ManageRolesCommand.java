@@ -4,10 +4,10 @@ import com.vdurmont.emoji.EmojiManager;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ReactionRoleMessage;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import io.banditoz.mchelper.utils.database.dao.RolesDao;
 import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -56,7 +56,7 @@ public class ManageRolesCommand extends Command {
         Namespace args = getDefaultArgs().parseArgs(slicedArgs);
 
         RolesDao dao = new RolesDaoImpl(ce.getDatabase());
-        char thisPrefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
+        char thisPrefix = ce.getConfig().get(Config.PREFIX).charAt(0);
         if (args.get("init") != null && args.getBoolean("init")) {
             if (dao.containsGuild(ce.getGuild())) {
                 ce.sendReply("This guild already has a message setup!");

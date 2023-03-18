@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.UserEvent;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.interactions.EmbedPaginator;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
  */
-public class CommandEvent {
+public class CommandEvent implements UserEvent {
     private String COMMAND_ARGS_STRING;
     private String RAW_COMMAND_ARGS_STRING;
     private String[] COMMAND_ARGS;
@@ -36,6 +38,7 @@ public class CommandEvent {
     private final Database DATABASE;
     private final String COMMAND_NAME;
     private final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
+    private final GuildConfigurationProvider CONFIG;
 
 
     public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper, String commandClassName) {
@@ -46,6 +49,7 @@ public class CommandEvent {
         this.MCHELPER = mcHelper;
         this.DATABASE = mcHelper.getDatabase();
         this.COMMAND_NAME = commandClassName;
+        this.CONFIG = new GuildConfigurationProvider(this);
     }
 
     /**
@@ -126,6 +130,7 @@ public class CommandEvent {
      *
      * @return The Guild, or null if the command didn't happen in one.
      */
+    @Override
     public Guild getGuild() {
         return GUILD;
     }
@@ -259,6 +264,7 @@ public class CommandEvent {
      *
      * @return The database.
      */
+    @Override
     public Database getDatabase() {
         return DATABASE;
     }
@@ -317,5 +323,15 @@ public class CommandEvent {
 
     public ChannelType getChannelType() {
         return EVENT.getChannel().getType();
+    }
+
+    @Override
+    public GuildConfigurationProvider getConfig() {
+        return CONFIG;
+    }
+
+    @Override
+    public User getUser() {
+        return EVENT.getAuthor();
     }
 }

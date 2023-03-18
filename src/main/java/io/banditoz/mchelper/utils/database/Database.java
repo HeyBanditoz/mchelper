@@ -1,7 +1,7 @@
 package io.banditoz.mchelper.utils.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import io.jenetics.facilejdbc.Query;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -34,13 +34,19 @@ public class Database {
         POOL.setJdbcUrl(url);
 
         try (Connection c = getConnection()) {
-            LOGGER.info("getConnection() succeeded! {}", c.toString());
+            int res = Query.of("SELECT 1").as((rs, conn) -> {
+                rs.next();
+                return rs.getInt(1);
+            }, c);
+            if (res != 1) {
+                throw new SQLException("SQL sanity check failed, expected 1 from SELECT 1; but got " + res + " instead.");
+            }
+            LOGGER.info("getConnection() succeeded and sanity check passed! {}", c.toString());
         } catch (Exception ex) {
             LOGGER.error("Could not get connection from pool! Cowardly stopping.", ex);
             System.exit(1);
         }
-
-        LOGGER.info("Database loaded. We have " + new GuildConfigDaoImpl(this).getGuildCount() + " guilds in the config.");
+        LOGGER.info("Database loaded.");
     }
 
     public void migrate(boolean wait) throws Exception {

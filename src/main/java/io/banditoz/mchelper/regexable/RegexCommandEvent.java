@@ -1,20 +1,26 @@
 package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
+import io.banditoz.mchelper.utils.database.Database;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
 
-public class RegexCommandEvent {
+public class RegexCommandEvent implements UserEvent {
     protected final MessageReceivedEvent EVENT;
     private final MCHelper MCHELPER;
     private final Logger LOGGER;
     protected final String ARGS;
     protected final String CLASS_NAME;
     protected final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
+    protected final GuildConfigurationProvider CONFIG;
 
     public RegexCommandEvent(@NotNull MessageReceivedEvent event, MCHelper mcHelper, String args, Logger logger, String className) {
         this.EVENT = event;
@@ -22,6 +28,7 @@ public class RegexCommandEvent {
         this.ARGS = args;
         this.LOGGER = logger;
         this.CLASS_NAME = className;
+        this.CONFIG = new GuildConfigurationProvider(this);
     }
 
     public MessageReceivedEvent getEvent() {
@@ -71,5 +78,25 @@ public class RegexCommandEvent {
 
     public LocalDateTime getExecutedWhen() {
         return EXECUTED_WHEN;
+    }
+
+    @Override
+    public Guild getGuild() {
+        return EVENT.getGuild();
+    }
+
+    @Override
+    public Database getDatabase() {
+        return MCHELPER.getDatabase();
+    }
+
+    @Override
+    public GuildConfigurationProvider getConfig() {
+        return CONFIG;
+    }
+
+    @Override
+    public User getUser() {
+        return EVENT.getAuthor();
     }
 }

@@ -17,3 +17,6 @@ databaseChangeLog:
   - include:
       file: 20221227-add-polls.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20230318-guild-config-table-rewrite.yml
+      relativeToChangelogFile: true

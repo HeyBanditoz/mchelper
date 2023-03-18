@@ -2,11 +2,11 @@ package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -22,13 +22,13 @@ public class RegexableHandler extends ListenerAdapter {
     private final List<Regexable> regexables;
     private final Logger LOGGER = LoggerFactory.getLogger(RegexableHandler.class);
     private final MCHelper MCHELPER;
-    private final GuildConfigDao dao;
+    private final ConfigurationProvider config;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return;
         // don't try to run a listener if a command is (probably) present
-        if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && dao.getConfig(event.getGuild()).getPrefix() == event.getMessage().getContentRaw().charAt(0)) return;
+        if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && config.getValue(Config.PREFIX, event.getGuild().getIdLong()).charAt(0) == event.getMessage().getContentRaw().charAt(0)) return;
 
         getRegexableByEvent(event).forEach(r -> MCHELPER.getThreadPoolExecutor().execute(() -> {
             if (r.handleCooldown(event.getChannel().getId())) {
@@ -78,7 +78,7 @@ public class RegexableHandler extends ListenerAdapter {
 
     public RegexableHandler(MCHelper mcHelper) throws Exception {
         this.MCHELPER = mcHelper;
-        this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
+        this.config = new ConfigurationProvider(mcHelper.getDatabase());
         regexables = new ArrayList<>();
         LOGGER.info("Registering regexable listeners...");
         long before = System.currentTimeMillis();

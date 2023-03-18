@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: new-guild-config
+      author: Hayden
+      comment: Rewrite guild_config to have one row per config entry, so adding new configs are easier.
+      changes:
+        - dropTable:
+            tableName: guild_config
+        - createTable:
+            tableName: guild_config
+            columns:
+              - column:
+                  name: guild_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: key
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: guild_id, key
+            constraintName: guild_config_guild_id_key_key
+            tableName: guild_config

@@ -2,9 +2,9 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 
 import java.util.Collection;
 import java.util.TreeMap;
@@ -31,7 +31,7 @@ public class HelpCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         if (!(ce.getCommandArgs().length > 1)) {
-            char prefix = new GuildConfigDaoImpl(ce.getDatabase()).getConfig(ce.getGuild()).getPrefix();
+            char prefix = ce.getConfig().get(Config.PREFIX).charAt(0);
             StringBuilder sb = new StringBuilder();
             for (String s : helps.keySet()) {
                 sb.append('`').append(prefix).append(s).append("` ");
