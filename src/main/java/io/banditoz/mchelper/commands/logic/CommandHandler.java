@@ -3,12 +3,12 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class CommandHandler extends ListenerAdapter {
         }
         char prefix = '!';
         if (e.isFromGuild()) {
-            prefix = new GuildConfigDaoImpl(MCHELPER.getDatabase()).getConfigValueForGuild(Config.PREFIX, e.getGuild().getIdLong()).charAt(0);
+            prefix = new GuildConfigurationProvider(e.getGuild(), e.getAuthor(), MCHELPER).get(Config.PREFIX).charAt(0);
         }
         if (args[0].charAt(0) != prefix) {
             return Optional.empty();
