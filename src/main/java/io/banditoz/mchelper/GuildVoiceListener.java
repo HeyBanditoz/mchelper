@@ -33,7 +33,8 @@ public class GuildVoiceListener extends ListenerAdapter {
             return;
         }
         Guild g = event.getGuild();
-        long roleId = Long.parseLong(config.get(Config.VOICE_ROLE_ID));
+        String dbRoleId = config.get(Config.VOICE_ROLE_ID);
+        long roleId = Long.parseLong(dbRoleId == null ? "0" : dbRoleId);
         Role toChange = g.getRoleById(roleId);
         if (toChange == null) {
             log.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
