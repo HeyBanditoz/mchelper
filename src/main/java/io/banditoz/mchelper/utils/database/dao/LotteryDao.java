@@ -17,4 +17,5 @@ public interface LotteryDao {
     void enterLottery(Member m, BigDecimal amount) throws SQLException;
     List<LotteryEntrant> getEntrantsForLottery(Guild g) throws SQLException;
     void markLotteryComplete(long lotteryId) throws SQLException;
+    int countParticipantsForLottery(long lotteryId) throws SQLException;
 }

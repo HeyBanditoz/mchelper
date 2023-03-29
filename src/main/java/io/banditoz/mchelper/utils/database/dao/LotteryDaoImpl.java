@@ -36,7 +36,9 @@ public class LotteryDaoImpl extends Dao implements LotteryDao {
     @Override
     public List<Lottery> getAllActiveLotteries() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM lottery WHERE complete = false")
+            return Query.of("""
+                            SELECT * FROM lottery WHERE complete = false AND
+                            (SELECT COUNT(*) FROM lottery_entrants WHERE lottery_id = id) > 1""")
                     .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
         }
     }
@@ -109,6 +111,18 @@ public class LotteryDaoImpl extends Dao implements LotteryDao {
             Query.of("UPDATE lottery SET complete = true WHERE id = :l")
                     .on(Param.value("l", lotteryId))
                     .executeUpdate(c);
+        }
+    }
+
+    @Override
+    public int countParticipantsForLottery(long lotteryId) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("SELECT COUNT(*) FROM lottery_entrants WHERE lottery_id = :l")
+                    .on(Param.value("l", lotteryId))
+                    .as((rs, conn) -> {
+                        rs.next();
+                        return rs.getInt(1);
+                    }, c);
         }
     }
 

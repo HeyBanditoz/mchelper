@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.money.lottery;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.RandomCollection;
@@ -32,7 +33,7 @@ public class LotteryManager {
     private final AccountManager am;
     private final ScheduledExecutorService ses;
     private final JDA jda;
-    private final Logger logger = LoggerFactory.getLogger(LotteryManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(LotteryManager.class);
 
     public LotteryManager(MCHelper mcHelper) {
         this.dao = new LotteryDaoImpl(mcHelper.getDatabase());
@@ -71,9 +72,6 @@ public class LotteryManager {
         synchronized (this) {
             BigDecimal max = getTicketLimitForGuild(g);
             dao.createLottery(c, max);
-            Lottery l = dao.getActiveLottery(g);
-            Duration duration = Duration.between(Instant.now(), l.drawAt().toInstant());
-            ses.schedule(() -> payout(l), duration.getSeconds(), TimeUnit.SECONDS);
             logger.info("Lottery started for guild {} with maximum ticket amount of ${}.", g, AccountManager.format(max));
             return max;
         }
@@ -89,6 +87,9 @@ public class LotteryManager {
                 throw new IllegalArgumentException("Requested ticket of $" + format(amount) + " breaches lottery limit of $" + format(activeLottery.limit()));
             }
             dao.enterLottery(m, amount);
+            if (dao.countParticipantsForLottery(activeLottery.id()) == 2) {
+                scheduleCountdown(activeLottery);
+            }
             return am.remove(amount, m.getIdLong(), "lottery ticket for " + activeLottery.id());
         }
     }
@@ -156,5 +157,12 @@ public class LotteryManager {
                 logger.error("Exception thrown when paying out for lottery " + l.id(), ex);
             }
         }
+    }
+    
+    @VisibleForTesting
+    public void scheduleCountdown(Lottery activeLottery) {
+        Duration duration = Duration.between(Instant.now(), activeLottery.drawAt().toInstant());
+        ses.schedule(() -> payout(activeLottery), duration.getSeconds(), TimeUnit.SECONDS);
+        logger.info("Lottery countdown started for lottery {}. Duration {}.", activeLottery, duration);
     }
 }

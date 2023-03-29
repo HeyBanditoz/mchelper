@@ -62,6 +62,25 @@ public class Mocks {
         return m;
     }
 
+    public static Member getDiffDiffMockedMember() {
+        Member m = mock(Member.class);
+        User u = mock(User.class);
+
+        when(u.getName()).thenReturn("Zat");
+        when(u.getId()).thenReturn("537893458730429519");
+        when(u.getIdLong()).thenReturn(537893458730429519L);
+        when(u.getDiscriminator()).thenReturn("#0019");
+
+        when(m.getNickname()).thenReturn("NZat");
+        when(m.getUser()).thenReturn(u);
+        when(m.getId()).thenReturn("537893458730429519");
+        when(m.getIdLong()).thenReturn(537893458730429519L);
+        when(m.getRoles()).thenReturn(List.of(R));
+        when(m.getAsMention()).thenReturn("<@!537893458730429519>");
+        when(m.getEffectiveName()).thenReturn("NZat");
+
+        return m;
+    }
 
     public static Guild getMockedGuild() {
         Guild g = mock(Guild.class);

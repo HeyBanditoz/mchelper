@@ -44,11 +44,14 @@ public class LotteryCommand extends Command {
                         .map(LotteryEntrant::amount)
                         .reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO);
-                ce.sendReply("The guild currently has a lottery you can enter. The ticket limit is set at $" + format(l.limit()) + " with a pot of $" + format(sum) + ".\n" + getParticipantAndAmountsForLottery(entrantsForLottery));
+                ce.sendReply("The guild currently has a lottery you can enter. It is set to end at %s (if there are at least two entrants) with a ticket limit set at $%s and a pot of $%s.\n%s"
+                        .formatted(TimeFormat.RELATIVE.format(l.drawAt().toInstant()), format(l.limit()), format(sum), getParticipantAndAmountsForLottery(entrantsForLottery)));
             }
             else {
                 BigDecimal limit = lm.getTicketLimitForGuild(ce.getGuild());
-                ce.sendReply("The guild currently has no lottery. You may start one by rerunning this command and specifying an amount. The ticket limit would be $" + format(limit) + ".");
+                ce.sendReply("The guild currently has no lottery. You may start one by rerunning this command and" +
+                        " specifying an amount. The ticket limit would be $" + format(limit) + ". The lottery will end" +
+                        " after four hours when there are at least two entrants.");
             }
         }
         else {
@@ -64,7 +67,7 @@ public class LotteryCommand extends Command {
                     .map(LotteryEntrant::amount)
                     .reduce(BigDecimal::add)
                     .orElse(BigDecimal.ZERO);
-            ce.sendReply("You have entered the lottery. It is set to end %s with a current pot of $%s. Entrant list:\n%s"
+            ce.sendReply("You have entered the lottery. It is set to end %s (if there are at least two entrants) with a current pot of $%s. Entrant list:\n%s"
                     .formatted(TimeFormat.RELATIVE.format(l.drawAt().toInstant()), format(sum), getParticipantAndAmountsForLottery(entrantsForLottery)));
         }
         return Status.SUCCESS;
