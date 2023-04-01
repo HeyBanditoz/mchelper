@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: april-fools-2023
+      author: Hayden
+      comment: April fools!
+      changes:
+        - createTable:
+            tableName: levels
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: messages_sent
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: "0"
+              - column:
+                  name: levelable_messages_sent
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: "0"
+              - column:
+                  name: level
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: "0"

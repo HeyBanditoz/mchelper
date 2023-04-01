@@ -20,3 +20,6 @@ databaseChangeLog:
   - include:
       file: 20230318-guild-config-table-rewrite.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20230401-april-fools-2023.yml
+      relativeToChangelogFile: true

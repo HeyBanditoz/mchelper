@@ -114,6 +114,7 @@ public class MCHelperImpl implements MCHelper {
             GuildVoiceListener voiceListener = new GuildVoiceListener(this);
             voiceListener.updateAll();
             JDA.addEventListener(voiceListener);
+            JDA.addEventListener(new LevelListenker(this));
         }
         else {
             DB = null;

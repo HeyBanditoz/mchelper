@@ -90,8 +90,5 @@ COMMANDS_OLD.md
 # Liquibase
 liquibase.properties
 
-# sql symlink
-sql
-
 # Top level .jar files
 *.jar
