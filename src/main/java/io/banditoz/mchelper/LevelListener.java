@@ -69,7 +69,7 @@ public class LevelListener extends ListenerAdapter {
                     if (levelableMessages > v) {
                         levelDao.levelUp(u.getIdLong());
                         log.info("{} leveled up to {}.", u, (level + 1));
-                        BigDecimal levelUpEarnings = BigDecimal.valueOf(sqrt(50 * v) + 25);
+                        BigDecimal levelUpEarnings = BigDecimal.valueOf((sqrt(50 * v) + 25) * 3);
                         String formattedEarnings = AccountManager.format(levelUpEarnings);
                         if (accountsDao.queryBalance(u.getIdLong(), false) != null) {
                             event.getMessage().reply("Congratulations! You leveled up to level " + (level + 1) + "! " +
