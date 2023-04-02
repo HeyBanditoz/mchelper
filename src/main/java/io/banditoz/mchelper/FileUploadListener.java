@@ -36,7 +36,7 @@ public class FileUploadListener extends ListenerAdapter {
                 for (Message.Attachment a : attachments) {
                     try {
                         String c = a.getContentType();
-                        if (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html")) {
+                        if (c != null && (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html"))) {
                             try (InputStream is = a.getProxy().download().get()) {
                                 String pasteContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                                 Paste p = new Paste(pasteContent, a.getFileName());
