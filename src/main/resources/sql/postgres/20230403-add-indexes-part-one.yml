@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-indexes-part-one
+      author: Hayden
+      comment: Adds some indexes hot columns.
+      changes:
+        - createIndex:
+            tableName: transactions
+            column:
+              name: from_id
+        - createIndex:
+            tableName: transactions
+            column:
+              name: to_id
+        - createIndex:
+            tableName: transactions
+            column:
+              name: when
