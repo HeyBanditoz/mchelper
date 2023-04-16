@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: thread-id-column
+      author: Hayden
+      comment: Adds thread_id to statistics.
+      changes:
+        - sql:
+            sql: CREATE TABLE stats_copy AS SELECT * FROM statistics;
+        - dropTable:
+            tableName: statistics
+        - createTable:
+            tableName: statistics
+            columns:
+              - column:
+                  name: guild_id
+                  type: BIGINT
+              - column:
+                  name: channel_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: true
+                  name: thread_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: arguments
+                  type: VARCHAR(1997)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: return_code
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: execution_time
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: executed_at
+                  type: TIMESTAMP WITH TIME ZONE
+        - sql:
+            sql: >
+              INSERT INTO statistics
+                  (guild_id, channel_id, thread_id, author_id, name, arguments, return_code, execution_time, executed_at)
+                  (SELECT guild_id, channel_id, null, author_id, name, arguments, return_code, execution_time, executed_at FROM stats_copy);
+        - dropTable:
+            tableName: stats_copy

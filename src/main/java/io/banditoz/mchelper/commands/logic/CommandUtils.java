@@ -4,7 +4,7 @@ import io.banditoz.mchelper.utils.StringUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
@@ -101,12 +101,23 @@ public class CommandUtils {
             }
             // get our own membership in the guild we're in to check if we can reply (replying requires message history)
             // but it could be null (for some reason) so stay a little sane here
-            Member us = c.getGuild().getMember(c.getJDA().getSelfUser());
-            if (us != null && us.hasPermission((TextChannel) c.getChannel(), Permission.MESSAGE_HISTORY)) {
-                c.getMessage().reply(mb.build()).mentionRepliedUser(ping).queue();
+            // this scares me
+            if (c.isFromGuild()) {
+                Member us = c.getGuild().getMember(c.getJDA().getSelfUser());
+                if (c.getChannel() instanceof GuildChannel gc) {
+                    if (us != null && us.hasPermission(gc, Permission.MESSAGE_HISTORY)) {
+                        c.getMessage().reply(mb.build()).mentionRepliedUser(ping).queue();
+                    }
+                    else {
+                        c.getChannel().sendMessage(mb.build()).queue();
+                    }
+                }
+                else {
+                    c.getChannel().sendMessage(mb.build()).queue();
+                }
             }
             else {
-                c.getChannel().sendMessage(mb.build()).queue();
+                c.getMessage().reply(mb.build()).mentionRepliedUser(ping).queue();
             }
         }
     }

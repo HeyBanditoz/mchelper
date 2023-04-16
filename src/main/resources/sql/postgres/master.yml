@@ -26,3 +26,6 @@ databaseChangeLog:
   - include:
       file: 20230403-add-indexes-part-one.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20230416-thread-id-column.yml
+      relativeToChangelogFile: true
