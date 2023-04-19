@@ -29,7 +29,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         log.info("[{}] {} joined {}", (event.getUser().isBot() ? "Bot" : "User"), event.getUser(), event.getGuild());
         String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild().getIdLong());
-        if (!defaultChannel.equals("0")) {
+        if (defaultChannel != null) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
@@ -46,7 +46,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         log.info("[{}] {} left {}", (event.getUser().isBot() ? "Bot" : "User"), event.getUser(), event.getGuild());
         String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild().getIdLong());
-        if (!defaultChannel.equals("0")) {
+        if (defaultChannel != null) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
