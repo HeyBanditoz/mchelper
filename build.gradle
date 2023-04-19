@@ -104,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-beta.5') {
+    implementation('net.dv8tion:JDA:5.0.0-beta.8') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11' // pinned back to attempt to fix issues with missing fields in elasticsearch
@@ -132,9 +132,9 @@ dependencies {
     implementation 'org.yaml:snakeyaml:1.33'
     implementation 'com.github.minndevelopment:emoji-java:6.1.0'
     implementation 'com.github.cgoIT:logback-elasticsearch-appender:v1.12'
-    implementation 'io.github.openfeign:feign-core:12.1'
-    implementation 'io.github.openfeign:feign-jackson:12.1'
-    implementation 'io.github.openfeign:feign-okhttp:12.1'
+    implementation 'io.github.openfeign:feign-core:12.3'
+    implementation 'io.github.openfeign:feign-jackson:12.3'
+    implementation 'io.github.openfeign:feign-okhttp:12.3'
 
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
