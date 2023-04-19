@@ -28,17 +28,21 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong())
-            return; // don't execute own commands
+        if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong() || event.getMessage().isWebhookMessage())
+            return; // don't execute own commands, or webhook messages
         getCommandByEvent(event).ifPresent(c -> {
             if (c.canExecute(event, MCHELPER)) {
                 MCHELPER.getThreadPoolExecutor().execute(() -> {
-                    Stat s = c.execute(event, MCHELPER);
-                    if (s.getStatus() == Status.SUCCESS) {
-                        commandsRun++;
+                    try {
+                        Stat s = c.execute(event, MCHELPER);
+                        if (s.getStatus() == Status.SUCCESS) {
+                            commandsRun++;
+                        }
+                        LOGGER.info(s.getLogMessage());
+                        MCHELPER.getStatsRecorder().record(s);
+                    } catch (Exception ex) {
+                        LOGGER.error("Unhandled exception in command execution. This should never happen. author=" + event.getAuthor() + " args='" + event.getMessage().getContentRaw() + "' command=" + c, ex);
                     }
-                    LOGGER.info(s.getLogMessage());
-                    MCHELPER.getStatsRecorder().record(s);
                 });
             }
         });
