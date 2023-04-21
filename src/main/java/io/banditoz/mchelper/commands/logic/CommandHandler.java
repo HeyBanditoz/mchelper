@@ -18,12 +18,14 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandHandler extends ListenerAdapter {
     /** The command map. String is the command name (what the user types) and Command is the command. */
     private final Map<String, Command> commands = new HashMap<>();
     private final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
     private final MCHelper MCHELPER;
+    private final AtomicBoolean isShutdown = new AtomicBoolean(false);
     private int commandsRun;
 
     @Override
@@ -31,6 +33,10 @@ public class CommandHandler extends ListenerAdapter {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong() || event.getMessage().isWebhookMessage())
             return; // don't execute own commands, or webhook messages
         getCommandByEvent(event).ifPresent(c -> {
+            if (isShutdown.get()) {
+                event.getChannel().sendMessage("WARN: This CommandHandler is being shutdown. No new commands will be accepted. The bot is most likely rebooting. Try again later.").queue();
+                return;
+            }
             if (c.canExecute(event, MCHELPER)) {
                 MCHELPER.getThreadPoolExecutor().execute(() -> {
                     try {
@@ -122,5 +128,9 @@ public class CommandHandler extends ListenerAdapter {
 
     public int getCommandsRun() {
         return commandsRun;
+    }
+
+    public void dontAcceptNewCommands() {
+        isShutdown.set(true);
     }
 }

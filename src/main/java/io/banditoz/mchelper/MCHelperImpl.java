@@ -198,11 +198,25 @@ public class MCHelperImpl implements MCHelper {
     }
 
     private void shutdown() {
-        LOGGER.info("Shutdown hook fired. Shutting down JDA and thread pools...");
+        LOGGER.info("Shutdown hook fired. Denying new commands, and waiting for all interactables to close...");
+        CH.dontAcceptNewCommands();
+        long then = System.currentTimeMillis();
+        int activeInteractables;
+        while ((activeInteractables = BL.getActiveInteractables()) != 0) {
+            LOGGER.info("Waited {} ms for {} interactables to finish...", (System.currentTimeMillis() - then), activeInteractables);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        LOGGER.info("Interactables finished. Closing DB pool...");
+        if (DB != null) DB.close();
+        LOGGER.info("DB pool closed. Shutting down JDA and thread pools...");
         if (SES != null) SES.shutdown();
         if (TPE != null) TPE.shutdown();
         if (JDA != null) JDA.shutdown();
-        if (getDatabase() != null) getDatabase().close();
+        LOGGER.info("Shutdown complete. Goodbye.");
     }
 
     @Override
@@ -303,6 +317,7 @@ public class MCHelperImpl implements MCHelper {
                     .enableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOJI)
                     .setChunkingFilter(ChunkingFilter.ALL)
                     .setMaxReconnectDelay(32)
+                    .setEnableShutdownHook(false)
                     .build();
         } catch (Exception ex) {
             LOGGER.error("Couldn't build JDA. Exiting!", ex);

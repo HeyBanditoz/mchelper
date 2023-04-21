@@ -41,6 +41,10 @@ public class ButtonListener extends ListenerAdapter {
         INTERACTABLES.removeIf(buttonInteractable -> buttonInteractable.containsButton(button));
     }
 
+    public int getActiveInteractables() {
+        return INTERACTABLES.size();
+    }
+
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (event.isAcknowledged()) {
