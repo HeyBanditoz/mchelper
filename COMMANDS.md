@@ -1,5 +1,5 @@
 # Commands
-There are a total of 61 commands and 4 regex listeners.
+There are a total of 62 commands and 4 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -40,6 +40,8 @@ There are a total of 61 commands and 4 regex listeners.
 `flood` - [num] <message> - Floods this channel with a message.
 ### FromMorseCommand
 `frommorse` - <morse> - Converts morse to text. Use / for spaces between words.
+### GuildBalanceGraphCommand
+`gbalgraph` - <no parameters>  - Graphs this guild's transactions history, transaction by transaction.
 ### GuildConfigCommand
 `config` - <key> <value> - Configure the bot for this guild. No arguments to view the configuration.
 ### HeapDumpCommand
