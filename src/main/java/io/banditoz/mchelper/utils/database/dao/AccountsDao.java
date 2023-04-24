@@ -74,6 +74,12 @@ public interface AccountsDao {
     List<Transaction> getNTransactionsForUser(long id, int n) throws SQLException, MoneyException;
 
     /**
+     * @return A {@link List} of all {@link Transaction transactions}.
+     * @throws SQLException   If there was a database error.
+     */
+    List<Transaction> getAllTransactions() throws SQLException;
+
+    /**
      * @return A {@link List} of user accounts <i>without</i> balance associated.
      * @throws SQLException If there was a database error.
      */

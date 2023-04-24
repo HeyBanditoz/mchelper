@@ -8,6 +8,7 @@ import io.jenetics.facilejdbc.Param;
 import io.jenetics.facilejdbc.Query;
 import net.dv8tion.jda.api.entities.User;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -147,6 +148,14 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
     }
 
     @Override
+    public List<Transaction> getAllTransactions() throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("SELECT * FROM transactions ORDER BY \"when\" DESC;")
+                    .as((rs, conn) -> parseMany(rs, conn, this::parseManyTransactions), c);
+        }
+    }
+
+    @Override
     public List<Long> getAllAccounts() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("SELECT id FROM accounts;")
@@ -194,5 +203,13 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         String memo = rs.getString(5);
         LocalDateTime time = rs.getTimestamp(6).toLocalDateTime();
         return Transaction.of(from == 0 ? null : from, to == 0 ? null : to, before, amount, time, memo);
+    }
+
+    @Nullable
+    private Transaction parseManyTransactions(ResultSet rs, Connection c) throws SQLException {
+        if (!rs.next()) {
+            return null;
+        }
+        return createTransactionFromResultSet(rs);
     }
 }

@@ -56,6 +56,14 @@ public record Transaction(
         return before.add(amount);
     }
 
+    public Long fromN() {
+        return from == null ? 0 : from;
+    }
+
+    public Long toN() {
+        return to == null ? 0 : to;
+    }
+
     @Override
     public int compareTo(@Nonnull Transaction o) {
         return this.date.compareTo(o.date);
