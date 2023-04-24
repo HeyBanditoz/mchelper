@@ -48,7 +48,7 @@ public class GuildBalanceGraphCommand extends Command {
             newTxns.add(new Transaction(null, null, runningSum, BigDecimal.ZERO, null, t.date(), Type.GRANT));
         }
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(g.getName(), newTxns);
-        ce.sendImageReply("Last " + txns.size() + " transactions for " + g.getName(), thp.plot());
+        ce.sendImageReply("Last " + newTxns.size() + " transactions for " + g.getName(), thp.plot());
         return Status.SUCCESS;
     }
 
