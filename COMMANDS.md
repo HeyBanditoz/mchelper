@@ -5,7 +5,7 @@ There are a total of 62 commands and 4 regex listeners.
 ### BalanceCommand
 `bal` - <no parameters>  - Checks your balance.
 ### BalanceGraphCommand
-`balgraph` - <no parameters>  - Graphs your transaction history, transaction by transaction.
+`balgraph` - [-d] - Graphs your transaction history, transaction by transaction. Use -d to use dates instead
 ### BaltopCommand
 `baltop` - <no parameters>  - Gets the money leaderboard for this guild.
 ### BashCommand
@@ -41,7 +41,7 @@ There are a total of 62 commands and 4 regex listeners.
 ### FromMorseCommand
 `frommorse` - <morse> - Converts morse to text. Use / for spaces between words.
 ### GuildBalanceGraphCommand
-`gbalgraph` - <no parameters>  - Graphs this guild's transactions history, transaction by transaction.
+`gbalgraph` - [-d] - Graphs this guild's transactions history, transaction by transaction. Use -d to use dates instead
 ### GuildConfigCommand
 `config` - <key> <value> - Configure the bot for this guild. No arguments to view the configuration.
 ### HeapDumpCommand
