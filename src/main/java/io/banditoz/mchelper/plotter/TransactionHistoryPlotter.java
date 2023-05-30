@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 public class TransactionHistoryPlotter {
@@ -37,6 +39,27 @@ public class TransactionHistoryPlotter {
                 .toArray();
         XYChart chart = new XYChartBuilder().title("Transaction history for " + name).width(1500).height(800).build();
         chart.addSeries(name, generate1ToN(y.length), y).setMarker(SeriesMarkers.NONE);
+        chart.getStyler().setYAxisDecimalPattern("$###,###.###").setLegendVisible(false);
+        BufferedImage bi = BitmapEncoder.getBufferedImage(chart);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, "png", baos);
+        return baos;
+    }
+
+    public ByteArrayOutputStream plotWithDates() throws IOException {
+        List<Double> y = transactions.stream()
+                .filter(transaction -> transaction.type() != Type.TRANSFER) // TODO make this in SQL instead
+                .map(Transaction::getFinalAmount)
+                .mapToDouble(BigDecimal::doubleValue)
+                .boxed()
+                .toList();
+        List<Date> x = transactions.stream()
+                .filter(transaction -> transaction.type() != Type.TRANSFER)
+                .map(txn -> Date.from(txn.date().atZone(ZoneId.systemDefault()).toInstant()))
+                .sorted()
+                .toList();
+        XYChart chart = new XYChartBuilder().title("Transaction history for " + name).width(1500).height(800).build();
+        chart.addSeries(name, x, y).setMarker(SeriesMarkers.NONE);
         chart.getStyler().setYAxisDecimalPattern("$###,###.###").setLegendVisible(false);
         BufferedImage bi = BitmapEncoder.getBufferedImage(chart);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

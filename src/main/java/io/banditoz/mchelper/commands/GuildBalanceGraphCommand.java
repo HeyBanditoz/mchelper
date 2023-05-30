@@ -12,6 +12,7 @@ import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.Guild;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class GuildBalanceGraphCommand extends Command {
     @Override
     public Help getHelp() {
         return new Help(commandName(), false).withDescription("Graphs this guild's transactions history, transaction" +
-                " by transaction.");
+                " by transaction. Use -d to use dates instead").withParameters("[-d]");
     }
 
     @Override
@@ -48,7 +49,14 @@ public class GuildBalanceGraphCommand extends Command {
             newTxns.add(new Transaction(null, null, runningSum, BigDecimal.ZERO, null, t.date(), Type.GRANT));
         }
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(g.getName(), newTxns);
-        ce.sendImageReply("Last " + newTxns.size() + " transactions for " + g.getName(), thp.plot());
+        ByteArrayOutputStream plot;
+        if (ce.getCommandArgsString().contains("-d")) {
+            plot = thp.plotWithDates();
+        }
+        else {
+            plot = thp.plot();
+        }
+        ce.sendImageReply("Last " + newTxns.size() + " transactions for " + g.getName(), plot);
         return Status.SUCCESS;
     }
 

@@ -12,6 +12,7 @@ import io.banditoz.mchelper.utils.database.dao.AccountsDao;
 import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.User;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @Requires(database = true)
@@ -24,7 +25,7 @@ public class BalanceGraphCommand extends Command {
     @Override
     public Help getHelp() {
         return new Help(commandName(), false).withDescription("Graphs your transaction history, transaction" +
-                " by transaction.");
+                " by transaction. Use -d to use dates instead").withParameters("[-d]");
     }
 
     @Override
@@ -50,7 +51,14 @@ public class BalanceGraphCommand extends Command {
         }
 
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(u.getName(), txns);
-        ce.sendImageReply("Last " + txns.size() + " transactions for " + u.getName(), thp.plot());
+        ByteArrayOutputStream plot;
+        if (ce.getCommandArgsString().contains("-d")) {
+            plot = thp.plotWithDates();
+        }
+        else {
+            plot = thp.plot();
+        }
+        ce.sendImageReply("Last " + txns.size() + " transactions for " + u.getName(), plot);
         return Status.SUCCESS;
 
     }
