@@ -37,7 +37,7 @@ public class JoinOrderCommand extends Command {
         joinSortedMembers.sort(Comparator.comparing(Member::getTimeJoined));
         StringJoiner sj = new StringJoiner("\n");
         for (Member member : joinSortedMembers) {
-            sj.add(MarkdownSanitizer.escape("[" + (member.getUser().isBot() ? "B" : "U") + "] " + member.getEffectiveName() + "#" + member.getUser().getDiscriminator()));
+            sj.add(MarkdownSanitizer.escape("[" + (member.getUser().isBot() ? "B" : "U") + "] " + member.getEffectiveName()));
         }
         ce.sendReply("```\n" + sj.toString() + "\n```");
         return Status.SUCCESS;

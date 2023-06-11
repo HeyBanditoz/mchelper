@@ -48,7 +48,7 @@ public class TeXRenderer {
     }
 
     public static void sendTeXToChannel(MessageReceivedEvent e, String args) throws Exception {
-        String message = "TeX for " + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator();
+        String message = "TeX for " + e.getMember().getEffectiveName();
         CommandUtils.sendImageReply(message, renderTeX(args), e, true);
     }
 }

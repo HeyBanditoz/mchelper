@@ -5,7 +5,6 @@ import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -34,7 +33,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
                     .setColor(Color.GREEN)
-                    .setDescription(getNameAndDiscriminator(event.getUser()))
+                    .setDescription(event.getMember().getEffectiveName())
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
@@ -51,15 +50,11 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")
                     .setThumbnail(event.getUser().getAvatarUrl() == null ? DEFAULT_AVATAR : event.getUser().getAvatarUrl())
                     .setColor(Color.RED)
-                    .setDescription(getNameAndDiscriminator(event.getUser()))
+                    .setDescription(event.getMember() == null ? event.getUser().getEffectiveName() : event.getMember().getEffectiveName())
                     .setFooter(event.getUser().getId())
                     .setTimestamp(Instant.now())
                     .build();
             event.getGuild().getTextChannelById(defaultChannel).sendMessageEmbeds(me).queue();
         }
-    }
-
-    private String getNameAndDiscriminator(User u) {
-        return u.getName() + "#" + u.getDiscriminator();
     }
 }

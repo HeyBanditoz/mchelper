@@ -263,7 +263,7 @@ public class CommandUtils {
     }
 
     private static String buildMessageAndAuthor(MessageReceivedEvent e) {
-        return "<" + e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + "> " + formatMessage(e.getMessage().getContentRaw());
+        return "<" + e.getAuthor().getName() + "#" + "> " + formatMessage(e.getMessage().getContentRaw());
     }
 
     public static void sendFile(String msg, File f, MessageReceivedEvent e) {

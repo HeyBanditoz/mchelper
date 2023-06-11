@@ -62,7 +62,7 @@ public class UserInfoCommand extends Command {
             roles.add(role.getName());
         }
         MessageEmbed me = new EmbedBuilder()
-                .setTitle(m.getUser().getAsTag())
+                .setTitle(m.getUser().getEffectiveName())
                 .setThumbnail(m.getUser().getEffectiveAvatarUrl())
                 .setColor(m.getUser().isBot() ? Color.CYAN : Color.GREEN)
                 .addField("ID", m.getUser().getId(), false)

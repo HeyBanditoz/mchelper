@@ -166,7 +166,7 @@ public class PollService extends ListenerAdapter {
         int resultsSum = results.values().stream().reduce(Integer::sum).orElse(0);
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("\uD83D\uDCCA " + escape(title))
-                .setFooter(type.nameAsCapitalized() + " mode. " + "Added by " + (u == null ? "Unknown#0000" : u.getName() + '#' + u.getDiscriminator() + '.'), (u == null ? "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png" : u.getAvatarUrl()));
+                .setFooter(type.nameAsCapitalized() + " mode. " + "Added by " + (u == null ? "Unknown#0000" : u.getName() + '.'), (u == null ? "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png" : u.getAvatarUrl()));
         for (int i = 0; i < questions.size(); i++) {
             PollQuestion pq = questions.get(i);
             int c = results.get(pq);

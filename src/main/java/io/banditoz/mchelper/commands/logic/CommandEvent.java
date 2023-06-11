@@ -163,7 +163,7 @@ public class CommandEvent implements UserEvent {
         if (msg.length() > 2000) {
             try {
                 Paste p = new Paste(msg);
-                p.setName(getRawCommandArgs()[0] + " by " + EVENT.getAuthor().getAsTag() + " (" + EVENT.getAuthor().getId() + ")");
+                p.setName(getRawCommandArgs()[0] + " by " + EVENT.getAuthor().getName() + " (" + EVENT.getAuthor().getId() + ")");
                 p.setDescription("Automatically generated paste from message " + EVENT.getMessageId());
                 sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(p));
             } catch (Exception e) {

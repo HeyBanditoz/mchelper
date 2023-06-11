@@ -47,7 +47,7 @@ public class BalanceGraphCommand extends Command {
         }
         List<Transaction> txns = dao.getNTransactionsForUser(u.getIdLong(), count);
         if (txns.isEmpty()) {
-            throw new MoneyException("There is no account history for " + u.getAsTag());
+            throw new MoneyException("There is no account history for " + u.getName());
         }
 
         TransactionHistoryPlotter thp = new TransactionHistoryPlotter(u.getName(), txns);

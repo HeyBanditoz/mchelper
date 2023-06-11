@@ -35,7 +35,7 @@ public class VersionCommand extends Command {
                 .setDescription("[GitLab Commit](https://gitlab.com/HeyBanditoz/mchelper/commit/" + Version.GIT_SHA + ")\n" +
                         "Git revision date: " + gitDate + "\n" +
                         "Build date: " + buildDate)
-                .setFooter("Instance managed by " + owner.getAsTag(), owner.getAvatarUrl())
+                .setFooter("Instance managed by " + owner.getName(), owner.getAvatarUrl())
                 .build();
         ce.sendEmbedReply(me);
         return Status.SUCCESS;

@@ -40,7 +40,7 @@ public class FileUploadListener extends ListenerAdapter {
                             try (InputStream is = a.getProxy().download().get()) {
                                 String pasteContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                                 Paste p = new Paste(pasteContent, a.getFileName());
-                                p.setName(a.getFileName() + " by " + u.getAsTag() + " (" + u.getId() + ")");
+                                p.setName(a.getFileName() + " by " + u.getName() + " (" + u.getId() + ")");
                                 p.setDescription("Automatically generated paste from message " + event.getMessageId());
                                 String pasteUrl = UPLOADER.uploadToPastegg(p);
                                 sj.add(a.getFileName() + ": " + pasteUrl);
