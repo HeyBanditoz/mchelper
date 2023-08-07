@@ -10,6 +10,14 @@ public class DateUtils {
         return ZonedDateTime.ofInstant(ldt, ZoneOffset.UTC, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 
+    public static Instant getNextMidnight() {
+        ZoneId of = ZoneId.of("UTC");
+        LocalTime midnight = LocalTime.MIDNIGHT;
+        LocalDate today = LocalDate.now(of);
+        LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
+        return todayMidnight.toInstant(of.getRules().getOffset(todayMidnight));
+    }
+
     // Everything below is lifted from http://www.java2s.com/Code/Java/Data-Type/Checksiftwocalendarsrepresentthesamedayignoringtime.htm
 
     /**

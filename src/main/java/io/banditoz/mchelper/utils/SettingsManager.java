@@ -72,6 +72,8 @@ public class SettingsManager {
         defaultSettings.setPasteGgBaseUrl("https://paste.gg/");
         defaultSettings.setPasteGgApiKey("<not required>");
         defaultSettings.setTarkovToolsApiEndpoint("https://api.tarkov.dev/graphql");
+        defaultSettings.setDarkSkyEndpoint("https://api.pirateweather.net");
+        defaultSettings.setDarkSkyApiKey(null);
         return defaultSettings;
     }
 

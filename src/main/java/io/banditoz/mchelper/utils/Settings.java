@@ -33,6 +33,10 @@ public class Settings {
     private String pasteGgBaseUrl;
     @JsonProperty("tarkovToolsApiEndpoint")
     private String tarkovToolsApiEndpoint;
+    @JsonProperty("darkSkyEndpoint")
+    private String darkSkyEndpoint;
+    @JsonProperty("darkSkyApiKey")
+    private String darkSkyApiKey;
 
     private final static Settings defaultSettings = SettingsManager.getDefaultSettings();
 
@@ -186,5 +190,25 @@ public class Settings {
     @JsonProperty("tarkovToolsApiEndpoint")
     public void setTarkovToolsApiEndpoint(String tarkovToolsApiEndpoint) {
         this.tarkovToolsApiEndpoint = tarkovToolsApiEndpoint;
+    }
+
+    @JsonProperty("darkSkyEndpoint")
+    public String getDarkSkyEndpoint() {
+        return darkSkyEndpoint;
+    }
+
+    @JsonProperty("darkSkyEndpoint")
+    public void setDarkSkyEndpoint(String darkSkyEndpoint) {
+        this.darkSkyEndpoint = darkSkyEndpoint;
+    }
+
+    @JsonProperty("darkSkyApiKey")
+    public String getDarkSkyApiKey() {
+        return darkSkyApiKey;
+    }
+
+    @JsonProperty("darkSkyApiKey")
+    public void setDarkSkyApiKey(String darkSkyApiKey) {
+        this.darkSkyApiKey = darkSkyApiKey;
     }
 }

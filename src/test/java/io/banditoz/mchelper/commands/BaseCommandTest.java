@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static io.banditoz.mchelper.Whitebox.setInternalState;
+import static io.banditoz.mchelper.utils.Whitebox.setInternalState;
 import static org.mockito.Mockito.*;
 
 /**

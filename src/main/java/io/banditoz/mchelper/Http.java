@@ -1,17 +1,26 @@
 package io.banditoz.mchelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import feign.*;
+import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import io.banditoz.mchelper.http.*;
 import io.banditoz.mchelper.utils.Settings;
+import io.banditoz.mchelper.utils.Whitebox;
+import io.banditoz.mchelper.weather.geocoder.Location;
 import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +34,8 @@ public class Http {
     private final RedditLinkClient redditLinkClient;
     private final FinnhubClient finnhubClient;
     private final OwlbotClient owlbotClient;
+    private final NominatimClient nominatimClient;
+    private final DarkSkyClient darkSkyClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
@@ -66,6 +77,19 @@ public class Http {
             pasteggClient = null;
         }
 
+        if (s.getDarkSkyApiKey() != null) {
+            darkSkyClient = Feign.builder()
+                    .client(feignClient)
+                    .decoder(d)
+                    .errorDecoder(new BodyUrlRedactingErrorDecoder())
+                    .requestInterceptor(uai)
+                    .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", s.getDarkSkyApiKey())))
+                    .target(PirateWeatherClient.class, "https://api.pirateweather.net");
+        }
+        else {
+            darkSkyClient = null;
+        }
+
         urbanDictionaryClient = Feign.builder()
                 .client(feignClient)
                 .decoder(d)
@@ -95,6 +119,13 @@ public class Http {
                 .requestInterceptor(template -> template.header("Authorization", "Token " + mcHelper.getSettings().getOwlBotToken()))
                 .target(OwlbotClient.class, "https://owlbot.info/api") : null;
 
+        nominatimClient = Feign.builder()
+                .client(feignClient)
+                .decoder(new JsonArrayJacksonDecoder(om, Location.class))
+                .errorDecoder(er)
+                .requestInterceptor(uai)
+                .target(NominatimClient.class, "https://nominatim.openstreetmap.org");
+
         LOGGER.info("Finished building Feign clients. Current status: " + this);
     }
 
@@ -122,6 +153,14 @@ public class Http {
         return owlbotClient;
     }
 
+    public NominatimClient getNominatimClient() {
+        return nominatimClient;
+    }
+
+    public DarkSkyClient getDarkSkyClient() {
+        return darkSkyClient;
+    }
+
     private static final class UserAgentInterceptor implements RequestInterceptor {
         private static final String javaVersion = System.getProperty("java.version");
 
@@ -138,6 +177,49 @@ public class Http {
         }
     }
 
+    // TODO just write a custom exception handler instead of this hacky reflection shit lol, but this is quick and lazy :)
+    private static final class BodyUrlRedactingErrorDecoder implements ErrorDecoder {
+        @Override
+        public Exception decode(String methodKey, Response response) {
+            Whitebox.setInternalState(response.request(), "url", "REDACTED");
+            return errorStatus(methodKey, response, 0, 0);
+        }
+    }
+
+    /**
+     * Copied from feign-jackson-12.3 to support lists.
+     *
+     * @param mapper The {@link ObjectMapper} to use.
+     * @param type   The type that we should deserialize to in the {@link List}.
+     */
+    private record JsonArrayJacksonDecoder(ObjectMapper mapper, Class<?> type) implements Decoder {
+        @Override
+        public List<?> decode(Response response, Type type) throws IOException {
+            if (response.status() == 404 || response.status() == 204)
+                return Collections.emptyList();
+            if (response.body() == null)
+                return null;
+            Reader reader = response.body().asReader(response.charset());
+            if (!reader.markSupported()) {
+                reader = new BufferedReader(reader, 1);
+            }
+            try {
+                // Read the first byte to see if we have any data
+                reader.mark(1);
+                if (reader.read() == -1) {
+                    return null; // Eagerly returning null avoids "No content to map due to end-of-input"
+                }
+                reader.reset();
+                return mapper.readValue(reader, mapper.getTypeFactory().constructCollectionType(List.class, this.type));
+            } catch (RuntimeJsonMappingException e) {
+                if (e.getCause() != null && e.getCause() instanceof IOException) {
+                    throw IOException.class.cast(e.getCause());
+                }
+                throw e;
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return "Http{" +
@@ -148,6 +230,8 @@ public class Http {
                 ", redditLinkClient=" + redditLinkClient +
                 ", finnhubClient=" + finnhubClient +
                 ", owlbotClient=" + owlbotClient +
+                ", nominatimClient=" + nominatimClient +
+                ", darkSkyClient=" + darkSkyClient +
                 '}';
     }
 }

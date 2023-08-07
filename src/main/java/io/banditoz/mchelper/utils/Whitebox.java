@@ -2,7 +2,7 @@
  * Copyright (c) 2007 Mockito contributors
  * This program is made available under the terms of the MIT License.
  */
-package io.banditoz.mchelper;
+package io.banditoz.mchelper.utils;
 
 import java.lang.reflect.Field;
 
@@ -27,7 +27,7 @@ public class Whitebox {
             f.setAccessible(true);
             return f.get(target);
         } catch (Exception e) {
-            throw new RuntimeException("Unable to get internal state on a private field. Please report to mockito mailing list.", e);
+            throw new RuntimeException("Unable to get internal state on a private field.", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class Whitebox {
             f.setAccessible(true);
             f.set(target, value);
         } catch (Exception e) {
-            throw new RuntimeException("Unable to set internal state on a private field. Please report to mockito mailing list.", e);
+            throw new RuntimeException("Unable to set internal state on a private field.", e);
         }
     }
 
