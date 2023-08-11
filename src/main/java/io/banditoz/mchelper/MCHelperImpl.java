@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -61,6 +62,7 @@ public class MCHelperImpl implements MCHelper {
     private final NominatimLocationService NLS;
 
     public MCHelperImpl() throws InterruptedException {
+        long before = System.currentTimeMillis();
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
 
         if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
@@ -77,7 +79,7 @@ public class MCHelperImpl implements MCHelper {
         LOGGER.info("\\_|  |_/\\____/\\_| |_/\\___|_| .__/ \\___|_|   ");
         LOGGER.info("                           | |              ");
         LOGGER.info("                           |_|              ");
-        LOGGER.info("MCHelper version " + Version.GIT_SHA + " using JDA " + JDAInfo.VERSION + " committed on " + Version.GIT_DATE);
+        LOGGER.info("MCHelper version {} using JDA {} running on JVM {} commited on {}", Version.GIT_SHA, JDAInfo.VERSION, Runtime.version(), Version.GIT_DATE);
 
         TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
@@ -197,7 +199,7 @@ public class MCHelperImpl implements MCHelper {
         HTTP_HOLDER = new Http(this);
         NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
 
-        LOGGER.info("MCHelper initialization finished.");
+        LOGGER.info("MCHelper initialization finished in {} seconds.", new DecimalFormat("#.#").format((System.currentTimeMillis() - before) / 1000D));
     }
 
     private void shutdown() {
