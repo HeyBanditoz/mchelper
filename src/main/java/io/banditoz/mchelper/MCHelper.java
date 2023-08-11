@@ -10,6 +10,7 @@ import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
@@ -36,4 +37,5 @@ public interface MCHelper {
     void messageOwner(String s);
     Http getHttp();
     PollService getPollService();
+    NominatimLocationService getNominatimLocationService();
 }

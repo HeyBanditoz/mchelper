@@ -12,6 +12,7 @@ import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
@@ -26,12 +27,14 @@ public class MCHelperTestImpl implements MCHelper {
     private final RegexableHandler RH;
     private final ObjectMapper OM;
     private final Http HTTP_HOLDER;
+    private final NominatimLocationService NLS;
 
     public MCHelperTestImpl() throws Exception {
         this.OM = new ObjectMapper().registerModule(new JavaTimeModule());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
         this.HTTP_HOLDER = new Http(this);
+        this.NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
     }
 
     @Override
@@ -117,6 +120,11 @@ public class MCHelperTestImpl implements MCHelper {
     @Override
     public PollService getPollService() {
         return null;
+    }
+
+    @Override
+    public NominatimLocationService getNominatimLocationService() {
+        return NLS;
     }
 
     @Override

@@ -17,6 +17,7 @@ import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.JDAInfo;
@@ -57,6 +58,7 @@ public class MCHelperImpl implements MCHelper {
     private final User OWNER;
     private final Http HTTP_HOLDER;
     private final PollService PS;
+    private final NominatimLocationService NLS;
 
     public MCHelperImpl() throws InterruptedException {
         this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
@@ -193,6 +195,7 @@ public class MCHelperImpl implements MCHelper {
 
         OWNER = JDA.retrieveApplicationInfo().complete().getOwner();
         HTTP_HOLDER = new Http(this);
+        NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
 
         LOGGER.info("MCHelper initialization finished.");
     }
@@ -301,6 +304,10 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public PollService getPollService() {
         return PS;
+    }
+
+    public NominatimLocationService getNominatimLocationService() {
+        return NLS;
     }
 
     /**

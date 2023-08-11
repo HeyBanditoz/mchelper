@@ -153,6 +153,10 @@ public class Http {
         return owlbotClient;
     }
 
+    /**
+     * @apiNote Don't use this. Go through the caching
+     * {@link io.banditoz.mchelper.weather.geocoder.NominatimLocationService#searchForLocation(String)} instead.
+     */
     public NominatimClient getNominatimClient() {
         return nominatimClient;
     }

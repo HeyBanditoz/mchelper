@@ -3,7 +3,6 @@ package io.banditoz.mchelper.commands;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.http.DarkSkyClient;
-import io.banditoz.mchelper.http.NominatimClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.Help;
@@ -31,10 +30,9 @@ public class WeatherCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        NominatimClient nominatimClient = ce.getMCHelper().getHttp().getNominatimClient();
         DarkSkyClient darkSkyClient = ce.getMCHelper().getHttp().getDarkSkyClient();
 
-        List<Location> locs = nominatimClient.searchForLocation(ce.getCommandArgsString());
+        List<Location> locs = ce.getMCHelper().getNominatimLocationService().searchForLocation(ce.getCommandArgsString());
         if (locs.isEmpty()) {
             ce.sendReply("Could not find location.");
             return Status.FAIL;
