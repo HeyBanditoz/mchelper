@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static feign.FeignException.errorStatus;
@@ -84,6 +85,22 @@ public class Http {
                     .errorDecoder(new BodyUrlRedactingErrorDecoder())
                     .requestInterceptor(uai)
                     .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", s.getDarkSkyApiKey())))
+                    .responseInterceptor(r -> {
+                        try {
+                            int remain = Integer.parseInt(r.response().headers().get("X-RateLimit-Remaining-Month").iterator().next());
+                            int limit = Integer.parseInt(r.response().headers().get("X-RateLimit-Limit-Month").iterator().next());
+                            if (remain % 10 == 0) {
+                                LOGGER.info("DarkSky-compat X-RateLimit-Remaining-Month={} X-RateLimit-Limit-Month={}", remain, limit);
+                            }
+                        }
+                        catch (NoSuchElementException ex) {
+                            LOGGER.warn("Could not extract ratelimit info from " + r.response() + ", headers not present?", ex);
+                        }
+                        catch (Exception ex) {
+                            LOGGER.warn("Generic error decoding headers for ratelimit info.", ex);
+                        }
+                        return r.proceed();
+                    })
                     .target(PirateWeatherClient.class, "https://api.pirateweather.net");
         }
         else {

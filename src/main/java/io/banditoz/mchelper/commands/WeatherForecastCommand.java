@@ -7,15 +7,20 @@ import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.weather.IconGenerator;
+import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
 import io.banditoz.mchelper.weather.geocoder.Location;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+
+import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
+import static java.lang.Math.round;
 
 public class WeatherForecastCommand extends Command {
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-HH")
@@ -45,24 +50,22 @@ public class WeatherForecastCommand extends Command {
 
         Location location = locs.get(0);
         DSWeather response = darkSkyClient.getForecast(location.lat(), location.lon());
-        StringBuilder weather = new StringBuilder("Date-Time • Icon • Temp • Precip. Chance\n");
+        Currently c = response.currently();
+        StringBuilder weather = new StringBuilder("When • Icon • Temp • Precip. Chance\n");
         for (List<DataItem> dataItems : Iterables.partition(response.hourly().data(), 3)) {
-            DataItem data = dataItems.get(0);
-            if (data == null) {
-                continue;
-            }
-            weather.append(formatter.format(data.time()))
+            DataItem data = DataItem.reduceSome(dataItems);
+            weather.append(TimeFormat.DATE_TIME_SHORT.format(data.time()))
                     .append(" • ")
                     .append(IconGenerator.generateWeatherIcon(data.icon()))
                     .append(" • ")
-                    .append(data.temperature())
-                    .append("°F • ")
-                    .append(String.format("%.1f%%", response.currently().precipProbability() * 100))
+                    .append("%d°F/%s°C".formatted(round(data.temperature()), fToCHU(data.temperature())))
+                    .append(" • ")
+                    .append(String.format("%d%%", round(data.precipProbability() * 100)))
                     .append("\n");
         }
         ce.sendEmbedReply(new EmbedBuilder()
-                .setTitle("Current Weather • " + response.currently().summary() + " • " + response.currently().temperature() + "°F",
-                        "https://merrysky.net/forecast/" + response.latitude() + "," + response.longitude())
+                .setTitle("Current Weather Forecast • %s • %d°F / %s°C".formatted(c.summary(), round(c.temperature()), fToCHU(c.temperature())),
+                        "https://merrysky.net/forecast/%s,%s".formatted(response.latitude(), response.longitude()))
                 .setDescription(weather.toString())
                 .setFooter(String.format("%s\n(%.5f,%.5f)", location.displayName(), response.latitude(), response.longitude()))
                 .build());
