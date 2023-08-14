@@ -3,12 +3,17 @@ package io.banditoz.mchelper;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class Bot {
     public static void main(String[] args) throws Exception {
+        // required for RSS reader library, a little silly
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
         List<String> argsList = Arrays.asList(args);
         if (argsList.size() > 0 && argsList.contains("dumpcommands")) {
             CommandsToMarkdown.commandsToMarkdown();

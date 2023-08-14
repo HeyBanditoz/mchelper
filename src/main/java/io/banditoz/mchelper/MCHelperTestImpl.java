@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
+import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
@@ -125,6 +126,11 @@ public class MCHelperTestImpl implements MCHelper {
     @Override
     public NominatimLocationService getNominatimLocationService() {
         return NLS;
+    }
+
+    @Override
+    public RssScraper getRssScraper() {
+        return null;
     }
 
     @Override

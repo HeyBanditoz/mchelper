@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
+import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
@@ -60,6 +61,7 @@ public class MCHelperImpl implements MCHelper {
     private final Http HTTP_HOLDER;
     private final PollService PS;
     private final NominatimLocationService NLS;
+    private final RssScraper RSS_SCRAPER;
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
@@ -198,6 +200,7 @@ public class MCHelperImpl implements MCHelper {
         OWNER = JDA.retrieveApplicationInfo().complete().getOwner();
         HTTP_HOLDER = new Http(this);
         NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
+        RSS_SCRAPER = new RssScraper();
 
         LOGGER.info("MCHelper initialization finished in {} seconds.", new DecimalFormat("#.#").format((System.currentTimeMillis() - before) / 1000D));
     }
@@ -308,8 +311,14 @@ public class MCHelperImpl implements MCHelper {
         return PS;
     }
 
+    @Override
     public NominatimLocationService getNominatimLocationService() {
         return NLS;
+    }
+
+    @Override
+    public RssScraper getRssScraper() {
+        return RSS_SCRAPER;
     }
 
     /**

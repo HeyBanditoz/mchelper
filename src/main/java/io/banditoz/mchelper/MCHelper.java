@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.games.GameManager;
+import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
@@ -38,4 +39,5 @@ public interface MCHelper {
     Http getHttp();
     PollService getPollService();
     NominatimLocationService getNominatimLocationService();
+    RssScraper getRssScraper();
 }

@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -191,6 +192,10 @@ public class CommandEvent implements UserEvent {
      */
     public void sendEmbedReply(MessageEmbed me) {
         EVENT.getChannel().sendMessageEmbeds(me).queue();
+    }
+
+    public void sendEmbedsReply(MessageEmbed... mes) {
+        EVENT.getChannel().sendMessageEmbeds(Arrays.asList(mes)).queue();
     }
 
     public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {
