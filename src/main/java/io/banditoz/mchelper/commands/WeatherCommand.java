@@ -2,6 +2,7 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.DateUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
 
+@Requires(settingsMethod = "getDarkSkyApiKey")
 public class WeatherCommand extends Command {
     @Override
     public String commandName() {

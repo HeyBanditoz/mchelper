@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands;
 import com.google.common.collect.Iterables;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
@@ -22,6 +23,7 @@ import java.util.Locale;
 import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
 
+@Requires(settingsMethod = "getDarkSkyApiKey")
 public class WeatherForecastCommand extends Command {
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-HH")
             .withLocale(Locale.US)

@@ -204,6 +204,9 @@ public class Settings {
 
     @JsonProperty("darkSkyApiKey")
     public String getDarkSkyApiKey() {
+        if (darkSkyApiKey != null && darkSkyApiKey.equals(defaultSettings.darkSkyApiKey)) {
+            return null;
+        }
         return darkSkyApiKey;
     }
 
