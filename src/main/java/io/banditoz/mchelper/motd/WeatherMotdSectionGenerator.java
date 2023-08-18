@@ -22,7 +22,7 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
     @Override
     public MessageEmbed generate(TextChannel tc) {
         // TODO customizable location per guild
-        Location location = mcHelper.getNominatimLocationService().searchForLocation(System.getProperty("LOC", "Washington DC")).get(0);
+        Location location = mcHelper.getNominatimLocationService().searchForLocation(System.getenv().getOrDefault("LOC", "Washington DC")).get(0);
         DSWeather response = mcHelper.getHttp().getDarkSkyClient().getCurrentlyDaily(location);
 
         // TODO move to proper WeatherService later in the future to centralize forecast embed generation
