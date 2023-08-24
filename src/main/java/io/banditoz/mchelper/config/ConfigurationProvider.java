@@ -1,7 +1,8 @@
 package io.banditoz.mchelper.config;
 
 import com.google.common.collect.Sets;
-import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.entities.Guild;
@@ -18,26 +19,28 @@ public class ConfigurationProvider {
     private static final AtomicBoolean notifiedDatabaseDown = new AtomicBoolean(false);
 
     private final GuildConfigDao dao;
+    private final Settings settings;
 
-    public ConfigurationProvider(Database database) {
-        if (database == null && !notifiedDatabaseDown.get()) {
+    public ConfigurationProvider(MCHelper mcHelper) {
+        if (mcHelper.getDatabase() == null && !notifiedDatabaseDown.get()) {
             log.warn("The database is down. All configurations will be default!");
             notifiedDatabaseDown.set(true);
             this.dao = null;
         }
         else {
-            this.dao = new GuildConfigDaoImpl(database);
+            this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
         }
+        this.settings = mcHelper.getSettings();
     }
 
-    public String getValue(Config c, long g) {
-        if (g == 0 || dao == null) {
-            return c.getDefaultValue();
+    public String getValue(Config config, long guildId) {
+        if (guildId == 0 || dao == null) {
+            return config.getDefaultValue();
         }
         else {
-            String value = dao.getConfigValueForGuild(c, g);
+            String value = dao.getConfigValueForGuild(config, guildId);
             if (value == null || value.equals("null")) { // 2nd condition just in case
-                return c.getDefaultValue();
+                return config.getDefaultValue();
             }
             else {
                 return value;
@@ -45,7 +48,20 @@ public class ConfigurationProvider {
         }
     }
 
+    public String getValueOrDefault(Config config, String defaultValue, long guildId) {
+        String value = getValue(config, guildId);
+        if (value.equals(config.getDefaultValue())) {
+            return defaultValue;
+        }
+        else {
+            return value;
+        }
+    }
+
     public void writeValue(Config key, String value, long guildId, long userId) throws SQLException {
+        if (key.isBotOwnerLocked() && !settings.getBotOwners().contains(String.valueOf(userId))) {
+            throw new IllegalStateException("You are not a bot owner.");
+        }
         dao.writeValue(key, value, guildId, userId);
     }
 

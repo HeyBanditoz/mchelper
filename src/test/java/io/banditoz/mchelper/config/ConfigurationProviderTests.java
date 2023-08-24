@@ -12,7 +12,7 @@ public class ConfigurationProviderTests extends BaseCommandTest {
     private final ConfigurationProvider provider;
 
     public ConfigurationProviderTests() {
-        this.provider = new ConfigurationProvider(DB);
+        this.provider = new ConfigurationProvider(mcHelper);
     }
 
     @Test

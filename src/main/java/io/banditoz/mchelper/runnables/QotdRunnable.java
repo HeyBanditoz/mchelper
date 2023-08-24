@@ -36,7 +36,7 @@ public class QotdRunnable implements Runnable {
 
     public QotdRunnable(MCHelper mcHelper) {
         this.jda = mcHelper.getJDA();
-        this.configs = new ConfigurationProvider(mcHelper.getDatabase());
+        this.configs = new ConfigurationProvider(mcHelper);
         this.generators = new MotdSectionGenerator[] {
                 new WeatherMotdSectionGenerator(mcHelper),
                 new NewsHeadlineMotdSectionGenerator(mcHelper),

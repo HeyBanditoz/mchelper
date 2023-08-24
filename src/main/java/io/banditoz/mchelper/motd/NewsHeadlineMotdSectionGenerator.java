@@ -3,6 +3,8 @@ package io.banditoz.mchelper.motd;
 import com.apptasticsoftware.rssreader.Channel;
 import com.apptasticsoftware.rssreader.Item;
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -21,14 +23,10 @@ public class NewsHeadlineMotdSectionGenerator extends MotdSectionGenerator {
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
-        // TODO move to guild level config, but carefully, as this will introduce user-controlled URLs the bot accesses, perhaps introduce bot-admin-only guild configs?
-        Map<Channel, List<Item>> stories = mcHelper.getRssScraper().getRssForAll(
-                "https://www.ksl.com/rss/news",
-                "http://rss.cnn.com/rss/cnn_latest.rss",
-                "https://moxie.foxnews.com/google-publisher/latest.xml",
-                "https://techcrunch.com/feed/",
-                "https://feeds.arstechnica.com/arstechnica/science"
-        );
+        ConfigurationProvider configurationProvider = new ConfigurationProvider(mcHelper);
+        String[] urls = configurationProvider.getValue(Config.RSS_URLS, tc.getGuild().getIdLong()).split(" ");
+
+        Map<Channel, List<Item>> stories = mcHelper.getRssScraper().getRssForAll(urls);
         EmbedBuilder eb = new EmbedBuilder().setTitle("News Stories Today").setColor(new Color(23, 183, 204));
         stories.keySet().stream().sorted(Comparator.comparing(Channel::getTitle)).forEach(channel -> {
             Item item = stories.get(channel).get(0);

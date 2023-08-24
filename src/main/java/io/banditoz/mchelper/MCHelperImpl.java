@@ -112,7 +112,7 @@ public class MCHelperImpl implements MCHelper {
             SES.scheduleWithFixedDelay(userMaintenanceRunnable,10, 43200, TimeUnit.SECONDS);
             SES.scheduleWithFixedDelay(pollCullerRunnable, 120, 86400, TimeUnit.SECONDS);
             if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-                JDA.addEventListener(new GuildJoinLeaveListener(DB));
+                JDA.addEventListener(new GuildJoinLeaveListener(this));
             }
             else {
                 LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");

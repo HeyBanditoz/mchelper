@@ -2,7 +2,6 @@ package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
-import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -20,8 +19,8 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(GuildJoinLeaveListener.class);
     private final ConfigurationProvider gc;
 
-    public GuildJoinLeaveListener(Database database) {
-        this.gc = new ConfigurationProvider(database);
+    public GuildJoinLeaveListener(MCHelper mcHelper) {
+        this.gc = new ConfigurationProvider(mcHelper);
     }
 
     @Override

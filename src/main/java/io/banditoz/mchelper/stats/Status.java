@@ -13,7 +13,9 @@ public enum Status {
     /** The executable was on cooldown. */
     COOLDOWN(3),
     /** The user has no permissions to execute this command. */
-    NO_PERMISSION(4);
+    NO_PERMISSION(4),
+    /** While trying to execute this executable, the user did not have bot owner permissions. */
+    BOT_OWNER_CHECK_FAILED(5);
 
     private final int value;
 

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 @Requires(database = true)
@@ -51,7 +52,12 @@ public class GuildConfigCommand extends Command {
                 return Status.SUCCESS;
             }
             else {
-                ce.getConfig().set(Config.valueOf(ce.getRawCommandArgs()[1]), ce.getRawCommandArgs()[2]);
+                Config c = Config.valueOf(ce.getRawCommandArgs()[1]);
+                if (c.isBotOwnerLocked() && !ce.getMCHelper().getSettings().getBotOwners().contains(ce.getUser().getId())) {
+                    ce.sendReply("Sorry, you do not have permissions to set this config. Please get a bot owner to set it for you.");
+                    return Status.BOT_OWNER_CHECK_FAILED;
+                }
+                ce.getConfig().set(Config.valueOf(ce.getRawCommandArgs()[1]), String.join(" ", Arrays.copyOfRange(ce.getRawCommandArgs(), 2, ce.getRawCommandArgs().length)));
                 ce.sendReply("Set.");
                 return Status.SUCCESS;
             }

@@ -24,14 +24,14 @@ public class GuildConfigurationProvider {
         this.guild = ue.getGuild();
         this.user = ue.getUser();
         this.mcHelper = ue.getMCHelper();
-        this.config = new ConfigurationProvider(ue.getDatabase());
+        this.config = new ConfigurationProvider(ue.getMCHelper());
     }
 
     public GuildConfigurationProvider(Guild guild, User user, MCHelper mcHelper) {
         this.guild = guild;
         this.user = user;
         this.mcHelper = mcHelper;
-        this.config = new ConfigurationProvider(mcHelper.getDatabase());
+        this.config = new ConfigurationProvider(mcHelper);
     }
 
     public String get(Config c) {

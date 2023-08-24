@@ -78,7 +78,7 @@ public class RegexableHandler extends ListenerAdapter {
 
     public RegexableHandler(MCHelper mcHelper) throws Exception {
         this.MCHELPER = mcHelper;
-        this.config = new ConfigurationProvider(mcHelper.getDatabase());
+        this.config = new ConfigurationProvider(mcHelper);
         regexables = new ArrayList<>();
         LOGGER.info("Registering regexable listeners...");
         long before = System.currentTimeMillis();
