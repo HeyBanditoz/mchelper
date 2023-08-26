@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
@@ -43,8 +44,23 @@ public class WeatherForecastCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) {
         DarkSkyClient darkSkyClient = ce.getMCHelper().getHttp().getDarkSkyClient();
+        String locationToSearch;
+        if (ce.getCommandArgsString().isBlank()) {
+            String configuredLocation = ce.getConfig().get(Config.WEATHER_DEFAULT_LOC);
+            if (configuredLocation == null) {
+                ce.sendReply("No location provided, and no Config.WEATHER_DEFAULT_LOC was specified.\n" +
+                        "You can use this command to set a default: !config WEATHER_DEFAULT_LOC location here");
+                return Status.FAIL;
+            }
+            else {
+                locationToSearch = configuredLocation;
+            }
+        }
+        else {
+            locationToSearch = ce.getCommandArgsString();
+        }
 
-        List<Location> locs = ce.getMCHelper().getNominatimLocationService().searchForLocation(ce.getCommandArgsString());
+        List<Location> locs = ce.getMCHelper().getNominatimLocationService().searchForLocation(locationToSearch);
         if (locs.isEmpty()) {
             ce.sendReply("Could not find location.");
             return Status.FAIL;

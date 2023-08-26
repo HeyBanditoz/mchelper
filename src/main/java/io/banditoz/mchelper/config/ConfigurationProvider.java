@@ -50,7 +50,7 @@ public class ConfigurationProvider {
 
     public String getValueOrDefault(Config config, String defaultValue, long guildId) {
         String value = getValue(config, guildId);
-        if (value.equals(config.getDefaultValue())) {
+        if (Objects.equals(value, config.getDefaultValue())) {
             return defaultValue;
         }
         else {

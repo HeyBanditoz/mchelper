@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.motd;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
@@ -15,14 +17,26 @@ import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
 
 public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
+    private static final Color EMBED_COLOR = new Color(212, 19, 196);
     public WeatherMotdSectionGenerator(MCHelper mcHelper) {
         super(mcHelper);
     }
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
-        // TODO customizable location per guild
-        Location location = mcHelper.getNominatimLocationService().searchForLocation(System.getenv().getOrDefault("LOC", "Washington DC")).get(0);
+        long guildId = tc.getGuild().getIdLong();
+        ConfigurationProvider c = new ConfigurationProvider(mcHelper);
+        String val = c.getValue(Config.WEATHER_DEFAULT_LOC, guildId);
+        if (val == null) {
+            return new EmbedBuilder()
+                    .setTitle("No location configured!")
+                    .setDescription("Have a guild admin set one with " + c.getValue(Config.PREFIX, guildId) + "config WEATHER_DEFAULT_LOC location here!")
+                    .setColor(EMBED_COLOR)
+                    .build();
+        }
+        Location location = mcHelper.getNominatimLocationService()
+                .searchForLocation(c.getValue(Config.WEATHER_DEFAULT_LOC, guildId))
+                .get(0);
         DSWeather response = mcHelper.getHttp().getDarkSkyClient().getCurrentlyDaily(location);
 
         // TODO move to proper WeatherService later in the future to centralize forecast embed generation
@@ -38,7 +52,7 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
                 .addField("Precipitation", "%s%%".formatted(round(today.precipProbability() * 100D)), true)
                 .addField("Pressure", "%s mb\n%.3f atm".formatted(round(today.pressure()), today.pressure() / 1013.0), true)
                 .setFooter(String.format("%s\n(%.5f,%.5f)", location.displayName(), response.latitude(), response.longitude()))
-                .setColor(new Color(212, 19, 196))
+                .setColor(EMBED_COLOR)
                 .build();
     }
 }
