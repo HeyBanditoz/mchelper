@@ -101,6 +101,7 @@ public class Http {
                         }
                         return r.proceed();
                     })
+                    .retryer(new Retryer.Default(1000L, 3000L, 3))
                     .target(PirateWeatherClient.class, "https://api.pirateweather.net");
         }
         else {
