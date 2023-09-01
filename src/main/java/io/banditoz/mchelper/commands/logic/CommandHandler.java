@@ -3,7 +3,6 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
@@ -61,7 +60,7 @@ public class CommandHandler extends ListenerAdapter {
         }
         char prefix = '!';
         if (e.isFromGuild()) {
-            prefix = new GuildConfigurationProvider(e.getGuild(), e.getAuthor(), MCHELPER).get(Config.PREFIX).charAt(0);
+            prefix = MCHELPER.getConfigurationProvider().getValue(Config.PREFIX, e.getGuild()).charAt(0);
         }
         if (args[0].charAt(0) != prefix) {
             return Optional.empty();

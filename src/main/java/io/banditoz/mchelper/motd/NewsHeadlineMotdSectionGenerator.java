@@ -23,8 +23,8 @@ public class NewsHeadlineMotdSectionGenerator extends MotdSectionGenerator {
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
-        ConfigurationProvider configurationProvider = new ConfigurationProvider(mcHelper);
-        String[] urls = configurationProvider.getValue(Config.RSS_URLS, tc.getGuild().getIdLong()).split(" ");
+        ConfigurationProvider configurationProvider = mcHelper.getConfigurationProvider();
+        String[] urls = configurationProvider.getValue(Config.RSS_URLS, tc.getGuild()).split(" ");
 
         Map<Channel, List<Item>> stories = mcHelper.getRssScraper().getRssForAll(urls);
         EmbedBuilder eb = new EmbedBuilder().setTitle("News Stories Today").setColor(new Color(23, 183, 204));

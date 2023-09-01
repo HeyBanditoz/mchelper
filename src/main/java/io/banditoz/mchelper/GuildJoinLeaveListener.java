@@ -20,13 +20,13 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     private final ConfigurationProvider gc;
 
     public GuildJoinLeaveListener(MCHelper mcHelper) {
-        this.gc = new ConfigurationProvider(mcHelper);
+        this.gc = mcHelper.getConfigurationProvider();
     }
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         log.info("[{}] {} joined {}", (event.getUser().isBot() ? "Bot" : "User"), event.getUser(), event.getGuild());
-        String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild().getIdLong());
+        String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild());
         if (defaultChannel != null) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " joined the guild.")
@@ -43,7 +43,7 @@ public class GuildJoinLeaveListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         log.info("[{}] {} left {}", (event.getUser().isBot() ? "Bot" : "User"), event.getUser(), event.getGuild());
-        String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild().getIdLong());
+        String defaultChannel = gc.getValue(Config.DEFAULT_CHANNEL, event.getGuild());
         if (defaultChannel != null) {
             MessageEmbed me = new EmbedBuilder()
                     .setTitle((event.getUser().isBot() ? "Bot" : "User") + " left the guild.")

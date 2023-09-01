@@ -28,7 +28,7 @@ public class RegexableHandler extends ListenerAdapter {
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return;
         // don't try to run a listener if a command is (probably) present
-        if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && config.getValue(Config.PREFIX, event.getGuild().getIdLong()).charAt(0) == event.getMessage().getContentRaw().charAt(0)) return;
+        if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && config.getValue(Config.PREFIX, event.getGuild()).charAt(0) == event.getMessage().getContentRaw().charAt(0)) return;
 
         getRegexableByEvent(event).forEach(r -> MCHELPER.getThreadPoolExecutor().execute(() -> {
             if (r.handleCooldown(event.getChannel().getId())) {
@@ -78,7 +78,7 @@ public class RegexableHandler extends ListenerAdapter {
 
     public RegexableHandler(MCHelper mcHelper) throws Exception {
         this.MCHELPER = mcHelper;
-        this.config = new ConfigurationProvider(mcHelper);
+        this.config = mcHelper.getConfigurationProvider();
         regexables = new ArrayList<>();
         LOGGER.info("Registering regexable listeners...");
         long before = System.currentTimeMillis();

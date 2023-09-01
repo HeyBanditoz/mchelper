@@ -25,7 +25,7 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
     @Override
     public MessageEmbed generate(TextChannel tc) {
         long guildId = tc.getGuild().getIdLong();
-        ConfigurationProvider c = new ConfigurationProvider(mcHelper);
+        ConfigurationProvider c = mcHelper.getConfigurationProvider();
         String val = c.getValue(Config.WEATHER_DEFAULT_LOC, guildId);
         if (val == null) {
             return new EmbedBuilder()

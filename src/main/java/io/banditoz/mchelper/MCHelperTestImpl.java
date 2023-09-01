@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
@@ -130,6 +131,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public RssScraper getRssScraper() {
+        return null;
+    }
+
+    @Override
+    public ConfigurationProvider getConfigurationProvider() {
         return null;
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
@@ -62,6 +63,7 @@ public class MCHelperImpl implements MCHelper {
     private final PollService PS;
     private final NominatimLocationService NLS;
     private final RssScraper RSS_SCRAPER;
+    private final ConfigurationProvider CONFIG_PROVIDER;
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
@@ -129,6 +131,7 @@ public class MCHelperImpl implements MCHelper {
             PS = null;
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
+        CONFIG_PROVIDER = new ConfigurationProvider(this);
         this.CH = buildCommandHandler();
         this.RH = buildRegexableHandler();
         JDA.addEventListener(CH, RH);
@@ -319,6 +322,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public RssScraper getRssScraper() {
         return RSS_SCRAPER;
+    }
+
+    @Override
+    public ConfigurationProvider getConfigurationProvider() {
+        return CONFIG_PROVIDER;
     }
 
     /**
