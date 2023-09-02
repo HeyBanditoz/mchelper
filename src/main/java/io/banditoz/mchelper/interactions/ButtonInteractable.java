@@ -62,6 +62,9 @@ public class ButtonInteractable {
                 consumer.accept(event);
             }
         }
+        else {
+            event.getEvent().deferEdit().queue();
+        }
     }
 
     /**
