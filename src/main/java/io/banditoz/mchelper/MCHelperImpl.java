@@ -113,12 +113,6 @@ public class MCHelperImpl implements MCHelper {
             PollCullerRunnable pollCullerRunnable = new PollCullerRunnable(this);
             SES.scheduleWithFixedDelay(userMaintenanceRunnable,10, 43200, TimeUnit.SECONDS);
             SES.scheduleWithFixedDelay(pollCullerRunnable, 120, 86400, TimeUnit.SECONDS);
-            if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-                JDA.addEventListener(new GuildJoinLeaveListener(this));
-            }
-            else {
-                LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
-            }
             GuildVoiceListener voiceListener = new GuildVoiceListener(this);
             voiceListener.updateAll();
             JDA.addEventListener(voiceListener);
@@ -132,6 +126,15 @@ public class MCHelperImpl implements MCHelper {
             LOGGER.warn("The database is not configured! All database functionality will not be enabled.");
         }
         CONFIG_PROVIDER = new ConfigurationProvider(this);
+        // TODO GuildJoinLeaveListener wants ConfigurationProvider during db init but we have to init ConfigProvider after DB init... fix the weirdness there
+        if (Database.isConfigured()) {
+            if (JDA.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
+                JDA.addEventListener(new GuildJoinLeaveListener(this));
+            }
+            else {
+                LOGGER.info("GUILD_MEMBERS gateway intent not enabled. Not enabling the guild leave/join listener...");
+            }
+        }
         this.CH = buildCommandHandler();
         this.RH = buildRegexableHandler();
         JDA.addEventListener(CH, RH);
