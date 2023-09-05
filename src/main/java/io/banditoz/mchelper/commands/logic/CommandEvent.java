@@ -4,6 +4,7 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.interactions.EmbedPaginator;
+import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.paste.Paste;
@@ -328,6 +329,15 @@ public class CommandEvent implements UserEvent {
 
     public ChannelType getChannelType() {
         return EVENT.getChannel().getType();
+    }
+
+    /**
+     * Replays this command, with all cooldown checks, permission checks, and other effects described in
+     * {@link io.banditoz.mchelper.commands.logic.CommandHandler#go(net.dv8tion.jda.api.events.message.MessageReceivedEvent, io.banditoz.mchelper.stats.Kind)}
+     * and callees within.
+     */
+    public void replay() {
+        MCHELPER.getCommandHandler().go(EVENT, Kind.TEXT_REPLAY);
     }
 
     @Override

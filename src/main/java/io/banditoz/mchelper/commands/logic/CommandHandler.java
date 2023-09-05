@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
@@ -29,6 +30,15 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        go(event, Kind.TEXT);
+    }
+
+    /**
+     * Attempt to run a command that is currently unknown at invocation time.
+     * @param event The {@link MessageReceivedEvent} to use for command execution.
+     * @param kind  The source of the command.
+     */
+    protected void go(@Nonnull MessageReceivedEvent event, Kind kind) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong() || event.getMessage().isWebhookMessage())
             return; // don't execute own commands, or webhook messages
         getCommandByEvent(event).ifPresent(c -> {
@@ -39,7 +49,7 @@ public class CommandHandler extends ListenerAdapter {
             if (c.canExecute(event, MCHELPER)) {
                 MCHELPER.getThreadPoolExecutor().execute(() -> {
                     try {
-                        Stat s = c.execute(event, MCHELPER);
+                        Stat s = c.execute(event, MCHELPER, kind);
                         if (s.getStatus() == Status.SUCCESS) {
                             commandsRun++;
                         }

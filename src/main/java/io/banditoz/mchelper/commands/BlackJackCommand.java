@@ -67,7 +67,7 @@ public class BlackJackCommand extends Command {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(hit, game::hit, stay, game::stand),
                     ce.getEvent().getAuthor()::equals,
-                    0, success);
+                    0, success, ce);
             ce.getMCHelper().getButtonListener().addInteractable(i);
         });
 

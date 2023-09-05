@@ -108,8 +108,7 @@ public class AddquoteCommand extends Command {
                 cache.put(u.getIdLong(), new CommandEventAndQuote(ce, finalId));
                 ButtonInteractable bi = new ButtonInteractable(Map.of(b, this::editQuote),
                         user -> ce.getEvent().getMessage().getAuthor().equals(user),
-                        60,
-                        sentMessage);
+                        60, sentMessage, ce);
                 ce.getMCHelper().getButtonListener().addInteractable(bi);
             }
         });
@@ -124,7 +123,7 @@ public class AddquoteCommand extends Command {
         event.getEvent().editMessage(edit).queue();
         CommandEventAndQuote ceq = cache.get(event.getEvent().getUser().getIdLong());
         if (ceq == null) {
-            event.removeListenerAndDestroy();
+            event.removeListenerAndDestroy(event);
             return;
         }
         CommandEvent ce = ceq.ce();

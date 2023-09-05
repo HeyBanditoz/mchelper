@@ -48,7 +48,7 @@ public class DoubleOrNothingCommand extends Command {
         ce.getEvent().getChannel().sendMessage(m).queue(message -> {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(bet, game::bet, stop, game::stop),
-                    ce.getEvent().getAuthor()::equals, 0, message);
+                    ce.getEvent().getAuthor()::equals, 0, message, ce);
             ce.getMCHelper().getButtonListener().addInteractable(i);
         });
         return Status.SUCCESS;

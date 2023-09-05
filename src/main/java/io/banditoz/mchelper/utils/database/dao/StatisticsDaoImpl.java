@@ -26,7 +26,7 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
     public void log(Stat s) throws SQLException {
         MessageChannelUnion channel = s.getEvent().getChannel();
         try (Connection c = DATABASE.getConnection()) {
-            Query.of("INSERT INTO statistics VALUES (:a, :b, :t, :c, :d, :e, :f, :g, :h)")
+            Query.of("INSERT INTO statistics VALUES (:a, :b, :t, :c, :d, :e, :f, :k, :g, :h)")
                     .on(
                             Param.value("a", s.getEvent().isFromGuild() ? s.getEvent().getGuild().getIdLong() : Optional.empty()),
                             Param.value("b", channel instanceof ThreadChannel t ? t.getParentChannel().getIdLong() : channel.getIdLong()),
@@ -35,6 +35,7 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
                             Param.value("d", s.getClassName()),
                             Param.value("e", s.getArgs()),
                             Param.value("f", s.getStatus().getValue()),
+                            Param.value("k", s.getKind().ordinal()),
                             Param.value("g", s.getExecutionTime()),
                             Param.value("h", Timestamp.valueOf(s.getExecutedWhen()))
                     ).execute(c);

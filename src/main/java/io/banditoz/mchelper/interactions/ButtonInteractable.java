@@ -1,11 +1,16 @@
 package io.banditoz.mchelper.interactions;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +34,11 @@ public class ButtonInteractable {
     private final Predicate<User> canInteract;
     /** The timeout when we should remove the {@link Button}s and stop accepting input, in seconds. */
     private final long timeoutSeconds;
-    /** The {@link Message} associated with this {@link ButtonInteractable}. */
     private volatile ScheduledFuture<?> timeoutFuture;
+    /** The {@link Message} that the buttons are associated with. */
     private final Message message;
+    /** The {@link CommandEvent} that originally created this. */
+    private final CommandEvent ce;
     private final static Logger LOGGER = LoggerFactory.getLogger(ButtonInteractable.class);
 
     /**
@@ -43,11 +50,12 @@ public class ButtonInteractable {
      * @param timeoutSeconds The timeout when we should remove the {@link Button}s and stop accepting input, in seconds.
      */
     public ButtonInteractable(@NotNull Map<Button, Consumer<WrappedButtonClickEvent>> map, @NotNull Predicate<User> canInteract,
-                              long timeoutSeconds, Message m) {
+                              long timeoutSeconds, @NotNull Message m, @Nullable CommandEvent ce) {
         buttons.putAll(map);
         this.canInteract = canInteract;
         this.timeoutSeconds = timeoutSeconds;
         this.message = m;
+        this.ce = ce;
     }
 
     /**
@@ -79,6 +87,8 @@ public class ButtonInteractable {
 
     /**
      * Removes all {@link Button} in the referenced {@link Message}.
+     *
+     * @deprecated Use {@link #destroy(WrappedButtonClickEvent)} as that is the smoother path.
      */
     public void destroy() {
         LOGGER.debug("Removing all buttons for " + message);
@@ -86,6 +96,24 @@ public class ButtonInteractable {
             timeoutFuture.cancel(false);
         }
         message.editMessageComponents(Collections.emptyList()).queue();
+    }
+
+    /**
+     * Removes all {@link Button} in the referenced {@link Message}. If the supplied {@link ButtonInteractionEvent}
+     * hasn't been acknowledged yet, it'll acknowledge the event by removing the buttons. Else, edit the message (the
+     * former is smoother)
+     */
+    public void destroy(WrappedButtonClickEvent event) {
+        LOGGER.debug("Removing all buttons for " + message);
+        if (timeoutFuture != null) {
+            timeoutFuture.cancel(false);
+        }
+        if (event.getEvent().isAcknowledged()) {
+            message.editMessageComponents(Collections.emptyList()).queue();
+        }
+        else {
+            event.getEvent().editMessage(MessageEditBuilder.fromMessage(event.getMessage()).setComponents(Collections.emptyList()).build()).queue();
+        }
     }
 
     /**
@@ -107,6 +135,18 @@ public class ButtonInteractable {
         message.editMessageComponents(rows).queue();
     }
 
+    public void destroyAndAddNewButtons(MessageEmbed me, ButtonInteractionEvent event, ActionRow... rows) {
+        LOGGER.debug("Removing AND REPLACING buttons and embeds for " + event);
+        if (timeoutFuture != null) {
+            timeoutFuture.cancel(true);
+        }
+        MessageEditData msgEdit = new MessageEditBuilder()
+                .setEmbeds(me)
+                .setComponents(rows)
+                .build();
+        event.editMessage(msgEdit).queue();
+    }
+
     /**
      * @return The timeout of this {@link ButtonInteractable}, in seconds.
      */
@@ -124,5 +164,9 @@ public class ButtonInteractable {
 
     public Message getMessage() {
         return message;
+    }
+
+    public CommandEvent getCommandEvent() {
+        return ce;
     }
 }

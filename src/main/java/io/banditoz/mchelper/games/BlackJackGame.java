@@ -109,11 +109,11 @@ public class BlackJackGame extends Game {
                 }
                 if (getDealerSum() == 21) {
                     standOff();
-                    wrappedEvent.removeListenerAndDestroy(win(WinState.STANDOFF));
+                    wrappedEvent.destroyThenAddReplayer(win(WinState.STANDOFF));
                     return;
                 }
                 payout(true);
-                wrappedEvent.removeListenerAndDestroy(win(WinState.BLACKJACK));
+                wrappedEvent.destroyThenAddReplayer(win(WinState.BLACKJACK));
             }
             else if (sum < 21) {
                 wrappedEvent.getEvent().editMessageEmbeds(generate()).queue();
@@ -122,7 +122,7 @@ public class BlackJackGame extends Game {
                 while (getDealerSum() < 17) {
                     hitDealer();
                 }
-                wrappedEvent.removeListenerAndDestroy(lose());
+                wrappedEvent.destroyThenAddReplayer(lose());
             }
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
@@ -139,14 +139,14 @@ public class BlackJackGame extends Game {
         try {
             if (getDealerSum() > 21 || getDealerSum() < getPlayersSum()) {
                 payout(false);
-                wrappedEvent.removeListenerAndDestroy(win(WinState.NORMAL));
+                wrappedEvent.destroyThenAddReplayer(win(WinState.NORMAL));
             }
             else if (getDealerSum() == getPlayersSum()) {
                 standOff();
-                wrappedEvent.removeListenerAndDestroy(win(WinState.STANDOFF));
+                wrappedEvent.destroyThenAddReplayer(win(WinState.STANDOFF));
             }
             else {
-                wrappedEvent.removeListenerAndDestroy(lose());
+                wrappedEvent.destroyThenAddReplayer(lose());
             }
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);

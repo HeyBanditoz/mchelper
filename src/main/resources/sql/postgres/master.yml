@@ -29,3 +29,6 @@ databaseChangeLog:
   - include:
       file: 20230416-thread-id-column.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20230903-add-kind-to-statistics.yml
+      relativeToChangelogFile: true

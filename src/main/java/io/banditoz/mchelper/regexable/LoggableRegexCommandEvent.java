@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.regexable;
 
+import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 
@@ -21,6 +22,11 @@ public class LoggableRegexCommandEvent extends RegexCommandEvent implements Stat
 
     public Status getStatus() {
         return status;
+    }
+
+    @Override
+    public Kind getKind() {
+        return Kind.TEXT;
     }
 
     public int getExecutionTime() {

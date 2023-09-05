@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands.logic;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
@@ -78,17 +79,15 @@ public abstract class Command {
         return true;
     }
 
-    /**
-     * Runs onCommand() in parallel.
-     */
-    protected Stat execute(MessageReceivedEvent e, MCHelper MCHelper) {
+    /** Runs onCommand(). Called from {@link CommandHandler#onMessageReceived(MessageReceivedEvent)} asynchronously, or by replay logic. */
+    protected Stat execute(MessageReceivedEvent e, MCHelper MCHelper, Kind kind) {
         CommandEvent ce = new CommandEvent(e, LOGGER, MCHelper, this.getClass().getSimpleName());
         long before = System.nanoTime();
         // bot owners can bypass permission checks
         if (!CommandPermissions.isBotOwner(e.getAuthor(), MCHelper.getSettings())) {
             if (e.isFromGuild() && !e.getMember().getPermissions().containsAll(getRequiredPermissions())) {
                 e.getMessage().addReaction(Emoji.fromUnicode("\uD83D\uDD34")).queue();
-                return new LoggableCommandEvent(ce, (int) ((System.nanoTime()) - before) / 1000000, Status.NO_PERMISSION);
+                return new LoggableCommandEvent(ce, (int) ((System.nanoTime()) - before) / 1000000, Status.NO_PERMISSION, kind);
             }
         }
 
@@ -99,14 +98,14 @@ public abstract class Command {
                     entity = e.getAuthor();
                     if (!cooldown.handle(e.getAuthor())) {
                         e.getMessage().addReaction(Emoji.fromUnicode("⏲️")).queue();
-                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
+                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN, kind);
                     }
                 }
                 case PER_GUILD -> {
                     entity = e.getGuild();
                     if (!cooldown.handle(e.getGuild())) {
                         e.getMessage().addReaction(Emoji.fromUnicode("⏲️")).queue();
-                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN);
+                        return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN, kind);
                     }
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + cooldown.getType());
@@ -119,11 +118,11 @@ public abstract class Command {
                 lazyRemove(entity);
             }
             long after = System.nanoTime() - before;
-            return new LoggableCommandEvent(ce, (int) (after / 1000000), status);
+            return new LoggableCommandEvent(ce, (int) (after / 1000000), status, kind);
         } catch (Exception ex) {
             lazyRemove(entity);
             CommandUtils.sendExceptionMessage(e, ex, LOGGER);
-            return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.EXCEPTIONAL_FAILURE);
+            return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.EXCEPTIONAL_FAILURE, kind);
         } catch (Throwable t) {
             lazyRemove(entity);
             CommandUtils.sendThrowableMessage(e, t, LOGGER);

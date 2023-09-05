@@ -24,7 +24,7 @@ public class VideoPokerGame extends Game {
     private static final Logger log = LoggerFactory.getLogger(VideoPokerGame.class);
 
     public VideoPokerGame(BigDecimal ante, User u, MCHelper mcHelper) {
-        super(100, 500, mcHelper, u, ante);
+        super(100, 10000, mcHelper, u, ante);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class VideoPokerGame extends Game {
         } catch (Exception ex) {
             log.error("Error while playing out!", ex);
         } finally {
-            e.removeListenerAndDestroy(me.build());
+            e.destroyThenAddReplayer(me.build());
         }
     }
 

@@ -62,7 +62,7 @@ public class DuelGame extends Game {
                 Button clickMe = Button.primary(UUID.randomUUID().toString(), "Click Me!");
                 ButtonInteractable bi = new ButtonInteractable(
                         Map.of(clickMe, this::fight),
-                        user -> user.equals(player) || user.equals(opponent), 0, event.getMessage());
+                        user -> user.equals(player) || user.equals(opponent), 0, event.getMessage(), null);
                 event.destroyThenReplaceWith(bi, ActionRow.of(clickMe));
             }, RANDOM.nextLong(7 - 2 + 1) + 2, TimeUnit.SECONDS);
         }

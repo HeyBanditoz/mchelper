@@ -63,7 +63,7 @@ public class EmbedPaginator {
                 .addActionRow(prev, stop, next)
                 .build();
         channel.sendMessage(messageCreate).queue(message -> {
-            this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message);
+            this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message, null);
             bl.addInteractable(bi);
         });
     }
@@ -87,6 +87,6 @@ public class EmbedPaginator {
     }
 
     private void handleStop(WrappedButtonClickEvent event) {
-        event.removeListenerAndDestroy();
+        event.removeListenerAndDestroy(event);
     }
 }

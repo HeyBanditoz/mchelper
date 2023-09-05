@@ -47,15 +47,22 @@ public interface Stat {
      */
     Status getStatus();
     /**
+     * Returns how this command was executed via the {@link Kind} enum.
+     *
+     * @return The kind.
+     */
+    Kind getKind();
+    /**
      * Returns a String representation of this {@link Stat}, meant for logging.
      *
      * @return A String representation.
      */
     default String getLogMessage() {
-        return String.format("%s returned %s in %d ms. <%s@%s> %s",
+        return String.format("%s returned %s in %d ms via %s. <%s@%s> %s",
                 this.getClassName(),
                 this.getStatus(),
                 this.getExecutionTime(),
+                this.getKind(),
                 this.getEvent().getAuthor().toString(),
                 this.getEvent().getChannel().toString(),
                 this.getArgs().isEmpty() ? "<no arguments>" : this.getArgs());

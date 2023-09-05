@@ -51,7 +51,7 @@ public class DoubleOrNothingGame extends Game {
             event.editMessageEmbeds(generate(currentBet , player)).queue();
         }
         else {
-            wrappedEvent.removeListenerAndDestroy(lose(currentBet , player));
+            wrappedEvent.destroyThenAddReplayer(lose(currentBet , player));
             gm.stopPlaying(player);
         }
     }
@@ -67,7 +67,7 @@ public class DoubleOrNothingGame extends Game {
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
         } finally {
-            wrappedEvent.removeListenerAndDestroy(cashout(currentBet , player));
+            wrappedEvent.destroyThenAddReplayer(cashout(currentBet , player));
         }
     }
 
