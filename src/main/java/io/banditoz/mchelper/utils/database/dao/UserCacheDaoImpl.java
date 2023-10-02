@@ -12,13 +12,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UserCacheDaoImpl extends Dao implements UserCacheDao {
     private static final Dctor<User> DCTOR = Dctor.of(
             Dctor.field("id", User::getIdLong),
-            Dctor.field("username", User::getName)
+            Dctor.field("username", User::getName),
+            Dctor.field("discriminator", t ->
+                    // looks a little odd, but if the discriminator is null, 0000 (which discord seems to return) or blank, return null for the database
+                    (t.getDiscriminator() == null || t.getDiscriminator().equals("0000") || t.getDiscriminator().isBlank()) ? Optional.empty() : Integer.parseInt(t.getDiscriminator())
+            ),
+            Dctor.field("display_name", User::getGlobalName),
+            Dctor.field("is_bot", User::isBot)
     );
 
     public UserCacheDaoImpl(Database database) {
@@ -28,7 +35,17 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
     public void replaceAll(List<User> users) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             c.setAutoCommit(false);
-            Query.of("INSERT INTO username_cache VALUES (:id, :username) ON CONFLICT (id) DO UPDATE SET username = excluded.username")
+            Query.of("""
+                         INSERT INTO
+                             username_cache
+                         VALUES
+                             (:id, :username, :discriminator, :display_name, :is_bot)
+                             ON CONFLICT (id) DO UPDATE SET
+                                 username = excluded.username,
+                                 discriminator = excluded.discriminator,
+                                 display_name = excluded.display_name,
+                                 is_bot = excluded.is_bot
+                         """)
                     .execute(Batch.of(users, DCTOR), c);
             c.commit();
             c.setAutoCommit(true);
@@ -66,11 +83,17 @@ public class UserCacheDaoImpl extends Dao implements UserCacheDao {
 
     private List<FakeUser> getAllCachedUsers() throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM username_cache")
+            return Query.of("SELECT id, username, discriminator, display_name, is_bot FROM username_cache")
                     .as((rs, conn) -> {
                         List<FakeUser> users = new ArrayList<>();
                         while (rs.next()) {
-                            users.add(new FakeUser(rs.getLong(1), rs.getString(2)));
+                            users.add(new FakeUser(
+                                    rs.getLong(1),
+                                    rs.getString(2),
+                                    rs.getInt(3),
+                                    rs.getString(4),
+                                    rs.getBoolean(5)
+                            ));
                         }
                         return users;
                     }, c);

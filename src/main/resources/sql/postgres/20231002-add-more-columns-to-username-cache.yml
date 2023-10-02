@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-more-columns-to-username-cache
+      author: Hayden
+      comment: Adds more columns to username cache.
+      changes:
+        - addColumn:
+            tableName: username_cache
+            columns:
+              - column:
+                  name: discriminator
+                  type: SMALLINT
+              - column:
+                  name: display_name
+                  type: VARCHAR(32)
+              - column:
+                  name: is_bot
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  # will be corrected when UserMaintenanceRunnable runs for the first time
+                  defaultValue: 'false'
