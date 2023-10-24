@@ -57,8 +57,8 @@ public class GuildConfigCommand extends Command {
                     ce.sendReply("Sorry, you do not have permissions to set this config. Please get a bot owner to set it for you.");
                     return Status.BOT_OWNER_CHECK_FAILED;
                 }
-                ce.getConfig().set(Config.valueOf(ce.getRawCommandArgs()[1]), String.join(" ", Arrays.copyOfRange(ce.getRawCommandArgs(), 2, ce.getRawCommandArgs().length)));
-                ce.sendReply("Set.");
+                String valueSetTo = ce.getConfig().set(Config.valueOf(ce.getRawCommandArgs()[1]), String.join(" ", Arrays.copyOfRange(ce.getRawCommandArgs(), 2, ce.getRawCommandArgs().length)));
+                ce.sendReply("Set to `" + MarkdownSanitizer.escape(valueSetTo) + "`.");
                 return Status.SUCCESS;
             }
         }

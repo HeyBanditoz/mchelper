@@ -40,13 +40,13 @@ public class CommandUtils {
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }
-        _sendReply(reply, e, true, true);
+        _sendReply(reply, e, true, true, false);
     }
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
         l.error("THROWABLE! Offending message: " + buildMessageAndAuthor(e), t);
         String reply = "***STATUS: CALAMITOUS!!!*** " + StringUtils.truncate(MarkdownSanitizer.escape(t.toString()), 500, true);
-        _sendReply(reply, e, true, true);
+        _sendReply(reply, e, true, true, false);
     }
 
     /**
@@ -57,7 +57,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e, true, true);
+        _sendReply(msg, e, true, true, false);
     }
 
     /**
@@ -68,7 +68,19 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReplyWithoutPing(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e, true, false);
+        _sendReply(msg, e, true, false, false);
+    }
+
+    /**
+     * Sends a reply. Note if msg is empty, &lt;no output&gt; will be send instead. All mentions will be sanitized, they
+     * will appear as normal but, otherwise not do anything. The invoking user will <i>not</i> be pinged.
+     *
+     * @param msg The reply.
+     * @param e   The MessageReceivedEvent to reply to.
+     * @param allowLinkEmbeds Whether link embeds should be allowed (i.e. replaced with <$0>.)
+     */
+    public static void sendReplyWithoutPing(String msg, MessageReceivedEvent e, boolean allowLinkEmbeds) {
+        _sendReply(msg, e, true, false, allowLinkEmbeds);
     }
 
     /**
@@ -79,7 +91,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendUnsanitizedReply(String msg, MessageReceivedEvent e) {
-        _sendReply(msg, e, false, true);
+        _sendReply(msg, e, false, true, false);
     }
 
     /**
@@ -90,8 +102,8 @@ public class CommandUtils {
      * @param sanitizeMentions Whether or not to sanitize mentions contained in the reply.
      * @param ping             Whether or not to ping the invoker.
      */
-    private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions, boolean ping) {
-        msg = formatMessage(msg);
+    private static void _sendReply(String msg, MessageReceivedEvent c, boolean sanitizeMentions, boolean ping, boolean allowLinkEmbeds) {
+        msg = formatMessage(msg, allowLinkEmbeds);
         List<String> split = SplitUtil.split(msg, 2_000, SplitUtil.Strategy.WHITESPACE);
         for (String s : split) {
             MessageCreateBuilder mb = new MessageCreateBuilder()
@@ -134,7 +146,7 @@ public class CommandUtils {
             p.waitFor();
 
             MessageCreateBuilder m = new MessageCreateBuilder()
-                    .setContent(formatMessage(msg))
+                    .setContent(formatMessage(msg, false))
                     .addFiles(FileUpload.fromData(f));
             if (sanitizeMentions) {
                 m.setAllowedMentions(Collections.emptyList());
@@ -147,7 +159,7 @@ public class CommandUtils {
         } catch (IOException ex) {
             LOGGER.warn("There was most likely an error trying to execute oxipng: " + ex.getMessage());
             MessageCreateBuilder m = new MessageCreateBuilder()
-                    .setContent(formatMessage(msg))
+                    .setContent(formatMessage(msg, false))
                     .addFiles(FileUpload.fromData(f));
             if (sanitizeMentions) {
                 m.setAllowedMentions(Collections.emptyList());
@@ -226,14 +238,14 @@ public class CommandUtils {
      * @param msg The string to check.
      * @return The formatted message.
      */
-    public static String formatMessage(String msg) {
+    public static String formatMessage(String msg, boolean allowLinkEmbeds) {
         if (msg == null) {
             msg = "<null output>";
         }
-        else if (msg.isEmpty()) {
+        else if (msg.isBlank()) {
             msg = "<no output>";
         }
-        return URL_PATTERN.matcher(msg).replaceAll("<$0>"); // wrap String in brackets so discord won't embed it
+        return allowLinkEmbeds ? msg : URL_PATTERN.matcher(msg).replaceAll("<$0>"); // wrap String in brackets so discord won't embed it
     }
 
     public static String[] commandArgs(String string) {
@@ -263,10 +275,10 @@ public class CommandUtils {
     }
 
     private static String buildMessageAndAuthor(MessageReceivedEvent e) {
-        return "<" + e.getAuthor().getName() + "#" + "> " + formatMessage(e.getMessage().getContentRaw());
+        return "<" + e.getAuthor().getName() + "#" + "> " + formatMessage(e.getMessage().getContentRaw(), false);
     }
 
     public static void sendFile(String msg, File f, MessageReceivedEvent e) {
-        e.getChannel().sendMessage(formatMessage(msg)).addFiles(FileUpload.fromData(f)).queue();
+        e.getChannel().sendMessage(formatMessage(msg, false)).addFiles(FileUpload.fromData(f)).queue();
     }
 }

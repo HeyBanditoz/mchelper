@@ -65,6 +65,10 @@ public class RegexCommandEvent implements UserEvent {
         CommandUtils.sendReplyWithoutPing(msg, EVENT);
     }
 
+    public void sendReplyWithoutPingAllowingLinkEmbeds(String msg) {
+        CommandUtils.sendReplyWithoutPing(msg, EVENT, true);
+    }
+
     /**
      * Sends typing to where this event came from.
      */

@@ -29,10 +29,10 @@ import static feign.FeignException.errorStatus;
 
 public class Http {
     private final OkHttpClient client;
+    private final OkHttpClient nonRedirectingClient;
     private final TarkovClient tarkovClient;
     private final PasteggClient pasteggClient;
     private final UrbanDictionaryClient urbanDictionaryClient;
-    private final RedditLinkClient redditLinkClient;
     private final FinnhubClient finnhubClient;
     private final OwlbotClient owlbotClient;
     private final NominatimClient nominatimClient;
@@ -46,6 +46,14 @@ public class Http {
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS);
+        // what the hell? why is this necessary? thanks kotlin...
+        builder.setFollowRedirects$okhttp(false);
+        builder.setFollowSslRedirects$okhttp(false);
+        nonRedirectingClient = builder.build();
+
         feign.okhttp.OkHttpClient feignClient = new feign.okhttp.OkHttpClient(client);
         Settings s = mcHelper.getSettings();
         ObjectMapper om = mcHelper.getObjectMapper();
@@ -115,12 +123,6 @@ public class Http {
                 .requestInterceptor(uai)
                 .target(UrbanDictionaryClient.class, "https://api.urbandictionary.com");
 
-        // this client doesn't follow redirects to fool the stupid reddit link fetching
-        redditLinkClient = Feign.builder()
-                .client(feignClient)
-                .options(new Request.Options(10, TimeUnit.SECONDS, 60, TimeUnit.SECONDS, false))
-                .target(RedditLinkClient.class, "https://reddit.app.link");
-
         finnhubClient = mcHelper.getSettings().getFinnhubKey() != null ? Feign.builder()
                     .client(feignClient)
                     .decoder(d)
@@ -147,6 +149,10 @@ public class Http {
         LOGGER.info("Finished building Feign clients. Current status: " + this);
     }
 
+    public OkHttpClient getClient() {
+        return client;
+    }
+
     public TarkovClient getTarkovClient() {
         return tarkovClient;
     }
@@ -157,10 +163,6 @@ public class Http {
 
     public UrbanDictionaryClient getUrbanDictionaryClient() {
         return urbanDictionaryClient;
-    }
-
-    public RedditLinkClient getRedditLinkClient() {
-        return redditLinkClient;
     }
 
     public FinnhubClient getFinnhubClient() {
@@ -242,14 +244,20 @@ public class Http {
         }
     }
 
+    public okhttp3.Response placeNonRedirectingRequest(okhttp3.Request request) throws IOException {
+        try (okhttp3.Response response = nonRedirectingClient.newCall(request).execute()) {
+            return response;
+        }
+    }
+
     @Override
     public String toString() {
         return "Http{" +
                 "client=" + client +
+                ", nonRedirectingClient=" + nonRedirectingClient +
                 ", tarkovClient=" + tarkovClient +
                 ", pasteggClient=" + pasteggClient +
                 ", urbanDictionaryClient=" + urbanDictionaryClient +
-                ", redditLinkClient=" + redditLinkClient +
                 ", finnhubClient=" + finnhubClient +
                 ", owlbotClient=" + owlbotClient +
                 ", nominatimClient=" + nominatimClient +

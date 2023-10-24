@@ -48,9 +48,10 @@ public class GuildConfigurationProvider {
         return config.getAllConfigs(guild);
     }
 
-    public void set(Config c, String value) throws SQLException {
+    public String set(Config c, String value) throws SQLException {
         if (value.equals("null")) {
             config.writeValue(c, null, guild.getIdLong(), user.getIdLong());
+            return value;
         }
         else {
             switch (c) {
@@ -86,8 +87,10 @@ public class GuildConfigurationProvider {
                         throw new IllegalArgumentException("This bot needs MANAGE_ROLES to do this.");
                     }
                 }
+                case BETTER_REDDIT_LINKS -> value = String.valueOf(Boolean.parseBoolean(value));
             }
             config.writeValue(c, value, guild.getIdLong(), user.getIdLong());
+            return value;
         }
     }
 

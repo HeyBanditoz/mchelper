@@ -45,6 +45,6 @@ public class ReminderRunnable implements Runnable {
     }
 
     private String format(Reminder r) {
-        return CommandUtils.formatMessage("*Buzz* <@" + r.getAuthorId() + "> " + r.getReminder());
+        return CommandUtils.formatMessage("*Buzz* <@" + r.getAuthorId() + "> " + r.getReminder(), false);
     }
 }
