@@ -23,9 +23,12 @@ public class RedditLinkExtractor {
 
     public String extractFromRedditShareLink(String url) throws IOException {
         try (Response response = http.placeNonRedirectingRequest(getBaseRequest().url(url).build())) {
-            // need to redirect *just once more*
-            String loc = response.header("Location");
-            try (okhttp3.Response response2 = http.placeNonRedirectingRequest(getBaseRequest().url(loc).build())) {
+            String loc = response.header("Location").split("\\?")[0]; // strip tracking shit
+            if (url.contains("www.")) {
+                return loc;
+            }
+            // need to redirect *just once more* if the original url didn't already contain a www.
+            try (Response response2 = http.placeNonRedirectingRequest(getBaseRequest().url(loc).build())) {
                 return response2.header("Location").split("\\?")[0]; // strip tracking shit
             }
         }
