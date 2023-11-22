@@ -34,8 +34,6 @@ public class LotteryCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         // TODO reduce the massive amounts of copypaste in here
         LotteryManager lm = ce.getMCHelper().getLotteryManager();
-        AccountManager am = ce.getMCHelper().getAccountManager();
-
         Lottery l = lm.getLottery(ce.getGuild());
         if (ce.getCommandArgsString().isBlank()) {
             if (l != null) {
@@ -54,21 +52,13 @@ public class LotteryCommand extends Command {
                         " after four hours when there are at least two entrants.");
             }
         }
+        else if (ce.getCommandArgsString().equalsIgnoreCase("max")) {
+            BigDecimal requestedTicket = lm.getTicketLimitForGuild(ce.getGuild());
+            enterLottery(ce, l, requestedTicket);
+        }
         else {
             BigDecimal requestedTicket = new BigDecimal(ce.getCommandArgsString());
-            am.checkUserCanCompleteTransaction(ce.getEvent().getAuthor(), requestedTicket);
-            if (l == null) {
-                lm.startLotteryForGuild(ce.getEvent().getChannel().asTextChannel());
-                l = lm.getLottery(ce.getGuild());
-            }
-            lm.enterMember(requestedTicket, ce.getEvent().getMember());
-            List<LotteryEntrant> entrantsForLottery = lm.getEntrantsForLottery(ce.getGuild());
-            BigDecimal sum = entrantsForLottery.stream()
-                    .map(LotteryEntrant::amount)
-                    .reduce(BigDecimal::add)
-                    .orElse(BigDecimal.ZERO);
-            ce.sendReply("You have entered the lottery. It is set to end %s (if there are at least two entrants) with a current pot of $%s. Entrant list:\n%s"
-                    .formatted(TimeFormat.RELATIVE.format(l.drawAt().toInstant()), format(sum), getParticipantAndAmountsForLottery(entrantsForLottery)));
+            enterLottery(ce, l, requestedTicket);
         }
         return Status.SUCCESS;
     }
@@ -92,5 +82,23 @@ public class LotteryCommand extends Command {
                     .append("%.\n");
         }
         return participants.toString();
+    }
+
+    private void enterLottery(CommandEvent ce, Lottery l, BigDecimal requestedTicket) throws Exception {
+        AccountManager am = ce.getMCHelper().getAccountManager();
+        LotteryManager lm = ce.getMCHelper().getLotteryManager();
+        am.checkUserCanCompleteTransaction(ce.getEvent().getAuthor(), requestedTicket);
+        if (l == null) {
+            lm.startLotteryForGuild(ce.getEvent().getChannel().asTextChannel());
+            l = lm.getLottery(ce.getGuild());
+        }
+        lm.enterMember(requestedTicket, ce.getEvent().getMember());
+        List<LotteryEntrant> entrantsForLottery = lm.getEntrantsForLottery(ce.getGuild());
+        BigDecimal sum = entrantsForLottery.stream()
+                .map(LotteryEntrant::amount)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
+        ce.sendReply("You have entered the lottery. It is set to end %s (if there are at least two entrants) with a current pot of $%s. Entrant list:\n%s"
+                .formatted(TimeFormat.RELATIVE.format(l.drawAt().toInstant()), format(sum), getParticipantAndAmountsForLottery(entrantsForLottery)));
     }
 }

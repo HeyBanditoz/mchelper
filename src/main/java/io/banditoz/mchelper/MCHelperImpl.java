@@ -83,7 +83,7 @@ public class MCHelperImpl implements MCHelper {
         LOGGER.info("\\_|  |_/\\____/\\_| |_/\\___|_| .__/ \\___|_|   ");
         LOGGER.info("                           | |              ");
         LOGGER.info("                           |_|              ");
-        LOGGER.info("MCHelper version {} using JDA {} running on JVM {} commited on {}", Version.GIT_SHA, JDAInfo.VERSION, Runtime.version(), Version.GIT_DATE);
+        LOGGER.info("MCHelper version {} using JDA {} running on JVM {} committed on {}", Version.GIT_SHA, JDAInfo.VERSION, Runtime.version(), Version.GIT_DATE);
 
         TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
