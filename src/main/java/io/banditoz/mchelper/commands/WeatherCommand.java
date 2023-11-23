@@ -81,7 +81,7 @@ public class WeatherCommand extends Command {
                         .formatted(round(stats.getMin()), round(stats.getMax()), fToCHU(stats.getMin()), fToCHU(stats.getMax())), true)
                 .addField("Humidity", "%s%%".formatted(round(c.humidity() * 100D)), true)
                 .addField("Wind", "%s mph".formatted(round(c.windSpeed())), true)
-                .addField("Precipitation", "%s%%".formatted(round(c.precipProbability() * 100D)), true)
+                .addField("Precipitation", "%s%%%s".formatted(round(c.precipProbability() * 100D), c.getFormattedPrecipType()), true)
                 .addField("Pressure", "%s mb\n%.3f atm".formatted(round(c.pressure()), c.pressure() / 1013.0), true)
                 .setFooter("%s\n(%.4f,%.4f)".formatted(location.displayName(), response.latitude(), response.longitude()))
                 .build());

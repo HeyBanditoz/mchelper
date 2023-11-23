@@ -78,7 +78,7 @@ public class WeatherForecastCommand extends Command {
                     .append(" • ")
                     .append("%d°F/%s°C".formatted(round(data.temperature()), fToCHU(data.temperature())))
                     .append(" • ")
-                    .append(String.format("%d%%", round(data.precipProbability() * 100)))
+                    .append("%d%%%s".formatted(round(data.precipProbability() * 100), data.getFormattedPrecipType()))
                     .append("\n");
         }
         ce.sendEmbedReply(new EmbedBuilder()

@@ -15,7 +15,8 @@ public record DataItem(double windGust, int apparentTemperatureMinTime, double t
                        int temperatureMinTime, int uvIndexTime, double apparentTemperatureMax, double temperatureHigh,
                        int temperatureLowTime, double precipAccumulation, double apparentTemperatureHigh, Instant time,
                        int precipIntensityMaxTime, int windGustTime, double uvIndex, int apparentTemperatureMaxTime,
-                       double precipIntensityError, double apparentTemperature, double ozone, double temperature) {
+                       double precipIntensityError, double apparentTemperature, double ozone, double temperature)
+        implements Precipitationable {
 
     // TODO expand with more methods to average *all* fields in DataItem? basic functionality here only, as we only care about what WeatherForecast uses, though, which is only averaging two fields
     // perhaps this would just be better as a classic mutable POJO...
