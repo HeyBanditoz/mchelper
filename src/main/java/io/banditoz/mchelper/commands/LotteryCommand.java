@@ -72,13 +72,14 @@ public class LotteryCommand extends Command {
                 .sum();
         // summon someone using some runes
         for (LotteryEntrant entrant : entrantsForLottery) {
+            double am = entrant.amount().doubleValue() / sum * 100;
             participants.append("<@")
                     .append(entrant.userId())
                     .append(">")
                     .append(": $")
                     .append(AccountManager.format(entrant.amount()))
                     .append(", ")
-                    .append(String.format("%.2f", entrant.amount().doubleValue() / sum * 100))
+                    .append(am < 0.01 ? am : String.format("%.2f", am))
                     .append("%.\n");
         }
         return participants.toString();
