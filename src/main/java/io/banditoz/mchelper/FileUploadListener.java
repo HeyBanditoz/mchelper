@@ -35,12 +35,12 @@ public class FileUploadListener extends ListenerAdapter {
                 StringJoiner sj = new StringJoiner("\n");
                 for (Message.Attachment a : attachments) {
                     try {
-                        if (a.getSize() > 1024 * 512 ) { // 512 KB
-                            LOGGER.warn("Attachment {} from message {} is too big, with size {}.", a, m, a.getSize());
-                            continue;
-                        }
                         String c = a.getContentType();
                         if (c != null && (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html"))) {
+                            if (a.getSize() > 1024 * 512 ) { // 512 KB
+                                LOGGER.warn("Attachment {} from message {} is too big, with size {}.", a, m, a.getSize());
+                                continue;
+                            }
                             try (InputStream is = a.getProxy().download().get()) {
                                 String pasteContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                                 Paste p = new Paste(pasteContent, a.getFileName());
