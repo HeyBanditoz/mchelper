@@ -11,6 +11,8 @@ public enum ItemType {
     AMMO_BOX,
     @JsonProperty("armor")
     ARMOR,
+    @JsonProperty("armorPlate")
+    ARMOR_PLATE,
     @JsonProperty("backpack")
     BACKPACK,
     @JsonProperty("barter")

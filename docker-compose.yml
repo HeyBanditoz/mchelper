@@ -13,7 +13,11 @@ services:
             - SCHEMA=public
             - TZ=America/Denver  # swap this for your timezone, affects logging and dates in SQL
         image: registry.gitlab.com/heybanditoz/mchelper:master
-        entrypoint: [ 'java', '-Xmx64M', '-Xms64M', '-jar', '/app/bot.jar' ]
+        deploy:
+            resources:
+              limits:
+                  memory: 128M
+        entrypoint: [ 'java', '-jar', '/app/bot.jar' ]
 
     postgres:
         container_name: postgres

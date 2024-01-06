@@ -46,6 +46,8 @@ be destroyed.
 
 ### Local Development
 
+MCHelper uses Java 21.
+
 For development with a database, remove the entire `mchelper` block under `services` in the docker-compose file, and
 set up your system environment variables like so:
 `HOST=127.0.0.1;DB=postgres;USER=postgres;PASS=SuperSecret;SCHEMA=public`

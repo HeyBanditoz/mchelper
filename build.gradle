@@ -14,24 +14,24 @@ plugins {
     id 'application'
 
     // Fat JARs for easier distribution to places
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'io.github.goooler.shadow' version '8.1.3'
 
     // Distribute latest git information in jar
-    id 'com.peterabeles.gversion' version '1.10'
+    id 'com.peterabeles.gversion' version '1.10.2'
 
     // Clean testing output
-    id 'com.adarshr.test-logger' version '3.2.0'
+    id 'com.adarshr.test-logger' version '4.0.0'
 
     // Code coverage
     id 'jacoco'
-    id 'de.jansauer.printcoverage' version '2.0.0'
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0'
 
     // Database version control
-    id 'org.liquibase.gradle' version '2.1.1'
+    id 'org.liquibase.gradle' version '2.2.1'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
 liquibase {
