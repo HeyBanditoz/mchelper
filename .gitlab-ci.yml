@@ -1,5 +1,4 @@
-image: gradle:7.6.1-jdk17
-
+image: gradle:8.5.0-jdk21
 before_script:
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
@@ -41,11 +40,11 @@ test:
         # Create initial schema (tests build.gradle script
         - ln -s src/main/resources/sql sql
         - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle update
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle test jacocoTestReport printCoverage
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle test jacocoTestReport jacocoAggregatedReport
     needs: ["package"]
     dependencies:
         - package
-    coverage: '/Coverage: \d+\.\d+/'
+    coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
     artifacts:
         when: always
         paths:
@@ -80,8 +79,8 @@ create_image:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - DOCKER_BUILDKIT=1 docker build -t $IMAGE_TAG .
         - docker push $IMAGE_TAG
-    only:
-        - master
+#    only:
+#        - master
 
 new_commands:
     stage: deploy
