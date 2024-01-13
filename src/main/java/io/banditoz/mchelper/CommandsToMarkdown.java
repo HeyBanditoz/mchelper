@@ -1,5 +1,6 @@
 package io.banditoz.mchelper;
 
+import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.regexable.Regexable;
 import org.slf4j.Logger;
@@ -16,6 +17,10 @@ public class CommandsToMarkdown {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandsToMarkdown.class);
 
     public static void commandsToMarkdown() throws Exception {
+        // TODO there must be a better way of doing this...
+        Config.setProperty("mchelper.owlbot.token", "temp");
+        Config.setProperty("mchelper.finnhub.token", "temp");
+        Config.setProperty("mchelper.darksky.token", "temp");
         LOGGER.info("Beginning dumping of commands and regex listeners to markdown...");
         MCHelper mcHelper = new MCHelperTestImpl();
         StringBuilder markdown = new StringBuilder("# Commands\n");
