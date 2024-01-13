@@ -30,7 +30,7 @@ public class GuildConfigCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (ce.getEvent().getMember().hasPermission(Permission.MANAGE_SERVER) || CommandPermissions.isBotOwner(ce.getUser(), ce.getMCHelper().getSettings())) {
+        if (ce.getEvent().getMember().hasPermission(Permission.MANAGE_SERVER) || CommandPermissions.isBotOwner(ce.getUser())) {
             if (ce.getRawCommandArgs().length == 1) {
                 StringJoiner sj = new StringJoiner("\n");
                 ce.getConfig().getAllConfigs().forEach((config, value) -> {
@@ -53,7 +53,7 @@ public class GuildConfigCommand extends Command {
             }
             else {
                 Config c = Config.valueOf(ce.getRawCommandArgs()[1]);
-                if (c.isBotOwnerLocked() && !ce.getMCHelper().getSettings().getBotOwners().contains(ce.getUser().getId())) {
+                if (c.isBotOwnerLocked() && !io.avaje.config.Config.list().of("mchelper.owners").contains(ce.getUser().getId())) {
                     ce.sendReply("Sorry, you do not have permissions to set this config. Please get a bot owner to set it for you.");
                     return Status.BOT_OWNER_CHECK_FAILED;
                 }

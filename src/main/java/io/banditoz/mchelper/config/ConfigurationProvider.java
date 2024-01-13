@@ -2,7 +2,6 @@ package io.banditoz.mchelper.config;
 
 import com.google.common.collect.Sets;
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,7 +23,6 @@ public class ConfigurationProvider {
     private static final Logger log = LoggerFactory.getLogger(ConfigurationProvider.class);
     private boolean notifiedDatabaseDown = false;
     private final GuildConfigDao dao;
-    private final Settings settings;
     private final Cache<GuildCacheKey, String> cache = Cache2kBuilder.of(GuildCacheKey.class, String.class)
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .suppressExceptions(false)
@@ -40,7 +38,6 @@ public class ConfigurationProvider {
         else {
             this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
         }
-        this.settings = mcHelper.getSettings();
     }
 
     /**
@@ -86,7 +83,7 @@ public class ConfigurationProvider {
     }
 
     public void writeValue(Config key, String value, long guildId, long userId) throws SQLException {
-        if (key.isBotOwnerLocked() && !settings.getBotOwners().contains(String.valueOf(userId))) {
+        if (key.isBotOwnerLocked() && io.avaje.config.Config.list().ofLong("mchelper.owners").contains(userId)) {
             throw new IllegalStateException("You are not a bot owner.");
         }
         dao.writeValue(key, value, guildId, userId);

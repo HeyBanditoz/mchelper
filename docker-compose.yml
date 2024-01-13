@@ -4,7 +4,7 @@ services:
     mchelper:
         container_name: mchelper
         volumes:
-            - './Config.json:/app/Config.json'
+            - './application.yml:/app/application.yml'
         environment:
             - HOST=postgres
             - DB=postgres

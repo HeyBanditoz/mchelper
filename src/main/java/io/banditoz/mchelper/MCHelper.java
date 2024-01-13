@@ -10,7 +10,6 @@ import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
@@ -26,7 +25,6 @@ public interface MCHelper {
     Database getDatabase();
     ReminderService getReminderService();
     ThreadPoolExecutor getThreadPoolExecutor();
-    Settings getSettings();
     CommandHandler getCommandHandler();
     List<Regexable> getRegexListeners();
     StatsRecorder getStatsRecorder();

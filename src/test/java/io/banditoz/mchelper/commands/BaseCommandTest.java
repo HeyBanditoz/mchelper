@@ -4,7 +4,6 @@ import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.MCHelperTestImpl;
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.CommandTests;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.JDA;
@@ -98,7 +97,6 @@ public abstract class BaseCommandTest {
         when(ce.getEvent().getJDA()).thenReturn(j);
         when(ce.getDatabase()).thenReturn(DB);
         this.mcHelper = spy(MCHelperTestImpl.class);
-        when(mcHelper.getSettings()).thenReturn(CommandTests.getMockSettings());
         when(mcHelper.getDatabase()).thenReturn(DB);
         when(mcHelper.getAccountManager()).thenReturn(AM);
         when(mcHelper.getJDA()).thenReturn(j);

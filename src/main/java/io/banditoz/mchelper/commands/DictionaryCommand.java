@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.util.ArrayList;
 import java.util.List;
 
-@Requires(settingsMethod = "getOwlBotToken")
+@Requires(config = "mchelper.owlbot.token")
 public class DictionaryCommand extends Command {
     @Override
     public String commandName() {

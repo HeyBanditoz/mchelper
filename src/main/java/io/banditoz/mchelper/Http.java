@@ -7,8 +7,8 @@ import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import io.avaje.config.Config;
 import io.banditoz.mchelper.http.*;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.Whitebox;
 import io.banditoz.mchelper.weather.geocoder.Location;
 import okhttp3.OkHttp;
@@ -55,66 +55,64 @@ public class Http {
         nonRedirectingClient = builder.build();
 
         feign.okhttp.OkHttpClient feignClient = new feign.okhttp.OkHttpClient(client);
-        Settings s = mcHelper.getSettings();
         ObjectMapper om = mcHelper.getObjectMapper();
         JacksonDecoder d = new JacksonDecoder(om);
         JacksonEncoder e = new JacksonEncoder(om);
         UserAgentInterceptor uai = new UserAgentInterceptor();
         BodyRedactingErrorDecoder er = new BodyRedactingErrorDecoder();
 
-        tarkovClient = (s.getTarkovToolsApiEndpoint() != null) ? Feign.builder()
-                .client(feignClient)
-                .decoder(d)
-                .errorDecoder(er)
-                .requestInterceptor(uai)
-                .target(TarkovClient.class, s.getTarkovToolsApiEndpoint()) : null;
+        tarkovClient = Config.getOptional("mchelper.endpoints.tarkov-market")
+                .map(url -> Feign.builder()
+                        .client(feignClient)
+                        .decoder(d)
+                        .errorDecoder(er)
+                        .requestInterceptor(uai)
+                        .target(TarkovClient.class, url))
+                .orElse(null);
 
-        if (s.getPasteGgApiEndpoint() != null) {
-            Feign.Builder b = Feign.builder()
-                    .client(feignClient)
-                    .decoder(d)
-                    .encoder(e)
-                    .errorDecoder(er)
-                    .requestInterceptors(List.of())
-                    .requestInterceptor(uai);
-            if (s.getPasteGgApiKey() != null) {
-                b.requestInterceptor(template -> template.header("Authorization", "Key " + s.getPasteGgApiKey()));
-            }
-            pasteggClient = b.target(PasteggClient.class, s.getPasteGgApiEndpoint());
-        }
-        else {
-            pasteggClient = null;
-        }
+        pasteggClient = Config.getOptional("mchelper.pastegg.api-url")
+                .map(url -> {
+                    Feign.Builder b = Feign.builder()
+                            .client(feignClient)
+                            .decoder(d)
+                            .encoder(e)
+                            .errorDecoder(er)
+                            .requestInterceptors(List.of())
+                            .requestInterceptor(uai);
+                    String key = Config.getNullable("mchelper.pastegg.api-key");
+                    if (key != null) {
+                        b.requestInterceptor(template -> template.header("Authorization", "Key " + key));
+                    }
+                    return b.target(PasteggClient.class, url);
+                })
+                .orElse(null);
 
-        if (s.getDarkSkyApiKey() != null) {
-            darkSkyClient = Feign.builder()
-                    .client(feignClient)
-                    .decoder(d)
-                    .errorDecoder(new BodyUrlRedactingErrorDecoder())
-                    .requestInterceptor(uai)
-                    .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", s.getDarkSkyApiKey())))
-                    .responseInterceptor(r -> {
-                        try {
-                            int remain = Integer.parseInt(r.response().headers().get("X-RateLimit-Remaining-Month").iterator().next());
-                            int limit = Integer.parseInt(r.response().headers().get("X-RateLimit-Limit-Month").iterator().next());
-                            if (remain % 10 == 0) {
-                                LOGGER.info("DarkSky-compat X-RateLimit-Remaining-Month={} X-RateLimit-Limit-Month={}", remain, limit);
+        darkSkyClient = Config.getOptional("mchelper.darksky.token")
+                .map(token -> Feign.builder()
+                        .client(feignClient)
+                        .decoder(d)
+                        .errorDecoder(new BodyUrlRedactingErrorDecoder())
+                        .requestInterceptor(uai)
+                        .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", token)))
+                        .responseInterceptor(r -> {
+                            try {
+                                int remain = Integer.parseInt(r.response().headers().get("X-RateLimit-Remaining-Month").iterator().next());
+                                int limit = Integer.parseInt(r.response().headers().get("X-RateLimit-Limit-Month").iterator().next());
+                                if (remain % 10 == 0) {
+                                    LOGGER.info("DarkSky-compat X-RateLimit-Remaining-Month={} X-RateLimit-Limit-Month={}", remain, limit);
+                                }
                             }
-                        }
-                        catch (NoSuchElementException ex) {
-                            LOGGER.warn("Could not extract ratelimit info from " + r.response() + ", headers not present?", ex);
-                        }
-                        catch (Exception ex) {
-                            LOGGER.warn("Generic error decoding headers for ratelimit info.", ex);
-                        }
-                        return r.proceed();
-                    })
-                    .retryer(new Retryer.Default(1000L, 3000L, 3))
-                    .target(PirateWeatherClient.class, "https://api.pirateweather.net");
-        }
-        else {
-            darkSkyClient = null;
-        }
+                            catch (NoSuchElementException ex) {
+                                LOGGER.warn("Could not extract ratelimit info from " + r.response() + ", headers not present?", ex);
+                            }
+                            catch (Exception ex) {
+                                LOGGER.warn("Generic error decoding headers for ratelimit info.", ex);
+                            }
+                            return r.proceed();
+                        })
+                        .retryer(new Retryer.Default(1000L, 3000L, 3))
+                        .target(PirateWeatherClient.class, "https://api.pirateweather.net"))
+                .orElse(null);
 
         urbanDictionaryClient = Feign.builder()
                 .client(feignClient)
@@ -123,21 +121,25 @@ public class Http {
                 .requestInterceptor(uai)
                 .target(UrbanDictionaryClient.class, "https://api.urbandictionary.com");
 
-        finnhubClient = mcHelper.getSettings().getFinnhubKey() != null ? Feign.builder()
-                    .client(feignClient)
-                    .decoder(d)
-                    .errorDecoder(er)
-                    .requestInterceptor(uai)
-                    .requestInterceptor(template -> template.header("X-Finnhub-Token", mcHelper.getSettings().getFinnhubKey()))
-                    .target(FinnhubClient.class, "https://finnhub.io/api") : null;
+        finnhubClient = Config.getOptional("mchelper.finnhub.token")
+                .map(token -> Feign.builder()
+                        .client(feignClient)
+                        .decoder(d)
+                        .errorDecoder(er)
+                        .requestInterceptor(uai)
+                        .requestInterceptor(template -> template.header("X-Finnhub-Token", token))
+                        .target(FinnhubClient.class, "https://finnhub.io/api"))
+                .orElse(null);
 
-        owlbotClient = mcHelper.getSettings().getOwlBotToken() != null ? Feign.builder()
-                .client(feignClient)
-                .decoder(d)
-                .errorDecoder(er)
-                .requestInterceptor(uai)
-                .requestInterceptor(template -> template.header("Authorization", "Token " + mcHelper.getSettings().getOwlBotToken()))
-                .target(OwlbotClient.class, "https://owlbot.info/api") : null;
+        owlbotClient = Config.getOptional("mchelper.owlbot.token")
+                .map(token -> Feign.builder()
+                        .client(feignClient)
+                        .decoder(d)
+                        .errorDecoder(er)
+                        .requestInterceptor(uai)
+                        .requestInterceptor(template -> template.header("Authorization", "Token " + token))
+                        .target(OwlbotClient.class, "https://owlbot.info/api"))
+                .orElse(null);
 
         nominatimClient = Feign.builder()
                 .client(feignClient)

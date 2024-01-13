@@ -28,14 +28,11 @@ In the repository is a [docker-compose.yml](docker-compose.yml) file you can use
 Postgres-database configured. It will use the latest Docker image from the
 [master](https://gitlab.com/HeyBanditoz/mchelper/-/tree/master) branch.
 
-To try it out, you will first need to output the default config to a file:
+To try it out, copy the `application-example.yml` file to `application.yml` editing it with your token. Set your
+environment variables for the database (see below for what you need,) then you can run the database migration. This will
+create tables on first launch, or run migrations that don't exist yet.
 
-`docker run --rm registry.gitlab.com/heybanditoz/mchelper:master --entrypoint java -jar /app/bot.jar gensettings > Config.json`
-
-Then edit the resulting `Config.json` file. Set your environment variables for the database (see below for what you
-need,) then you can run the database migration. This will create tables, or, if you updated it, update the tables.
-
-`docker run --rm registry.gitlab.com/heybanditoz/mchelper:master --entrypoint java -jar /app/bot.jar migrate`
+`docker-compose run --entrypoint java -jar /app/bot.jar migrate`
 
 Finally, bring up the bot.
 
@@ -86,8 +83,9 @@ in Docker commands.
 
 ## Configuration
 
-On first run the bot will generate one for you. All external services the bot can access will be configured here, except
-the Postgres database. To configure that, you'll need to pass the following environment variables to Java:
+You will need to copy `application-example.yml` to `application.yml` and edit it with your tokens. All external services
+the bot can access will be configured here, except the Postgres database. To configure that, you'll need to pass the
+following environment variables to the JVM:
 * HOST
 * DB
 * USER

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public abstract class ElevatedCommand extends Command {
     @Override
     protected boolean canExecute(MessageReceivedEvent e, MCHelper mcHelper) {
-        if (CommandPermissions.isBotOwner(e.getAuthor(), mcHelper.getSettings())) {
+        if (CommandPermissions.isBotOwner(e.getAuthor())) {
             return true;
         }
         else {

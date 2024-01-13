@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils.paste;
 
+import io.avaje.config.Config;
 import io.banditoz.mchelper.MCHelper;
 
 public class PasteggUploader {
@@ -20,7 +21,7 @@ public class PasteggUploader {
     }
 
     private String buildUrl(PasteResponse pr) {
-        String baseUrl = MCHELPER.getSettings().getPasteGgBaseUrl();
+        String baseUrl = Config.get("mchelper.pastegg.base-url");
         baseUrl = (baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
         return baseUrl + pr.getResult().getId();
     }

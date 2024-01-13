@@ -12,13 +12,11 @@ import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -62,11 +60,6 @@ public class MCHelperTestImpl implements MCHelper {
     @Override
     public ThreadPoolExecutor getThreadPoolExecutor() {
         return null;
-    }
-
-    @Override
-    public Settings getSettings() {
-        return getMockSettings();
     }
 
     @Override
@@ -141,19 +134,4 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public void messageOwner(String s) {}
-
-    private Settings getMockSettings() {
-        Settings settings = new Settings();
-        List<String> defaultOwners = new ArrayList<>();
-        defaultOwners.add("12341234");
-        settings.setDiscordToken("asdgfstherjuhgfj");
-        settings.setBotOwners(defaultOwners);
-        settings.setOwlBotToken("eryhue354uh3y4ewtgs");
-        settings.setCommandThreads(1);
-        settings.setFinnhubKey("35uy7ewsgfhed");
-        settings.setTarkovMarketApiKey("sgfjklw4epoitju");
-        settings.setTarkovToolsApiEndpoint("https://api.tarkov.dev/graphql");
-        settings.setDarkSkyApiKey("sdfsdfds");
-        return settings;
-    }
 }

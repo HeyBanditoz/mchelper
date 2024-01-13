@@ -13,7 +13,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.time.temporal.ChronoUnit;
 
-@Requires(settingsMethod = "getFinnhubKey")
+@Requires(config = "mchelper.finnhub.token")
 public class StockCommand extends Command {
     @Override
     public String commandName() {

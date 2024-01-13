@@ -1,0 +1,14 @@
+mchelper:
+  command-threads: 2
+  record-stats: true
+  discord.token: fake-token
+  owlbot.token: fake-token
+  finnhub.token: fake-token
+  darksky.token: fake-token
+  endpoints:
+    tarkov-market: https://api.tarkov.dev/graphql
+  pastegg:
+    api-url: https://api.paste.gg
+    base-url: https://paste.gg/
+    api-key: fake-token
+  owners: 100,200

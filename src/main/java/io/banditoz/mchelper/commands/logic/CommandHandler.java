@@ -7,7 +7,6 @@ import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.ClassUtils;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -88,7 +86,6 @@ public class CommandHandler extends ListenerAdapter {
 
     public CommandHandler(MCHelper MCHelper) throws Exception {
         this.MCHELPER = MCHelper;
-        Settings settings = MCHelper.getSettings();
         LOGGER.info("Registering commands...");
         long before = System.currentTimeMillis();
         Set<Class<? extends Command>> classes = ClassUtils.getAllSubtypesOf(Command.class);
@@ -115,18 +112,13 @@ public class CommandHandler extends ListenerAdapter {
                     LOGGER.warn("Not registering " + clazz.getSimpleName() + " as the database is not configured.");
                 }
             }
-            else if (!r.settingsMethod().isEmpty()) {
-                // This is hacky, but essentially the "Requires" annotation holds a field called method(), which
-                // returns the underlying method name in Settings, so we dynamically invoke it here to see if it's
-                // not null, which means the user configured that setting. We have to do it this way as you can't
-                // have a method reference in an annotation. :(
-                Method m = settings.getClass().getDeclaredMethod(r.settingsMethod());
-                String s = (String) m.invoke(settings);
+            else if (!r.config().isEmpty()) {
+                String s = io.avaje.config.Config.getNullable(r.config());
                 if (s != null) {
                     commands.put(c.commandName(), c);
                 }
                 else {
-                    LOGGER.warn("Not registering " + clazz.getSimpleName() + " as " + r.settingsMethod() + " is null or default.");
+                    LOGGER.warn("Not registering {} as {} is null.", clazz.getSimpleName(), r.config());
                 }
             }
         }

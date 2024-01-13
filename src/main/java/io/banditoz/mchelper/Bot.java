@@ -1,7 +1,5 @@
 package io.banditoz.mchelper;
 
-import io.banditoz.mchelper.utils.Settings;
-import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -17,11 +15,6 @@ public class Bot {
         List<String> argsList = Arrays.asList(args);
         if (argsList.size() > 0 && argsList.contains("dumpcommands")) {
             CommandsToMarkdown.commandsToMarkdown();
-            System.exit(0);
-        }
-        else if (argsList.size() > 0 && argsList.contains("gensettings")) {
-            Settings s = SettingsManager.getDefaultSettings();
-            SettingsManager.outputSettings(s);
             System.exit(0);
         }
         else if (argsList.size() > 0 && argsList.contains("migrate")) {

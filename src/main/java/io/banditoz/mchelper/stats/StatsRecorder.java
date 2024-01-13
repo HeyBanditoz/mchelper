@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.stats;
 
+import io.avaje.config.Config;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ public class StatsRecorder {
     }
 
     public void record(Stat s) {
-        if (!MCHELPER.getSettings().getRecordCommandAndRegexStatistics() || MCHELPER.getDatabase() == null) {
+        if (MCHELPER.getDatabase() == null || !Config.getBool("mchelper.record-stats", true)) {
             return;
         }
         ES.execute(() -> {

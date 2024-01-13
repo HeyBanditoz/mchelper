@@ -1,0 +1,31 @@
+mchelper:
+  # Number of threads available for commands and regex listeners to use.
+  # Also used for other concurrent operations.
+  command-threads: 2
+  # Whether to record command runtime stats into the `statistics` SQL table.
+  record-stats: true
+  # Discord bot token. Get one from https://discord.com/developers/applications.
+  discord.token: null
+  # Owlbot token. For defining words. As of 2024-01-07 this service appears to be down.
+  owlbot.token: null
+  # Finnhub token. For stock information.
+  finnhub.token: null
+  # Darksky-compatible token. For fetching weather information
+  darksky.token: null
+  endpoints:
+    # The tarkov.tools compatible GraphQL endpoint. Currently, tarkov.dev is the active one.
+    # Used to fetch Tarkov item information.
+    tarkov-tools: https://api.tarkov.dev/graphql
+  # For uploading messages over 2k characters to a pastebin.
+  # pastegg is the only supported backend.
+  pastegg:
+    # Base API, for uploading pastes.
+    api-url: https://api.paste.gg
+    # Base URL, for linking pastes.
+    base-url: https://paste.gg/
+    # Optional API key. Useful if you want to keep a list of pastes to audit/delete.
+    api-key: null
+  # List of bot owner IDs. They can run elevated commands, bypass command ratelimits, and
+  # set owner-restricted guild configurations, et al.
+  # Separate by comma, YAML lists aren't currently supported.
+  owners: your_id_here

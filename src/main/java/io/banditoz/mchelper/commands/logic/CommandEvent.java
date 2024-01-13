@@ -5,7 +5,6 @@ import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.interactions.EmbedPaginator;
 import io.banditoz.mchelper.stats.Kind;
-import io.banditoz.mchelper.utils.Settings;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.utils.paste.Paste;
 import io.banditoz.mchelper.utils.paste.PasteggUploader;
@@ -47,7 +46,7 @@ public class CommandEvent implements UserEvent {
         this.EVENT = event;
         this.LOGGER = logger;
         this.GUILD = (event.isFromGuild()) ? event.getGuild() : null;
-        this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor(), mcHelper.getSettings());
+        this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor());
         this.MCHELPER = mcHelper;
         this.DATABASE = mcHelper.getDatabase();
         this.COMMAND_NAME = commandClassName;
@@ -273,15 +272,6 @@ public class CommandEvent implements UserEvent {
     @Override
     public Database getDatabase() {
         return DATABASE;
-    }
-
-    /**
-     * Returns the associated Settings with this CommandEvent.
-     *
-     * @return The settings.
-     */
-    public Settings getSettings() {
-        return MCHELPER.getSettings();
     }
 
     protected Logger getLogger() {

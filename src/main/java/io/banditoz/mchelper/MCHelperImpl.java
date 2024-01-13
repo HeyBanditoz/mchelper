@@ -3,6 +3,7 @@ package io.banditoz.mchelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
@@ -16,8 +17,6 @@ import io.banditoz.mchelper.runnables.PollCullerRunnable;
 import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.runnables.UserMaintenanceRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
-import io.banditoz.mchelper.utils.Settings;
-import io.banditoz.mchelper.utils.SettingsManager;
 import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
@@ -37,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -52,7 +52,6 @@ public class MCHelperImpl implements MCHelper {
     private final RegexableHandler RH;
     private final ReminderService RS;
     private final Database DB;
-    private final Settings SETTINGS;
     private final StatsRecorder STATS;
     private final AccountManager AM;
     private final ButtonListener BL;
@@ -67,10 +66,12 @@ public class MCHelperImpl implements MCHelper {
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
-        this.SETTINGS = new SettingsManager(new File(".").toPath().resolve("Config.json")).getSettings(); // TODO Make config file location configurable via program arguments
-
-        if (SETTINGS.getDiscordToken() == null || SETTINGS.getDiscordToken().equals("Bot token here...")) {
-            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your Config.json file.");
+        if (Files.exists(new File(".").toPath().resolve("Config.json"))) {
+            LOGGER.warn("The old Config.json file still exists! Please migrate to application.yml. See the application-example.yml file in the Gitlab repo to migrate to. " +
+                    "This warning will stop firing when Config.json no longer exists.");
+        }
+        if (Config.getNullable("mchelper.discord.token") == null) {
+            LOGGER.error("The Discord token is not configured correctly! The bot will now exit. Please check your application.yml file.");
             System.exit(1);
         }
 
@@ -85,7 +86,7 @@ public class MCHelperImpl implements MCHelper {
         LOGGER.info("                           |_|              ");
         LOGGER.info("MCHelper version {} using JDA {} running on JVM {} committed on {}", Version.GIT_SHA, JDAInfo.VERSION, Runtime.version(), Version.GIT_DATE);
 
-        TPE = new ThreadPoolExecutor(SETTINGS.getCommandThreads(), SETTINGS.getCommandThreads(),
+        TPE = new ThreadPoolExecutor(Config.getInt("mchelper.command-threads"), Config.getInt("mchelper.command-threads"),
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
         SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
@@ -259,11 +260,6 @@ public class MCHelperImpl implements MCHelper {
     }
 
     @Override
-    public Settings getSettings() {
-        return SETTINGS;
-    }
-
-    @Override
     public CommandHandler getCommandHandler() {
         return CH;
     }
@@ -340,7 +336,7 @@ public class MCHelperImpl implements MCHelper {
      */
     private JDA buildJDA() {
         try {
-            return JDABuilder.createDefault(SETTINGS.getDiscordToken())
+            return JDABuilder.createDefault(Config.get("mchelper.discord.token"))
                     .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOJI)

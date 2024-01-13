@@ -22,7 +22,7 @@ import java.util.List;
 import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
 
-@Requires(settingsMethod = "getDarkSkyApiKey")
+@Requires(config = "mchelper.darksky.token")
 public class WeatherCommand extends Command {
     @Override
     public String commandName() {
