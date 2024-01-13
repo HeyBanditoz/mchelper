@@ -1,5 +1,5 @@
 # Commands
-There are a total of 60 commands and 6 regex listeners.
+There are a total of 64 commands and 6 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -24,6 +24,8 @@ There are a total of 60 commands and 6 regex listeners.
 `delremind` - <id> - Deletes a reminder.
 ### DiceRollerCommand
 `roll` - [dice notation] - Roll some dice following standard dice notation.
+### DictionaryCommand
+`define` - <word> - Finds the definition of a word using Owlbot's API.
 ### DoubleOrNothingCommand
 `don` - <ante (with range 5 <= x <= 200000)> - Play double or nothing to win some money!
 ### DuelCommand
@@ -120,6 +122,21 @@ named arguments:
 `sql` - <sql query> - Evaluates SQL.
 ### StatisticsCommand
 `stats` - <no parameters>  - Returns command and other statistics.
+### StockCommand
+```
+usage: stock [-g {true,false}] [-y {true,false}] ticker
+
+Grabs stock information from a ticker.
+
+positional arguments:
+  ticker                 ticker to fetch
+
+named arguments:
+  -g {true,false}, --graph {true,false}
+                         generate a stock graph
+  -y {true,false}, --yearly {true,false}
+                         generated graph will show yearly data
+```
 ### TarkovCommand
 `tarkov` - <item name> - Returns pricing information about a given item from the tarkov-market API.
 ### TeXCommand
@@ -144,6 +161,10 @@ named arguments:
 `version` - <no parameters>  - Returns the bot's version.
 ### VideoPokerCommand
 `poker` - <ante (with range 100 <= x <= 500 )> - Play video poker to win some money! For the paytable, visit https://en.wikipedia.org/w/index.php?title=Video_poker&oldid=1094389801#Jacks_or_Better
+### WeatherCommand
+`w` - <location> - Returns the current weather of a location.
+### WeatherForecastCommand
+`wf` - <location> - Returns the weather forecast of a location.
 ### WhoHasCommand
 `whohas` - <role ID> - Returns who has a certain role in the guild.
 ### WorkCommand
