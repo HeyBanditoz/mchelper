@@ -11,16 +11,18 @@ public class BotOwnerTests {
     @Test
     public void testBotOwners_happyPath() {
         User mockUser = mock(User.class);
-        when(mockUser.getId()).thenReturn("100");
+        when(mockUser.getIdLong()).thenReturn(100L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isTrue();
-        when(mockUser.getId()).thenReturn("200");
+        when(mockUser.getIdLong()).thenReturn(200L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isTrue();
+        assertThat(CommandPermissions.isBotOwner(200L)).isTrue();
     }
 
     @Test
     public void testBotOwners_negative() {
         User mockUser = mock(User.class);
-        when(mockUser.getId()).thenReturn("300");
+        when(mockUser.getIdLong()).thenReturn(300L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isFalse();
+        assertThat(CommandPermissions.isBotOwner(300L)).isFalse();
     }
 }

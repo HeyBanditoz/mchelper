@@ -2,6 +2,7 @@ package io.banditoz.mchelper.config;
 
 import com.google.common.collect.Sets;
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.CommandPermissions;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
 import net.dv8tion.jda.api.entities.Guild;
@@ -83,7 +84,7 @@ public class ConfigurationProvider {
     }
 
     public void writeValue(Config key, String value, long guildId, long userId) throws SQLException {
-        if (key.isBotOwnerLocked() && io.avaje.config.Config.list().ofLong("mchelper.owners").contains(userId)) {
+        if (key.isBotOwnerLocked() && CommandPermissions.isBotOwner(userId)) {
             throw new IllegalStateException("You are not a bot owner.");
         }
         dao.writeValue(key, value, guildId, userId);

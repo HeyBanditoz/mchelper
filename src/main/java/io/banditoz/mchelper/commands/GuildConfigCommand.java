@@ -53,7 +53,7 @@ public class GuildConfigCommand extends Command {
             }
             else {
                 Config c = Config.valueOf(ce.getRawCommandArgs()[1]);
-                if (c.isBotOwnerLocked() && !io.avaje.config.Config.list().of("mchelper.owners").contains(ce.getUser().getId())) {
+                if (c.isBotOwnerLocked() && !CommandPermissions.isBotOwner(ce.getUser())) {
                     ce.sendReply("Sorry, you do not have permissions to set this config. Please get a bot owner to set it for you.");
                     return Status.BOT_OWNER_CHECK_FAILED;
                 }
