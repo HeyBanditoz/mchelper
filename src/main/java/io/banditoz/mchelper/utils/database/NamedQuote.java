@@ -136,6 +136,20 @@ public class NamedQuote {
         }
     }
 
+    /**
+     * Formats the quote for use in Discord, without the quote text (assumes it's an image instead.)
+     *
+     * @return The formatted String.
+     */
+    public String formatWithoutQuote(boolean includeId) {
+        if (includeId) {
+            return "*" + this.getQuoteAuthor() + " — " + TimeFormat.DATE_LONG.format(this.getLastModified().toInstant()) + "* (#" + id + ")";
+        }
+        else {
+            return "*" + this.getQuoteAuthor() + " — " + TimeFormat.DATE_LONG.format(this.getLastModified().toInstant()) + "*";
+        }
+    }
+
     public String formatPlain() {
         return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
     }

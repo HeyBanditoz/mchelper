@@ -20,6 +20,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.awt.Color;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -90,7 +92,13 @@ public class QuoteCommand extends Command {
                 NamedQuote nq = quotes.get(i);
                 eb.clear();
                 eb.setColor(wasEmpty ? EMPTY : GREEN);
-                eb.setDescription(nq.format(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
+                if (isUrl(nq.getQuote())) {
+                    eb.setImage(nq.getQuote());
+                    eb.setDescription(nq.formatWithoutQuote(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
+                }
+                else {
+                    eb.setDescription(nq.format(args.get("id") != null && args.getBoolean("id")) + " *(" + (i + 1) + " of " + quotes.size() + ")*");
+                }
                 if (args.get("include_author")) {
                     try {
                         User user = ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).complete();
@@ -142,6 +150,18 @@ public class QuoteCommand extends Command {
             return g.getMemberById(l).getEffectiveName();
         } catch (Exception ex) {
             return String.valueOf(l);
+        }
+    }
+
+    private boolean isUrl(String s) {
+        if (!(s.startsWith("http://") || s.startsWith("https://"))) {
+            return false;
+        }
+        try {
+            new URI(s);
+            return true;
+        } catch (URISyntaxException e) {
+            return false;
         }
     }
 
