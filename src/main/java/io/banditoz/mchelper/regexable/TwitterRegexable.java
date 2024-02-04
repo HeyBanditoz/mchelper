@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import java.util.regex.Pattern;
 
 public class TwitterRegexable extends Regexable {
-    private static final Pattern PATTERN = Pattern.compile("https://(www.)?twitter.com/\\w{1,45}/status/\\d+");
+    private static final Pattern PATTERN = Pattern.compile("https://(www.)?(twitter|x).com/\\w{1,45}/status/\\d+");
 
     @Override
     public Pattern regex() {
@@ -21,10 +21,11 @@ public class TwitterRegexable extends Regexable {
         }
         re.sendTyping();
         String twitterLink = re.getArgs().split("\\?")[0];
+        // TODO replace below regexes with Pattern?
         re.sendReplyWithoutPingAllowingLinkEmbeds(
-                twitterLink.replaceFirst("twitter.com", "vxtwitter.com")
+                twitterLink.replaceFirst("(twitter|x).com", "vxtwitter.com")
                         + "\n<"
-                        + twitterLink.replaceFirst("twitter.com", "nitter.net")
+                        + twitterLink.replaceFirst("(twitter|x).com", "nitter.perennialte.ch") // TODO move nitter url to configs as their instances' future is unknown
                         + '>'
         );
         if (re.getEvent().getGuild().getSelfMember().hasPermission(re.getEvent().getChannel().asGuildMessageChannel(), Permission.MESSAGE_MANAGE)) {
