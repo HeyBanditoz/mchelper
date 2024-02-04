@@ -201,4 +201,4 @@ named arguments:
 ### TeXRegexable
 `\$\$(.*?)\$\$`
 ### TwitterRegexable
-`https://(www.)?twitter.com/\w{1,45}/status/\d+`
+`https://(www.)?(twitter|x).com/\w{1,45}/status/\d+`
