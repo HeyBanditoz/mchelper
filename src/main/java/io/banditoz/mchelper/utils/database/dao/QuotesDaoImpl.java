@@ -183,7 +183,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                             Param.values("f", Flag.HIDDEN.ordinal()),
                             Param.value("g", g.getIdLong())
                     )
-                    .as((rs, _) -> {
+                    .as((rs, conn) -> {
                         List<StatPoint<Long>> stats = new ArrayList<>();
                         while (rs.next()) {
                             stats.add(new StatPoint<>(rs.getLong("author_id"), rs.getInt("count")));
