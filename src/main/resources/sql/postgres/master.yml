@@ -35,3 +35,6 @@ databaseChangeLog:
   - include:
       file: 20231002-add-more-columns-to-username-cache.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20240216-quote-flags.yml
+      relativeToChangelogFile: true

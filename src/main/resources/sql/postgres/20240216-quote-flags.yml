@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: quote-flags
+      author: Hayden
+      comment: Adds a quote_flags table for tracking special quote modifiers.
+      changes:
+        - createTable:
+            tableName: quote_flags
+            columns:
+              - column:
+                  name: quote_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quotes_id
+                    references: quotes(id)
+              - column:
+                  name: flag
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: quote_flags
+            columnNames: quote_id, flag
+            constraintName: quote_flags_quote_id_flag_key

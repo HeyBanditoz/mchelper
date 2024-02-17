@@ -20,7 +20,7 @@ public class QotdMotdSectionGenerator extends MotdSectionGenerator {
     public MessageEmbed generate(TextChannel tc) {
         QuotesDao dao = new QuotesDaoImpl(mcHelper.getDatabase());
         try {
-            NamedQuote nq = dao.getRandomQuote(tc.getGuild());
+            NamedQuote nq = dao.getRandomQuote(tc.getGuild(), true);
             if (nq == null) {
                 return null; // guild has no quotes, rip
             }

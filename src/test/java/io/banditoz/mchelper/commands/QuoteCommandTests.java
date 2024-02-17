@@ -1,8 +1,12 @@
 package io.banditoz.mchelper.commands;
 
+import io.banditoz.mchelper.utils.database.NamedQuote;
+import io.banditoz.mchelper.utils.database.dao.QuotesDao;
+import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.testng.annotations.Test;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,17 +16,21 @@ public class QuoteCommandTests extends BaseCommandTest {
     private final AddquoteCommand ac;
     private final QuoteCommand qc;
     private final DeleteQuoteCommand dqc;
+    private final QuotesDao dao;
 
     public QuoteCommandTests() {
         this.ac = new AddquoteCommand();
         this.qc = new QuoteCommand();
         this.dqc = new DeleteQuoteCommand();
+        this.dao = new QuotesDaoImpl(mcHelper.getDatabase());
     }
 
     public void testAddquote() throws Exception {
         setArgs("\"test\" quote");
         ac.onCommand(ce);
         assertThat(messageCaptor.getValue().getContent()).isEqualTo("Quote added.");
+        assertThat(dao.getQuotesByMatch("quote", ce.getGuild()).stream().map(nq -> nq.getFlags().stream().toList()).flatMap(Collection::stream).toList())
+                .containsExactlyInAnyOrder(NamedQuote.Flag.DERANK, NamedQuote.Flag.EXCLUDE_QOTD);
     }
 
     @Test(timeOut = 5000L) // 5 second timeout
@@ -66,9 +74,11 @@ public class QuoteCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testAddquote", "testQuote", "testQuoteWithQuoteSearch", "testQuoteWithAuthorSearch"})
     public void testDeleteQuote() throws Exception {
+        assertThat(dao.getQuotesByMatch("quote", ce.getGuild())).hasSize(1);
         setArgs("1");
         dqc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Quote successfully deleted.");
+        assertThat(dao.getQuotesByMatch("quote", ce.getGuild())).isEmpty();
     }
 
     @Test(dependsOnMethods = {"testAddquote", "testQuote", "testQuoteWithQuoteSearch", "testQuoteWithAuthorSearch"})
@@ -109,5 +119,23 @@ public class QuoteCommandTests extends BaseCommandTest {
                 Total                      2
                 ```""");
 
+    }
+
+    @Test(dependsOnMethods = "testQuoteStats")
+    public void testAddquoteGoodValues_inAuthor() throws Exception {
+        setArgs("\"test\" crap");
+        ac.onCommand(ce);
+        assertThat(messageCaptor.getValue().getContent()).isEqualTo("Quote added.");
+        assertThat(dao.getQuotesByMatch("crap", ce.getGuild()).stream().map(nq -> nq.getFlags().stream().toList()).flatMap(Collection::stream).toList())
+                .isEmpty();
+    }
+
+    @Test(dependsOnMethods = "testQuoteStats")
+    public void testAddquoteGoodValues_inQuote() throws Exception {
+        setArgs("\"Bad\" test");
+        ac.onCommand(ce);
+        assertThat(messageCaptor.getValue().getContent()).isEqualTo("Quote added.");
+        assertThat(dao.getQuotesByMatch("crap", ce.getGuild()).stream().map(nq -> nq.getFlags().stream().toList()).flatMap(Collection::stream).toList())
+                .isEmpty();
     }
 }

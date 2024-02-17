@@ -102,6 +102,7 @@ public abstract class BaseCommandTest {
         when(mcHelper.getJDA()).thenReturn(j);
         when(mcHelper.getSES()).thenReturn(mock(ScheduledExecutorService.class));
         when(ce.getMCHelper()).thenReturn(mcHelper);
+        when(ce.getUser()).thenReturn(u);
     }
 
     /**

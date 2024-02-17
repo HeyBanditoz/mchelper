@@ -12,8 +12,10 @@ import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static io.banditoz.mchelper.utils.database.NamedQuote.Flag;
 
 public class QuotesDaoImpl extends Dao implements QuotesDao {
     public QuotesDaoImpl(Database database) {
@@ -21,9 +23,10 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public int saveQuote(NamedQuote nq) throws SQLException {
+    public int saveQuote(NamedQuote nq, EnumSet<Flag> flags) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("INSERT INTO quotes (guild_id, author_id, quote, quote_author) VALUES (:g, :a, :q, :qa) RETURNING id")
+            c.setAutoCommit(false);
+            int qid = Query.of("INSERT INTO quotes (guild_id, author_id, quote, quote_author) VALUES (:g, :a, :q, :qa) RETURNING id")
                     .on(
                             Param.value("g", nq.getGuildId()),
                             Param.value("a", nq.getAuthorId()),
@@ -33,6 +36,19 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                         rs.next();
                         return rs.getInt(1);
                     }, c);
+            // add all flags, if available, not batching as there probably won't be more than two
+            for (Flag flag : flags) {
+                Query.of("INSERT INTO quote_flags (quote_id, flag, created_by) VALUES (:q, :f, :b)")
+                        .on(
+                                Param.value("q", qid),
+                                Param.value("f", flag.ordinal()),
+                                Param.value("b", nq.getAuthorId())
+                        )
+                        .executeInsert(c);
+            }
+            c.commit();
+            c.setAutoCommit(true);
+            return qid;
         }
     }
 
@@ -40,62 +56,134 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     public List<NamedQuote> getQuotesByMatch(String search, @NotNull Guild g) throws SQLException {
         search = '%' + search + '%';
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND (quote ILIKE :s OR quote_author ILIKE :t) ORDER BY RANDOM()")
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND (quote ILIKE :s OR quote_author ILIKE :t)
+                            ORDER BY RANDOM()""")
                     .on(
                             Param.value("g", g.getIdLong()),
+                            Param.values("f", Flag.HIDDEN.ordinal()),
                             Param.value("s", search),
                             Param.value("t", search))
-                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
+                    .as(this::parseManyQuotes, c);
         }
     }
 
     @Override
     public List<NamedQuote> getQuotesByFulltextSearch(String search, @NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND ts @@ phraseto_tsquery('english', :s) ORDER BY RANDOM()")
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND ts @@ phraseto_tsquery('english', :s)
+                            ORDER BY RANDOM()""")
                     .on(
                             Param.value("g", g.getIdLong()),
-                            Param.value("s", search))
-                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
+                            Param.values("f", Flag.HIDDEN.ordinal()),
+                            Param.value("s", search)
+                    )
+                    .as(this::parseManyQuotes, c);
         }
     }
 
     @Override
     public List<NamedQuote> getAllQuotesForGuild(@NotNull Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g ORDER BY RANDOM()")
-                    .on(Param.value("g", g.getIdLong()))
-                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                            ORDER BY RANDOM()""")
+                    .on(
+                            Param.value("g", g.getIdLong()),
+                            Param.values("f", Flag.HIDDEN.ordinal())
+                    )
+                    .as(this::parseManyQuotes, c);
         }
     }
 
     @Override
-    public @Nullable NamedQuote getRandomQuote(Guild g) throws SQLException {
+    public @Nullable NamedQuote getRandomQuote(Guild g, boolean forQotd) throws SQLException {
+        if (forQotd) {
+            return getRandomQotdQuote(g);
+        }
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g ORDER BY RANDOM() LIMIT 1")
-                    .on(Param.value("g", g.getIdLong()))
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                            ORDER BY RANDOM()
+                            LIMIT 1""")
+                    .on(
+                            Param.values("f", Flag.HIDDEN.ordinal()),
+                            Param.value("g", g.getIdLong())
+                    )
                     .as(this::parseOne, c);
         }
     }
 
+    private @Nullable NamedQuote getRandomQotdQuote(Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :ff) = 0
+                            ORDER BY RANDOM()
+                            LIMIT 1""")
+                    .on(
+                            Param.values("f", Flag.HIDDEN.ordinal()),
+                            Param.value("ff", Flag.EXCLUDE_QOTD.ordinal()),
+                            Param.value("g", g.getIdLong())
+                    )
+                    .as(this::parseOne, c);
+        }
+    }
+
+
     @Override
     public List<NamedQuote> getAllQuotesByAuthorInGuild(long u, Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT * FROM quotes WHERE guild_id=:g AND author_id=:u ORDER BY RANDOM()")
+            return Query.of("""
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND guild_id=:g AND author_id=:u
+                            ORDER BY RANDOM()
+                            LIMIT 1""")
                     .on(
+                            Param.values("f", Flag.HIDDEN.ordinal()),
                             Param.value("g", g.getIdLong()),
                             Param.value("u", u)
                     )
-                    .as((rs, conn) -> parseMany(rs, conn, this::parseOne), c);
+                    .as(this::parseManyQuotes, c);
         }
     }
 
     @Override
     public List<StatPoint<Long>> getUniqueAuthorQuoteCountPerGuild(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            return Query.of("SELECT author_id, COUNT(author_id) AS \"count\" FROM quotes WHERE guild_id=:g GROUP BY author_id ORDER BY COUNT(author_id) DESC")
-                    .on(Param.value("g", g.getIdLong()))
-                    .as((rs, conn) -> {
+            return Query.of("""
+                            SELECT author_id, COUNT(author_id) AS "count"
+                            FROM quotes
+                            WHERE (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND guild_id = :g
+                            GROUP BY author_id
+                            ORDER BY COUNT(author_id) DESC""")
+                    .on(
+                            Param.values("f", Flag.HIDDEN.ordinal()),
+                            Param.value("g", g.getIdLong())
+                    )
+                    .as((rs, _) -> {
                         List<StatPoint<Long>> stats = new ArrayList<>();
                         while (rs.next()) {
                             stats.add(new StatPoint<>(rs.getLong("author_id"), rs.getInt("count")));
@@ -118,9 +206,9 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public boolean deleteQuote(int id, Guild g) throws SQLException {
+    public boolean deleteQuote(int id, Guild g, long userId) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
-            NamedQuote nq = Query.of("SELECT * FROM quotes WHERE id=:i AND guild_id=:g")
+            NamedQuote nq = Query.of("SELECT *, (SELECT NULL) AS flags FROM quotes WHERE id=:i AND guild_id=:g")
                     .on(
                             Param.value("i", id),
                             Param.value("g", g.getIdLong())
@@ -128,12 +216,38 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
             if (nq == null) {
                 return false;
             }
-            LOGGER.info("Deleting quote #" + nq.getId() + " from guild \"" + g.getName() + "\" with content: " + nq.formatPlain());
-            return Query.of("DELETE FROM quotes WHERE id=:i")
-                    .on(Param.value("i", id))
-                    .executeUpdate(c) <= 1;
+            LOGGER.info("Hiding quote #" + nq.getId() + " from guild \"" + g.getName() + "\" with content: " + nq);
+            return Query.of("INSERT INTO quote_flags (quote_id, flag, created_by) VALUES (:i, :v, :u)")
+                    .on(
+                            Param.value("i", id),
+                            Param.value("v", Flag.HIDDEN.ordinal()),
+                            Param.value("u", userId)
+                    ).executeInsert(c).orElse(0L) > 0;
         }
     }
+
+    // quote randomization handled by SQL's ORDER BY RANDOM()
+    private List<NamedQuote> parseManyQuotes(ResultSet rs, Connection c) {
+        List<NamedQuote> quotes = parseMany(rs, c, this::parseOne);
+        if (quotes.isEmpty() || quotes.size() == 1) {
+            // sorting not required
+            return quotes;
+        }
+        // TODO can sort can just be called???
+        List<NamedQuote> frontQuotes = new ArrayList<>();
+        List<NamedQuote> backQuotes = new ArrayList<>();
+        for (NamedQuote quote : quotes) {
+            if (quote.getFlags().contains(Flag.DERANK)) {
+                backQuotes.add(quote);
+            }
+            else {
+                frontQuotes.add(quote);
+            }
+        }
+        frontQuotes.addAll(backQuotes);
+        return Collections.unmodifiableList(frontQuotes);
+    }
+
 
     private @Nullable NamedQuote parseOne(ResultSet rs, Connection c) throws SQLException {
         if (!rs.next()) {
@@ -146,6 +260,13 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         nq.setQuoteAuthor(rs.getString("quote_author"));
         nq.setLastModified(rs.getTimestamp("last_modified"));
         nq.setId(rs.getInt("id"));
+        if (rs.getArray("flags") != null) {
+            nq.setFlags(
+                    Arrays.stream(((Integer[]) rs.getArray("flags").getArray()))
+                            .map(i -> Flag.values()[i])
+                            .collect(Collectors.toCollection(() -> EnumSet.noneOf(Flag.class)))
+            );
+        }
         return nq;
     }
 }

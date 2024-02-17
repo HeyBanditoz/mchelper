@@ -12,3 +12,5 @@ mchelper:
     base-url: https://paste.gg/
     api-key: fake-token
   owners: 100,200
+  quotes:
+    derank-and-hide-from-motd-if-content-matches-none-of: Bad,Crap

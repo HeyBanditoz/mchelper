@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
@@ -9,6 +10,7 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.EventHandler;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.database.NamedQuote;
+import io.banditoz.mchelper.utils.database.NamedQuote.Flag;
 import io.banditoz.mchelper.utils.database.dao.QuotesDao;
 import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
 import net.dv8tion.jda.api.entities.Message;
@@ -25,10 +27,13 @@ import org.cache2k.Cache2kBuilder;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 @Requires(database = true)
 public class AddquoteCommand extends Command {
@@ -88,14 +93,14 @@ public class AddquoteCommand extends Command {
             }
             NamedQuote nq = NamedQuote.parseMessageId(messageId, (TextChannel) ce.getEvent().getChannel());
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
-            id = qd.saveQuote(nq);
+            id = qd.saveQuote(nq, calculateRequiredFlags(nq));
             message = new MessageCreateBuilder().setContent("Quote (from message ID) added.");
         }
         else {
             NamedQuote nq = NamedQuote.parseString(ce.getCommandArgsString());
             nq.setGuildId(ce.getGuild().getIdLong());
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
-            id = qd.saveQuote(nq);
+            id = qd.saveQuote(nq, calculateRequiredFlags(nq));
             message = new MessageCreateBuilder().setContent("Quote added.");
         }
         if (!cache.containsKey(ce.getEvent().getAuthor().getIdLong())) {
@@ -153,6 +158,15 @@ public class AddquoteCommand extends Command {
                 ce.sendReply(finalMessage.getAuthor().getAsMention() + ", your quote edit has expired.");
             }
         },1, TimeUnit.MINUTES);
+    }
+
+    private EnumSet<Flag> calculateRequiredFlags(NamedQuote nq) {
+        for (String s : Config.list().of("mchelper.quotes.derank-and-hide-from-motd-if-content-matches-none-of")) {
+            if (containsIgnoreCase(nq.getQuote(), s) || containsIgnoreCase(nq.getQuoteAuthor(), s)) {
+                return EnumSet.noneOf(Flag.class);
+            }
+        }
+        return EnumSet.of(Flag.DERANK, Flag.EXCLUDE_QOTD);
     }
 
     /** The poor man's tuple. */

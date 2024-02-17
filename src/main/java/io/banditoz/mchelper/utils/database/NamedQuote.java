@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +28,8 @@ public class NamedQuote {
     private Timestamp lastModified;
     /** The ID of the quote as it appears in the database. */
     private int id;
+    /** Special flags this quote has. */
+    private EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
     private final static DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMMM uuuu");
     private final static Pattern QUOTE_PARSER = Pattern.compile("^\"(.*?)\"\\s+");
@@ -62,7 +65,6 @@ public class NamedQuote {
 
     public void setQuoteAuthor(String quoteAuthor) {
         this.quoteAuthor = quoteAuthor;
-        
     }
 
     public Timestamp getLastModified() {
@@ -79,6 +81,14 @@ public class NamedQuote {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public EnumSet<Flag> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(EnumSet<Flag> flags) {
+        this.flags = flags;
     }
 
     /**
@@ -150,7 +160,8 @@ public class NamedQuote {
         }
     }
 
-    public String formatPlain() {
+    @Override
+    public String toString() {
         return "“" + this.getQuote() + "” --" + this.getQuoteAuthor();
     }
 
@@ -160,5 +171,19 @@ public class NamedQuote {
                 .replace('‘', '\'')    // U+2018
                 .replace('’', '\'')    // U+2019
                 .replace("…", "...");  // U+2026 Horizontal Ellipsis
+    }
+
+    /** Quote flags. Don't edit the position of existing values! */
+    public enum Flag {
+        /** This quote has been effectively deleted. */
+        HIDDEN,
+        /** This quote cannot be chosen for its guild's quote of the day. */
+        EXCLUDE_QOTD,
+        /**
+         * This quote will be ranked lower than other quotes.
+         * When searching, all <code>DERANK</code>ed quotes are
+         * sorted behind non-<code>DERANK</code>ed ones.
+         */
+        DERANK
     }
 }

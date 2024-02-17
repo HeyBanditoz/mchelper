@@ -33,7 +33,7 @@ public class DeleteQuoteCommand extends Command {
     protected Status onCommand(CommandEvent ce) throws Exception {
         int idToDelete = Integer.parseInt(ce.getCommandArgs()[1]);
         QuotesDao dao = new QuotesDaoImpl(ce.getMCHelper().getDatabase());
-        if (dao.deleteQuote(idToDelete, ce.getGuild())) {
+        if (dao.deleteQuote(idToDelete, ce.getGuild(), ce.getUser().getIdLong())) {
             ce.sendReply("Quote successfully deleted.");
             return Status.SUCCESS;
         }

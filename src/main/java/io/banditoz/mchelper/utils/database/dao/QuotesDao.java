@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,10 +17,11 @@ public interface QuotesDao {
      * Saves a {@link NamedQuote} to the database.
      *
      * @param nq The Quote to save.
+     * @param flags The flags to add to the quote on save.
      * @return The id of the quote added.
      * @throws SQLException If there was an error saving a quote.
      */
-    int saveQuote(NamedQuote nq) throws SQLException;
+    int saveQuote(NamedQuote nq, EnumSet<NamedQuote.Flag> flags) throws SQLException;
     /**
      * Returns a list of quotes by a {@link Guild} by a search.
      *
@@ -54,11 +56,13 @@ public interface QuotesDao {
      * Returns a random quote by a {@link Guild} A random one will be retrieved.
      *
      * @param g The {@link Guild} to search by.
+     * @param forQotd Whether to exclude quotes for the quote of the day, see
+     *                {@link io.banditoz.mchelper.utils.database.NamedQuote.Flag}'s <code>EXCLUDE_MOTD</code>
      * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
      * @throws SQLException If there was an error getting the quote.
      */
     @Nullable
-    NamedQuote getRandomQuote(Guild g) throws SQLException;
+    NamedQuote getRandomQuote(Guild g, boolean forQotd) throws SQLException;
 
     /**
      * Returns a list of all quotes by a certain {@link net.dv8tion.jda.api.entities.User} in a {@link Guild}.
@@ -93,8 +97,9 @@ public interface QuotesDao {
      *
      * @param id The ID of the quote.
      * @param g The guild it's in.
+     * @param userId Who marked the quote as hidden, for auditing purposes.
      * @return Whether or not the quote deletion succeeded.
      * @throws SQLException If there was an error deleting the quote.
      */
-    boolean deleteQuote(int id, Guild g) throws SQLException;
+    boolean deleteQuote(int id, Guild g, long userId) throws SQLException;
 }
