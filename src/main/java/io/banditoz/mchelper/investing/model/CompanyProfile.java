@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-@JsonIgnoreProperties({"phone", "currency"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CompanyProfile {
     @JsonProperty("finnhubIndustry")
     private String finnhubIndustry;
