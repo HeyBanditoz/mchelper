@@ -110,7 +110,7 @@ public class Http {
                             }
                             return r.proceed();
                         })
-                        .retryer(new Retryer.Default(1000L, 3000L, 3))
+                        .retryer(new Retryer.Default(1000L, 7500L, 7))
                         .target(PirateWeatherClient.class, "https://api.pirateweather.net"))
                 .orElse(null);
 
