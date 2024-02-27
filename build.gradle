@@ -104,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-beta.13') {
+    implementation('net.dv8tion:JDA:5.0.0-beta.20') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11' // pinned back to attempt to fix issues with missing fields in elasticsearch
