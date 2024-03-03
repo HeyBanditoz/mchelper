@@ -29,3 +29,7 @@ mchelper:
   # set owner-restricted guild configurations, et al.
   # Separate by comma, YAML lists aren't currently supported.
   owners: your_id_here
+  # Which URLs the Twitter/X regexable will use, for better embeds than what Twitter/X provides.
+  twitter-regexable:
+    twitter-embed-domain: vxtwitter.com
+    nitter-domain: nitter.poast.org

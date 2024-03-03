@@ -23,9 +23,9 @@ public class TwitterRegexable extends Regexable {
         String twitterLink = re.getArgs().split("\\?")[0];
         // TODO replace below regexes with Pattern?
         re.sendReplyWithoutPingAllowingLinkEmbeds(
-                twitterLink.replaceFirst("(twitter|x).com", "vxtwitter.com")
+                twitterLink.replaceFirst("(twitter|x).com", io.avaje.config.Config.get("mchelper.twitter-regexable.twitter-embed-domain"))
                         + "\n<"
-                        + twitterLink.replaceFirst("(twitter|x).com", "nitter.perennialte.ch") // TODO move nitter url to configs as their instances' future is unknown
+                        + twitterLink.replaceFirst("(twitter|x).com", io.avaje.config.Config.get("mchelper.twitter-regexable.nitter-domain"))
                         + '>'
         );
         if (re.getEvent().getGuild().getSelfMember().hasPermission(re.getEvent().getChannel().asGuildMessageChannel(), Permission.MESSAGE_MANAGE)) {
