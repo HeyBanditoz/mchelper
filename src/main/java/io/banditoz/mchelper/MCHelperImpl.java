@@ -63,6 +63,7 @@ public class MCHelperImpl implements MCHelper {
     private final NominatimLocationService NLS;
     private final RssScraper RSS_SCRAPER;
     private final ConfigurationProvider CONFIG_PROVIDER;
+    private final OTel OTEL;
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
@@ -94,6 +95,13 @@ public class MCHelperImpl implements MCHelper {
         GM = new GameManager();
         JDA = buildJDA();
 
+        if (Config.getBool("mchelper.metrics.enabled", false)) {
+            OTEL = new OTel();
+            JDA.addEventListener(new MetricsEventListener(OTEL.meter()));
+        } else {
+            LOGGER.info("Not enabling metrics.");
+            OTEL = null;
+        }
         STATS = new StatsRecorder(this, TPE);
 
         // Shut things down gracefully.
@@ -326,6 +334,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public ConfigurationProvider getConfigurationProvider() {
         return CONFIG_PROVIDER;
+    }
+
+    @Override
+    public OTel getOTel() {
+        return OTEL;
     }
 
     /**

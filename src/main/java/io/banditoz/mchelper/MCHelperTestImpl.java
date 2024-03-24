@@ -133,5 +133,10 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
+    public OTel getOTel() {
+        return null;
+    }
+
+    @Override
     public void messageOwner(String s) {}
 }

@@ -40,4 +40,5 @@ public interface MCHelper {
     NominatimLocationService getNominatimLocationService();
     RssScraper getRssScraper();
     ConfigurationProvider getConfigurationProvider();
+    OTel getOTel();
 }

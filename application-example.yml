@@ -33,3 +33,8 @@ mchelper:
   twitter-regexable:
     twitter-embed-domain: vxtwitter.com
     nitter-domain: nitter.poast.org
+  # For Prometheus metrics. See OTel#meter
+  metrics:
+    enabled: true
+    # The port to listen on for Prometheus to scrape metrics from.
+    port: 9092
