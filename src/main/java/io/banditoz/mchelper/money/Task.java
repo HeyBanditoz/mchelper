@@ -17,7 +17,7 @@ public enum Task {
      */
     public long getDelay() {
         return switch (this) {
-            case WORK -> 1 /*21600 */; // 6 hours
+            case WORK -> 21600; // 6 hours
 //            case WORK -> {
 //                Calendar c = Calendar.getInstance();
 //                c.set(Calendar.HOUR_OF_DAY, 0);
