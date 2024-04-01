@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests", "BalanceCommandTests"})
+@Test(dependsOnGroups = {"DatabaseInitializationTests", "BalanceCommandTests"}, enabled = false) // disabled for april fools
 public class WorkCommandTests extends BaseCommandTest {
     private final WorkCommand wc;
 

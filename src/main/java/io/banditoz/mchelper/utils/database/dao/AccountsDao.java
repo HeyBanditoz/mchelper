@@ -86,4 +86,11 @@ public interface AccountsDao {
     List<Long> getAllAccounts() throws SQLException;
 
     boolean isUserShadowbanned(User u) throws SQLException;
+
+    /**
+     * @param days The number of days for an account to be considered "active."
+     * @return A {@link List} of accounts with recent transactions.
+     * @throws SQLException If there was a database error.
+     */
+    List<Long> getAccountsWithTxnsInLastNDays(int days) throws SQLException;
 }

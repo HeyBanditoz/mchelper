@@ -178,6 +178,35 @@ public class AccountsDaoImpl extends Dao implements AccountsDao {
         }
     }
 
+    @Override
+    public List<Long> getAccountsWithTxnsInLastNDays(int days) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("""
+                    SELECT a.id
+                    FROM accounts a
+                    WHERE a.id IN (SELECT to_id
+                                   FROM transactions it
+                                   WHERE a.id = it.to_id
+                                     AND it."when" >= NOW() - (INTERVAL '1 DAY' * :s)
+                                     AND memo NOT LIKE 'transfer'
+                                   UNION DISTINCT
+                                   SELECT from_id
+                                   FROM transactions it
+                                   WHERE a.id = it.from_id
+                                     AND it."when" >= NOW() - (INTERVAL '1 DAY' * :s)
+                                     AND memo NOT LIKE 'transfer')
+                    ORDER BY RANDOM();""")
+                    .on(Param.value("s", days))
+                    .as((rs, conn) -> {
+                        List<Long> accs = new ArrayList<>();
+                        while (rs.next()) {
+                            accs.add(rs.getLong(1));
+                        }
+                        return accs;
+                    }, c);
+        }
+    }
+
     /**
      * Creates a new account with the current SEED_MONEY value.
      *
