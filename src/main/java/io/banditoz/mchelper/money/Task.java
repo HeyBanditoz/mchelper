@@ -3,6 +3,8 @@ package io.banditoz.mchelper.money;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Random;
 
 public enum Task {
@@ -17,17 +19,16 @@ public enum Task {
      */
     public long getDelay() {
         return switch (this) {
-            case WORK -> 21600; // 6 hours
-//            case WORK -> {
-//                Calendar c = Calendar.getInstance();
-//                c.set(Calendar.HOUR_OF_DAY, 0);
-//                c.set(Calendar.MINUTE, 0);
-//                c.set(Calendar.SECOND, 0);
-//                c.set(Calendar.MILLISECOND, 0);
-//                c.add(Calendar.DAY_OF_WEEK, 1);
-//                c.add(Calendar.SECOND, 5); // hacky, but will show 00:00 instead of 23:59
-//                yield (c.getTimeInMillis() - Instant.now().toEpochMilli()) / 1000;
-//            }
+            case WORK -> {
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.HOUR_OF_DAY, 0);
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MILLISECOND, 0);
+                c.add(Calendar.DAY_OF_WEEK, 1);
+                c.add(Calendar.SECOND, 5); // hacky, but will show 00:00 instead of 23:59
+                yield (c.getTimeInMillis() - Instant.now().toEpochMilli()) / 1000;
+            }
             default -> 0;
         };
     }

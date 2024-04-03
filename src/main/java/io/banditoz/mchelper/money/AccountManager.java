@@ -180,10 +180,6 @@ public class AccountManager {
         return dao.isUserShadowbanned(u);
     }
 
-    public List<Long> getAccountsWithTxnsInLastNDays(int days) throws SQLException {
-        return dao.getAccountsWithTxnsInLastNDays(days);
-    }
-
     /**
      * Ensure a {@link BigDecimal} does not exceed a scale of two.
      *
