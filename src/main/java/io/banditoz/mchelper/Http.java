@@ -94,7 +94,7 @@ public class Http {
                         .errorDecoder(new BodyUrlRedactingErrorDecoder())
                         .requestInterceptor(uai)
                         .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", token)))
-                        .responseInterceptor(r -> {
+                        .responseInterceptor((r, c) -> {
                             try {
                                 int remain = Integer.parseInt(r.response().headers().get("X-RateLimit-Remaining-Month").iterator().next());
                                 int limit = Integer.parseInt(r.response().headers().get("X-RateLimit-Limit-Month").iterator().next());

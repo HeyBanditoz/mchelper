@@ -104,24 +104,24 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.0.0-beta.20') {
+    implementation('net.dv8tion:JDA:5.0.0-beta.22') {
         exclude module: 'opus-java'
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11' // pinned back to attempt to fix issues with missing fields in elasticsearch
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
-    implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
+    implementation 'com.google.guava:guava:33.1.0-jre'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
-    implementation 'org.postgresql:postgresql:42.6.0'
-    implementation 'com.zaxxer:HikariCP:5.0.1'
-    implementation 'io.jenetics:facilejdbc:2.0.0'
+    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'io.jenetics:facilejdbc:2.1.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final'
     implementation 'net.sourceforge.argparse4j:argparse4j:0.9.0'
-    implementation('org.knowm.xchart:xchart:3.8.5') {
+    implementation('org.knowm.xchart:xchart:3.8.7') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     implementation 'org.reflections:reflections:0.10.2'
@@ -132,12 +132,12 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.2'
     implementation 'com.github.minndevelopment:emoji-java:6.1.0'
     implementation 'com.github.cgoIT:logback-elasticsearch-appender:v1.12'
-    implementation 'io.github.openfeign:feign-core:12.4'
-    implementation 'io.github.openfeign:feign-jackson:12.4'
-    implementation 'io.github.openfeign:feign-okhttp:12.4'
-    implementation 'com.apptasticsoftware:rssreader:3.4.6'
+    implementation 'io.github.openfeign:feign-core:13.2.1'
+    implementation 'io.github.openfeign:feign-jackson:13.2.1'
+    implementation 'io.github.openfeign:feign-okhttp:13.2.1'
+    implementation 'com.apptasticsoftware:rssreader:3.6.0'
     implementation 'org.slf4j:jul-to-slf4j:1.7.36' // above rssreader library calls upon JUL
-    implementation 'io.avaje:avaje-config:3.10'
+    implementation 'io.avaje:avaje-config:3.13'
 
     implementation(platform('io.opentelemetry:opentelemetry-bom:1.36.0'))
     implementation 'io.opentelemetry:opentelemetry-api'
