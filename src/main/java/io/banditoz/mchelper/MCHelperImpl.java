@@ -96,11 +96,11 @@ public class MCHelperImpl implements MCHelper {
         JDA = buildJDA();
 
         if (Config.getBool("mchelper.metrics.enabled", false)) {
-            OTEL = new OTel();
+            OTEL = new OTel(true);
             JDA.addEventListener(new MetricsEventListener(OTEL.meter()));
         } else {
             LOGGER.info("Not enabling metrics.");
-            OTEL = null;
+            OTEL = new OTel(false);
         }
         STATS = new StatsRecorder(this, TPE);
 
@@ -112,7 +112,7 @@ public class MCHelperImpl implements MCHelper {
         // now that JDA is done loading, we can initialize things
         // that could have used it before initialization completed.
         if (Database.isConfigured()) {
-            DB = new Database();
+            DB = new Database(getOTel().openTelemetry());
             RS = new ReminderService(this, SES);
             AM = new AccountManager(DB);
             LM = new LotteryManager(this);

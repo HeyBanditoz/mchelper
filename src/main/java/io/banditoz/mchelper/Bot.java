@@ -1,6 +1,7 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.utils.database.Database;
+import io.opentelemetry.api.OpenTelemetry;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class Bot {
             System.exit(0);
         }
         else if (argsList.size() > 0 && argsList.contains("migrate")) {
-            new Database().migrate(true);
+            new Database(OpenTelemetry.noop()).migrate(true);
             System.exit(0);
         }
         else if (argsList.size() > 0) {

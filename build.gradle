@@ -144,6 +144,7 @@ dependencies {
     implementation 'io.opentelemetry:opentelemetry-sdk'
     implementation 'io.opentelemetry.instrumentation:opentelemetry-runtime-metrics:1.26.0-alpha'
     implementation 'io.opentelemetry:opentelemetry-exporter-prometheus:1.36.0-alpha'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0:1.26.0-alpha'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise

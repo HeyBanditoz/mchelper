@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.utils.database;
 
+import io.opentelemetry.api.OpenTelemetry;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
@@ -13,7 +14,7 @@ public class DatabaseInitializationTests {
             throw new SkipException("The database is not configured.");
         }
         assertThatCode(() -> {
-            Database d = new Database();
+            Database d = new Database(OpenTelemetry.noop());
             d.migrate(false);
         }).doesNotThrowAnyException();
     }

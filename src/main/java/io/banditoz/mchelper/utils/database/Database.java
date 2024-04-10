@@ -2,6 +2,8 @@ package io.banditoz.mchelper.utils.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import io.jenetics.facilejdbc.Query;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.instrumentation.hikaricp.v3_0.HikariTelemetry;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -19,7 +21,7 @@ public class Database {
     private final HikariDataSource POOL;
     private final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
-    public Database() {
+    public Database(OpenTelemetry openTelemetry) {
         if (!isConfigured()) {
             throw new IllegalStateException("The database is not configured.");
         }
@@ -31,6 +33,7 @@ public class Database {
                 "&useSSL=false&currentSchema=" + env.get("SCHEMA");
         POOL = new HikariDataSource();
         POOL.setMaximumPoolSize(2);
+        POOL.setMetricsTrackerFactory(HikariTelemetry.create(openTelemetry).createMetricsTrackerFactory());
         POOL.setJdbcUrl(url);
 
         try (Connection c = getConnection()) {

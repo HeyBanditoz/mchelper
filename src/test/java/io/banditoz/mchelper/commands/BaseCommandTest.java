@@ -6,6 +6,7 @@ import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.utils.database.Database;
+import io.opentelemetry.api.OpenTelemetry;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -48,7 +49,7 @@ public abstract class BaseCommandTest {
 
     static {
         if (Database.isConfigured()) {
-            DB = new Database();
+            DB = new Database(OpenTelemetry.noop());
             AM = new AccountManager(DB);
         }
         else {

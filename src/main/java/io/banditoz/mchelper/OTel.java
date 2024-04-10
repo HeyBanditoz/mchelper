@@ -19,7 +19,11 @@ public class OTel {
     private final OpenTelemetry openTelemetry;
     private static final Logger log = LoggerFactory.getLogger(OTel.class);
 
-    public OTel() {
+    public OTel(boolean enabled) {
+        if (!enabled) {
+            openTelemetry = OpenTelemetry.noop();
+            return;
+        }
         Attributes attr = Attributes.builder()
                 .put("application", "mchelper")
                 .put("hostname", getHostname())
@@ -47,6 +51,10 @@ public class OTel {
 
     public MeterProvider meter() {
         return openTelemetry.getMeterProvider();
+    }
+
+    public OpenTelemetry openTelemetry() {
+        return openTelemetry;
     }
 
     private String getHostname() {
