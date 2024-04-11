@@ -74,6 +74,32 @@ This is because the file paths from the jar will show up in the `databasechangel
 (because Java resources) whereas running it locally will show up as
 `src/main/resources/sql/postgres/changelog-file.yml`, so the symlink is needed for consistency.
 
+### Prometheus
+MCHelper uses [OpenTelemetry](https://opentelemetry.io/) for basic metrics. A
+[Prometheus](https://prometheus.io/)-compatible HTTP server is provided and its port can be configured with the
+`mchelper.metrics.port` config value. The port is logged on startup. You can scrape this HTTP server using Prometheus or
+other compatible metrics solution.
+
+Current recorded events:
+
+* GenericEvents' implementing classes are recorded as
+  a [LongCounter](https://javadoc.io/static/io.opentelemetry/opentelemetry-api/1.36.0/io/opentelemetry/api/metrics/LongCounter.html#add(long,io.opentelemetry.api.common.Attributes)).
+* The HikariCP SQL connection pool also tracks some basic metrics around how long it takes to acquire a connection,
+  how long it takes a connection for, et al., using
+  the [opentelemetry-hikaricp-3.0](https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/hikaricp-3.0/library)
+  library.
+* JVM stats around garbage collection, CPU, et al. are tracked using
+  the [opentelemetry-runtime-metrics](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/runtime/jvm-metrics.md)
+  library.
+
+You can configure a simple health check using Grafana, using this
+[PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query:
+
+`sum(increase(jda_events_total{event_name="GatewayPingEvent"}[5m]))`
+
+and alert if the last value drops below 0, for example. This should alert after 5 minutes, plus evaluation time, plus
+pending period; if your bot stops receiving heartbeats (perhaps it or Discord is down.)
+
 ### Building a Docker Image
 
 The Dockerfile is kept lean to quicken building in CI/CD. You will need to first produce a shadow JAR in the project by
