@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.Interaction;
 import org.jetbrains.annotations.NotNull;
 
 public class MetricsEventListener extends ListenerAdapter {
@@ -26,11 +27,14 @@ public class MetricsEventListener extends ListenerAdapter {
     public void onGenericEvent(@NotNull GenericEvent event) {
         AttributesBuilder attr = Attributes.builder()
                 .put("event_name", event.getClass().getSimpleName());
-        if (event instanceof GenericGuildEvent e) {
-            attr.put("guild", e.getGuild().getIdLong());
-        }
-        else if (event instanceof GenericMessageEvent e && e.isFromGuild()) {
-            attr.put("guild", e.getGuild().getIdLong());
+        switch (event) {
+            case GenericGuildEvent e ->
+                    attr.put("guild", e.getGuild().getIdLong());
+            case GenericMessageEvent e when e.isFromGuild() ->
+                    attr.put("guild", e.getGuild().getIdLong());
+            case Interaction e when e.getGuild() != null ->
+                    attr.put("guild", e.getGuild().getIdLong());
+            default -> {}
         }
 
         eventCounter.add(1, attr.build());
