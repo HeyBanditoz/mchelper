@@ -6,6 +6,7 @@ import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.MeterProvider;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.http.HttpRequestEvent;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.Interaction;
@@ -34,6 +35,8 @@ public class MetricsEventListener extends ListenerAdapter {
                     attr.put("guild", e.getGuild().getIdLong());
             case Interaction e when e.getGuild() != null ->
                     attr.put("guild", e.getGuild().getIdLong());
+            case HttpRequestEvent e ->
+                    attr.put("route", "%s /%s".formatted(e.getRoute().getBaseRoute().getMethod(), e.getRoute().getBaseRoute().getRoute()));
             default -> {}
         }
 
