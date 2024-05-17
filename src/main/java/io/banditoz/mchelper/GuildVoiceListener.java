@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -17,9 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class GuildVoiceListener extends ListenerAdapter {
     private final MCHelper mcHelper;
@@ -92,23 +90,20 @@ public class GuildVoiceListener extends ListenerAdapter {
                     log.debug("There is no role in guild {} by id {}. Skipping role update.", g, voiceRoleId);
                     return;
                 }
+                int secondsDelay = 0;
                 for (GuildVoiceState vs : g.getVoiceStates()) {
                     if (vs.getMember().getUser().isBot()) {
                         continue;
                     }
-                    Set<String> memberRoles = vs.getMember().getRoles()
-                            .stream()
-                            .map(ISnowflake::getId)
-                            .collect(Collectors.toSet());
-                    if (vs.inAudioChannel() && !memberRoles.contains(voiceRoleId)) {
+                    if (vs.inAudioChannel()) {
                         g.addRoleToMember(vs.getMember(), toChange)
                                 .reason("This member was in a voice channel on bot startup, and was granted the assigned voice role.")
-                                .queue();
+                                .queueAfter(++secondsDelay, TimeUnit.SECONDS);
                     }
-                    else if (memberRoles.contains(voiceRoleId)) {
+                    else {
                         g.removeRoleFromMember(vs.getMember(), toChange)
                                 .reason("This member is not in a voice channel on bot startup, and was revoked the assigned voice role.")
-                                .queue();
+                                .queueAfter(++secondsDelay, TimeUnit.SECONDS);
                     }
                 }
                 i.getAndIncrement();
