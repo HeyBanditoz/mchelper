@@ -42,7 +42,7 @@ public class DuelGame extends Game {
                 return;
             }
             try {
-                am.remove(ante, event.getUser().getIdLong(), "duel ante with " + player.getIdLong());
+                remove(ante, event.getUser().getIdLong(), "duel ante with " + player.getIdLong());
             } catch (Exception e) {
                 event.getEvent().reply("Error! " + e.getMessage()).setEphemeral(true).queue();
                 LOGGER.warn("Error subtracting money from prospecting opponent!", e);
@@ -58,7 +58,7 @@ public class DuelGame extends Game {
                     .setColor(Color.MAGENTA)
                     .build();
             event.getMessage().editMessageEmbeds(me).setComponents().queue();
-            mcHelper.getSES().schedule(() -> {
+            getScheduledExecutorService().schedule(() -> {
                 Button clickMe = Button.primary(UUID.randomUUID().toString(), "Click Me!");
                 ButtonInteractable bi = new ButtonInteractable(
                         Map.of(clickMe, this::fight),
@@ -89,7 +89,7 @@ public class DuelGame extends Game {
                     .build();
             event.removeListenerAndDestroy(me);
             try {
-                am.add(ante.multiply(TWO), event.getEvent().getUser().getIdLong(), "duel winnings against " + realOpponent.getIdLong());
+                add(ante.multiply(TWO), event.getEvent().getUser().getIdLong(), "duel winnings against " + realOpponent.getIdLong());
             } catch (Exception e) {
                 LOGGER.error("Error adding money to winner! This shouldn't happen.", e);
             }
@@ -105,7 +105,7 @@ public class DuelGame extends Game {
             }
             complete = true;
             try {
-                am.add(ante, player.getIdLong(), "duel cancelled");
+                add(ante, player.getIdLong(), "duel cancelled");
             } catch (Exception e) {
                 LOGGER.error("Error giving money due to cancellation! This shouldn't happen.", e);
             }

@@ -103,7 +103,7 @@ public class VideoPokerGame extends Game {
         me.setDescription("You won $" + AccountManager.format(winnings) + "!\n" + sj);
         try {
             if (currentResult != PokerResult.LOSS) {
-                am.add(winnings, player.getIdLong(), "video poker " + currentResult.toString());
+                add(winnings, player.getIdLong(), "video poker " + currentResult.toString());
             }
         } catch (Exception ex) {
             log.error("Error while playing out!", ex);

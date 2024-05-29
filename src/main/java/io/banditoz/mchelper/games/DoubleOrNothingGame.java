@@ -72,7 +72,7 @@ public class DoubleOrNothingGame extends Game {
     }
 
     public void payout() throws Exception {
-        am.add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ")");
+        add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ")");
     }
 
     public MessageEmbed generate(BigDecimal currentAmount, User u) {

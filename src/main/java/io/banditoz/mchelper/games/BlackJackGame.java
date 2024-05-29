@@ -188,7 +188,7 @@ public class BlackJackGame extends Game {
             if (dirty || (doubleDownEvent != null && !wrappedEvent.equals(doubleDownEvent))) {
                 return;
             }
-            am.remove(currentAmount, player.getIdLong(), "blackjack double down");
+            remove(currentAmount, player.getIdLong(), "blackjack double down");
             currentAmount = currentAmount.multiply(BigDecimal.TWO);
             this.doubleDownEvent = wrappedEvent;
         } catch (MoneyException ex) {
@@ -307,11 +307,11 @@ public class BlackJackGame extends Game {
         else {
             currentAmount = currentAmount.multiply(TWO);
         }
-        am.add(currentAmount, player.getIdLong(), twentyOne ? "blackjack 21 winnings" : "blackjack winnings");
+        add(currentAmount, player.getIdLong(), twentyOne ? "blackjack 21 winnings" : "blackjack winnings");
     }
 
     public void standOff() throws Exception {
-        am.add(currentAmount, player.getIdLong(), "blackjack standoff");
+        add(currentAmount, player.getIdLong(), "blackjack standoff");
     }
 
     public enum WinState {
