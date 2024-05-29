@@ -62,10 +62,11 @@ public class BlackJackCommand extends Command {
         MessageEmbed embed = game.generate();
         Button hit = Button.primary(UUID.randomUUID().toString(), "Hit");
         Button stay = Button.primary(UUID.randomUUID().toString(), "Stay");
-        MessageCreateData m = new MessageCreateBuilder().setEmbeds(embed).addActionRow(hit, stay).build();
+        Button doubleDown = Button.danger(UUID.randomUUID().toString(), "Double Down");
+        MessageCreateData m = new MessageCreateBuilder().setEmbeds(embed).addActionRow(hit, stay, doubleDown).build();
         ce.getEvent().getChannel().sendMessage(m).queue(success -> {
             ButtonInteractable i = new ButtonInteractable(
-                    Map.of(hit, game::hit, stay, game::stand),
+                    Map.of(hit, game::hit, stay, game::stand, doubleDown, game::doubleDown),
                     ce.getEvent().getAuthor()::equals,
                     0, success, ce);
             ce.getMCHelper().getButtonListener().addInteractable(i);

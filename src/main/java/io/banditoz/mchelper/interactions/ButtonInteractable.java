@@ -144,7 +144,12 @@ public class ButtonInteractable {
                 .setEmbeds(me)
                 .setComponents(rows)
                 .build();
-        event.editMessage(msgEdit).queue();
+        if (!event.isAcknowledged()) {
+            event.editMessage(msgEdit).queue();
+        }
+        else {
+            event.getMessage().editMessage(msgEdit).queue();
+        }
     }
 
     /**

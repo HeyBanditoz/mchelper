@@ -3,9 +3,11 @@ package io.banditoz.mchelper.games;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.MoneyException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 
 import java.awt.Color;
 import java.math.BigDecimal;
@@ -22,6 +24,10 @@ public class BlackJackGame extends Game {
     private final List<Card> dealerHand = new ArrayList<>();
     private int dealerSum;
     private int playersSum;
+    /** Used for (hackily) preventing further access to this game if the user doubled down. */
+    private WrappedButtonClickEvent doubleDownEvent;
+    /** If this game has already been accessed post-command invocation. */
+    private boolean dirty = false;
 
     public BlackJackGame(User player, BigDecimal initialBet, MCHelper mcHelper) {
         super(5, 200_000, mcHelper, player, initialBet);
@@ -99,8 +105,13 @@ public class BlackJackGame extends Game {
 
     /**
      * Method called when a user intends to play for more money.
+     * @return Whether the game ended or not.
      */
-    public void hit(WrappedButtonClickEvent wrappedEvent) {
+    public boolean hit(WrappedButtonClickEvent wrappedEvent) {
+        if (doubleDownEvent != null && !wrappedEvent.equals(doubleDownEvent)) {
+            return false;
+        }
+        dirty = true;
         int sum = hitPlayer();
         try {
             if (sum == 21) {
@@ -110,48 +121,86 @@ public class BlackJackGame extends Game {
                 if (getDealerSum() == 21) {
                     standOff();
                     wrappedEvent.destroyThenAddReplayer(win(WinState.STANDOFF));
-                    return;
+                    return true;
                 }
                 payout(true);
                 wrappedEvent.destroyThenAddReplayer(win(WinState.BLACKJACK));
+                return true;
             }
             else if (sum < 21) {
-                wrappedEvent.getEvent().editMessageEmbeds(generate()).queue();
+                // drop the double down
+                List<ItemComponent> buttons = wrappedEvent.getMessage().getActionRows().get(0).getComponents().subList(0, 2);
+                wrappedEvent.getEvent().editMessageEmbeds(generate()).setActionRow(buttons).queue();
             }
             else {
                 while (getDealerSum() < 17) {
                     hitDealer();
                 }
                 wrappedEvent.destroyThenAddReplayer(lose());
+                return true;
             }
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
         }
+        return false;
     }
 
     /**
      * Method called when a user intends to cash out their winnings.
      */
     public void stand(WrappedButtonClickEvent wrappedEvent) {
+        if (doubleDownEvent != null && !wrappedEvent.equals(doubleDownEvent)) {
+            return;
+        }
+        dirty = true;
         while (getDealerSum() < 17) {
             hitDealer();
         }
         try {
-            if (getDealerSum() > 21 || getDealerSum() < getPlayersSum()) {
-                payout(false);
-                wrappedEvent.destroyThenAddReplayer(win(WinState.NORMAL));
-            }
-            else if (getDealerSum() == getPlayersSum()) {
-                standOff();
-                wrappedEvent.destroyThenAddReplayer(win(WinState.STANDOFF));
-            }
-            else {
-                wrappedEvent.destroyThenAddReplayer(lose());
-            }
+            forceEnd(wrappedEvent);
         } catch (Exception ex) {
             LOGGER.error("Error while paying out!", ex);
         } finally {
             stopPlaying();
+        }
+    }
+
+    private void forceEnd(WrappedButtonClickEvent wrappedEvent) throws Exception {
+        if (getDealerSum() > 21 || getDealerSum() < getPlayersSum()) {
+            payout(false);
+            wrappedEvent.destroyThenAddReplayer(win(WinState.NORMAL));
+        }
+        else if (getDealerSum() == getPlayersSum()) {
+            standOff();
+            wrappedEvent.destroyThenAddReplayer(win(WinState.STANDOFF));
+        }
+        else {
+            wrappedEvent.destroyThenAddReplayer(lose());
+        }
+    }
+
+    /**
+     * Method calls when a user intends to double down.<br>
+     * Doubling down doubles your bet, but only gives you one more card to play.
+     */
+    public void doubleDown(WrappedButtonClickEvent wrappedEvent) {
+        try {
+            if (dirty || (doubleDownEvent != null && !wrappedEvent.equals(doubleDownEvent))) {
+                return;
+            }
+            am.remove(currentAmount, player.getIdLong(), "blackjack double down");
+            currentAmount = currentAmount.multiply(BigDecimal.TWO);
+            this.doubleDownEvent = wrappedEvent;
+        } catch (MoneyException ex) {
+            wrappedEvent.getEvent().reply(ex.getMessage()).setEphemeral(true).queue();
+            return;
+        } catch (Exception ex) {
+            wrappedEvent.getEvent().reply("Other error attempting to double down. Please try again.").setEphemeral(true).queue();
+            return;
+        }
+        if (!hit(wrappedEvent)) {
+            // if the game isn't over after doubling down, force a stand
+            stand(wrappedEvent);
         }
     }
 

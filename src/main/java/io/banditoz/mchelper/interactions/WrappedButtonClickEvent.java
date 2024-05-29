@@ -7,11 +7,15 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class WrappedButtonClickEvent {
+    private static final Logger log = LoggerFactory.getLogger(WrappedButtonClickEvent.class);
     private final ButtonInteractionEvent event;
     private final ButtonInteractable bi;
     private final MCHelper MCHelper;
@@ -85,11 +89,27 @@ public class WrappedButtonClickEvent {
         ButtonListener bl = MCHelper.getButtonListener();
         Button replay = Button.primary(UUID.randomUUID().toString(), "♻");
         removeListener();
+        if (event.isAcknowledged()) {
+            log.info("{} was previously acknowledged. Editing the original message without button acknowledgement instead.", event);
+        }
         bi.destroyAndAddNewButtons(finalEmbed, event, ActionRow.of(replay));
         ButtonInteractable replayInteraction = new ButtonInteractable(Map.of(replay, event -> {
             this.removeListenerAndDestroy(event);
             bi.getCommandEvent().replay();
         }), user -> user.equals(bi.getCommandEvent().getUser()), 15, bi.getMessage(), bi.getCommandEvent());
         bl.addInteractable(replayInteraction);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WrappedButtonClickEvent that = (WrappedButtonClickEvent) o;
+        return Objects.equals(event.getIdLong(), that.event.getIdLong());
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(event.getIdLong());
     }
 }
