@@ -20,5 +20,7 @@ public enum VendorName {
     @JsonProperty("Jaeger")
     JAEGER,
     @JsonProperty("Flea Market")
-    FLEA
+    FLEA,
+    @JsonProperty("Ref")
+    REF
 }
