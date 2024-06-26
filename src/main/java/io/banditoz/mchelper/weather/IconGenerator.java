@@ -17,7 +17,7 @@ public class IconGenerator {
             case "fog" -> "\uD83C\uDF2B️";
             case "cloudy" -> "☁";
             case "partly-cloudy-day" -> "⛅";
-            case "partly-coudy-night" -> "\uD83C\uDF12";
+            case "partly-cloudy-night" -> "\uD83C\uDF12";
             default -> {
                 log.warn("icon={} is unknown", icon);
                 yield "❓";
