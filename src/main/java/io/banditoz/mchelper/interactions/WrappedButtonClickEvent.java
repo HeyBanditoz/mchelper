@@ -46,8 +46,8 @@ public class WrappedButtonClickEvent {
      * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list, and removes all
      * buttons.
      */
-    public void removeListenerAndDestroy(WrappedButtonClickEvent event) {
-        bi.destroy(event);
+    public void removeListenerAndDestroy() {
+        bi.destroy(this);
         removeListener();
     }
 
@@ -94,7 +94,7 @@ public class WrappedButtonClickEvent {
         }
         bi.destroyAndAddNewButtons(finalEmbed, event, ActionRow.of(replay));
         ButtonInteractable replayInteraction = new ButtonInteractable(Map.of(replay, event -> {
-            this.removeListenerAndDestroy(event);
+            event.removeListenerAndDestroy();
             bi.getCommandEvent().replay();
         }), user -> user.equals(bi.getCommandEvent().getUser()), 15, bi.getMessage(), bi.getCommandEvent());
         bl.addInteractable(replayInteraction);

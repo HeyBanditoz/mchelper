@@ -87,6 +87,6 @@ public class EmbedPaginator {
     }
 
     private void handleStop(WrappedButtonClickEvent event) {
-        event.removeListenerAndDestroy(event);
+        event.removeListenerAndDestroy();
     }
 }

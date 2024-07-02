@@ -7,6 +7,7 @@ import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.interactions.ButtonInteractable;
+import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.weather.IconGenerator;
@@ -62,7 +63,6 @@ public class WeatherForecastCommand extends Command {
         String hourlyUuid = UUID.randomUUID().toString();
         String hourly48Uuid = UUID.randomUUID().toString();
         String dailyUuid = UUID.randomUUID().toString();
-        String stopUuid = UUID.randomUUID().toString();
 
         Button threeHoursForecastButton = Button.primary(threeHoursUuid, "Three Hours");
         Button hourlyForecastButton = Button.primary(hourlyUuid, "Hourly (24h)");
@@ -104,7 +104,7 @@ public class WeatherForecastCommand extends Command {
                             dailyForecastButton,
                             e -> e.getEvent().editMessage(dailyMessage).queue(),
                             stop,
-                            e -> e.removeListenerAndDestroy(e)
+                            WrappedButtonClickEvent::removeListenerAndDestroy
                     ),
                     ce.getEvent().getAuthor()::equals, 60, message, ce);
             ce.getMCHelper().getButtonListener().addInteractable(i);

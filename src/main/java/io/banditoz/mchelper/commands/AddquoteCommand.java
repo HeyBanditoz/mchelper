@@ -128,7 +128,7 @@ public class AddquoteCommand extends Command {
         event.getEvent().editMessage(edit).queue();
         CommandEventAndQuote ceq = cache.get(event.getEvent().getUser().getIdLong());
         if (ceq == null) {
-            event.removeListenerAndDestroy(event);
+            event.removeListenerAndDestroy();
             return;
         }
         CommandEvent ce = ceq.ce();
