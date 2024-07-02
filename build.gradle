@@ -104,8 +104,9 @@ repositories {
 }
 
 dependencies {
-    implementation('io.github.discord-jda:JDA:e82f4dccee') {
+    implementation('net.dv8tion:JDA:5.0.0-beta.24') {
         exclude module: 'opus-java'
+        exclude module: 'slf4j-api' // still need an old logback version for elasticsearch logger issue
     }
     implementation 'ch.qos.logback:logback-classic:1.2.11' // pinned back to attempt to fix issues with missing fields in elasticsearch
     implementation 'com.udojava:EvalEx:2.7'
