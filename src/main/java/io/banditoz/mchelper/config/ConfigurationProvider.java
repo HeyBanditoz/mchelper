@@ -84,7 +84,7 @@ public class ConfigurationProvider {
     }
 
     public void writeValue(Config key, String value, long guildId, long userId) throws SQLException {
-        if (key.isBotOwnerLocked() && CommandPermissions.isBotOwner(userId)) {
+        if (key.isBotOwnerLocked() && !CommandPermissions.isBotOwner(userId)) {
             throw new IllegalStateException("You are not a bot owner.");
         }
         dao.writeValue(key, value, guildId, userId);
