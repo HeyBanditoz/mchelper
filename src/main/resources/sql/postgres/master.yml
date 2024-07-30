@@ -38,3 +38,6 @@ databaseChangeLog:
   - include:
       file: 20240216-quote-flags.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20240728-llm-usage-tracker.yml
+      relativeToChangelogFile: true

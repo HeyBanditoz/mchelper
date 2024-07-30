@@ -103,4 +103,14 @@ public class RegexCommandEvent implements UserEvent {
     public User getUser() {
         return EVENT.getAuthor();
     }
+
+    @Override
+    public String commandName() {
+        return CLASS_NAME;
+    }
+
+    @Override
+    public long getUserId() {
+        return EVENT.getAuthor().getIdLong();
+    }
 }

@@ -6,11 +6,13 @@ import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
+import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.weather.WeatherService;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
@@ -41,4 +43,6 @@ public interface MCHelper {
     RssScraper getRssScraper();
     ConfigurationProvider getConfigurationProvider();
     OTel getOTel();
+    LLMService getLLMService();
+    WeatherService getWeatherService();
 }

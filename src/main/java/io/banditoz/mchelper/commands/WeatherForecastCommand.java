@@ -1,16 +1,15 @@
 package io.banditoz.mchelper.commands;
 
 import com.google.common.collect.Iterables;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.commands.logic.*;
 import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.interactions.ButtonInteractable;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.weather.ForecastSummary;
 import io.banditoz.mchelper.weather.IconGenerator;
+import io.banditoz.mchelper.weather.WeatherService;
 import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
@@ -23,6 +22,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,19 +45,26 @@ public class WeatherForecastCommand extends Command {
     }
 
     @Override
+    protected Cooldown getDefaultCooldown() {
+        if (io.avaje.config.Config.getBool("mchelper.darksky.llm-summaries-enabled", true)) {
+            return new Cooldown(15, ChronoUnit.SECONDS, CooldownType.PER_USER);
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
     protected Status onCommand(CommandEvent ce) {
-        DarkSkyClient darkSkyClient = ce.getMCHelper().getHttp().getDarkSkyClient();
+        WeatherService svc = ce.getMCHelper().getWeatherService();
+
         String locationToSearch = getLocationToSearch(ce);
         if (locationToSearch == null) return Status.FAIL;
 
-        List<Location> locs = ce.getMCHelper().getNominatimLocationService().searchForLocation(locationToSearch);
-        if (locs.isEmpty()) {
-            ce.sendReply("Could not find location.");
-            return Status.FAIL;
-        }
-
-        Location location = locs.get(0);
-        DSWeather response = darkSkyClient.getForecast(location.lat(), location.lon());
+        ForecastSummary forecastSummary = svc.getSummaryForLocation(locationToSearch, ce);
+        DSWeather response = forecastSummary.forecast();
+        Location location = forecastSummary.location();
+        String llmWeatherSummary = forecastSummary.llmSummary();
 
         String threeHoursUuid = UUID.randomUUID().toString();
         String hourlyUuid = UUID.randomUUID().toString();
@@ -77,19 +84,19 @@ public class WeatherForecastCommand extends Command {
 
         MessageEditData threeHoursMessage = new MessageEditBuilder()
                 .setActionRow(threeHoursForecastButtonDisabled, hourlyForecastButton, hourly48ForecastButton, dailyForecastButton, stop)
-                .setEmbeds(getThreeHoursForecast(response, location))
+                .setEmbeds(getThreeHoursForecast(response, location, llmWeatherSummary))
                 .build();
         MessageEditData hourlyMessage = new MessageEditBuilder()
                 .setActionRow(threeHoursForecastButton, hourlyForecastButtonDisabled, hourly48ForecastButton, dailyForecastButton, stop)
-                .setEmbeds(getHourlyForecast(response, location, false))
+                .setEmbeds(getHourlyForecast(response, location, false, llmWeatherSummary))
                 .build();
         MessageEditData hourly48Message = new MessageEditBuilder()
                 .setActionRow(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButtonDisabled, dailyForecastButton, stop)
-                .setEmbeds(getHourlyForecast(response, location, true))
+                .setEmbeds(getHourlyForecast(response, location, true, llmWeatherSummary))
                 .build();
         MessageEditData dailyMessage = new MessageEditBuilder()
                 .setActionRow(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButton, dailyForecastButtonDisabled, stop)
-                .setEmbeds(getDailyForecast(response, location))
+                .setEmbeds(getDailyForecast(response, location, llmWeatherSummary))
                 .build();
 
         ce.getEvent().getChannel().sendMessage(fromEditData(threeHoursMessage)).queue(message -> {
@@ -113,9 +120,9 @@ public class WeatherForecastCommand extends Command {
         return Status.SUCCESS;
     }
 
-    private MessageEmbed getThreeHoursForecast(DSWeather response, Location location) {
+    private MessageEmbed getThreeHoursForecast(DSWeather response, Location location, String llmWeatherSummary) {
         Currently c = response.currently();
-        StringBuilder weather = new StringBuilder("When • Icon • Temp • Precip. Chance\n");
+        StringBuilder weather = new StringBuilder((llmWeatherSummary == null ? "" : llmWeatherSummary + "\n\n") + "When • Icon • Temp • Precip. Chance\n");
         for (List<DataItem> dataItems : Iterables.partition(response.hourly().data(), 3)) {
             DataItem data = DataItem.reduceSome(dataItems);
             weather.append(TimeFormat.DATE_TIME_SHORT.format(data.time()))
@@ -135,9 +142,9 @@ public class WeatherForecastCommand extends Command {
                 .build();
     }
 
-    private MessageEmbed getHourlyForecast(DSWeather response, Location location, boolean is48) {
+    private MessageEmbed getHourlyForecast(DSWeather response, Location location, boolean is48, String llmWeatherSummary) {
         Currently c = response.currently();
-        StringBuilder weather = new StringBuilder("When • Icon • Temp • Precip. Chance\n");
+        StringBuilder weather = new StringBuilder((llmWeatherSummary == null ? "" : llmWeatherSummary + "\n\n") + "When • Icon • Temp • Precip. Chance\n");
         // the size of the response.hourly().data() array should be 48, but in case it's less, guard against it here.
         for (int i = 0; i < (is48 ? Math.min(response.hourly().data().size(), 48) : Math.min(response.hourly().data().size(), 24)); i++) {
             DataItem data = response.hourly().data().get(i);
@@ -158,9 +165,9 @@ public class WeatherForecastCommand extends Command {
                 .build();
     }
 
-    private MessageEmbed getDailyForecast(DSWeather response, Location location) {
+    private MessageEmbed getDailyForecast(DSWeather response, Location location, String llmWeatherSummary) {
         Currently c = response.currently();
-        StringBuilder weather = new StringBuilder("When • Icon • Temp LH F • Temp LH C • Precip. Chance\n");
+        StringBuilder weather = new StringBuilder((llmWeatherSummary == null ? "" : llmWeatherSummary + "\n\n") + "When • Icon • Temp LH F • Temp LH C • Precip. Chance\n");
         for (int i = 0; i < Math.min(response.daily().data().size(), 7); i++) {
             DataItem data = response.daily().data().get(i);
             weather.append(TimeFormat.DATE_LONG.format(data.time()))

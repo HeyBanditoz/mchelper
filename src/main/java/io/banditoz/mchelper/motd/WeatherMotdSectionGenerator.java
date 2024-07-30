@@ -1,14 +1,19 @@
 package io.banditoz.mchelper.motd;
 
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
+import io.banditoz.mchelper.utils.database.Database;
 import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
 import io.banditoz.mchelper.weather.geocoder.Location;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.Color;
@@ -37,12 +42,16 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
         Location location = mcHelper.getNominatimLocationService()
                 .searchForLocation(c.getValue(Config.WEATHER_DEFAULT_LOC, guildId))
                 .get(0);
-        DSWeather response = mcHelper.getHttp().getDarkSkyClient().getCurrentlyDaily(location);
+
+        DSWeather response = mcHelper.getHttp().getDarkSkyClient().getForecast(location);
+
+        WeatherMotdSectionUserEvent fakeEvent = new WeatherMotdSectionUserEvent(tc.getGuild());
+        String description = mcHelper.getWeatherService().getSummaryForForecast(response, fakeEvent);
 
         // TODO move to proper WeatherService later in the future to centralize forecast embed generation
         Currently currently = response.currently();
         DataItem today = response.daily().data().get(0);
-        return new EmbedBuilder()
+        EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Current Weather Forecast • %s • %d°F / %s°C".formatted(currently.summary(), round(currently.temperature()), fToCHU(currently.temperature())),
                         "https://merrysky.net/forecast/%s,%s".formatted(response.latitude(), response.longitude()))
                 .addField("Low/High", "%s°F/%s°F\n%s°C/%s°C"
@@ -52,7 +61,47 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
                 .addField("Precipitation", "%s%%".formatted(round(today.precipProbability() * 100D)), true)
                 .addField("Pressure", "%s mb\n%.3f atm".formatted(round(today.pressure()), today.pressure() / 1013.0), true)
                 .setFooter(String.format("%s\n(%.5f,%.5f)", location.displayName(), response.latitude(), response.longitude()))
-                .setColor(EMBED_COLOR)
-                .build();
+                .setColor(EMBED_COLOR);
+        if (description != null) {
+            builder.setDescription(description);
+        }
+        return builder.build();
+    }
+
+    private record WeatherMotdSectionUserEvent(Guild g) implements UserEvent {
+        @Override
+        public Guild getGuild() {
+            return g;
+        }
+
+        @Override
+        public Database getDatabase() {
+            return null;
+        }
+
+        @Override
+        public GuildConfigurationProvider getConfig() {
+            return null;
+        }
+
+        @Override
+        public MCHelper getMCHelper() {
+            return null;
+        }
+
+        @Override
+        public User getUser() {
+            return null;
+        }
+
+        @Override
+        public long getUserId() {
+            return 0;
+        }
+
+        @Override
+        public String commandName() {
+            return "WeatherMotdSectionGenerator";
+        }
     }
 }

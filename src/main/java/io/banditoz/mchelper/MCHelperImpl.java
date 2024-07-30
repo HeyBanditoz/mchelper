@@ -9,6 +9,7 @@ import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
 import io.banditoz.mchelper.interactions.ButtonListener;
+import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
 import io.banditoz.mchelper.regexable.Regexable;
@@ -18,11 +19,13 @@ import io.banditoz.mchelper.runnables.QotdRunnable;
 import io.banditoz.mchelper.runnables.UserMaintenanceRunnable;
 import io.banditoz.mchelper.stats.StatsRecorder;
 import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.weather.WeatherService;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
@@ -64,6 +67,8 @@ public class MCHelperImpl implements MCHelper {
     private final RssScraper RSS_SCRAPER;
     private final ConfigurationProvider CONFIG_PROVIDER;
     private final OTel OTEL;
+    private final LLMService LLM_SERVICE;
+    private final WeatherService WEATHER_SERVICE;
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
@@ -171,6 +176,15 @@ public class MCHelperImpl implements MCHelper {
             }
 
             @Override
+            public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+                TPE.execute(() -> {
+                    if (BL != null) {
+                        BL.onModalInteraction(event);
+                    }
+                });
+            }
+
+            @Override
             public void onMessageDelete(@NotNull MessageDeleteEvent event) {
                 TPE.execute(() -> {
                     if (PS != null) {
@@ -216,6 +230,19 @@ public class MCHelperImpl implements MCHelper {
         HTTP_HOLDER = new Http(this);
         NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
         RSS_SCRAPER = new RssScraper();
+        if (Config.getNullable("mchelper.anthropic.token") != null) {
+            LLM_SERVICE = new LLMService(this);
+        }
+        else {
+            LLM_SERVICE = null;
+        }
+
+        if (Config.getNullable("mchelper.darksky.token") != null) {
+            WEATHER_SERVICE = new WeatherService(this);
+        }
+        else {
+            WEATHER_SERVICE = null;
+        }
 
         LOGGER.info("MCHelper initialization finished in {} seconds.", new DecimalFormat("#.#").format((System.currentTimeMillis() - before) / 1000D));
     }
@@ -339,6 +366,16 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public OTel getOTel() {
         return OTEL;
+    }
+
+    @Override
+    public LLMService getLLMService() {
+        return LLM_SERVICE;
+    }
+
+    @Override
+    public WeatherService getWeatherService() {
+        return WEATHER_SERVICE;
     }
 
     /**

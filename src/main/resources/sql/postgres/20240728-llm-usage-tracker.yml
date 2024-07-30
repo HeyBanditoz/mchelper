@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: llm-usage-tracker
+      author: Hayden
+      comment: Adds a llm_usage table for tracking which users consume the most tokens.
+      changes:
+        - createTable:
+            tableName: llm_usage
+            columns:
+              - column:
+                    name: created_on
+                    type: TIMESTAMPTZ
+                    constraints:
+                      nullable: false
+                    defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: guild_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source
+                  type: TEXT
+                  constraints:
+                    nullable: false
+                  remarks: From which command the LLM was invoked.
+              - column:
+                  name: llm_provider
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: input_tokens_used
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: output_tokens_used
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: time_took_ms
+                  type: INT
+                  constraints:
+                    nullable: false

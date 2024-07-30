@@ -37,6 +37,7 @@ public class Http {
     private final OwlbotClient owlbotClient;
     private final NominatimClient nominatimClient;
     private final DarkSkyClient darkSkyClient;
+    private final AnthropicClient anthropicClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
@@ -148,6 +149,17 @@ public class Http {
                 .requestInterceptor(uai)
                 .target(NominatimClient.class, "https://nominatim.openstreetmap.org");
 
+        anthropicClient = Config.getOptional("mchelper.anthropic.token")
+                .map(token -> Feign.builder()
+                        .client(feignClient)
+                        .encoder(e)
+                        .decoder(d)
+                        .errorDecoder(er)
+                        .requestInterceptor(uai)
+                        .requestInterceptor(template -> template.header("x-api-key", token))
+                        .target(AnthropicClient.class, Config.get("mchelper.anthropic.endpoint", "https://api.anthropic.com")))
+                .orElse(null);
+
         LOGGER.info("Finished building Feign clients. Current status: " + this);
     }
 
@@ -185,6 +197,10 @@ public class Http {
 
     public DarkSkyClient getDarkSkyClient() {
         return darkSkyClient;
+    }
+
+    public AnthropicClient getAnthropicClient() {
+        return anthropicClient;
     }
 
     private static final class UserAgentInterceptor implements RequestInterceptor {
@@ -264,6 +280,7 @@ public class Http {
                 ", owlbotClient=" + owlbotClient +
                 ", nominatimClient=" + nominatimClient +
                 ", darkSkyClient=" + darkSkyClient +
+                ", anthropicClient=" + anthropicClient +
                 '}';
     }
 }

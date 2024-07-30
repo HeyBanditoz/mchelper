@@ -339,4 +339,14 @@ public class CommandEvent implements UserEvent {
     public User getUser() {
         return EVENT.getAuthor();
     }
+
+    @Override
+    public String commandName() {
+        return COMMAND_NAME;
+    }
+
+    @Override
+    public long getUserId() {
+        return EVENT.getAuthor().getIdLong();
+    }
 }

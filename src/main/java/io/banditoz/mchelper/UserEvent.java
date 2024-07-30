@@ -14,4 +14,6 @@ public interface UserEvent {
     GuildConfigurationProvider getConfig();
     MCHelper getMCHelper();
     User getUser();
+    long getUserId();
+    String commandName();
 }

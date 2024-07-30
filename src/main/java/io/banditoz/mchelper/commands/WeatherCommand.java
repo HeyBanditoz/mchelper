@@ -4,10 +4,10 @@ import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.http.DarkSkyClient;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.DateUtils;
 import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.weather.ForecastSummary;
 import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.DoubleSummaryStatistics;
-import java.util.List;
 
 import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
@@ -37,7 +36,6 @@ public class WeatherCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        DarkSkyClient darkSkyClient = ce.getMCHelper().getHttp().getDarkSkyClient();
         String locationToSearch;
         if (ce.getCommandArgsString().isBlank()) {
             String configuredLocation = ce.getConfig().get(Config.WEATHER_DEFAULT_LOC);
@@ -54,14 +52,10 @@ public class WeatherCommand extends Command {
             locationToSearch = ce.getCommandArgsString();
         }
 
-        List<Location> locs = ce.getMCHelper().getNominatimLocationService().searchForLocation(locationToSearch);
-        if (locs.isEmpty()) {
-            ce.sendReply("Could not find location.");
-            return Status.FAIL;
-        }
+        ForecastSummary forecast = ce.getMCHelper().getWeatherService().getForecastForLocation(locationToSearch);
+        DSWeather response = forecast.forecast();
+        Location location = forecast.location();
 
-        Location location = locs.get(0);
-        DSWeather response = darkSkyClient.getForecast(location.lat(), location.lon());
         Instant nextMidnight = DateUtils.getNextMidnight();
         Instant morning = DateUtils.getNextMidnight().minus(1, ChronoUnit.DAYS);
         DoubleSummaryStatistics stats = response.hourly().data().stream()
