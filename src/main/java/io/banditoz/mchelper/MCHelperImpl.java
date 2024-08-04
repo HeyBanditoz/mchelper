@@ -8,7 +8,7 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
-import io.banditoz.mchelper.interactions.ButtonListener;
+import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
@@ -57,7 +57,7 @@ public class MCHelperImpl implements MCHelper {
     private final Database DB;
     private final StatsRecorder STATS;
     private final AccountManager AM;
-    private final ButtonListener BL;
+    private final InteractionListener IL;
     private final GameManager GM;
     private final LotteryManager LM;
     private final User OWNER;
@@ -152,7 +152,7 @@ public class MCHelperImpl implements MCHelper {
         this.CH = buildCommandHandler();
         this.RH = buildRegexableHandler();
         JDA.addEventListener(CH, RH);
-        BL = new ButtonListener(this);
+        IL = new InteractionListener(this);
 
         // deterministic order for onButtonInteraction handling, and all in one thread
         // TODO clean this shit up!
@@ -163,23 +163,17 @@ public class MCHelperImpl implements MCHelper {
                     if (PS != null) {
                         PS.onButtonInteraction(event);
                     }
-                    if (BL != null) {
-                        BL.onButtonInteraction(event);
+                    if (IL != null) {
+                        IL.onButtonInteraction(event);
                     }
-//                    if (!event.isAcknowledged()) {
-//                        event.reply("""
-//                                Your button interaction was not acknowledged by any listener.
-//                                It most likely doesn't exist anymore. (i.e. bot restart.)
-//                                If this is a poll, try again in a minute.""").setEphemeral(true).queue();
-//                    }
                 });
             }
 
             @Override
             public void onModalInteraction(@NotNull ModalInteractionEvent event) {
                 TPE.execute(() -> {
-                    if (BL != null) {
-                        BL.onModalInteraction(event);
+                    if (IL != null) {
+                        IL.onModalInteraction(event);
                     }
                 });
             }
@@ -252,7 +246,7 @@ public class MCHelperImpl implements MCHelper {
         CH.dontAcceptNewCommands();
         long then = System.currentTimeMillis();
         int activeInteractables;
-        while ((activeInteractables = BL.getActiveInteractables()) != 0) {
+        while ((activeInteractables = IL.getActiveInteractables()) != 0) {
             LOGGER.info("Waited {} ms for {} interactables to finish...", (System.currentTimeMillis() - then), activeInteractables);
             try {
                 Thread.sleep(1000);
@@ -325,8 +319,8 @@ public class MCHelperImpl implements MCHelper {
     }
 
     @Override
-    public ButtonListener getButtonListener() {
-        return BL;
+    public InteractionListener getInteractionListener() {
+        return IL;
     }
 
     @Override

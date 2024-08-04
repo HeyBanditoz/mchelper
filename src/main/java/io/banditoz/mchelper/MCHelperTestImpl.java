@@ -6,7 +6,7 @@ import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.games.GameManager;
 import io.banditoz.mchelper.http.scraper.RssScraper;
-import io.banditoz.mchelper.interactions.ButtonListener;
+import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
@@ -90,7 +90,7 @@ public class MCHelperTestImpl implements MCHelper {
     }
 
     @Override
-    public ButtonListener getButtonListener() {
+    public InteractionListener getInteractionListener() {
         return null;
     }
 

@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public class EmbedPaginator {
     private final List<MessageEmbed> pages;
     private ButtonInteractable bi; // can't be final because we're accessing from a lambda
-    private final ButtonListener bl;
+    private final InteractionListener bl;
     private final TimeUnit unit;
     private final long time;
     private final MessageChannel channel;
@@ -35,14 +35,14 @@ public class EmbedPaginator {
     private static final Emoji NEXT = Emoji.fromUnicode("\u25B6");
 
     /**
-     * @param bl          The {@link ButtonListener} to attach to.
+     * @param bl          The {@link InteractionListener} to attach to.
      * @param channel     The {@link MessageChannel} to reply to.
      * @param pages       A list of {@link MessageEmbed} to use. The zeroth element will be used in the initial message.
      * @param time        How long to wait.
      * @param unit        The {@link TimeUnit} for how long we should wait.
      * @param canInteract Whether the user can interact with this {@link EmbedPaginator} or not
      */
-    public EmbedPaginator(@NotNull ButtonListener bl, @NotNull MessageChannel channel, @NotNull List<MessageEmbed> pages,
+    public EmbedPaginator(@NotNull InteractionListener bl, @NotNull MessageChannel channel, @NotNull List<MessageEmbed> pages,
                           long time, @NotNull TimeUnit unit, @NotNull Predicate<User> canInteract) {
         this.pages = pages;
         this.bl = bl;

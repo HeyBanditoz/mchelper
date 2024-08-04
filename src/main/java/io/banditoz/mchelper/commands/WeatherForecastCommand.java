@@ -114,7 +114,7 @@ public class WeatherForecastCommand extends Command {
                             WrappedButtonClickEvent::removeListenerAndDestroy
                     ),
                     ce.getEvent().getAuthor()::equals, 60, message, ce);
-            ce.getMCHelper().getButtonListener().addInteractable(i);
+            ce.getMCHelper().getInteractionListener().addInteractable(i);
         });
 
         return Status.SUCCESS;

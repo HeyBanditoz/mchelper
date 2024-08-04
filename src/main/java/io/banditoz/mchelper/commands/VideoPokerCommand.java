@@ -65,7 +65,7 @@ public class VideoPokerCommand extends Command {
                            haas, game::holdAllAndSubmit,
                            invert, game::invert),
                     ce.getEvent().getAuthor()::equals, 0, message, ce);
-            ce.getMCHelper().getButtonListener().addInteractable(i);
+            ce.getMCHelper().getInteractionListener().addInteractable(i);
         });
         return Status.SUCCESS;
     }

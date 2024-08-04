@@ -24,17 +24,12 @@ import java.util.function.Predicate;
 /**
  * The base class for all messages that need to listen to a button interaction from Discord.
  */
-public class ButtonInteractable {
+public class ButtonInteractable extends Interactable<Button, WrappedButtonClickEvent> {
     /**
      * A {@link ConcurrentHashMap} of Buttons that we are listening for. Made concurrent, so we can only add or remove
      * buttons on one thread at a time, as there's a potential for multiple threads to access this.
      */
     private final Map<Button, Consumer<WrappedButtonClickEvent>> buttons = new ConcurrentHashMap<>();
-    /** Whether the user can interact with the entire {@link ButtonInteractable} or not. */
-    private final Predicate<User> canInteract;
-    /** The timeout when we should remove the {@link Button}s and stop accepting input, in seconds. */
-    private final long timeoutSeconds;
-    private volatile ScheduledFuture<?> timeoutFuture;
     /** The {@link Message} that the buttons are associated with. */
     private final Message message;
     /** The {@link CommandEvent} that originally created this. */
@@ -42,7 +37,7 @@ public class ButtonInteractable {
     private final static Logger LOGGER = LoggerFactory.getLogger(ButtonInteractable.class);
 
     /**
-     * Constructs a new {@link ButtonInteractable} to be listened to by the {@link ButtonListener}.
+     * Constructs a new {@link ButtonInteractable} to be listened to by the {@link InteractionListener}.
      *
      * @param map            A {@link Map} containing a {@link} Button and a {@link Consumer} that contains a
      *                       {@link WrappedButtonClickEvent}.
@@ -51,9 +46,8 @@ public class ButtonInteractable {
      */
     public ButtonInteractable(@NotNull Map<Button, Consumer<WrappedButtonClickEvent>> map, @NotNull Predicate<User> canInteract,
                               long timeoutSeconds, @NotNull Message m, @Nullable CommandEvent ce) {
+        super(canInteract, timeoutSeconds);
         buttons.putAll(map);
-        this.canInteract = canInteract;
-        this.timeoutSeconds = timeoutSeconds;
         this.message = m;
         this.ce = ce;
     }
@@ -64,7 +58,7 @@ public class ButtonInteractable {
      * @param event The {@link WrappedButtonClickEvent} to handle.
      */
     public void handleEvent(WrappedButtonClickEvent event) {
-        if (canInteract.test(event.getEvent().getUser())) {
+        if (test(event)) {
             Consumer<WrappedButtonClickEvent> consumer = buttons.get(event.getEvent().getButton());
             if (consumer != null) {
                 consumer.accept(event);
@@ -81,7 +75,8 @@ public class ButtonInteractable {
      * @param button The {@link Button} to check for.
      * @return true if the {@link Button} is contained in the map somewhere, false otherwise.
      */
-    public boolean containsButton(Button button) {
+    @Override
+    public boolean contains(Button button) {
         return buttons.containsKey(button);
     }
 
@@ -92,9 +87,7 @@ public class ButtonInteractable {
      */
     public void destroy() {
         LOGGER.debug("Removing all buttons for " + message);
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(false);
-        }
+        super.destroy();
         message.editMessageComponents(Collections.emptyList()).queue();
     }
 
@@ -105,9 +98,7 @@ public class ButtonInteractable {
      */
     public void destroy(WrappedButtonClickEvent event) {
         LOGGER.debug("Removing all buttons for " + message);
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(false);
-        }
+        super.destroy();
         if (event.getEvent().isAcknowledged()) {
             message.editMessageComponents(Collections.emptyList()).queue();
         }
@@ -121,25 +112,19 @@ public class ButtonInteractable {
      */
     public void destroy(MessageEmbed me) {
         LOGGER.debug("Removing all buttons for " + message);
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(true);
-        }
+        super.destroy();
         message.editMessageComponents(Collections.emptyList()).setEmbeds(me).queue();
     }
 
     public void destroyAndAddNewButtons(ActionRow... rows) {
         LOGGER.debug("Removing AND REPLACING buttons for " + message);
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(true);
-        }
+        super.destroy();
         message.editMessageComponents(rows).queue();
     }
 
     public void destroyAndAddNewButtons(MessageEmbed me, ButtonInteractionEvent event, ActionRow... rows) {
         LOGGER.debug("Removing AND REPLACING buttons and embeds for " + event);
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(true);
-        }
+        super.destroy();
         MessageEditData msgEdit = new MessageEditBuilder()
                 .setEmbeds(me)
                 .setComponents(rows)
@@ -150,13 +135,6 @@ public class ButtonInteractable {
         else {
             event.getMessage().editMessage(msgEdit).queue();
         }
-    }
-
-    /**
-     * @return The timeout of this {@link ButtonInteractable}, in seconds.
-     */
-    public long getTimeoutSeconds() {
-        return timeoutSeconds;
     }
 
     public ScheduledFuture<?> getTimeoutFuture() {

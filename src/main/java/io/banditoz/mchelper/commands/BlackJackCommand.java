@@ -69,7 +69,7 @@ public class BlackJackCommand extends Command {
                     Map.of(hit, game::hit, stay, game::stand, doubleDown, game::doubleDown),
                     ce.getEvent().getAuthor()::equals,
                     0, success, ce);
-            ce.getMCHelper().getButtonListener().addInteractable(i);
+            ce.getMCHelper().getInteractionListener().addInteractable(i);
         });
 
         return Status.SUCCESS;

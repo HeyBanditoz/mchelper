@@ -116,6 +116,14 @@ public class NamedQuote {
         return nq;
     }
 
+    public void editContent(String quote, String quoteAuthor) {
+        quote = fixAppleOddities(quote).trim();
+        quoteAuthor = fixAppleOddities(quoteAuthor).trim().replaceFirst(GREEDY_DASHES, "");
+
+        this.quote = quote;
+        this.quoteAuthor = quoteAuthor;
+    }
+
     /**
      * Attempts the build a Quote from a given message ID that happened in the given TextChannel..
      *

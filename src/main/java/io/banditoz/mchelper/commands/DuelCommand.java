@@ -63,7 +63,7 @@ public class DuelCommand extends Command {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(play, game::enterGame, cancel, game::cancel),
                     user -> true, 0, message, ce);
-            ce.getMCHelper().getButtonListener().addInteractable(i);
+            ce.getMCHelper().getInteractionListener().addInteractable(i);
         });
 
         return Status.SUCCESS;

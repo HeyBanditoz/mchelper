@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-public class WrappedButtonClickEvent {
+public class WrappedButtonClickEvent implements Interaction {
     private static final Logger log = LoggerFactory.getLogger(WrappedButtonClickEvent.class);
     private final ButtonInteractionEvent event;
     private final ButtonInteractable bi;
@@ -43,7 +43,7 @@ public class WrappedButtonClickEvent {
     }
 
     /**
-     * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list, and removes all
+     * Removes the underlying {@link ButtonInteractable} from {@link InteractionListener}'s list, and removes all
      * buttons.
      */
     public void removeListenerAndDestroy() {
@@ -52,14 +52,15 @@ public class WrappedButtonClickEvent {
     }
 
     /**
-     * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list.
+     * Removes the underlying {@link ButtonInteractable} from {@link InteractionListener}'s list.
      */
+    @Override
     public void removeListener() {
-        this.MCHelper.getButtonListener().removeInteractableByButton(event.getButton());
+        this.MCHelper.getInteractionListener().removeInteractableByButton(event.getButton());
     }
 
     /**
-     * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list, and removes all
+     * Removes the underlying {@link ButtonInteractable} from {@link InteractionListener}'s list, and removes all
      * buttons
      *
      * @param finalEmbed The {@link MessageEmbed} that is to be replaced.
@@ -70,7 +71,7 @@ public class WrappedButtonClickEvent {
     }
 
     /**
-     * Removes the underlying {@link ButtonInteractable} from {@link ButtonListener}'s list, and <i>replaces</i> all
+     * Removes the underlying {@link ButtonInteractable} from {@link InteractionListener}'s list, and <i>replaces</i> all
      * buttons with the new {@link ActionRow ActionRows.}
      *
      * @param rows The {@link ActionRow ActionRows} to use.
@@ -79,14 +80,14 @@ public class WrappedButtonClickEvent {
     public void destroyThenReplaceWith(ButtonInteractable bi, ActionRow... rows) {
         bi.destroyAndAddNewButtons(rows);
         removeListener();
-        MCHelper.getButtonListener().addInteractable(bi);
+        MCHelper.getInteractionListener().addInteractable(bi);
     }
 
     public void destroyThenAddReplayer(MessageEmbed finalEmbed) {
         if (bi.getCommandEvent() == null) {
             throw new IllegalArgumentException("Cannot replay as the CommandEvent supplied to the ButtonListener is null.");
         }
-        ButtonListener bl = MCHelper.getButtonListener();
+        InteractionListener bl = MCHelper.getInteractionListener();
         Button replay = Button.primary(UUID.randomUUID().toString(), "♻");
         removeListener();
         if (event.isAcknowledged()) {

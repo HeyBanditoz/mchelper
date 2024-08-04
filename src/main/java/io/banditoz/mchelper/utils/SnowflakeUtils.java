@@ -21,4 +21,13 @@ public class SnowflakeUtils {
         }
         return sb.toString().isEmpty() ? "No snowflake IDs found or IDs are invalid." : sb.toString();
     }
+
+    public static boolean isLong(String s) {
+        try {
+            Long.parseLong(s);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
 }
