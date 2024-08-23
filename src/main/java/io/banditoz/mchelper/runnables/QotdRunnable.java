@@ -79,9 +79,9 @@ public class QotdRunnable implements Runnable {
                         try {
                             MessageEmbed me = g.generate(tc);
                             if (me == null) {
-                                throw new NullPointerException("Generated section is null");
+                                throw new NullPointerException("Generated section from " + g.getClass() + " is null");
                             }
-                            embeds.add(g.generate(tc));
+                            embeds.add(me);
                         } catch (Exception e) {
                             log.error("Exception thrown generating MOTD section for " + g.getClass().getSimpleName(), e);
                             embeds.add(new EmbedBuilder()
