@@ -30,6 +30,7 @@ import static feign.FeignException.errorStatus;
 public class Http {
     private final OkHttpClient client;
     private final OkHttpClient nonRedirectingClient;
+    private final feign.Client feignClient;
     private final TarkovClient tarkovClient;
     private final PasteggClient pasteggClient;
     private final UrbanDictionaryClient urbanDictionaryClient;
@@ -38,6 +39,11 @@ public class Http {
     private final NominatimClient nominatimClient;
     private final DarkSkyClient darkSkyClient;
     private final AnthropicClient anthropicClient;
+
+    private final JacksonDecoder decoder;
+    private final JacksonEncoder encoder;
+    private final UserAgentInterceptor userAgentInterceptor;
+    private final BodyRedactingErrorDecoder bodyRedactingErrorDecoder;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
@@ -55,31 +61,24 @@ public class Http {
         builder.setFollowSslRedirects$okhttp(false);
         nonRedirectingClient = builder.build();
 
-        feign.okhttp.OkHttpClient feignClient = new feign.okhttp.OkHttpClient(client);
+        this.feignClient = new feign.okhttp.OkHttpClient(client);
         ObjectMapper om = mcHelper.getObjectMapper();
-        JacksonDecoder d = new JacksonDecoder(om);
-        JacksonEncoder e = new JacksonEncoder(om);
-        UserAgentInterceptor uai = new UserAgentInterceptor();
-        BodyRedactingErrorDecoder er = new BodyRedactingErrorDecoder();
+        this.decoder = new JacksonDecoder(om);
+        this.encoder = new JacksonEncoder(om);
+        this.userAgentInterceptor = new UserAgentInterceptor();
+        this.bodyRedactingErrorDecoder = new BodyRedactingErrorDecoder();
 
         tarkovClient = Config.getOptional("mchelper.endpoints.tarkov-market")
-                .map(url -> Feign.builder()
-                        .client(feignClient)
-                        .decoder(d)
-                        .errorDecoder(er)
-                        .requestInterceptor(uai)
+                .map(url -> baseFeignBuilder()
+                        .encoder(encoder)
+                        .retryer(new Retryer.Default(1000L, 3000L, 2))
                         .target(TarkovClient.class, url))
                 .orElse(null);
 
         pasteggClient = Config.getOptional("mchelper.pastegg.api-url")
                 .map(url -> {
-                    Feign.Builder b = Feign.builder()
-                            .client(feignClient)
-                            .decoder(d)
-                            .encoder(e)
-                            .errorDecoder(er)
-                            .requestInterceptors(List.of())
-                            .requestInterceptor(uai);
+                    Feign.Builder b = baseFeignBuilder()
+                            .encoder(encoder);
                     String key = Config.getNullable("mchelper.pastegg.api-key");
                     if (key != null) {
                         b.requestInterceptor(template -> template.header("Authorization", "Key " + key));
@@ -89,11 +88,7 @@ public class Http {
                 .orElse(null);
 
         darkSkyClient = Config.getOptional("mchelper.darksky.token")
-                .map(token -> Feign.builder()
-                        .client(feignClient)
-                        .decoder(d)
-                        .errorDecoder(new BodyUrlRedactingErrorDecoder())
-                        .requestInterceptor(uai)
+                .map(token -> baseFeignBuilder()
                         .requestInterceptor(template -> template.uri(template.url().replace("APIKEY", token)))
                         .responseInterceptor((r, c) -> {
                             try {
@@ -115,52 +110,43 @@ public class Http {
                         .target(PirateWeatherClient.class, "https://api.pirateweather.net"))
                 .orElse(null);
 
-        urbanDictionaryClient = Feign.builder()
-                .client(feignClient)
-                .decoder(d)
-                .errorDecoder(er)
-                .requestInterceptor(uai)
+        urbanDictionaryClient = baseFeignBuilder()
                 .target(UrbanDictionaryClient.class, "https://api.urbandictionary.com");
 
         finnhubClient = Config.getOptional("mchelper.finnhub.token")
-                .map(token -> Feign.builder()
-                        .client(feignClient)
-                        .decoder(d)
-                        .errorDecoder(er)
-                        .requestInterceptor(uai)
+                .map(token -> baseFeignBuilder()
                         .requestInterceptor(template -> template.header("X-Finnhub-Token", token))
                         .target(FinnhubClient.class, "https://finnhub.io/api"))
                 .orElse(null);
 
         owlbotClient = Config.getOptional("mchelper.owlbot.token")
-                .map(token -> Feign.builder()
-                        .client(feignClient)
-                        .decoder(d)
-                        .errorDecoder(er)
-                        .requestInterceptor(uai)
+                .map(token -> baseFeignBuilder()
                         .requestInterceptor(template -> template.header("Authorization", "Token " + token))
                         .target(OwlbotClient.class, "https://owlbot.info/api"))
                 .orElse(null);
 
-        nominatimClient = Feign.builder()
-                .client(feignClient)
+        nominatimClient = baseFeignBuilder()
                 .decoder(new JsonArrayJacksonDecoder(om, Location.class))
-                .errorDecoder(er)
-                .requestInterceptor(uai)
                 .target(NominatimClient.class, "https://nominatim.openstreetmap.org");
 
         anthropicClient = Config.getOptional("mchelper.anthropic.token")
-                .map(token -> Feign.builder()
-                        .client(feignClient)
-                        .encoder(e)
-                        .decoder(d)
-                        .errorDecoder(er)
-                        .requestInterceptor(uai)
+                .map(token -> baseFeignBuilder()
+                        .encoder(encoder)
+                        .errorDecoder(bodyRedactingErrorDecoder)
+                        .options(new Request.Options(30, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true))
                         .requestInterceptor(template -> template.header("x-api-key", token))
                         .target(AnthropicClient.class, Config.get("mchelper.anthropic.endpoint", "https://api.anthropic.com")))
                 .orElse(null);
 
         LOGGER.info("Finished building Feign clients. Current status: " + this);
+    }
+
+    private Feign.Builder baseFeignBuilder() {
+        return new Feign.Builder()
+                .client(feignClient)
+                .decoder(decoder)
+                .options(new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true))
+                .requestInterceptor(userAgentInterceptor);
     }
 
     public OkHttpClient getClient() {

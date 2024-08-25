@@ -49,9 +49,7 @@ public class TarkovMarketSearcher {
                         shortName
                       }
                     }""";
-            Map<String, String> jsonIntermediate = Map.of("query", query);
-            String jsonQuery = om.writeValueAsString(jsonIntermediate);
-            Response data = MCHELPER.getHttp().getTarkovClient().getTarkovMarketData(jsonQuery);
+            Response data = MCHELPER.getHttp().getTarkovClient().getTarkovMarketData(Map.of("query", query));
             // filter out flea market from all results
             for (Item item : data.data().items()) {
                 item.vendorPrices().removeIf(vendorPrice -> vendorPrice.vendor().vendorName() == VendorName.FLEA);
