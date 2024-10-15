@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.serverstatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -73,7 +74,7 @@ public class MinecraftServerStatus {
 
             outputStream = socket.getOutputStream();
             dataOutputStream = new DataOutputStream(outputStream);
-            inputStream = socket.getInputStream();
+            inputStream = ByteStreams.limit(socket.getInputStream(), 512_000);
 
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream handshake = new DataOutputStream(b);

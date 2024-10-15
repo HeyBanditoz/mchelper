@@ -33,6 +33,9 @@ public class StatusResponse {
         if (description.has("text")) {
             descStringBuilder.append(description.get("text").asText());
         }
+        else { // description is just a plain JSON string, so append it plainly
+            descStringBuilder.append(description.textValue());
+        }
         return descStringBuilder.toString();
     }
 

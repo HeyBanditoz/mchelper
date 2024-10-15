@@ -65,6 +65,7 @@ public class ServerStatusCommand extends Command {
                     .setTitle("Could not fetch server status for " + addr.toString())
                     .setColor(Color.RED)
                     .setDescription(ex.toString()).build());
+            LOGGER.warn("Error fetching server status for " + addr, ex);
             return Status.FAIL;
         }
     }
