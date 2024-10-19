@@ -7,7 +7,7 @@ public enum Config {
     DADBOT_CHANCE("0.0", "The chance to invoke dad bot. 0 means 0%, 1 means 100%."),
     BETBOT_CHANCE("0.0", "The chance to invoke bet bot. 0 means 0%, 1 means 100%."),
     VOICE_ROLE_ID(null, "Which role to grant to users (not bots) joining a voice channel."),
-    RSS_URLS("", "Space-separated list of CSV feeds to use in MOTD generation.", true),
+    RSS_URLS("", "Space-separated list of RSS feeds to use in MOTD generation.", true),
     WEATHER_DEFAULT_LOC(null, "Default location to use in weather-related commands, and in MOTD generation."),
     BETTER_REDDIT_LINKS("false", "If reddit links should be sent using rxddit instead, for better embeds."),
     BETTER_TWITTER_LINKS("false", "If Twitter links should be sent using vxtwitter instead, for better embeds.");
