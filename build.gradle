@@ -104,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.1.0') {
+    implementation('net.dv8tion:JDA:5.1.2') {
         exclude module: 'opus-java'
         exclude module: 'slf4j-api' // still need an old logback version for elasticsearch logger issue
     }
