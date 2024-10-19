@@ -109,10 +109,7 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
-    public @Nullable NamedQuote getRandomQuote(Guild g, boolean forQotd) throws SQLException {
-        if (forQotd) {
-            return getRandomQotdQuote(g);
-        }
+    public @Nullable NamedQuote getRandomQuote(Guild g) throws SQLException {
         try (Connection c = DATABASE.getConnection()) {
             return Query.of("""
                             SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
@@ -127,6 +124,11 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                     )
                     .as(this::parseOne, c);
         }
+    }
+
+    @Override
+    public @Nullable NamedQuote getRandomQotd(Guild g, boolean onlyExcluded) throws SQLException {
+        return onlyExcluded ? getRandomQotdQuoteExcludedQuotes(g) : getRandomQotdQuote(g);
     }
 
     private @Nullable NamedQuote getRandomQotdQuote(Guild g) throws SQLException {
@@ -148,6 +150,28 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
         }
     }
 
+    private @Nullable NamedQuote getRandomQotdQuoteExcludedQuotes(Guild g) throws SQLException {
+        try (Connection c = DATABASE.getConnection()) {
+            return Query.of("""
+                            WITH excluded_quotes AS (
+                                SELECT id FROM quotes -- guild check can be skipped here, as this isn't the final result set
+                                WHERE (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :ff) = 0
+                            )
+                            SELECT *, (SELECT ARRAY_AGG(flag) FROM quote_flags qf WHERE qf.quote_id = id) AS flags
+                            FROM quotes
+                            WHERE guild_id = :g
+                              AND (SELECT COUNT(*) FROM quote_flags qf WHERE qf.quote_id = id AND flag = :f) = 0
+                              AND id NOT IN (SELECT id FROM excluded_quotes)
+                            ORDER BY RANDOM()
+                            LIMIT 1""")
+                    .on(
+                            Param.values("f", Flag.HIDDEN.ordinal()),
+                            Param.value("ff", Flag.EXCLUDE_QOTD.ordinal()),
+                            Param.value("g", g.getIdLong())
+                    )
+                    .as(this::parseOne, c);
+        }
+    }
 
     @Override
     public List<NamedQuote> getAllQuotesByAuthorInGuild(long u, Guild g) throws SQLException {

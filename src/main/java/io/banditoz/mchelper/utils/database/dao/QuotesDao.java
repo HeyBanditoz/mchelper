@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface QuotesDao {
     /**
@@ -52,17 +51,27 @@ public interface QuotesDao {
      * @throws SQLException If there was an error getting the quote.
      */
     List<NamedQuote> getAllQuotesForGuild(Guild g) throws SQLException;
+
     /**
-     * Returns a random quote by a {@link Guild} A random one will be retrieved.
+     * Returns a random quote by a {@link Guild}.
      *
      * @param g The {@link Guild} to search by.
-     * @param forQotd Whether to exclude quotes for the quote of the day, see
-     *                {@link io.banditoz.mchelper.utils.database.NamedQuote.Flag}'s <code>EXCLUDE_MOTD</code>
-     * @return An {@link Optional} that may or may not contain a {@link NamedQuote}.
+     * @return A nullable {@link NamedQuote}.
      * @throws SQLException If there was an error getting the quote.
      */
     @Nullable
-    NamedQuote getRandomQuote(Guild g, boolean forQotd) throws SQLException;
+    NamedQuote getRandomQuote(Guild g) throws SQLException;
+
+    /**
+     * Returns a random quote by a {@link Guild} for the quote of the day.
+     *
+     * @param g The {@link Guild} to search by.
+     * @param onlyExcluded If quotes that have the {@link NamedQuote.Flag#EXCLUDE_QOTD} flag should only be in the pool.
+     * @return A nullable {@link NamedQuote}.
+     * @throws SQLException If there was an error getting the quote.
+     */
+    @Nullable
+    NamedQuote getRandomQotd(Guild g, boolean onlyExcluded) throws SQLException;
 
     /**
      * Returns a list of all quotes by a certain {@link net.dv8tion.jda.api.entities.User} in a {@link Guild}.

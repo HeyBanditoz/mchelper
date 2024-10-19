@@ -3,10 +3,7 @@ package io.banditoz.mchelper.runnables;
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
-import io.banditoz.mchelper.motd.MotdSectionGenerator;
-import io.banditoz.mchelper.motd.NewsHeadlineMotdSectionGenerator;
-import io.banditoz.mchelper.motd.QotdMotdSectionGenerator;
-import io.banditoz.mchelper.motd.WeatherMotdSectionGenerator;
+import io.banditoz.mchelper.motd.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,7 +37,8 @@ public class QotdRunnable implements Runnable {
         this.generators = new MotdSectionGenerator[] {
                 new WeatherMotdSectionGenerator(mcHelper),
                 new NewsHeadlineMotdSectionGenerator(mcHelper),
-                new QotdMotdSectionGenerator(mcHelper)
+                new QotdMotdSectionGenerator(mcHelper),
+                new QotdMotdExcludedSectionGenerator(mcHelper)
         };
     }
 
