@@ -228,7 +228,7 @@ public class CommandEvent implements UserEvent {
             sendEmbedReply(embeds.get(0));
         }
         else {
-            EmbedPaginator paginator = new EmbedPaginator(MCHELPER.getInteractionListener(), EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals);
+            EmbedPaginator paginator = new EmbedPaginator(MCHELPER.getInteractionListener(), EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals, this);
             paginator.go();
         }
     }

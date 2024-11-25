@@ -2,6 +2,10 @@ package io.banditoz.mchelper.interactions;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.api.metrics.LongHistogram;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,11 +28,20 @@ public class InteractionListener extends ListenerAdapter {
     private final ScheduledExecutorService SES;
     private final List<Interactable<?, ?>> INTERACTABLES = new CopyOnWriteArrayList<>();
     private final MCHelper MCHELPER;
+    private final LongHistogram buttonProcessingDelay;
     private static final Logger LOGGER = LoggerFactory.getLogger(InteractionListener.class);
 
     public InteractionListener(MCHelper mcHelper) {
         this.SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("BL-Scheduled-%d").build());
         this.MCHELPER = mcHelper;
+        this.buttonProcessingDelay = mcHelper.getOTel().meter()
+                .meterBuilder("interaction_metrics")
+                .build()
+                .histogramBuilder("mchelper_interaction_processing_delay")
+                .setDescription("Histogram tracking the processing delay of an interaction.")
+                .ofLongs()
+                .setExplicitBucketBoundariesAdvice(List.of(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 15L, 20L, 25L, 50L, 75L, 100L, 250L, 500L, 750L, 1000L, 2500L))
+                .build();
     }
 
     public void addInteractable(Interactable<?, ?> i) {
@@ -90,7 +103,7 @@ public class InteractionListener extends ListenerAdapter {
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
-                i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER));
+                        measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER)), "button", i.getCommandEvent(), event.getButton());
             }, () -> event.reply("Unfortunately, the button `" + event.getButton().getId() + "` you clicked " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "This button will never be valid again. Sorry!").setEphemeral(true).queue());
@@ -119,6 +132,7 @@ public class InteractionListener extends ListenerAdapter {
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
+                        measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, MCHELPER)), "modal", null, null);
                         i.handleEvent(new WrappedModalInteractionEvent(event, MCHELPER));
                     }, () -> event.reply("Unfortunately, the modal `" + event.getModalId() + "` you submitted " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
@@ -126,6 +140,42 @@ public class InteractionListener extends ListenerAdapter {
         } catch (Exception ex) {
             LOGGER.error("Error when handling the modal!", ex);
             event.reply("Error handling the modal! " + ex).setEphemeral(true).queue(unused -> {}, unused -> {});
+        }
+    }
+
+    private void measure(Runnable runnable, String interactionType, CommandEvent commandEvent, Button button) {
+        long before = System.currentTimeMillis();
+        boolean exceptionally = false;
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            // rare case, button interactions shouldn't throw uncaught exceptions
+            exceptionally = true;
+            throw e; // rethrow
+        } finally {
+            long after = System.currentTimeMillis();
+            AttributesBuilder attrs = Attributes.builder()
+                    .put("interaction_type", interactionType)
+                    .put("exceptionally", Boolean.toString(exceptionally));
+
+            if ("button".equals(interactionType) && commandEvent != null && commandEvent.commandName() != null) {
+                attrs.put("command", commandEvent.commandName());
+            }
+            else {
+                LOGGER.warn("CommandEvent or the command name was null for a button interaction. Printing stacktrace...", new Exception().fillInStackTrace());
+            }
+
+            if (button != null) {
+                if (button.getLabel().isEmpty()) {
+                    // button is an emoji
+                    attrs.put("button", button.getEmoji().getFormatted());
+                }
+                else {
+                    // button has text
+                    attrs.put("button", button.getLabel());
+                }
+            }
+            buttonProcessingDelay.record(after - before, attrs.build());
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.interactions;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -27,6 +28,7 @@ public class EmbedPaginator {
     private final Button prev = Button.primary(UUID.randomUUID().toString(), PREV);
     private final Button stop = Button.danger(UUID.randomUUID().toString(), STOP);
     private final Button next = Button.primary(UUID.randomUUID().toString(), NEXT);
+    private final CommandEvent originator;
 
     private int cursor = 0;
 
@@ -43,13 +45,14 @@ public class EmbedPaginator {
      * @param canInteract Whether the user can interact with this {@link EmbedPaginator} or not
      */
     public EmbedPaginator(@NotNull InteractionListener bl, @NotNull MessageChannel channel, @NotNull List<MessageEmbed> pages,
-                          long time, @NotNull TimeUnit unit, @NotNull Predicate<User> canInteract) {
+                          long time, @NotNull TimeUnit unit, @NotNull Predicate<User> canInteract, @NotNull CommandEvent originator) {
         this.pages = pages;
         this.bl = bl;
         this.unit = unit;
         this.time = time;
         this.channel = channel;
         this.canInteract = canInteract;
+        this.originator = originator;
     }
 
     public void go() {
@@ -63,7 +66,7 @@ public class EmbedPaginator {
                 .addActionRow(prev, stop, next)
                 .build();
         channel.sendMessage(messageCreate).queue(message -> {
-            this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message, null);
+            this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message, originator);
             bl.addInteractable(bi);
         });
     }
