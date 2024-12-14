@@ -5,7 +5,6 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.MeterProvider;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
@@ -42,7 +41,6 @@ public class MetricsEventListener extends ListenerAdapter {
 
     @Override
     public void onGenericEvent(@NotNull GenericEvent event) {
-        long now = System.currentTimeMillis();
         AttributesBuilder attr = Attributes.builder()
                 .put("event_name", event.getClass().getSimpleName());
         switch (event) {
@@ -59,9 +57,10 @@ public class MetricsEventListener extends ListenerAdapter {
 
         eventCounter.add(1, attr.build());
 
-        if (event instanceof ISnowflake snowflake) {
+        if (event instanceof Interaction interaction) {
             // this long -> OffsetDateTime -> Instant -> long is wasteful...
-            long delay = snowflake.getTimeCreated().toInstant().toEpochMilli() - now;
+            // this metric also relies on an accurate system clock!
+            long delay = System.currentTimeMillis() - interaction.getTimeCreated().toInstant().toEpochMilli();
             if (delay < 0) {
                 log.warn("Event {} has time traveled with a negative delay of {}", event.getClass().getSimpleName(), delay);
             }
