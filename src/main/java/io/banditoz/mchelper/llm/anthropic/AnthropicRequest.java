@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.llm.anthropic;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.banditoz.mchelper.llm.Message;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @param system The <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/system-prompts">system prompt</a>
  *               to use.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record AnthropicRequest(String model,
                                @JsonProperty("max_tokens") int maxTokens,
                                List<Message> messages,
