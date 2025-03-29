@@ -104,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    implementation('net.dv8tion:JDA:5.1.2') {
+    implementation('net.dv8tion:JDA:5.3.1') {
         exclude module: 'opus-java'
         exclude module: 'slf4j-api' // still need an old logback version for elasticsearch logger issue
     }
@@ -117,8 +117,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2'
     implementation 'com.google.guava:guava:33.2.0-jre'
     implementation 'io.github.tfriedrichs:dicebot:1.0.0'
-    implementation 'org.postgresql:postgresql:42.7.3'
-    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'org.postgresql:postgresql:42.7.5'
+    implementation 'com.zaxxer:HikariCP:6.3.0'
     implementation 'io.jenetics:facilejdbc:2.1.0'
     implementation 'org.cache2k:cache2k-api:1.2.3.Final'
     implementation 'net.sourceforge.argparse4j:argparse4j:0.9.0'
@@ -158,7 +158,7 @@ dependencies {
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
     liquibaseRuntime 'info.picocli:picocli:4.7.0'
     liquibaseRuntime 'org.yaml:snakeyaml:1.33'
-    liquibaseRuntime 'org.postgresql:postgresql:42.5.1'
+    liquibaseRuntime 'org.postgresql:postgresql:42.7.5'
 }
 
 test {
