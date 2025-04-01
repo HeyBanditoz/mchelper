@@ -47,7 +47,7 @@ public class CommandUtils {
         Thread.ofVirtual().start(() -> {
             try {
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(finalReply);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue((a) -> {}, (error) -> {
+                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {}, (error) -> {
                     _sendReply(finalReply, e, true, true, false); // fallback
                 });
             } catch (Exception ignored) {
@@ -73,7 +73,7 @@ public class CommandUtils {
         Thread.ofVirtual().start(() -> {
             try {
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue((a) -> {LOGGER.info("sent :)");}, (error) -> {
+                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {LOGGER.info("sent :)");}, (error) -> {
                     _sendReply(msg, e, true, true, false); // fallback
                 });
             } catch (Exception ex) {
@@ -94,7 +94,7 @@ public class CommandUtils {
         Thread.ofVirtual().start(() -> {
             try {
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue((message -> {}), (error) -> {
+                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((message -> {}), (error) -> {
                     _sendReply(msg, e, true, false, false);
                 });
             } catch (Exception ex) {
@@ -116,7 +116,7 @@ public class CommandUtils {
         Thread.ofVirtual().start(() -> {
             try {
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue((a) -> {}, error -> {
+                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {}, error -> {
                     _sendReply(msg, e, true, false, allowLinkEmbeds);
                 });
             } catch (Exception ex) {
@@ -137,7 +137,7 @@ public class CommandUtils {
         Thread.ofVirtual().start(() -> {
             try {
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue(a -> {}, error -> {
+                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue(a -> {}, error -> {
                     _sendReply(msg, e, false, true, false);
                 });
             } catch (Exception ex) {

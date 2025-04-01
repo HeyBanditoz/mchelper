@@ -198,7 +198,7 @@ public class CommandEvent implements UserEvent {
             try {
                 String ttsText = TTSService.getMessageEmbedForTts(me);
                 TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(ttsText);
-                EVENT.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue((ignored) -> {}, (ex) -> {
+                EVENT.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((ignored) -> {}, (ex) -> {
                     LOGGER.warn("Error while sending message with TTS for embed", ex);
                     EVENT.getChannel().sendMessageEmbeds(me).queue();
                 });

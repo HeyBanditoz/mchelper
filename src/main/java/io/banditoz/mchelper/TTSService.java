@@ -42,14 +42,17 @@ public class TTSService {
         byte[] bytes = processTextToSpeech(text);
         Files.write(Path.of(fileName + ".mp3"), bytes);
         // -err_detect ignore_error...... Idk why this is needed, idk what im doing really
-        Process exec = new ProcessBuilder("ffmpeg", "-hide_banner", "-loglevel", "error", "-err_detect", "ignore_err", "-i", fileName + ".mp3", "-c:a", "libvorbis", fileName + ".ogg").start();
+        // reencode to mp3 again to fix weird errors i may have caused by concatenation
+        // since despite JDA docs recommending .ogg to use in their example
+        // it seems iphones actually cannot play it
+        Process exec = new ProcessBuilder("ffmpeg", "-hide_banner", "-loglevel", "error", "-err_detect", "ignore_err", "-i", fileName + ".mp3", fileName + "_corrected.mp3").start();
         exec.waitFor();
         // the file has been encoded :) maybe
         // guess we'll find out lmao
 
         // we need duration here because discord doesn't know how to run ffprobe or otherwise get audio file length on
         // their backend, so we gotta do it, smh discord
-        exec = new ProcessBuilder("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", fileName + ".ogg").start();
+        exec = new ProcessBuilder("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", fileName + "_corrected.mp3").start();
         exec.waitFor();
         double duration = Double.parseDouble(new String(exec.getInputStream().readAllBytes()));
 
@@ -58,7 +61,7 @@ public class TTSService {
             try {
                 Thread.sleep(180_000); // WAIT TO CLEAN UP!!!! WHAT IS GOOD CODE DESIGN?
                 Files.delete(Path.of(fileName + ".mp3"));
-                Files.delete(Path.of(fileName + ".ogg"));
+                Files.delete(Path.of(fileName + "_corrected.mp3"));
             } catch (InterruptedException e) {
                 // what?
                 Thread.currentThread().interrupt();
@@ -73,7 +76,7 @@ public class TTSService {
         // guess audio processing is expensive these days
         byte[] waveform = new byte[255];
         random.nextBytes(waveform);
-        return new TTSResponse(Path.of(fileName + ".ogg"), duration, waveform);
+        return new TTSResponse(Path.of(fileName + "_corrected.mp3"), duration, waveform);
     }
 
     public static String getMessageEmbedForTts(MessageEmbed me) {
