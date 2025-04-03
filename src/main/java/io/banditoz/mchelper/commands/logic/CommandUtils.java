@@ -1,15 +1,5 @@
 package io.banditoz.mchelper.commands.logic;
 
-import javax.script.ScriptException;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import io.banditoz.mchelper.TTSService;
 import io.banditoz.mchelper.utils.StringUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,9 +10,17 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.SplitUtil;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import okhttp3.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.script.ScriptException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommandUtils {
     private static final Pattern URL_PATTERN = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
@@ -42,18 +40,7 @@ public class CommandUtils {
         if (ex instanceof ArrayIndexOutOfBoundsException) {
             reply += " (are you missing arguments?)";
         }
-        // hehe, try to send a voice message
-        String finalReply = reply;
-        Thread.ofVirtual().start(() -> {
-            try {
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(finalReply);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {}, (error) -> {
-                    _sendReply(finalReply, e, true, true, false); // fallback
-                });
-            } catch (Exception ignored) {
-                _sendReply(finalReply, e, true, true, false);
-            }
-        });
+        _sendReply(reply, e, true, true, false);
     }
 
     public static void sendThrowableMessage(MessageReceivedEvent e, Throwable t, Logger l) {
@@ -70,17 +57,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReply(String msg, MessageReceivedEvent e) {
-        Thread.ofVirtual().start(() -> {
-            try {
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {LOGGER.info("sent :)");}, (error) -> {
-                    _sendReply(msg, e, true, true, false); // fallback
-                });
-            } catch (Exception ex) {
-                LOGGER.warn("Error while generating TTS for message `" + msg + "`.", ex);
-                _sendReply(msg, e, true, true, false); // fallback
-            }
-        });
+        _sendReply(msg, e, true, true, false);
     }
 
     /**
@@ -91,17 +68,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendReplyWithoutPing(String msg, MessageReceivedEvent e) {
-        Thread.ofVirtual().start(() -> {
-            try {
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((message -> {}), (error) -> {
-                    _sendReply(msg, e, true, false, false);
-                });
-            } catch (Exception ex) {
-                LOGGER.warn("Error while generating TTS for message `" + msg + "`.", ex);
-                _sendReply(msg, e, true, false, false);
-            }
-        });
+        _sendReply(msg, e, true, false, false);
     }
 
     /**
@@ -113,17 +80,7 @@ public class CommandUtils {
      * @param allowLinkEmbeds Whether link embeds should be allowed (i.e. replaced with <$0>.)
      */
     public static void sendReplyWithoutPing(String msg, MessageReceivedEvent e, boolean allowLinkEmbeds) {
-        Thread.ofVirtual().start(() -> {
-            try {
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((a) -> {}, error -> {
-                    _sendReply(msg, e, true, false, allowLinkEmbeds);
-                });
-            } catch (Exception ex) {
-                LOGGER.warn("Error while generating TTS for message `" + msg + "`.", ex);
-                _sendReply(msg, e, true, false, allowLinkEmbeds);
-            }
-        });
+        _sendReply(msg, e, true, false, allowLinkEmbeds);
     }
 
     /**
@@ -134,17 +91,7 @@ public class CommandUtils {
      * @param e   The MessageReceivedEvent to reply to.
      */
     public static void sendUnsanitizedReply(String msg, MessageReceivedEvent e) {
-        Thread.ofVirtual().start(() -> {
-            try {
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(msg);
-                e.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue(a -> {}, error -> {
-                    _sendReply(msg, e, false, true, false);
-                });
-            } catch (Exception ex) {
-                LOGGER.warn("Error while generating TTS for message `" + msg + "`.", ex);
-                _sendReply(msg, e, false, true, false);
-            }
-        });
+        _sendReply(msg, e, false, true, false);
     }
 
     /**

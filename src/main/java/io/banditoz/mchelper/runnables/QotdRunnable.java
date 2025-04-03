@@ -1,5 +1,19 @@
 package io.banditoz.mchelper.runnables;
 
+import io.banditoz.mchelper.MCHelper;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.motd.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -10,21 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.TTSService;
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.config.ConfigurationProvider;
-import io.banditoz.mchelper.motd.*;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.utils.FileUpload;
-import okhttp3.MediaType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class QotdRunnable implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(QotdRunnable.class);
@@ -90,15 +89,11 @@ public class QotdRunnable implements Runnable {
                                     .build());
                         }
                     }
-                    for (MessageEmbed embed : embeds) {
-                        try {
-                            String ttsText = TTSService.getMessageEmbedForTts(embed);
-                            TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(ttsText);
-                            tc.sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/ogg"), tts.waveform(), tts.length())).queue();
-                        } catch (Exception ex) {
-                            log.warn("Exception generating TTS message", ex);
-                        }
-                    }
+                    tc.sendMessage(new MessageCreateBuilder()
+                            .addContent("**Message of the day for** ***" + MarkdownSanitizer.escape(guild.getName()) + ":***")
+                            .setEmbeds(embeds)
+                            .build())
+                            .queue();
                     deliveryCount.getAndIncrement();
                 } catch (Exception e) {
                     log.error("Could not send QOTD to " + guild.getId() + " as there was an exception fetching one or sending to the channel.", e);

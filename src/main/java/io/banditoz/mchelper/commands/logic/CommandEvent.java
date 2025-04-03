@@ -1,15 +1,6 @@
 package io.banditoz.mchelper.commands.logic;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.TTSService;
 import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.interactions.EmbedPaginator;
@@ -21,10 +12,16 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
-import okhttp3.MediaType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -194,19 +191,7 @@ public class CommandEvent implements UserEvent {
      * @param me The reply.
      */
     public void sendEmbedReply(MessageEmbed me) {
-        Thread.ofVirtual().start(() -> {
-            try {
-                String ttsText = TTSService.getMessageEmbedForTts(me);
-                TTSService.TTSResponse tts = TTSService.getInstance().generateTTSFileFromString(ttsText);
-                EVENT.getChannel().sendFiles(FileUpload.fromData(tts.path()).asVoiceMessage(MediaType.parse("audio/mpeg"), tts.waveform(), tts.length())).queue((ignored) -> {}, (ex) -> {
-                    LOGGER.warn("Error while sending message with TTS for embed", ex);
-                    EVENT.getChannel().sendMessageEmbeds(me).queue();
-                });
-            } catch (Exception ex) {
-                LOGGER.warn("Error while generating TTS for embed", ex);
-                EVENT.getChannel().sendMessageEmbeds(me).queue();
-            }
-        });
+        EVENT.getChannel().sendMessageEmbeds(me).queue();
     }
 
     public void sendEmbedsReply(MessageEmbed... mes) {
