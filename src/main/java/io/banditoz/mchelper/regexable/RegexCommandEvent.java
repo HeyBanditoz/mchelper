@@ -1,17 +1,22 @@
 package io.banditoz.mchelper.regexable;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-
-import java.time.LocalDateTime;
 
 public class RegexCommandEvent implements UserEvent {
     protected final MessageReceivedEvent EVENT;
@@ -74,6 +79,15 @@ public class RegexCommandEvent implements UserEvent {
      */
     public void sendTyping() {
         getEvent().getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
+    }
+
+    public void sendEmbedReply(Collection<? extends MessageEmbed> me) {
+        MessageCreateData message = new MessageCreateBuilder()
+                .setEmbeds(me)
+                .setAllowedMentions(Collections.emptyList())
+                .mentionRepliedUser(false)
+                .build();
+        getEvent().getMessage().reply(message).queue();
     }
 
     public Logger getLogger() {

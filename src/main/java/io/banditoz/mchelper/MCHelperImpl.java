@@ -1,5 +1,12 @@
 package io.banditoz.mchelper;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.concurrent.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -12,6 +19,7 @@ import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
+import io.banditoz.mchelper.mtg.ScryfallService;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.runnables.PollCullerRunnable;
@@ -38,13 +46,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.concurrent.*;
-
 public class MCHelperImpl implements MCHelper {
     private final JDA JDA;
     private final ObjectMapper OM = new ObjectMapper().registerModule(new JavaTimeModule());
@@ -69,6 +70,7 @@ public class MCHelperImpl implements MCHelper {
     private final OTel OTEL;
     private final LLMService LLM_SERVICE;
     private final WeatherService WEATHER_SERVICE;
+    private final ScryfallService SCRYFALL_SERVICE;
 
     public MCHelperImpl() throws InterruptedException {
         long before = System.currentTimeMillis();
@@ -221,7 +223,8 @@ public class MCHelperImpl implements MCHelper {
                 TimeUnit.SECONDS);
 
         OWNER = JDA.retrieveApplicationInfo().complete().getOwner();
-        HTTP_HOLDER = new Http(this);
+        HTTP_HOLDER = new Http(this.getObjectMapper());
+        SCRYFALL_SERVICE = new ScryfallService(this);
         NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
         RSS_SCRAPER = new RssScraper();
         if (Config.getNullable("mchelper.anthropic.token") != null) {
@@ -370,6 +373,11 @@ public class MCHelperImpl implements MCHelper {
     @Override
     public WeatherService getWeatherService() {
         return WEATHER_SERVICE;
+    }
+
+    @Override
+    public ScryfallService getScryfallService() {
+        return SCRYFALL_SERVICE;
     }
 
     /**

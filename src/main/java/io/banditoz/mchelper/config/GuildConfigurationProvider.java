@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.config;
 
+import java.sql.SQLException;
+import java.util.SortedMap;
+
 import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.UserEvent;
 import net.dv8tion.jda.api.Permission;
@@ -7,9 +10,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-
-import java.sql.SQLException;
-import java.util.SortedMap;
 
 /**
  * The guild config provider. Scope it per event.
@@ -87,7 +87,7 @@ public class GuildConfigurationProvider {
                         throw new IllegalArgumentException("This bot needs MANAGE_ROLES to do this.");
                     }
                 }
-                case BETTER_REDDIT_LINKS, BETTER_TWITTER_LINKS -> value = String.valueOf(Boolean.parseBoolean(value));
+                case BETTER_REDDIT_LINKS, BETTER_TWITTER_LINKS, LISTEN_FOR_SCRYFALL -> value = String.valueOf(Boolean.parseBoolean(value));
             }
             config.writeValue(c, value, guild.getIdLong(), user.getIdLong());
             return value;

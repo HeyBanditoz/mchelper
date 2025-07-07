@@ -10,7 +10,8 @@ public enum Config {
     RSS_URLS("", "Space-separated list of RSS feeds to use in MOTD generation.", true),
     WEATHER_DEFAULT_LOC(null, "Default location to use in weather-related commands, and in MOTD generation."),
     BETTER_REDDIT_LINKS("false", "If reddit links should be sent using rxddit instead, for better embeds."),
-    BETTER_TWITTER_LINKS("false", "If Twitter links should be sent using vxtwitter instead, for better embeds.");
+    BETTER_TWITTER_LINKS("false", "If Twitter links should be sent using vxtwitter instead, for better embeds."),
+    LISTEN_FOR_SCRYFALL("false", "If the bot should listen for MTG cards and send info about them, example: [[Commander Sphere]]");
 
     /** The default value this config should return, when no value is set. */
     private final String defaultValue;

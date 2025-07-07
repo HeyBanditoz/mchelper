@@ -1,5 +1,9 @@
 package io.banditoz.mchelper;
 
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.banditoz.mchelper.commands.logic.CommandHandler;
@@ -10,6 +14,7 @@ import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.llm.LLMService;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.lottery.LotteryManager;
+import io.banditoz.mchelper.mtg.ScryfallService;
 import io.banditoz.mchelper.regexable.Regexable;
 import io.banditoz.mchelper.regexable.RegexableHandler;
 import io.banditoz.mchelper.stats.StatsRecorder;
@@ -18,10 +23,6 @@ import io.banditoz.mchelper.weather.WeatherService;
 import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
-
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 // This class only exists so CommandsToMarkdown can run, as Mockito is only used for testing.
 public class MCHelperTestImpl implements MCHelper {
@@ -35,7 +36,7 @@ public class MCHelperTestImpl implements MCHelper {
         this.OM = new ObjectMapper().registerModule(new JavaTimeModule());
         this.CH = new CommandHandler(this);
         this.RH = new RegexableHandler(this);
-        this.HTTP_HOLDER = new Http(this);
+        this.HTTP_HOLDER = new Http(this.getObjectMapper());
         this.NLS = new NominatimLocationService(HTTP_HOLDER.getNominatimClient());
     }
 
@@ -146,6 +147,11 @@ public class MCHelperTestImpl implements MCHelper {
 
     @Override
     public WeatherService getWeatherService() {
+        return null;
+    }
+
+    @Override
+    public ScryfallService getScryfallService() {
         return null;
     }
 

@@ -1,5 +1,16 @@
 package io.banditoz.mchelper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
+
+import static feign.FeignException.errorStatus;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import feign.*;
@@ -16,17 +27,6 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
-
-import static feign.FeignException.errorStatus;
-
 public class Http {
     private final OkHttpClient client;
     private final OkHttpClient nonRedirectingClient;
@@ -39,6 +39,7 @@ public class Http {
     private final NominatimClient nominatimClient;
     private final DarkSkyClient darkSkyClient;
     private final AnthropicClient anthropicClient;
+    private final ScryfallClient scryfallClient;
 
     private final JacksonDecoder decoder;
     private final JacksonEncoder encoder;
@@ -47,7 +48,7 @@ public class Http {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
-    public Http(MCHelper mcHelper) {
+    public Http(ObjectMapper om) {
         LOGGER.info("Building Feign HTTP clients...");
         client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -62,7 +63,6 @@ public class Http {
         nonRedirectingClient = builder.build();
 
         this.feignClient = new feign.okhttp.OkHttpClient(client);
-        ObjectMapper om = mcHelper.getObjectMapper();
         this.decoder = new JacksonDecoder(om);
         this.encoder = new JacksonEncoder(om);
         this.userAgentInterceptor = new UserAgentInterceptor();
@@ -138,6 +138,10 @@ public class Http {
                         .target(AnthropicClient.class, Config.get("mchelper.anthropic.endpoint", "https://api.anthropic.com")))
                 .orElse(null);
 
+        scryfallClient = baseFeignBuilder()
+                .errorDecoder(bodyRedactingErrorDecoder)
+                .target(ScryfallClient.class, "https://api.scryfall.com");
+
         LOGGER.info("Finished building Feign clients. Current status: " + this);
     }
 
@@ -187,6 +191,10 @@ public class Http {
 
     public AnthropicClient getAnthropicClient() {
         return anthropicClient;
+    }
+
+    public ScryfallClient getScryfallClient() {
+        return scryfallClient;
     }
 
     private static final class UserAgentInterceptor implements RequestInterceptor {
@@ -267,6 +275,7 @@ public class Http {
                 ", nominatimClient=" + nominatimClient +
                 ", darkSkyClient=" + darkSkyClient +
                 ", anthropicClient=" + anthropicClient +
+                ", scryfallClient=" + scryfallClient +
                 '}';
     }
 }
