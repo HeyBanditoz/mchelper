@@ -147,6 +147,9 @@ dependencies {
     implementation 'io.opentelemetry:opentelemetry-exporter-prometheus:1.51.0-alpha'
     implementation 'io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0:2.17.0-alpha'
 
+    compileOnly 'io.avaje:avaje-record-builder:1.2'
+    annotationProcessor 'io.avaje:avaje-record-builder:1.2'
+
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 

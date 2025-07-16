@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.mtg;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,24 +34,35 @@ public class ScryfallService {
                 .collect(Collectors.toMap(ApplicationEmoji::getName, identity()));
     }
 
-    public MessageEmbed getMtgEmbedByFuzzy(String fuzzy) {
+    public List<MessageEmbed> getMtgEmbedByFuzzy(String fuzzy) {
         ScryfallCard card = scryfallClient.getCardByFuzzySearch(fuzzy);
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("%s %s".formatted(card.name(), parseManaizedString(card.manaCost())));
-        eb.setUrl(card.scryfallUri());
-        eb.setThumbnail(card.imageUris().png());
-        String description = "%s\n%s".formatted(card.typeLine(), parseManaizedString(sanitize(card.oracleText())));
-        if (card.power() != null) {
-            // assuming toughness is not null if power is, questionable?
-            description += "\n%s/%s".formatted(card.power(), card.toughness());
+        List<MessageEmbed> list = new ArrayList<>(card.faces().size());
+        int x = 0;
+        for (ScryfallCardFace cardFace : card.faces()) {
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("%s %s".formatted(cardFace.name(), parseManaizedString(cardFace.manaCost())).trim());
+            eb.setUrl(card.scryfallUri() + '&' + x++);
+            if (cardFace.imageUris() == null && card.imageUris() != null) {
+                eb.setThumbnail(card.imageUris().png());
+            }
+            else if (cardFace.imageUris() != null) {
+                eb.setThumbnail(cardFace.imageUris().png());
+            }
+            String description = "%s\n%s".formatted(cardFace.typeLine(), parseManaizedString(sanitize(cardFace.oracleText())));
+            if (cardFace.power() != null) {
+                // assuming toughness is not null if power is, questionable?
+                description += "\n%s/%s".formatted(cardFace.power(), cardFace.toughness());
+            }
+            if (cardFace.flavorText() != null) {
+                description += "\n\n*%s*".formatted(sanitize(cardFace.flavorText()));
+            }
+            eb.setDescription(description);
+            eb.setFooter("%s %s, %s".formatted(card.set().toUpperCase(), card.collectorNumber(), card.releasedAt().getYear()));
+            eb.setColor(MTG_COLOR);
+            MessageEmbed apply = eb.build();
+            list.add(apply);
         }
-        if (card.flavorText() != null) {
-            description += "\n\n*%s*".formatted(sanitize(card.flavorText()));
-        }
-        eb.setDescription(description);
-        eb.setFooter("%s %s, %s".formatted(card.set().toUpperCase(), card.collectorNumber(), card.releasedAt().substring(0, 4)));
-        eb.setColor(MTG_COLOR);
-        return eb.build();
+        return list;
     }
 
     /**

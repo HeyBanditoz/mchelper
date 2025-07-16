@@ -35,8 +35,7 @@ public class ScryfallCardRegexable extends Regexable {
         for (int i = 0; messageMatcher.find(); i++) {
             String search = messageMatcher.group(1);
             try {
-                MessageEmbed cardEmbed = re.getMCHelper().getScryfallService().getMtgEmbedByFuzzy(search);
-                embeds.add(cardEmbed);
+                embeds.addAll(re.getMCHelper().getScryfallService().getMtgEmbedByFuzzy(search));
                 anySuccess = true;
             } catch (FeignException ex) {
                 LOGGER.warn("\"Couldn't fetch card details.\" name=\"{}\"", search, ex);

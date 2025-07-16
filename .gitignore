@@ -93,3 +93,6 @@ liquibase.properties
 
 # Top level .jar files
 *.jar
+
+# Generated source files
+src/main/generated
