@@ -66,6 +66,7 @@ shadowJar {
         exclude(dependency('org.postgresql:postgresql.*:.*'))
         exclude(dependency('com.github.cgoIT:logback-elasticsearch-appender.*:.*'))
         exclude(dependency('org.liquibase:liquibase-core.*:.*'))
+        exclude(dependency('io.avaje:.*:.*'))
     }
 }
 
