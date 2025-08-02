@@ -1,12 +1,5 @@
 package io.banditoz.mchelper.plotter;
 
-import io.banditoz.mchelper.utils.database.Transaction;
-import io.banditoz.mchelper.utils.database.Type;
-import org.knowm.xchart.BitmapEncoder;
-import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.style.markers.SeriesMarkers;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +8,13 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
+import io.banditoz.mchelper.database.Transaction;
+import io.banditoz.mchelper.database.Type;
+import org.knowm.xchart.BitmapEncoder;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
 public class TransactionHistoryPlotter {
     private final String name;

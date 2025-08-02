@@ -1,22 +1,27 @@
 package io.banditoz.mchelper.llm;
 
-import io.banditoz.mchelper.MCHelper;
+import javax.annotation.Nullable;
+
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+
+import io.avaje.inject.RequiresProperty;
 import io.banditoz.mchelper.UserEvent;
+import io.banditoz.mchelper.database.LLMUsageLog;
+import io.banditoz.mchelper.database.dao.LlmUsageDao;
 import io.banditoz.mchelper.http.AnthropicClient;
 import io.banditoz.mchelper.llm.anthropic.AnthropicRequest;
 import io.banditoz.mchelper.llm.anthropic.AnthropicResponse;
 import io.banditoz.mchelper.llm.anthropic.Usage;
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.LLMUsageLog;
-import io.banditoz.mchelper.utils.database.dao.LlmUsageDao;
-import io.banditoz.mchelper.utils.database.dao.LlmUsageDaoImpl;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.metrics.MeterProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
-
+@Singleton
+@RequiresProperty(value = "mchelper.anthropic.token")
 public class LLMService {
     private final AnthropicClient anthropicClient;
     private final LongCounter tokenCounter;
@@ -24,23 +29,18 @@ public class LLMService {
 
     private static final Logger log = LoggerFactory.getLogger(LLMService.class);
 
-    public LLMService(MCHelper mcHelper) {
-        this.anthropicClient = mcHelper.getHttp().getAnthropicClient();
-        this.tokenCounter = mcHelper.getOTel().meter()
+    @Inject
+    public LLMService(AnthropicClient anthropicClient,
+                      MeterProvider meterProvider,
+                      @Nullable LlmUsageDao llmUsageDao) {
+        this.anthropicClient = anthropicClient;
+        this.tokenCounter = meterProvider
                 .meterBuilder("llm_metrics")
                 .build()
                 .counterBuilder("llm_tokens")
                 .setDescription("Counter tracking tokens from an LLM, including model and consumed tokens.")
                 .build();
-
-        Database database = mcHelper.getDatabase();
-        if (database == null) {
-            log.warn("The database is not configured. LLM usage statistics will only be visible to the counters.");
-            this.llmUsageDao = new LlmUsageDaoImpl.LlmUsageDaoNoopImpl();
-        }
-        else {
-            this.llmUsageDao = new LlmUsageDaoImpl(database);
-        }
+        this.llmUsageDao = llmUsageDao;
     }
 
     public String getSingleResponse(AnthropicRequest request, UserEvent userEvent) {
@@ -61,7 +61,9 @@ public class LLMService {
                     .setTimeTookMs((int) (System.currentTimeMillis() - before))
                     .build();
             log.info("LLM request finished. details={}", llmUsageLog);
-            llmUsageDao.log(llmUsageLog);
+            if (llmUsageDao != null) {
+                llmUsageDao.log(llmUsageLog);
+            }
         } catch (Exception e) {
             log.error("Error while recording a LLM stat!", e);
         }

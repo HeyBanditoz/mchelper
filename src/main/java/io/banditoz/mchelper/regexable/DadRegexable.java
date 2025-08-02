@@ -1,12 +1,14 @@
 package io.banditoz.mchelper.regexable;
 
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.stats.Status;
-
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.stats.Status;
+import jakarta.inject.Singleton;
+
+@Singleton
 public class DadRegexable extends Regexable {
     private static final Pattern PATTERN = Pattern.compile("^(i['’]?)m(ma)?\\b", Pattern.CASE_INSENSITIVE);
 

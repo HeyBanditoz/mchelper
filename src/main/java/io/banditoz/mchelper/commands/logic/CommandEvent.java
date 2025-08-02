@@ -1,20 +1,5 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.UserEvent;
-import io.banditoz.mchelper.config.GuildConfigurationProvider;
-import io.banditoz.mchelper.interactions.EmbedPaginator;
-import io.banditoz.mchelper.stats.Kind;
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.paste.Paste;
-import io.banditoz.mchelper.utils.paste.PasteggUploader;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
@@ -22,6 +7,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import io.banditoz.mchelper.UserEvent;
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.config.GuildConfigurationProvider;
+import io.banditoz.mchelper.interactions.EmbedPaginator;
+import io.banditoz.mchelper.interactions.InteractionListener;
+import io.banditoz.mchelper.stats.Kind;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
@@ -34,23 +32,27 @@ public class CommandEvent implements UserEvent {
     private final MessageReceivedEvent EVENT;
     private final Logger LOGGER;
     private final Guild GUILD;
-    private final MCHelper MCHELPER;
     private final boolean IS_ELEVATED;
-    private final Database DATABASE;
     private final String COMMAND_NAME;
     private final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
     private final GuildConfigurationProvider CONFIG;
+    private final InteractionListener INTERACTION_LISTENER;
+    private final CommandHandler COMMAND_HANDLER;
 
-
-    public CommandEvent(@NotNull MessageReceivedEvent event, Logger logger, MCHelper mcHelper, String commandClassName) {
+    public CommandEvent(@NotNull MessageReceivedEvent event,
+                        Logger logger,
+                        String commandClassName,
+                        InteractionListener interactionListener,
+                        CommandHandler commandHandler,
+                        ConfigurationProvider configurationProvider) {
         this.EVENT = event;
         this.LOGGER = logger;
         this.GUILD = (event.isFromGuild()) ? event.getGuild() : null;
         this.IS_ELEVATED = CommandPermissions.isBotOwner(event.getAuthor());
-        this.MCHELPER = mcHelper;
-        this.DATABASE = mcHelper.getDatabase();
         this.COMMAND_NAME = commandClassName;
-        this.CONFIG = new GuildConfigurationProvider(this);
+        this.CONFIG = new GuildConfigurationProvider(this, configurationProvider);
+        this.INTERACTION_LISTENER = interactionListener;
+        this.COMMAND_HANDLER = commandHandler;
     }
 
     /**
@@ -163,10 +165,12 @@ public class CommandEvent implements UserEvent {
     public void sendPastableReply(String msg) {
         if (msg.length() > 2000) {
             try {
-                Paste p = new Paste(msg);
-                p.setName(getRawCommandArgs()[0] + " by " + EVENT.getAuthor().getName() + " (" + EVENT.getAuthor().getId() + ")");
-                p.setDescription("Automatically generated paste from message " + EVENT.getMessageId());
-                sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(p));
+                throw new RuntimeException("TODO uploading long messages not yet implemented for long messages, sorry");
+                // TODO
+//                Paste p = new Paste(msg);
+//                p.setName(getRawCommandArgs()[0] + " by " + EVENT.getAuthor().getName() + " (" + EVENT.getAuthor().getId() + ")");
+//                p.setDescription("Automatically generated paste from message " + EVENT.getMessageId());
+//                sendReply(new PasteggUploader(this.MCHELPER).uploadToPastegg(p));
             } catch (Exception e) {
                 sendExceptionMessage(e);
             }
@@ -228,7 +232,7 @@ public class CommandEvent implements UserEvent {
             sendEmbedReply(embeds.get(0));
         }
         else {
-            EmbedPaginator paginator = new EmbedPaginator(MCHELPER.getInteractionListener(), EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals, this);
+            EmbedPaginator paginator = new EmbedPaginator(INTERACTION_LISTENER, EVENT.getChannel(), embeds, 1, TimeUnit.MINUTES, EVENT.getAuthor()::equals, this);
             paginator.go();
         }
     }
@@ -260,19 +264,9 @@ public class CommandEvent implements UserEvent {
      *
      * @return The MCHelper instance.
      */
-    public MCHelper getMCHelper() {
-        return MCHELPER;
-    }
-
-    /**
-     * Returns the associated Database with this CommandEvent.
-     *
-     * @return The database.
-     */
-    @Override
-    public Database getDatabase() {
-        return DATABASE;
-    }
+//    public MCHelper getMCHelper() {
+//        return MCHELPER;
+//    }
 
     protected Logger getLogger() {
         return LOGGER;
@@ -327,7 +321,7 @@ public class CommandEvent implements UserEvent {
      * and callees within.
      */
     public void replay() {
-        MCHELPER.getCommandHandler().go(EVENT, Kind.TEXT_REPLAY);
+        COMMAND_HANDLER.go(EVENT, Kind.TEXT_REPLAY);
     }
 
     @Override

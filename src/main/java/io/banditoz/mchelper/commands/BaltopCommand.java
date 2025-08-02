@@ -1,18 +1,28 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.List;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.StatPoint;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import java.util.List;
-
-@Requires(database = true)
+@Singleton
+@RequiresDatabase
 public class BaltopCommand extends Command {
+    private final AccountManager accountManager;
+
+    @Inject
+    public BaltopCommand(AccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
+
     @Override
     public String commandName() {
         return "baltop";
@@ -26,7 +36,7 @@ public class BaltopCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        List<StatPoint<String>> organized = ce.getMCHelper().getAccountManager().getTopBalancesForGuild(ce.getGuild());
+        List<StatPoint<String>> organized = accountManager.getTopBalancesForGuild(ce.getGuild());
         ce.sendEmbedReply(new EmbedBuilder()
                 .setAuthor("Money leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
                 .appendDescription(generateBaltopTable(organized))

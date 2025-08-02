@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.mtg;
 
+import javax.annotation.Nullable;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,15 @@ import java.util.stream.Collectors;
 import static java.util.function.Function.identity;
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.sanitize;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.http.ScryfallClient;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
+@Singleton
 public class ScryfallService {
     private final ScryfallClient scryfallClient;
     private final Map<String, Emoji> emojis;
@@ -25,11 +28,11 @@ public class ScryfallService {
     private static final Pattern MANA_MATCHER = Pattern.compile("\\{(\\w+)}");
     private static final Color MTG_COLOR = new Color(201, 56, 20);
 
-    public ScryfallService(MCHelper mcHelper) {
-        this.scryfallClient = mcHelper.getHttp().getScryfallClient();
-        emojis = mcHelper.getJDA().retrieveApplicationEmojis()
-                .complete()
-                .stream()
+    @Inject
+    public ScryfallService(@Nullable ScryfallClient scryfallClient, // TODO WHY IS THIS NULL!
+                           List<ApplicationEmoji> applicationEmojis) {
+        this.scryfallClient = scryfallClient;
+        emojis = applicationEmojis.stream()
                 .filter(emoji -> emoji.getName().startsWith("mana"))
                 .collect(Collectors.toMap(ApplicationEmoji::getName, identity()));
     }

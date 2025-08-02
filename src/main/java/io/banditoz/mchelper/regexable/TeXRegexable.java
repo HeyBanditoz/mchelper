@@ -1,10 +1,12 @@
 package io.banditoz.mchelper.regexable;
 
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.TeXRenderer;
-
 import java.util.regex.Pattern;
 
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.TeXRenderer;
+import jakarta.inject.Singleton;
+
+@Singleton
 public class TeXRegexable extends Regexable {
     private static final Pattern PATTERN = Pattern.compile("\\$\\$(.*?)\\$\\$");
 

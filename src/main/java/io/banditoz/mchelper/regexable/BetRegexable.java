@@ -1,11 +1,13 @@
 package io.banditoz.mchelper.regexable;
 
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.stats.Status;
-
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.stats.Status;
+import jakarta.inject.Singleton;
+
+@Singleton
 public class BetRegexable extends Regexable {
     private static final Pattern PATTERN = Pattern.compile("\\bbet((s)?|(ting)?|(ted))\\b", Pattern.CASE_INSENSITIVE);
     private static final String[] BETS = {"Bet!", "Bet?", "Bet.", "How much you wanna bet?", "Okay, bet!"};

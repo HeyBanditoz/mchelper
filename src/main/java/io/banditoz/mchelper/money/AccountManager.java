@@ -1,14 +1,5 @@
 package io.banditoz.mchelper.money;
 
-import io.banditoz.mchelper.utils.database.Database;
-import io.banditoz.mchelper.utils.database.StatPoint;
-import io.banditoz.mchelper.utils.database.Transaction;
-import io.banditoz.mchelper.utils.database.dao.AccountsDao;
-import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
@@ -16,12 +7,24 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.database.Transaction;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+
 /**
  * The class that handles monetary user accounts and their transactions. Use this class
  * (from {@link io.banditoz.mchelper.MCHelper#getAccountManager()}) instead of creating a new one, as this class does
  * synchronization to ensure money remains the same while a thread operates on a user's account.<br><br>
  * In the comments, user and accounts are used synonymously to represent a user's account, which holds a balance.
  */
+@Singleton
+@RequiresDatabase
 public class AccountManager {
     private final AccountsDao dao;
     /** The {@link DecimalFormat} to cleanly format {@link BigDecimal BigDecimals} as {@link String Strings}. */
@@ -33,8 +36,9 @@ public class AccountManager {
         DF.setMinimumFractionDigits(0);
     }
 
-    public AccountManager(Database database) {
-        dao = new AccountsDaoImpl(database);
+    @Inject
+    public AccountManager(AccountsDao accountsDao) {
+        this.dao = accountsDao;
     }
 
     /**

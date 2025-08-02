@@ -1,15 +1,24 @@
 package io.banditoz.mchelper.commands;
 
+import java.awt.Color;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.EnumSet;
+
+import static io.banditoz.mchelper.utils.RoleReactionUtils.buildMessage;
+import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
+
 import com.vdurmont.emoji.EmojiManager;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.database.dao.RolesDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ReactionRoleMessage;
-import io.banditoz.mchelper.utils.database.dao.RolesDao;
-import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,16 +33,16 @@ import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import java.awt.Color;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.EnumSet;
-
-import static io.banditoz.mchelper.utils.RoleReactionUtils.buildMessage;
-import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
-
-@Requires(database = true)
+@Singleton
+@RequiresDatabase
 public class ManageRolesCommand extends Command {
+    private final RolesDao dao;
+
+    @Inject
+    public ManageRolesCommand(RolesDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "manageroles";
@@ -55,7 +64,6 @@ public class ManageRolesCommand extends Command {
         String[] slicedArgs = Arrays.copyOfRange(rawArgs, 1, rawArgs.length);
         Namespace args = getDefaultArgs().parseArgs(slicedArgs);
 
-        RolesDao dao = new RolesDaoImpl(ce.getDatabase());
         char thisPrefix = ce.getConfig().get(Config.PREFIX).charAt(0);
         if (args.get("init") != null && args.getBoolean("init")) {
             if (dao.containsGuild(ce.getGuild())) {

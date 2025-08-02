@@ -1,21 +1,5 @@
 package io.banditoz.mchelper.money.lottery;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.utils.RandomCollection;
-import io.banditoz.mchelper.utils.database.Lottery;
-import io.banditoz.mchelper.utils.database.LotteryEntrant;
-import io.banditoz.mchelper.utils.database.StatPoint;
-import io.banditoz.mchelper.utils.database.dao.LotteryDao;
-import io.banditoz.mchelper.utils.database.dao.LotteryDaoImpl;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -28,6 +12,26 @@ import java.util.concurrent.TimeUnit;
 
 import static io.banditoz.mchelper.money.AccountManager.format;
 
+import com.google.common.annotations.VisibleForTesting;
+import io.avaje.inject.PostConstruct;
+import io.banditoz.mchelper.database.Lottery;
+import io.banditoz.mchelper.database.LotteryEntrant;
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.database.dao.LotteryDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.utils.RandomCollection;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Singleton
+@RequiresDatabase
 public class LotteryManager {
     private final LotteryDao dao;
     private final AccountManager am;
@@ -35,15 +39,19 @@ public class LotteryManager {
     private final JDA jda;
     private static final Logger logger = LoggerFactory.getLogger(LotteryManager.class);
 
-    public LotteryManager(MCHelper mcHelper) {
-        this.dao = new LotteryDaoImpl(mcHelper.getDatabase());
-        this.am = mcHelper.getAccountManager();
-        this.ses = mcHelper.getSES();
-        this.jda = mcHelper.getJDA();
-        initialize();
+    @Inject
+    public LotteryManager(LotteryDao dao,
+                          AccountManager accountManager,
+                          ScheduledExecutorService scheduledExecutorService,
+                          JDA jda) {
+        this.dao = dao;
+        this.am = accountManager;
+        this.ses = scheduledExecutorService;
+        this.jda = jda;
     }
 
-    private void initialize() {
+    @PostConstruct
+    public void initialize() {
         List<Lottery> lotteries;
         try {
             lotteries = dao.getAllActiveLotteries();

@@ -1,16 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.serverstatus.MinecraftServerStatus;
-import io.banditoz.mchelper.serverstatus.Player;
-import io.banditoz.mchelper.serverstatus.StatusResponse;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.utils.MarkdownSanitizer;
-
 import java.awt.Color;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -19,7 +8,29 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.serverstatus.MinecraftServerStatus;
+import io.banditoz.mchelper.serverstatus.Player;
+import io.banditoz.mchelper.serverstatus.StatusResponse;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+
+@Singleton
 public class ServerStatusCommand extends Command {
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public ServerStatusCommand(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public String commandName() {
         return "status";
@@ -40,7 +51,7 @@ public class ServerStatusCommand extends Command {
             port = Integer.parseInt(address[1]);
         }
         InetSocketAddress addr = new InetSocketAddress(host, port);
-        MinecraftServerStatus status = new MinecraftServerStatus(addr, 5000, ce.getMCHelper().getObjectMapper());
+        MinecraftServerStatus status = new MinecraftServerStatus(addr, 5000, objectMapper);
         try {
             StatusResponse response = status.fetchData();
             String description = MarkdownSanitizer.escape(response.getDescriptionAsString());

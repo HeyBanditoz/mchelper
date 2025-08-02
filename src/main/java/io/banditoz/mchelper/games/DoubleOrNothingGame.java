@@ -1,6 +1,10 @@
 package io.banditoz.mchelper.games;
 
-import io.banditoz.mchelper.MCHelper;
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.util.Random;
+import java.util.concurrent.ScheduledExecutorService;
+
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -10,18 +14,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
-import java.math.BigDecimal;
-import java.util.Random;
-
 public class DoubleOrNothingGame extends Game {
     private BigDecimal currentBet;
     private final Random rand = new Random();
     private int times = 0;
     private static final Logger LOGGER = LoggerFactory.getLogger(DoubleOrNothingGame.class);
 
-    public DoubleOrNothingGame(BigDecimal initialBet, User player, MCHelper mcHelper) {
-        super(5, 200_000, mcHelper, player, initialBet);
+    public DoubleOrNothingGame(BigDecimal initialBet, User player, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
+        super(5, 200_000, player, initialBet, gm, am, ses);
         this.currentBet = initialBet;
     }
 

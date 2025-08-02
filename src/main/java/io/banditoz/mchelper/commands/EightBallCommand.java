@@ -1,16 +1,18 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+@Singleton
 public class EightBallCommand extends Command {
     private final Random random = new SecureRandom();
     private static final List<String> RESPONSES;

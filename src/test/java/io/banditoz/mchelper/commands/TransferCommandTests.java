@@ -2,8 +2,8 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.money.MoneyException;
-import io.banditoz.mchelper.utils.database.Transaction;
-import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
+import io.banditoz.mchelper.database.Transaction;
+import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.testng.annotations.Test;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 @Test(dependsOnGroups = {"BalanceCommandTests"}, groups = {"TransferCommandTests"})
 public class TransferCommandTests extends BaseCommandTest {
-    private final TransferCommand tc = new TransferCommand();
+    private final TransferCommand tc = new TransferCommand(AM);
     private final Member member = Mocks.getMockedMember();
     private final User otherUser = Mocks.getDifferentMockedMember().getUser();
 

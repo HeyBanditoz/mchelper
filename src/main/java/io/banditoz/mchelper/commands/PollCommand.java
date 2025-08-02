@@ -1,21 +1,31 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.PollType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Requires(database = true)
+import io.banditoz.mchelper.PollService;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.PollType;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
+@RequiresDatabase
 public class PollCommand extends Command {
+    private final PollService pollService;
     private static final Pattern QUOTES_PATTERN = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+
+    @Inject
+    public PollCommand(PollService pollService) {
+        this.pollService = pollService;
+    }
 
     @Override
     public String commandName() {
@@ -49,7 +59,7 @@ public class PollCommand extends Command {
         String title = matchList.get(0);
         PollType type = PollType.valueOf(matchList.get(1).toUpperCase(Locale.ROOT));
         List<String> questions = matchList.subList(2, matchList.size()).stream().filter(s -> !s.isBlank()).distinct().toList();
-        ce.getMCHelper().getPollService().createPollAndSendMessage(title, questions, type, ce.getEvent());
+        pollService.createPollAndSendMessage(title, questions, type, ce.getEvent());
         return Status.SUCCESS;
     }
 }

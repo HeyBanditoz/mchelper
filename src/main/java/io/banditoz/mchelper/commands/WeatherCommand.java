@@ -1,19 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.DateUtils;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.weather.ForecastSummary;
-import io.banditoz.mchelper.weather.darksky.Currently;
-import io.banditoz.mchelper.weather.darksky.DSWeather;
-import io.banditoz.mchelper.weather.darksky.DataItem;
-import io.banditoz.mchelper.weather.geocoder.Location;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.DoubleSummaryStatistics;
@@ -21,8 +7,33 @@ import java.util.DoubleSummaryStatistics;
 import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
 import static java.lang.Math.round;
 
-@Requires(config = "mchelper.darksky.token")
+import io.avaje.inject.RequiresProperty;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.DateUtils;
+import io.banditoz.mchelper.utils.Help;
+import io.banditoz.mchelper.weather.ForecastSummary;
+import io.banditoz.mchelper.weather.WeatherService;
+import io.banditoz.mchelper.weather.darksky.Currently;
+import io.banditoz.mchelper.weather.darksky.DSWeather;
+import io.banditoz.mchelper.weather.darksky.DataItem;
+import io.banditoz.mchelper.weather.geocoder.Location;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+@Singleton
+@RequiresProperty("mchelper.darksky.token")
 public class WeatherCommand extends Command {
+    private final WeatherService weatherService;
+
+    @Inject
+    public WeatherCommand(WeatherService weatherService) {
+        this.weatherService = weatherService;
+    }
+
     @Override
     public String commandName() {
         return "w";
@@ -52,7 +63,7 @@ public class WeatherCommand extends Command {
             locationToSearch = ce.getCommandArgsString();
         }
 
-        ForecastSummary forecast = ce.getMCHelper().getWeatherService().getForecastForLocation(locationToSearch);
+        ForecastSummary forecast = weatherService.getForecastForLocation(locationToSearch);
         DSWeather response = forecast.forecast();
         Location location = forecast.location();
 

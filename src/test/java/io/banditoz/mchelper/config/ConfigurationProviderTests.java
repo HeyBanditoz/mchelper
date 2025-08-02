@@ -1,18 +1,19 @@
 package io.banditoz.mchelper.config;
 
-import io.banditoz.mchelper.commands.BaseCommandTest;
-import org.testng.annotations.Test;
-
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.banditoz.mchelper.commands.BaseCommandTest;
+import io.banditoz.mchelper.database.dao.GuildConfigDaoImpl;
+import org.testng.annotations.Test;
 
 @Test(dependsOnGroups = {"DatabaseInitializationTests"})
 public class ConfigurationProviderTests extends BaseCommandTest {
     private final ConfigurationProvider provider;
 
     public ConfigurationProviderTests() {
-        this.provider = new ConfigurationProvider(mcHelper);
+        this.provider = new ConfigurationProvider(new GuildConfigDaoImpl(DB));
     }
 
     @Test

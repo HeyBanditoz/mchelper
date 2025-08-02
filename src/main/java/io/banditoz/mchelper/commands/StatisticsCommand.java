@@ -1,20 +1,29 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.StatPoint;
-import io.banditoz.mchelper.utils.database.dao.StatisticsDao;
-import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.text.DecimalFormat;
 import java.util.List;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.database.dao.StatisticsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+@Singleton
+@RequiresDatabase
 public class StatisticsCommand extends Command {
+    private final StatisticsDao dao;
+
+    @Inject
+    public StatisticsCommand(StatisticsDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "stats";
@@ -28,7 +37,6 @@ public class StatisticsCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        StatisticsDao dao = new StatisticsDaoImpl(ce.getDatabase());
         List<StatPoint<String>> stats = dao.getUniqueCommandCountPerGuildOrGlobally(ce.getGuild());
         if (stats.isEmpty()) {
             ce.sendReply("No commands run for this guild, somehow.");

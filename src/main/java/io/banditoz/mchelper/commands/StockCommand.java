@@ -1,20 +1,34 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.*;
+import java.time.temporal.ChronoUnit;
+
+import io.avaje.inject.RequiresProperty;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Cooldown;
+import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.investing.Finance;
 import io.banditoz.mchelper.investing.model.CompanyProfile;
 import io.banditoz.mchelper.investing.model.Quote;
 import io.banditoz.mchelper.investing.model.RawCandlestick;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import java.time.temporal.ChronoUnit;
-
-@Requires(config = "mchelper.finnhub.token")
+@Singleton
+@RequiresProperty("mchelper.finnhub.token")
 public class StockCommand extends Command {
+    private final Finance finance;
+
+    @Inject
+    public StockCommand(Finance finance) {
+        this.finance = finance;
+    }
+
     @Override
     public String commandName() {
         return "stock";
@@ -32,7 +46,6 @@ public class StockCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        Finance finance = new Finance(ce.getMCHelper());
         Namespace args = getDefualtArgs().parseArgs(ce.getCommandArgsWithoutName());
         String ticker = args.get("ticker");
         Quote quote = finance.getQuote(ticker);

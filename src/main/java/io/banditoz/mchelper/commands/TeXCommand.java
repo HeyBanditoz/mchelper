@@ -5,7 +5,9 @@ import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.TeXRenderer;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class TeXCommand extends Command {
     @Override
     public String commandName() {

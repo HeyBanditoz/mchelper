@@ -1,11 +1,11 @@
 package io.banditoz.mchelper.motd;
 
-import io.banditoz.mchelper.MCHelper;
-
 import java.awt.Color;
 
+import io.avaje.inject.BeanScope;
+
 public class QotdMotdSectionGenerator extends AbstractQotdMotdSectionGenerator {
-    public QotdMotdSectionGenerator(MCHelper mcHelper) {
-        super(mcHelper, false, Color.GREEN);
+    public QotdMotdSectionGenerator(BeanScope beanScope) {
+        super(beanScope, false, Color.GREEN);
     }
 }

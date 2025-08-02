@@ -9,12 +9,22 @@ import static net.dv8tion.jda.api.utils.MarkdownSanitizer.sanitize;
 
 import feign.FeignException;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.mtg.ScryfallService;
 import io.banditoz.mchelper.stats.Status;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+@Singleton
 public class ScryfallCardRegexable extends Regexable {
+    private final ScryfallService scryfallService;
     private static final Pattern PATTERN = Pattern.compile("\\[\\[([^]]+)]]");
+
+    @Inject
+    public ScryfallCardRegexable(ScryfallService scryfallService) {
+        this.scryfallService = scryfallService;
+    }
 
     @Override
     public Pattern regex() {
@@ -35,7 +45,7 @@ public class ScryfallCardRegexable extends Regexable {
         for (int i = 0; messageMatcher.find(); i++) {
             String search = messageMatcher.group(1);
             try {
-                embeds.addAll(re.getMCHelper().getScryfallService().getMtgEmbedByFuzzy(search));
+                embeds.addAll(scryfallService.getMtgEmbedByFuzzy(search));
                 anySuccess = true;
             } catch (FeignException ex) {
                 LOGGER.warn("\"Couldn't fetch card details.\" name=\"{}\"", search, ex);

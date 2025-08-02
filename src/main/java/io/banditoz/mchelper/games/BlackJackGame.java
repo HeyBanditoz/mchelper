@@ -1,14 +1,5 @@
 package io.banditoz.mchelper.games;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
-import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.money.MoneyException;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+
+import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.MoneyException;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 
 public class BlackJackGame extends Game {
     private BigDecimal currentAmount;
@@ -29,8 +29,8 @@ public class BlackJackGame extends Game {
     /** If this game has already been accessed post-command invocation. */
     private boolean dirty = false;
 
-    public BlackJackGame(User player, BigDecimal initialBet, MCHelper mcHelper) {
-        super(5, 200_000, mcHelper, player, initialBet);
+    public BlackJackGame(User player, BigDecimal initialBet, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
+        super(5, 200_000, player, initialBet, gm, am, ses);
         this.currentAmount = initialBet;
         if (DECKS.get(player) == null) {
             DECKS.put(player, new Deck(2));

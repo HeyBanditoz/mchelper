@@ -1,18 +1,6 @@
 package io.banditoz.mchelper.investing;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.http.FinnhubClient;
-import io.banditoz.mchelper.investing.model.CompanyProfile;
-import io.banditoz.mchelper.investing.model.Quote;
-import io.banditoz.mchelper.investing.model.RawCandlestick;
-import io.banditoz.mchelper.utils.database.dao.CompanyProfileDao;
-import io.banditoz.mchelper.utils.database.dao.CompanyProfileDaoImpl;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.knowm.xchart.BitmapEncoder;
-import org.knowm.xchart.OHLCChart;
-import org.knowm.xchart.OHLCChartBuilder;
-
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -24,13 +12,29 @@ import java.util.Calendar;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import io.banditoz.mchelper.database.dao.CompanyProfileDao;
+import io.banditoz.mchelper.http.FinnhubClient;
+import io.banditoz.mchelper.investing.model.CompanyProfile;
+import io.banditoz.mchelper.investing.model.Quote;
+import io.banditoz.mchelper.investing.model.RawCandlestick;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.knowm.xchart.BitmapEncoder;
+import org.knowm.xchart.OHLCChart;
+import org.knowm.xchart.OHLCChartBuilder;
+
+@Singleton
 public class Finance {
-    private final MCHelper MCHELPER;
+    private final CompanyProfileDao companyProfileDao;
     private final FinnhubClient client;
 
-    public Finance(MCHelper mcHelper) {
-        this.MCHELPER = mcHelper;
-        this.client = mcHelper.getHttp().getFinnhubClient();
+    @Inject
+    public Finance(@Nullable CompanyProfileDao companyProfileDao,
+                   FinnhubClient client) {
+        this.companyProfileDao = companyProfileDao;
+        this.client = client;
     }
 
     public Quote getQuote(String ticker) {
@@ -40,12 +44,13 @@ public class Finance {
     public CompanyProfile getCompanyProfile(String ticker) {
         // first, check SQL cache
         ticker = ticker.toUpperCase();
-        CompanyProfileDao dao = new CompanyProfileDaoImpl(MCHELPER.getDatabase());
-        Optional<CompanyProfile> companyProfile = dao.getCompanyProfile(ticker);
+        Optional<CompanyProfile> companyProfile = companyProfileDao == null ? Optional.empty() : companyProfileDao.getCompanyProfile(ticker);
         // nothing, get from API
         if (companyProfile.isEmpty()) {
             companyProfile = Optional.of(client.getCompanyProfile(ticker));
-            dao.addCompanyProfileIfNotExists(companyProfile.get());
+            if (companyProfileDao != null) {
+                companyProfileDao.addCompanyProfileIfNotExists(companyProfile.get());
+            }
         }
         return companyProfile.get();
     }

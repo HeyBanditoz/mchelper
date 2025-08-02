@@ -1,21 +1,31 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.avaje.inject.RequiresProperty;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.dictionary.Definition;
 import io.banditoz.mchelper.dictionary.DictionaryResult;
 import io.banditoz.mchelper.dictionary.DictionarySearcher;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Requires(config = "mchelper.owlbot.token")
+@Singleton
+@RequiresProperty("mchelper.owlbot.token")
 public class DictionaryCommand extends Command {
+    private final DictionarySearcher ds;
+
+    @Inject
+    public DictionaryCommand(DictionarySearcher ds) {
+        this.ds = ds;
+    }
+
     @Override
     public String commandName() {
         return "define";
@@ -29,7 +39,6 @@ public class DictionaryCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        DictionarySearcher ds = new DictionarySearcher(ce.getMCHelper());
         DictionaryResult result = ds.search(ce.getCommandArgsString());
 
         List<MessageEmbed> embeds = createPagesFromDefinition(result);

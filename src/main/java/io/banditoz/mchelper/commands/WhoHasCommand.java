@@ -1,18 +1,20 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.StringJoiner;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.StringJoiner;
-
+@Singleton
 public class WhoHasCommand extends Command {
     @Override
     public String commandName() {

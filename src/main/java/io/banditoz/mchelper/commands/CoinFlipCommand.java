@@ -1,12 +1,14 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 
-import java.util.concurrent.ThreadLocalRandom;
-
+@Singleton
 public class CoinFlipCommand extends Command {
     @Override
     public String commandName() {

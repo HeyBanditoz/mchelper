@@ -1,19 +1,5 @@
 package io.banditoz.mchelper.runnables;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.config.ConfigurationProvider;
-import io.banditoz.mchelper.motd.*;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.utils.MarkdownSanitizer;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -25,20 +11,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.avaje.inject.BeanScope;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.motd.*;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Singleton
 public class QotdRunnable implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(QotdRunnable.class);
     private final JDA jda;
     private final ConfigurationProvider configs;
     private final MotdSectionGenerator[] generators;
 
-    public QotdRunnable(MCHelper mcHelper) {
-        this.jda = mcHelper.getJDA();
-        this.configs = mcHelper.getConfigurationProvider();
+    @Inject
+    public QotdRunnable(JDA jda,
+                        ConfigurationProvider configs,
+                        BeanScope beanScope) {
+        this.jda = jda;
+        this.configs = configs;
         this.generators = new MotdSectionGenerator[] {
-                new WeatherMotdSectionGenerator(mcHelper),
-                new NewsHeadlineMotdSectionGenerator(mcHelper),
-                new QotdMotdSectionGenerator(mcHelper),
-                new QotdMotdExcludedSectionGenerator(mcHelper)
+                new WeatherMotdSectionGenerator(beanScope),
+                new NewsHeadlineMotdSectionGenerator(beanScope),
+                new QotdMotdSectionGenerator(beanScope),
+                new QotdMotdExcludedSectionGenerator(beanScope)
         };
     }
 

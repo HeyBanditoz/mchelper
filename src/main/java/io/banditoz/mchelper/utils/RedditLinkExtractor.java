@@ -1,17 +1,20 @@
 package io.banditoz.mchelper.utils;
 
+import java.io.IOException;
+
 import io.banditoz.mchelper.Http;
-import io.banditoz.mchelper.MCHelper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.io.IOException;
-
+@Singleton
 public class RedditLinkExtractor {
     private final Http http;
 
-    public RedditLinkExtractor(MCHelper mcHelper) {
-        this.http = mcHelper.getHttp();
+    @Inject
+    public RedditLinkExtractor(Http http) {
+        this.http = http;
     }
 
     public String extractFromRedditAppLink(String url) throws IOException {

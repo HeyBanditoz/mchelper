@@ -1,10 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +7,13 @@ import java.util.Random;
 
 import static io.banditoz.mchelper.utils.ListUtils.extractNumRandomly;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
+
+@Singleton
 public class PickCommand extends Command {
     private final Random random = new SecureRandom();
 

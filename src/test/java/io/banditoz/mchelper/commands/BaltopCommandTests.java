@@ -1,12 +1,12 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.testng.annotations.Test;
 
 @Test(dependsOnGroups = {"BalanceCommandTests"})
 public class BaltopCommandTests extends BaseCommandTest {
-    private final BaltopCommand bc = new BaltopCommand();
+    private final BaltopCommand bc = new BaltopCommand(AM);
 
     @Test
     public void testBaltopCommand() throws Exception {

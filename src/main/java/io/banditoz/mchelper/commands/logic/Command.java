@@ -1,6 +1,9 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.MCHelper;
+import java.util.EnumSet;
+
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
@@ -11,8 +14,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.EnumSet;
 
 /**
  * Represents the abstract class for any Command the bot may have. Note any command you implement
@@ -75,13 +76,13 @@ public abstract class Command {
      * @param e The MessageReceivedEvent to execute
      * @see ElevatedCommand
      */
-    protected boolean canExecute(MessageReceivedEvent e, MCHelper mcHelper) {
+    protected boolean canExecute(MessageReceivedEvent e) {
         return true;
     }
 
     /** Runs onCommand(). Called from {@link CommandHandler#onMessageReceived(MessageReceivedEvent)} asynchronously, or by replay logic. */
-    protected Stat execute(MessageReceivedEvent e, MCHelper MCHelper, Kind kind) {
-        CommandEvent ce = new CommandEvent(e, LOGGER, MCHelper, this.getClass().getSimpleName());
+    protected Stat execute(MessageReceivedEvent e, Kind kind, InteractionListener interactionListener, CommandHandler commandHandler, ConfigurationProvider configurationProvider) {
+        CommandEvent ce = new CommandEvent(e, LOGGER, this.getClass().getSimpleName(), interactionListener, commandHandler, configurationProvider);
         long before = System.nanoTime();
         // bot owners can bypass permission checks
         if (!CommandPermissions.isBotOwner(e.getAuthor())) {

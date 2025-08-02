@@ -1,19 +1,31 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.dao.AccountsDao;
-import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
 import java.util.Collections;
 import java.util.List;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+
+@Singleton
+@RequiresDatabase
 public class TransactionsCommand extends Command {
+    private final AccountsDao dao;
+    private final JDA jda;
+
+    @Inject
+    public TransactionsCommand(AccountsDao dao, JDA jda) {
+        this.dao = dao;
+        this.jda = jda;
+    }
+
     @Override
     public String commandName() {
         return "txns";
@@ -26,10 +38,9 @@ public class TransactionsCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        AccountsDao dao = new AccountsDaoImpl(ce.getMCHelper().getDatabase());
         List<MessageEmbed> pages = dao.getNTransactionsForUser(ce.getEvent().getAuthor().getIdLong(), 20).stream()
                 .sorted(Collections.reverseOrder())
-                .map(transaction -> transaction.render(ce.getMCHelper().getJDA()))
+                .map(transaction -> transaction.render(jda))
                 .toList();
         ce.sendEmbedPaginatedReplyWithPageNumber(pages);
         return Status.SUCCESS;

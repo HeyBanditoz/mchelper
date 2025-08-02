@@ -1,7 +1,13 @@
 package io.banditoz.mchelper;
 
+import javax.annotation.Nonnull;
+import java.awt.Color;
+import java.time.Instant;
+
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -10,17 +16,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import java.awt.Color;
-import java.time.Instant;
-
+@Singleton
 public class GuildJoinLeaveListener extends ListenerAdapter {
     private static final String DEFAULT_AVATAR = "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png";
     private static final Logger log = LoggerFactory.getLogger(GuildJoinLeaveListener.class);
     private final ConfigurationProvider gc;
 
-    public GuildJoinLeaveListener(MCHelper mcHelper) {
-        this.gc = mcHelper.getConfigurationProvider();
+    @Inject
+    public GuildJoinLeaveListener(ConfigurationProvider configurationProvider) {
+        this.gc = configurationProvider;
     }
 
     @Override

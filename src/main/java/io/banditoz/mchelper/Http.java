@@ -19,14 +19,18 @@ import feign.codec.ErrorDecoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import io.avaje.config.Config;
+import io.avaje.inject.Bean;
+import io.avaje.inject.Factory;
 import io.banditoz.mchelper.http.*;
 import io.banditoz.mchelper.utils.Whitebox;
 import io.banditoz.mchelper.weather.geocoder.Location;
+import jakarta.inject.Inject;
 import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Factory
 public class Http {
     private final OkHttpClient client;
     private final OkHttpClient nonRedirectingClient;
@@ -48,6 +52,7 @@ public class Http {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
+    @Inject
     public Http(ObjectMapper om) {
         LOGGER.info("Building Feign HTTP clients...");
         client = new OkHttpClient.Builder()
@@ -153,26 +158,32 @@ public class Http {
                 .requestInterceptor(userAgentInterceptor);
     }
 
+    @Bean
     public OkHttpClient getClient() {
         return client;
     }
 
+    @Bean
     public TarkovClient getTarkovClient() {
         return tarkovClient;
     }
 
+    @Bean
     public PasteggClient getPasteggClient() {
         return pasteggClient;
     }
 
+    @Bean
     public UrbanDictionaryClient getUrbanDictionaryClient() {
         return urbanDictionaryClient;
     }
 
+    @Bean
     public FinnhubClient getFinnhubClient() {
         return finnhubClient;
     }
 
+    @Bean
     public OwlbotClient getOwlbotCLient() {
         return owlbotClient;
     }
@@ -181,18 +192,22 @@ public class Http {
      * @apiNote Don't use this. Go through the caching
      * {@link io.banditoz.mchelper.weather.geocoder.NominatimLocationService#searchForLocation(String)} instead.
      */
+    @Bean
     public NominatimClient getNominatimClient() {
         return nominatimClient;
     }
 
+    @Bean
     public DarkSkyClient getDarkSkyClient() {
         return darkSkyClient;
     }
 
+    @Bean
     public AnthropicClient getAnthropicClient() {
         return anthropicClient;
     }
 
+    @Bean
     public ScryfallClient getScryfallClient() {
         return scryfallClient;
     }

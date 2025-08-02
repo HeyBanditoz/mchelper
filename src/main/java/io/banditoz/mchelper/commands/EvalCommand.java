@@ -1,20 +1,28 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.ElevatedCommand;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-
+import javax.annotation.Nullable;
 import javax.script.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.database.Database;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+
+@Singleton
 public class EvalCommand extends ElevatedCommand {
     private final ScriptEngineManager manager;
+    private final Database database;
 
-    public EvalCommand() {
+    @Inject
+    public EvalCommand(@Nullable Database database) {
+        this.database = database;
         manager = new ScriptEngineManager();
     }
 
@@ -44,8 +52,8 @@ public class EvalCommand extends ElevatedCommand {
         }
         StringBuilder imports = new StringBuilder("""
                 import java.util.*;
-                import io.banditoz.mchelper.utils.database.*;
-                import io.banditoz.mchelper.utils.database.dao.*;
+                import io.banditoz.mchelper.database.*;
+                import io.banditoz.mchelper.database.dao.*;
                 import io.banditoz.mchelper.commands.logic.*;
                 import net.dv8tion.jda.api.*;
                 import net.dv8tion.jda.api.entities.*;
@@ -93,7 +101,7 @@ public class EvalCommand extends ElevatedCommand {
         long compileDuration = System.currentTimeMillis() - before;
         Bindings b = engine.createBindings();
         b.put("ce", ce);
-        b.put("db", ce.getDatabase());
+        b.put("db", database);
         b.put("args", ce.getCommandArgs());
         b.put("jda", ce.getEvent().getJDA());
         if (ce.getEvent().isFromType(ChannelType.TEXT)) {

@@ -4,7 +4,9 @@ import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class LoadoutCommand extends Command {
     @Override
     public String commandName() {

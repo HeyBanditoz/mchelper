@@ -1,13 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.Mocks;
-import io.banditoz.mchelper.money.MoneyException;
-import io.banditoz.mchelper.utils.database.dao.AccountsDao;
-import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import org.testng.annotations.Test;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,12 +7,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.banditoz.mchelper.Mocks;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
+import io.banditoz.mchelper.money.MoneyException;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import org.testng.annotations.Test;
+
 @Test(dependsOnGroups = {"DatabaseInitializationTests"}, groups = "BalanceCommandTests")
 public class BalanceCommandTests extends BaseCommandTest {
     private final BalanceCommand bc;
 
     public BalanceCommandTests() {
-        this.bc = new BalanceCommand();
+        this.bc = new BalanceCommand(AM);
     }
 
     @Test

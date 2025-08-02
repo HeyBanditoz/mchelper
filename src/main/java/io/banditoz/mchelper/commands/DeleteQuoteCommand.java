@@ -1,18 +1,27 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.dao.QuotesDao;
-import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
-import net.dv8tion.jda.api.Permission;
-
 import java.util.EnumSet;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.dao.QuotesDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.Permission;
+
+@Singleton
+@RequiresDatabase
 public class DeleteQuoteCommand extends Command {
+    private final QuotesDao dao;
+
+    @Inject
+    public DeleteQuoteCommand(QuotesDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "delquote";
@@ -32,7 +41,6 @@ public class DeleteQuoteCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         int idToDelete = Integer.parseInt(ce.getCommandArgs()[1]);
-        QuotesDao dao = new QuotesDaoImpl(ce.getMCHelper().getDatabase());
         if (dao.deleteQuote(idToDelete, ce.getGuild(), ce.getUser().getIdLong())) {
             ce.sendReply("Quote successfully deleted.");
             return Status.SUCCESS;

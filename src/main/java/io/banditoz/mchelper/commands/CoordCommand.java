@@ -2,15 +2,24 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.database.CoordinatePoint;
+import io.banditoz.mchelper.database.dao.CoordsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.CoordinatePoint;
-import io.banditoz.mchelper.utils.database.dao.CoordsDao;
-import io.banditoz.mchelper.utils.database.dao.CoordsDaoImpl;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-@Requires(database = true)
+@Singleton
+@RequiresDatabase
 public class CoordCommand extends Command {
+    private final CoordsDao dao;
+
+    @Inject
+    public CoordCommand(CoordsDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "coords";
@@ -24,7 +33,6 @@ public class CoordCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        CoordsDao dao = new CoordsDaoImpl(ce.getDatabase());
         if (ce.getCommandArgs().length <= 1) {
             help(ce);
         }

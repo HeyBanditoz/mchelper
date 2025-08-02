@@ -1,21 +1,21 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.Arrays;
+import java.util.StringJoiner;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.CommandPermissions;
-import io.banditoz.mchelper.commands.logic.Requires;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
-import java.util.Arrays;
-import java.util.StringJoiner;
-
-@Requires(database = true)
+@Singleton
 public class GuildConfigCommand extends Command {
     @Override
     public String commandName() {

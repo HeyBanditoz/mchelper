@@ -1,9 +1,11 @@
 package io.banditoz.mchelper;
 
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.utils.ReactionRole;
 import io.banditoz.mchelper.utils.ReactionRoleMessage;
-import io.banditoz.mchelper.utils.database.dao.RolesDao;
-import io.banditoz.mchelper.utils.database.dao.RolesDaoImpl;
+import io.banditoz.mchelper.database.dao.RolesDao;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -21,16 +23,21 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import static io.banditoz.mchelper.utils.RoleReactionUtils.removeRoleAndUpdateMessage;
 
+@Singleton
+@RequiresDatabase
 public class RoleReactionListener extends ListenerAdapter {
-    private final MCHelper mcHelper;
+    private final ThreadPoolExecutor tpe;
     private final RolesDao dao;
     private final Logger LOGGER = LoggerFactory.getLogger(RoleReactionListener.class);
 
-    public RoleReactionListener(MCHelper mcHelper) {
-        this.mcHelper = mcHelper;
-        this.dao = new RolesDaoImpl(mcHelper.getDatabase());
+    @Inject
+    public RoleReactionListener(ThreadPoolExecutor tpe, RolesDao rolesDao) {
+        this.tpe = tpe;
+        this.dao = rolesDao;
     }
 
     @Override
@@ -39,7 +46,7 @@ public class RoleReactionListener extends ListenerAdapter {
         if (!event.isFromType(ChannelType.TEXT) || event.getUser().isBot()) {
             return;
         }
-        mcHelper.getThreadPoolExecutor().execute(() -> {
+        tpe.execute(() -> {
             try {
                 if (dao.getRoleReactions().contains(event.getMessageIdLong())) {
                     ReactionRole r = dao.getByEmote(event.getEmoji(), event.getGuild());
@@ -60,7 +67,7 @@ public class RoleReactionListener extends ListenerAdapter {
 
     @Override
     public void onRoleDelete(@NotNull RoleDeleteEvent event) {
-        mcHelper.getThreadPoolExecutor().execute(() -> {
+        tpe.execute(() -> {
             try {
                 Emoji removed = dao.removeRole(event.getRole());
                 removeRoleAndUpdateMessage(dao, removed, event.getGuild());
@@ -72,7 +79,7 @@ public class RoleReactionListener extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {
-        mcHelper.getThreadPoolExecutor().execute(() -> {
+        tpe.execute(() -> {
             try {
                 ReactionRoleMessage messageRole = dao.getMessageRole(event.getGuild());
                 if (messageRole != null && messageRole.messageId() == event.getMessageIdLong()) {
@@ -86,7 +93,7 @@ public class RoleReactionListener extends ListenerAdapter {
 
     @Override
     public void onMessageBulkDelete(@NotNull MessageBulkDeleteEvent event) {
-        mcHelper.getThreadPoolExecutor().execute(() -> {
+        tpe.execute(() -> {
             try {
                 ReactionRoleMessage messageRole = dao.getMessageRole(event.getGuild());
                 if (messageRole == null) {

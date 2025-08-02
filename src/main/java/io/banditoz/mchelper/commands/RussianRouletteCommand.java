@@ -1,20 +1,30 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.*;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-
 import java.security.SecureRandom;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.banditoz.mchelper.commands.logic.*;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+
+@Singleton
 public class RussianRouletteCommand extends Command {
+    private final ScheduledExecutorService scheduledExecutorService;
     private final Random random = new SecureRandom();
+
+    @Inject
+    public RussianRouletteCommand(ScheduledExecutorService scheduledExecutorService) {
+        this.scheduledExecutorService = scheduledExecutorService;
+    }
 
     @Override
     public String commandName() {
@@ -39,7 +49,7 @@ public class RussianRouletteCommand extends Command {
             return Status.FAIL; // bot does not have permissions or not in a voice channel
         }
         ce.sendReply(ce.getEvent().getMember().getEffectiveName() + " spins the cylinder...");
-        ce.getMCHelper().getSES().schedule(() -> {
+        scheduledExecutorService.schedule(() -> {
             try {
                 if (check(ce, vs)) {
                     if (random.nextDouble() <= 0.2) {

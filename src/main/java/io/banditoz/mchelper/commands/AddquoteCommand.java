@@ -1,9 +1,19 @@
 package io.banditoz.mchelper.commands;
 
+import java.sql.SQLException;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+
 import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.database.NamedQuote;
+import io.banditoz.mchelper.database.NamedQuote.Flag;
+import io.banditoz.mchelper.database.dao.QuotesDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.interactions.ButtonInteractable;
 import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.interactions.ModalInteractable;
@@ -11,10 +21,8 @@ import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.SnowflakeUtils;
-import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.NamedQuote.Flag;
-import io.banditoz.mchelper.utils.database.dao.QuotesDao;
-import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -23,16 +31,18 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
-import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
-
-@Requires(database = true)
+@Singleton
+@RequiresDatabase
 public class AddquoteCommand extends Command {
-    private QuotesDao qd;
+    private final QuotesDao qd;
+    private final InteractionListener interactionListener;
+
+    @Inject
+    public AddquoteCommand(QuotesDao qd,
+                           InteractionListener interactionListener) {
+        this.qd = qd;
+        this.interactionListener = interactionListener;
+    }
 
     @Override
     public String commandName() {
@@ -47,12 +57,6 @@ public class AddquoteCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        // hacky, fix this (maybe with DI?)
-        if (qd == null) {
-            qd = new QuotesDaoImpl(ce.getDatabase());
-        }
-
-        QuotesDao qd = new QuotesDaoImpl(ce.getDatabase());
         int id;
         MessageCreateBuilder message;
         Button b = Button.primary(UUID.randomUUID().toString(), "✏️");
@@ -76,10 +80,10 @@ public class AddquoteCommand extends Command {
         }
         nq.setId(id);
         ce.getEvent().getChannel().sendMessage(message.build()).queue(sentMessage -> {
-            ButtonInteractable bi = new ButtonInteractable(Map.of(b, a -> editQuote(a, nq, ce.getMCHelper().getInteractionListener())),
+            ButtonInteractable bi = new ButtonInteractable(Map.of(b, a -> editQuote(a, nq, interactionListener)),
                     user -> ce.getEvent().getMessage().getAuthor().equals(user),
                     60, sentMessage, ce);
-            ce.getMCHelper().getInteractionListener().addInteractable(bi);
+            interactionListener.addInteractable(bi);
         });
         return Status.SUCCESS;
     }

@@ -1,24 +1,33 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.plotter.TransactionHistoryPlotter;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Transaction;
-import io.banditoz.mchelper.utils.database.Type;
-import io.banditoz.mchelper.utils.database.dao.AccountsDao;
-import io.banditoz.mchelper.utils.database.dao.AccountsDaoImpl;
-import net.dv8tion.jda.api.entities.Guild;
-
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.Transaction;
+import io.banditoz.mchelper.database.Type;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.plotter.TransactionHistoryPlotter;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.Guild;
+
+@Singleton
+@RequiresDatabase
 public class GuildBalanceGraphCommand extends Command {
+    private final AccountsDao dao;
+
+    @Inject
+    public GuildBalanceGraphCommand(AccountsDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "gbalgraph";
@@ -33,7 +42,6 @@ public class GuildBalanceGraphCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         Guild g = ce.getGuild();
-        AccountsDao dao = new AccountsDaoImpl(ce.getDatabase());
         BigDecimal runningSum = BigDecimal.ZERO;
         List<Transaction> txns = dao.getAllTransactions();
         List<Transaction> newTxns = new ArrayList<>(txns.size());

@@ -1,10 +1,9 @@
 package io.banditoz.mchelper.interactions;
 
-import io.banditoz.mchelper.MCHelper;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 
-public record WrappedModalInteractionEvent(ModalInteractionEvent event, MCHelper mcHelper) implements Interaction {
+public record WrappedModalInteractionEvent(ModalInteractionEvent event, InteractionListener interactionListener) implements Interaction {
     @Override
     public User getUser() {
         return event.getUser();
@@ -12,6 +11,6 @@ public record WrappedModalInteractionEvent(ModalInteractionEvent event, MCHelper
 
     @Override
     public void removeListener() {
-        mcHelper.getInteractionListener().removeInteractableByModalId(event.getModalId());
+        interactionListener.removeInteractableByModalId(event.getModalId());
     }
 }

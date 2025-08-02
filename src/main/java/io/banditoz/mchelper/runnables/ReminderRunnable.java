@@ -1,10 +1,9 @@
 package io.banditoz.mchelper.runnables;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
-import io.banditoz.mchelper.utils.database.Reminder;
-import io.banditoz.mchelper.utils.database.dao.RemindersDao;
-import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
+import io.banditoz.mchelper.database.Reminder;
+import io.banditoz.mchelper.database.dao.RemindersDao;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -13,31 +12,32 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ReminderRunnable implements Runnable {
-    private final Reminder R;
-    private final MCHelper MCHELPER;
+    private final Reminder reminder;
+    private final RemindersDao dao;
+    private final JDA jda;
 
-    public ReminderRunnable(Reminder r, MCHelper mc) {
-        this.R = r;
-        this.MCHELPER = mc;
+    public ReminderRunnable(Reminder reminder, RemindersDao dao, JDA jda) {
+        this.reminder = reminder;
+        this.dao = dao;
+        this.jda = jda;
     }
 
     public Reminder getReminder() {
-        return R;
+        return reminder;
     }
 
     @Override
     public void run() {
         try {
-            RemindersDao dao = new RemindersDaoImpl(MCHELPER.getDatabase());
-            if (dao.isStillActiveOrNotDeleted(R.getId())) {
-                if (!R.isFromDm()) {
-                    TextChannel tc = MCHELPER.getJDA().getTextChannelById(R.getChannelId());
-                    tc.sendMessage(new MessageCreateBuilder().setContent(format(R)).setAllowedMentions(List.of(Message.MentionType.USER)).build()).queue();
+            if (dao.isStillActiveOrNotDeleted(reminder.getId())) {
+                if (!reminder.isFromDm()) {
+                    TextChannel tc = jda.getTextChannelById(reminder.getChannelId());
+                    tc.sendMessage(new MessageCreateBuilder().setContent(format(reminder)).setAllowedMentions(List.of(Message.MentionType.USER)).build()).queue();
                 }
                 else {
-                    MCHELPER.getJDA().retrieveUserById(R.getAuthorId()).complete().openPrivateChannel().complete().sendMessage(format(R)).queue();
+                    jda.retrieveUserById(reminder.getAuthorId()).complete().openPrivateChannel().complete().sendMessage(format(reminder)).queue();
                 }
-                dao.markReminded(R.getId());
+                dao.markReminded(reminder.getId());
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(ReminderRunnable.class).error("Error while sending/marking the reminder.", e);

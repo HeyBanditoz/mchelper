@@ -1,31 +1,29 @@
 package io.banditoz.mchelper.motd;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.dao.QuotesDao;
-import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
+import java.awt.Color;
+import java.sql.SQLException;
+
+import io.avaje.inject.BeanScope;
+import io.banditoz.mchelper.database.NamedQuote;
+import io.banditoz.mchelper.database.dao.QuotesDao;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-
-import java.awt.Color;
-import java.sql.SQLException;
 
 public abstract class AbstractQotdMotdSectionGenerator extends MotdSectionGenerator {
     protected final boolean onlyExcluded;
     protected final Color embedColor;
 
-    public AbstractQotdMotdSectionGenerator(MCHelper mcHelper, boolean onlyExcluded, Color embedColor) {
-        super(mcHelper);
+    public AbstractQotdMotdSectionGenerator(BeanScope beanScope, boolean onlyExcluded, Color embedColor) {
+        super(beanScope);
         this.onlyExcluded = onlyExcluded;
         this.embedColor = embedColor;
     }
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
-        QuotesDao dao = new QuotesDaoImpl(mcHelper.getDatabase());
         try {
-            NamedQuote nq = dao.getRandomQotd(tc.getGuild(), onlyExcluded);
+            NamedQuote nq = beanScope.get(QuotesDao.class).getRandomQotd(tc.getGuild(), onlyExcluded);
             if (nq == null) {
                 return null; // guild has no quotes, rip
             }

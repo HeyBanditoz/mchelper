@@ -82,17 +82,17 @@ create_image:
     only:
         - master
 
-new_commands:
-    stage: deploy
-    needs: ["coverage"]
-    dependencies:
-        - coverage
-    script:
-        - cp -v COMMANDS.md COMMANDS_OLD.md
-        - echo "$PRIVATE_TOKEN" > token
-        - apt update
-        - apt -y install curl
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle run --args="dumpcommands"
-        - bash push_commands_to_gitlab.sh
-    only:
-        - master
+#new_commands:
+#    stage: deploy
+#    needs: ["coverage"]
+#    dependencies:
+#        - coverage
+#    script:
+#        - cp -v COMMANDS.md COMMANDS_OLD.md
+#        - echo "$PRIVATE_TOKEN" > token
+#        - apt update
+#        - apt -y install curl
+#        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle run --args="dumpcommands"
+#        - bash push_commands_to_gitlab.sh
+#    only:
+#        - master

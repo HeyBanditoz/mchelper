@@ -1,28 +1,43 @@
 package io.banditoz.mchelper.regexable;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.ClassUtils;
+import io.banditoz.mchelper.stats.service.StatsRecorder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 
+@Singleton
 public class RegexableHandler extends ListenerAdapter {
-    private final List<Regexable> regexables;
-    private final Logger LOGGER = LoggerFactory.getLogger(RegexableHandler.class);
-    private final MCHelper MCHELPER;
+    private final ThreadPoolExecutor threadPoolExecutor;
+    private final StatsRecorder statsRecorder;
     private final ConfigurationProvider config;
+    private final List<Regexable> regexables;
+    private static final Logger log = LoggerFactory.getLogger(RegexableHandler.class);
+
+    @Inject
+    public RegexableHandler(ThreadPoolExecutor threadPoolExecutor,
+                            StatsRecorder statsRecorder,
+                            ConfigurationProvider config,
+                            List<Regexable> regexables) {
+        this.threadPoolExecutor = threadPoolExecutor;
+        this.statsRecorder = statsRecorder;
+        this.config = config;
+        this.regexables = regexables;
+        log.info("{} regexables registered.", regexables.size());
+    }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -30,7 +45,7 @@ public class RegexableHandler extends ListenerAdapter {
         // don't try to run a listener if a command is (probably) present
         if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && config.getValue(Config.PREFIX, event.getGuild()).charAt(0) == event.getMessage().getContentRaw().charAt(0)) return;
 
-        getRegexableByEvent(event).forEach(r -> MCHELPER.getThreadPoolExecutor().execute(() -> {
+        getRegexableByEvent(event).forEach(r -> threadPoolExecutor.execute(() -> {
             if (r.handleCooldown(event.getChannel().getId())) {
                 long before = System.nanoTime();
                 try {
@@ -41,14 +56,14 @@ public class RegexableHandler extends ListenerAdapter {
                     // instead of twice.
                     if (m.find()) {
                         // regex matched... let's continue.
-                        RegexCommandEvent rce = new RegexCommandEvent(event, MCHELPER, m.group(), r.LOGGER, r.getClass().getSimpleName());
+                        RegexCommandEvent rce = new RegexCommandEvent(event, m.group(), r.LOGGER, r.getClass().getSimpleName(), config);
                         try {
                             Status status = r.onRegexCommand(rce);
                             Stat s = new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, status);
-                            MCHELPER.getStatsRecorder().record(s);
-                            LOGGER.info(s.getLogMessage());
+                            statsRecorder.record(s);
+                            log.info(s.getLogMessage());
                         } catch (Exception e) {
-                            MCHELPER.getStatsRecorder().record(new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, Status.EXCEPTIONAL_FAILURE));
+                            statsRecorder.record(new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, Status.EXCEPTIONAL_FAILURE));
                             CommandUtils.sendExceptionMessage(event, e, r.LOGGER);
                         } catch (Throwable t) {
                             if (t instanceof OutOfMemoryError) {
@@ -58,7 +73,7 @@ public class RegexableHandler extends ListenerAdapter {
                         }
                     }
                     else {
-                        LOGGER.warn(r.getClass().getName() + " somehow passed initial filtering but now does not match! What the hell is happening?!");
+                        log.warn(r.getClass().getName() + " somehow passed initial filtering but now does not match! What the hell is happening?!");
                     }
                 } catch (Exception e) {
                     r.LOGGER.error("Regex processing threw exception!", e);
@@ -74,17 +89,5 @@ public class RegexableHandler extends ListenerAdapter {
 
     public List<Regexable> getRegexables() {
         return Collections.unmodifiableList(regexables);
-    }
-
-    public RegexableHandler(MCHelper mcHelper) throws Exception {
-        this.MCHELPER = mcHelper;
-        this.config = mcHelper.getConfigurationProvider();
-        regexables = new ArrayList<>();
-        LOGGER.info("Registering regexable listeners...");
-        long before = System.currentTimeMillis();
-        for (Class<? extends Regexable> clazz : ClassUtils.getAllSubtypesOf(Regexable.class)) {
-            regexables.add(clazz.getDeclaredConstructor().newInstance());
-        }
-        LOGGER.info(regexables.size() + " regexable listeners registered in " + (System.currentTimeMillis() - before) + " ms.");
     }
 }

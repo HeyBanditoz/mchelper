@@ -1,14 +1,5 @@
 package io.banditoz.mchelper.motd;
 
-import com.apptasticsoftware.rssreader.Channel;
-import com.apptasticsoftware.rssreader.Item;
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.config.Config;
-import io.banditoz.mchelper.config.ConfigurationProvider;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-
 import java.awt.Color;
 import java.util.Comparator;
 import java.util.List;
@@ -17,17 +8,27 @@ import java.util.Objects;
 
 import static io.banditoz.mchelper.utils.StringUtils.truncate;
 
+import com.apptasticsoftware.rssreader.Channel;
+import com.apptasticsoftware.rssreader.Item;
+import io.avaje.inject.BeanScope;
+import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.http.scraper.RssScraper;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+
 public class NewsHeadlineMotdSectionGenerator extends MotdSectionGenerator {
-    public NewsHeadlineMotdSectionGenerator(MCHelper mcHelper) {
-        super(mcHelper);
+    public NewsHeadlineMotdSectionGenerator(BeanScope beanScope) {
+        super(beanScope);
     }
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
-        ConfigurationProvider configurationProvider = mcHelper.getConfigurationProvider();
+        ConfigurationProvider configurationProvider = beanScope.get(ConfigurationProvider.class);
         String[] urls = configurationProvider.getValue(Config.RSS_URLS, tc.getGuild()).split(" ");
 
-        Map<Channel, List<Item>> stories = mcHelper.getRssScraper().getRssForAll(urls);
+        Map<Channel, List<Item>> stories = beanScope.get(RssScraper.class).getRssForAll(urls);
         EmbedBuilder eb = new EmbedBuilder().setTitle("News Stories Today").setColor(new Color(23, 183, 204));
         stories.keySet()
                 .stream()

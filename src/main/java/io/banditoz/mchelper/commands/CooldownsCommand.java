@@ -1,14 +1,21 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.entities.User;
-
 import java.util.List;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.User;
+
+@Singleton
 public class CooldownsCommand extends Command {
+    @Inject
+    CommandHandler commandHandler;
+
     @Override
     public String commandName() {
         return "cooldowns";
@@ -32,7 +39,7 @@ public class CooldownsCommand extends Command {
         }
 
         StringBuilder sb = new StringBuilder("```\n");
-        for (Command command : ce.getMCHelper().getCommandHandler().getCommands()) {
+        for (Command command : commandHandler.getCommands()) {
             if (command.getCooldown() != null) {
                 switch (command.getCooldown().getType()) {
                     case PER_GUILD:

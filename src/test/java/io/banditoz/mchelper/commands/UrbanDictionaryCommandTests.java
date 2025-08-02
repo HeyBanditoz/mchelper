@@ -1,12 +1,18 @@
 package io.banditoz.mchelper.commands;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+
+import io.banditoz.mchelper.Http;
+import io.banditoz.mchelper.ObjectMapperFactory;
+import io.banditoz.mchelper.urbandictionary.UDSearcher;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.spy;
-
 public class UrbanDictionaryCommandTests extends BaseCommandTest {
-    private final UrbanDictionaryCommand udc = spy(UrbanDictionaryCommand.class);
+    private final UrbanDictionaryCommand udc;
+
+    public UrbanDictionaryCommandTests() {
+        this.udc = new UrbanDictionaryCommand(new UDSearcher(new Http(new ObjectMapperFactory().objectMapper()).getUrbanDictionaryClient()));
+    }
 
     @Test
     public void testUrbanDictionaryCommand() throws Exception {

@@ -1,15 +1,18 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.dao.QuotesDao;
-import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.testng.annotations.Test;
-
 import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
+import io.banditoz.mchelper.database.NamedQuote;
+import io.banditoz.mchelper.database.dao.QuotesDao;
+import io.banditoz.mchelper.database.dao.QuotesDaoImpl;
+import io.banditoz.mchelper.interactions.InteractionListener;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.testng.annotations.Test;
 
 @Test(dependsOnGroups = {"DatabaseInitializationTests"})
 public class QuoteCommandTests extends BaseCommandTest {
@@ -19,10 +22,10 @@ public class QuoteCommandTests extends BaseCommandTest {
     private final QuotesDao dao;
 
     public QuoteCommandTests() {
-        this.ac = new AddquoteCommand();
-        this.qc = new QuoteCommand();
-        this.dqc = new DeleteQuoteCommand();
-        this.dao = new QuotesDaoImpl(mcHelper.getDatabase());
+        this.dao = new QuotesDaoImpl(DB);
+        this.ac = new AddquoteCommand(dao, mock(InteractionListener.class));
+        this.qc = new QuoteCommand(dao, mock(JDA.class));
+        this.dqc = new DeleteQuoteCommand(dao);
     }
 
     public void testAddquote() throws Exception {

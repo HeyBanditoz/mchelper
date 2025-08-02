@@ -1,8 +1,16 @@
 package io.banditoz.mchelper;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import io.banditoz.mchelper.database.dao.GuildConfigDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import jakarta.inject.Inject;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,21 +23,25 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
+@RequiresDatabase
 public class GuildVoiceListener extends ListenerAdapter {
-    private final MCHelper mcHelper;
+    private final JDA jda;
+    private final GuildConfigDao configDao;
+    private final ConfigurationProvider config;
     private static final Logger log = LoggerFactory.getLogger(GuildVoiceListener.class);
 
-    public GuildVoiceListener(MCHelper mcHelper) {
-        this.mcHelper = mcHelper;
+    @Inject
+    public GuildVoiceListener(JDA jda,
+                              ConfigurationProvider config,
+                              GuildConfigDao configDao) {
+        this.jda = jda;
+        this.config = config;
+        this.configDao = configDao;
     }
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
-        GuildConfigurationProvider config = new GuildConfigurationProvider(event.getGuild(), event.getMember().getUser(), mcHelper);
+        GuildConfigurationProvider config = new GuildConfigurationProvider(event.getGuild(), event.getMember().getUser(), this.config);
         if (event.getMember().getUser().isBot()) {
             return;
         }
@@ -41,7 +53,7 @@ public class GuildVoiceListener extends ListenerAdapter {
             log.debug("There is no role in guild {} by id {}. Skipping role update.", g, roleId);
             return;
         }
-        if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+        if (!g.getMemberById(jda.getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
             return;
         }
         if (event.getChannelLeft() != null && event.getChannelJoined() != null) {
@@ -66,23 +78,24 @@ public class GuildVoiceListener extends ListenerAdapter {
         }
     }
 
+    @PostConstruct
     public void updateAll() {
         log.info("Updating all guild voice rules due to status change...");
         AtomicInteger i = new AtomicInteger();
         Map<Long, String> allGuildsWith;
         try {
-            allGuildsWith = new GuildConfigDaoImpl(mcHelper.getDatabase()).getAllGuildsWith(Config.VOICE_ROLE_ID);
+            allGuildsWith = configDao.getAllGuildsWith(Config.VOICE_ROLE_ID);
         } catch (Exception e) {
             log.error("Encountered Exception while updating all voice roles.", e);
             return;
         }
         allGuildsWith.forEach((guildId, voiceRoleId) -> {
-            Guild g = mcHelper.getJDA().getGuildById(guildId);
+            Guild g = jda.getGuildById(guildId);
             if (g == null) {
                 return;
             }
             if (!voiceRoleId.equals("0")) {
-                if (!g.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+                if (!g.getMemberById(jda.getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
                     return;
                 }
                 Role toChange = g.getRoleById(voiceRoleId);

@@ -1,30 +1,36 @@
 package io.banditoz.mchelper.runnables;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.PollService;
-import io.banditoz.mchelper.utils.database.Poll;
-import io.banditoz.mchelper.utils.database.dao.PollsDao;
-import io.banditoz.mchelper.utils.database.dao.PollsDaoImpl;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 
+import io.banditoz.mchelper.PollService;
+import io.banditoz.mchelper.database.Poll;
+import io.banditoz.mchelper.database.dao.PollsDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Singleton
+@RequiresDatabase
 public class PollCullerRunnable implements Runnable {
     private final PollService pollService;
     private final PollsDao pollsDao;
     private final JDA jda;
     private static final Logger log = LoggerFactory.getLogger(PollCullerRunnable.class);
 
-    public PollCullerRunnable(MCHelper mcHelper) {
-        this.pollService = mcHelper.getPollService();
-        this.pollsDao = new PollsDaoImpl(mcHelper.getDatabase());
-        this.jda = mcHelper.getJDA();
+    @Inject
+    public PollCullerRunnable(PollService pollService,
+                              PollsDao pollsDao,
+                              JDA jda) {
+        this.pollService = pollService;
+        this.pollsDao = pollsDao;
+        this.jda = jda;
     }
 
     @Override

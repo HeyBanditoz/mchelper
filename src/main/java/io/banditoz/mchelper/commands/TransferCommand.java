@@ -1,18 +1,27 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.stats.Stat;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
+@RequiresDatabase
 public class TransferCommand extends Command {
+    private final AccountManager accountManager;
+
+    @Inject
+    public TransferCommand(AccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
+
     @Override
     public String commandName() {
         return "transfer";
@@ -26,15 +35,14 @@ public class TransferCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        AccountManager am = ce.getMCHelper().getAccountManager();
         //if account is blacklisted apply a 95% tax to transfers
-        if (am.isUserShadowbanned(ce.getEvent().getAuthor())) {
+        if (accountManager.isUserShadowbanned(ce.getEvent().getAuthor())) {
             long to = ce.getMentionedMembers().get(0).getIdLong();
             BigDecimal amount = new BigDecimal(ce.getRawCommandArgs()[2]);
             BigDecimal deduction = amount.multiply(BigDecimal.valueOf(0.95));
             amount = amount.multiply(BigDecimal.valueOf(0.05));
-            am.remove(deduction, ce.getEvent().getAuthor().getIdLong(), "transfer tax");
-            BigDecimal remainingAmount = ce.getMCHelper().getAccountManager().transferTo(
+            accountManager.remove(deduction, ce.getEvent().getAuthor().getIdLong(), "transfer tax");
+            BigDecimal remainingAmount = accountManager.transferTo(
                     amount,
                     ce.getEvent().getAuthor().getIdLong(),
                     to,
@@ -47,7 +55,7 @@ public class TransferCommand extends Command {
         else {
             long to = ce.getMentionedMembers().get(0).getIdLong();
             BigDecimal amount = new BigDecimal(ce.getRawCommandArgs()[2]);
-            BigDecimal remainingAmount = ce.getMCHelper().getAccountManager().transferTo(
+            BigDecimal remainingAmount = accountManager.transferTo(
                     amount,
                     ce.getEvent().getAuthor().getIdLong(),
                     to,

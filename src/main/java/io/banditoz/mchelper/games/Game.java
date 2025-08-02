@@ -1,15 +1,14 @@
 package io.banditoz.mchelper.games;
 
-import io.banditoz.mchelper.MCHelper;
+import java.math.BigDecimal;
+import java.util.concurrent.ScheduledExecutorService;
+
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
-import java.util.concurrent.ScheduledExecutorService;
 
 public abstract class Game {
     protected final BigDecimal low;
@@ -18,20 +17,20 @@ public abstract class Game {
     private final AccountManager am;
     protected final User player;
     protected final BigDecimal ante;
-    private final MCHelper mcHelper;
+    protected final ScheduledExecutorService ses;
     public static final BigDecimal TWO = new BigDecimal("2");
     public static final BigDecimal THREE = new BigDecimal("3");
     protected final Logger LOGGER;
     private final String gameId = RandomStringUtils.randomAlphanumeric(6); // 44261653680 possibilities
 
-    Game(int low, int high, MCHelper mcHelper, User u, BigDecimal ante) {
+    Game(int low, int high, User u, BigDecimal ante, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
         this.low = new BigDecimal(low);
         this.high = new BigDecimal(high);
-        this.gm = mcHelper.getGameManager();
-        this.am = mcHelper.getAccountManager();
+        this.gm = gm;
+        this.am = am;
+        this.ses = ses;
         this.player = u;
         this.ante = ante;
-        this.mcHelper = mcHelper;
         this.LOGGER = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -73,6 +72,6 @@ public abstract class Game {
     }
 
     protected ScheduledExecutorService getScheduledExecutorService() {
-        return mcHelper.getSES();
+        return ses;
     }
 }

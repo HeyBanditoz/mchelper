@@ -1,19 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.money.Task;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.TaskResponse;
-import io.banditoz.mchelper.utils.database.dao.TasksDao;
-import io.banditoz.mchelper.utils.database.dao.TasksDaoImpl;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.utils.TimeFormat;
-
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -23,13 +9,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Requires(database = true)
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.inject.PostConstruct;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.TaskResponse;
+import io.banditoz.mchelper.database.dao.TasksDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.Task;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.TimeFormat;
+
+@Singleton
+@RequiresDatabase
 public class WorkCommand extends Command {
+    private final ObjectMapper objectMapper;
+    private final AccountManager am;
+    private final TasksDao dao;
+
     private final List<TaskResponse> workResponses = new ArrayList<>();
     private final List<TaskResponse> rareResponses = new ArrayList<>();
     private final Random random = new SecureRandom();
     private static final Color rareColor = new Color(219, 173, 44);
     private static final BigDecimal five = new BigDecimal("5");
+
+    @Inject
+    public WorkCommand(ObjectMapper objectMapper,
+                       AccountManager am,
+                       TasksDao dao) {
+        this.objectMapper = objectMapper;
+        this.am = am;
+        this.dao = dao;
+    }
+
+    @PostConstruct
+    public void populateResponses() {
+        try {
+            List<TaskResponse> tempList = objectMapper.readValue(getClass().getClassLoader()
+                    .getResource("tasks_responses.json")
+                    .openStream(), objectMapper.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
+            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::notRare).forEach(workResponses::add);
+            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::rare).forEach(rareResponses::add);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     @Override
     public String commandName() {
@@ -44,17 +73,6 @@ public class WorkCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (workResponses.isEmpty()) {
-            // lazy evaluation I guess, lol
-            ObjectMapper om = ce.getMCHelper().getObjectMapper();
-            List<TaskResponse> tempList = om.readValue(getClass().getClassLoader()
-                    .getResource("tasks_responses.json")
-                    .openStream(), om.getTypeFactory().constructCollectionType(List.class, TaskResponse.class));
-            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::notRare).forEach(workResponses::add);
-            tempList.stream().filter(t -> t.task() == Task.WORK).filter(TaskResponse::rare).forEach(rareResponses::add);
-        }
-        TasksDao dao = new TasksDaoImpl(ce.getDatabase());
-        AccountManager am = ce.getMCHelper().getAccountManager();
         LocalDateTime ldt = dao.getWhenCanExecute(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {
             BigDecimal randAmount = Task.WORK.getRandomAmount();

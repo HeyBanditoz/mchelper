@@ -1,15 +1,19 @@
 package io.banditoz.mchelper.weather.geocoder;
 
+import java.util.List;
+
 import io.banditoz.mchelper.http.NominatimClient;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 
-import java.util.List;
-
+@Singleton
 public class NominatimLocationService {
     private final NominatimClient client;
     private final Cache<String, List<Location>> locationCache;
 
+    @Inject
     public NominatimLocationService(NominatimClient client) {
         this.client = client;
         this.locationCache = new Cache2kBuilder<String, List<Location>>() {}

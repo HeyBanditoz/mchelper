@@ -1,6 +1,5 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.MCHelper;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -10,7 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  */
 public abstract class ElevatedCommand extends Command {
     @Override
-    protected boolean canExecute(MessageReceivedEvent e, MCHelper mcHelper) {
+    protected boolean canExecute(MessageReceivedEvent e) {
         if (CommandPermissions.isBotOwner(e.getAuthor())) {
             return true;
         }

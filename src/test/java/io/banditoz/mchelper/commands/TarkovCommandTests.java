@@ -1,11 +1,22 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.banditoz.mchelper.Http;
+import io.banditoz.mchelper.ObjectMapperFactory;
+import io.banditoz.mchelper.tarkovmarket.TarkovMarketSearcher;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 public class TarkovCommandTests extends BaseCommandTest {
-    private final TarkovCommand tc = new TarkovCommand();
+    private TarkovCommand tc;
+
+    @BeforeClass
+    public void tarkovCommand() {
+        Http http = new Http(new ObjectMapperFactory().objectMapper());
+        TarkovMarketSearcher searcher = new TarkovMarketSearcher(http.getTarkovClient());
+        tc = new TarkovCommand(searcher);
+    }
 
     @Test
     public void testTarkovCommand() throws Exception {

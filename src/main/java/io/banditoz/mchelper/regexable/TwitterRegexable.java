@@ -2,10 +2,12 @@ package io.banditoz.mchelper.regexable;
 
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Status;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.Permission;
 
 import java.util.regex.Pattern;
 
+@Singleton
 public class TwitterRegexable extends Regexable {
     private static final Pattern PATTERN = Pattern.compile("https://(www.)?(twitter|x).com/\\w{1,45}/status/\\d+");
 

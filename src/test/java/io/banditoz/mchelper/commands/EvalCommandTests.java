@@ -1,17 +1,17 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import org.testng.annotations.Test;
+
 public class EvalCommandTests extends BaseCommandTest {
     private final EvalCommand ec;
 
     public EvalCommandTests() {
-        this.ec = spy(new EvalCommand());
+        this.ec = spy(new EvalCommand(null));
         when(ce.getEvent().isFromType(any())).thenReturn(true);
     }
 

@@ -2,15 +2,24 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
+import io.banditoz.mchelper.database.Reminder;
+import io.banditoz.mchelper.database.dao.RemindersDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Reminder;
-import io.banditoz.mchelper.utils.database.dao.RemindersDao;
-import io.banditoz.mchelper.utils.database.dao.RemindersDaoImpl;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-@Requires(database = true)
+@Singleton
+@RequiresDatabase
 public class DeleteReminderCommand extends Command {
+    private final RemindersDao dao;
+
+    @Inject
+    public DeleteReminderCommand(RemindersDao dao) {
+        this.dao = dao;
+    }
+
     @Override
     public String commandName() {
         return "delremind";
@@ -25,7 +34,6 @@ public class DeleteReminderCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         int id = Integer.parseInt(ce.getCommandArgsString());
-        RemindersDao dao = new RemindersDaoImpl(ce.getDatabase());
         Reminder r = dao.getReminderById(id);
         if (r == null || r.getAuthorId() != ce.getEvent().getAuthor().getIdLong()) {
             ce.sendReply("Reminder does not exist or you did not write the reminder.");

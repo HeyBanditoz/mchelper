@@ -6,7 +6,9 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.github.tfriedrichs.dicebot.expression.DiceExpression;
 import io.github.tfriedrichs.dicebot.result.DiceResultPrettyPrinter;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class DiceRollerCommand extends Command {
     @Override
     public String commandName() {

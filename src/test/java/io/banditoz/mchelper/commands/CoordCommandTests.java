@@ -1,13 +1,14 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 
+import io.banditoz.mchelper.database.dao.CoordsDaoImpl;
+import org.testng.annotations.Test;
+
 @Test(dependsOnGroups = {"DatabaseInitializationTests"})
 public class CoordCommandTests extends BaseCommandTest {
-    private final CoordCommand cc = spy(CoordCommand.class);
+    private final CoordCommand cc = spy(new CoordCommand(new CoordsDaoImpl(DB)));
 
     @Test
     public void testCoordinateAdd() throws Exception {

@@ -1,11 +1,16 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.MCHelperTestImpl;
+import java.util.Collections;
+import java.util.List;
+
+import static io.banditoz.mchelper.utils.Whitebox.setInternalState;
+import static org.mockito.Mockito.*;
+
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.Database;
+import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
 import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.utils.database.Database;
 import io.opentelemetry.api.OpenTelemetry;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -17,13 +22,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static io.banditoz.mchelper.utils.Whitebox.setInternalState;
-import static org.mockito.Mockito.*;
 
 /**
  * The base class that all command-based tests should extend. If you want to add functionality to a test, if it can be
@@ -40,8 +38,6 @@ public abstract class BaseCommandTest {
     protected final ArgumentCaptor<List<MessageEmbed>> embedsCaptor;
     /** The {@link ArgumentCaptor} for capturing {@link MessageChannel#sendMessage(Message)} */
     protected final ArgumentCaptor<MessageCreateData> messageCaptor;
-    /** The {@link MCHelper} instance. */
-    protected final MCHelper mcHelper;
     protected final MessageReceivedEvent mre;
     protected final Message m;
     protected final static Database DB;
@@ -50,7 +46,7 @@ public abstract class BaseCommandTest {
     static {
         if (Database.isConfigured()) {
             DB = new Database(OpenTelemetry.noop());
-            AM = new AccountManager(DB);
+            AM = new AccountManager(new AccountsDaoImpl(DB));
         }
         else {
             DB = null;
@@ -96,13 +92,6 @@ public abstract class BaseCommandTest {
         when(m.clearReactions()).thenReturn(mock(RestAction.class));
         when(ce.getEvent()).thenReturn(mre);
         when(ce.getEvent().getJDA()).thenReturn(j);
-        when(ce.getDatabase()).thenReturn(DB);
-        this.mcHelper = spy(MCHelperTestImpl.class);
-        when(mcHelper.getDatabase()).thenReturn(DB);
-        when(mcHelper.getAccountManager()).thenReturn(AM);
-        when(mcHelper.getJDA()).thenReturn(j);
-        when(mcHelper.getSES()).thenReturn(mock(ScheduledExecutorService.class));
-        when(ce.getMCHelper()).thenReturn(mcHelper);
         when(ce.getUser()).thenReturn(u);
     }
 

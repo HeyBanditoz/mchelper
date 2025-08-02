@@ -1,18 +1,20 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+
+@Singleton
 public class TeamsCommand extends Command {
     @Override
     public String commandName() {

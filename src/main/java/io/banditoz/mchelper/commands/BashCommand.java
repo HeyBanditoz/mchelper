@@ -5,7 +5,9 @@ import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.ProcessUtils;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class BashCommand extends ElevatedCommand {
     @Override
     public String commandName() {

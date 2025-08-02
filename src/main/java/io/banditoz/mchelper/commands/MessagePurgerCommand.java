@@ -1,9 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -12,11 +18,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
+@Singleton
 public class MessagePurgerCommand extends ElevatedCommand {
     private static final Logger log = LoggerFactory.getLogger(MessagePurgerCommand.class);
 
@@ -41,7 +43,7 @@ public class MessagePurgerCommand extends ElevatedCommand {
 
         GuildMessageChannel channel = args.getString("channel") == null ?
                 ce.getEvent().getChannel().asGuildMessageChannel() :
-                ce.getMCHelper().getJDA().getTextChannelById(args.getString("channel"));
+                ce.getEvent().getJDA().getTextChannelById(args.getString("channel"));
 
         List<Message> messagesToDelete = new ArrayList<>();
         // should probably rewrite this to just be async...

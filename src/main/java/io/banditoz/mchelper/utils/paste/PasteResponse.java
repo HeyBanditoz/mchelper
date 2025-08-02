@@ -1,9 +1,9 @@
 package io.banditoz.mchelper.utils.paste;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
 
 public class PasteResponse {
     @JsonProperty("status")
@@ -29,6 +29,10 @@ public class PasteResponse {
     @JsonProperty("result")
     public void setResult(Result result) {
         this.result = result;
+    }
+
+    public String getPasteId() {
+        return result.getId();
     }
 }
 

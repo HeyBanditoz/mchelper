@@ -1,10 +1,5 @@
 package io.banditoz.mchelper.tarkovmarket;
 
-import com.google.common.base.Suppliers;
-import io.banditoz.mchelper.MCHelper;
-import me.xdrop.fuzzywuzzy.FuzzySearch;
-import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,12 +7,21 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
+import io.banditoz.mchelper.http.TarkovClient;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
+
+@Singleton
 public class TarkovMarketSearcher {
-    private final MCHelper MCHELPER;
+    private final TarkovClient tarkovClient;
     private final Supplier<List<Item>> CACHE = Suppliers.memoizeWithExpiration(this::findAllItems, 15, TimeUnit.MINUTES);
 
-    public TarkovMarketSearcher(MCHelper mcHelper) {
-        this.MCHELPER = mcHelper;
+    @Inject
+    public TarkovMarketSearcher(TarkovClient tarkovClient) {
+        this.tarkovClient = tarkovClient;
     }
 
     public List<Item> getMarketResultsBySearch(final String search) {
@@ -82,7 +86,7 @@ public class TarkovMarketSearcher {
                     shortName
                   }
                 }""";
-        Response data = MCHELPER.getHttp().getTarkovClient().getTarkovMarketData(Map.of("query", query));
+        Response data = tarkovClient.getTarkovMarketData(Map.of("query", query));
         // filter out flea market from all results
         for (Item item : data.data().items()) {
             item.vendorPrices().removeIf(vendorPrice -> vendorPrice.vendor().vendorName() == VendorName.FLEA);

@@ -4,11 +4,10 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
+import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
-import io.banditoz.mchelper.utils.database.Database;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -20,20 +19,18 @@ import org.slf4j.Logger;
 
 public class RegexCommandEvent implements UserEvent {
     protected final MessageReceivedEvent EVENT;
-    private final MCHelper MCHELPER;
     private final Logger LOGGER;
     protected final String ARGS;
     protected final String CLASS_NAME;
     protected final LocalDateTime EXECUTED_WHEN = LocalDateTime.now(); // hopefully accurate within a second
     protected final GuildConfigurationProvider CONFIG;
 
-    public RegexCommandEvent(@NotNull MessageReceivedEvent event, MCHelper mcHelper, String args, Logger logger, String className) {
+    public RegexCommandEvent(@NotNull MessageReceivedEvent event, String args, Logger logger, String className, ConfigurationProvider configurationProvider) {
         this.EVENT = event;
-        this.MCHELPER = mcHelper;
         this.ARGS = args;
         this.LOGGER = logger;
         this.CLASS_NAME = className;
-        this.CONFIG = new GuildConfigurationProvider(this);
+        this.CONFIG = new GuildConfigurationProvider(this, configurationProvider);
     }
 
     public MessageReceivedEvent getEvent() {
@@ -46,10 +43,6 @@ public class RegexCommandEvent implements UserEvent {
 
     public String getArgs() {
         return ARGS;
-    }
-
-    public MCHelper getMCHelper() {
-        return MCHELPER;
     }
 
     /**
@@ -101,11 +94,6 @@ public class RegexCommandEvent implements UserEvent {
     @Override
     public Guild getGuild() {
         return EVENT.getGuild();
-    }
-
-    @Override
-    public Database getDatabase() {
-        return MCHELPER.getDatabase();
     }
 
     @Override

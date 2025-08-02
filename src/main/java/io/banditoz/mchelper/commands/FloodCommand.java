@@ -1,14 +1,16 @@
 package io.banditoz.mchelper.commands;
 
+import java.time.temporal.ChronoUnit;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.Cooldown;
 import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 
-import java.time.temporal.ChronoUnit;
-
+@Singleton
 public class FloodCommand extends Command {
     @Override
     public String commandName() {

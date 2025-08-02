@@ -1,16 +1,6 @@
 package io.banditoz.mchelper.commands;
 
-import com.sun.management.OperatingSystemMXBean;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.dao.StatisticsDao;
-import io.banditoz.mchelper.utils.database.dao.StatisticsDaoImpl;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.utils.TimeFormat;
-
+import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
@@ -21,7 +11,30 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sun.management.OperatingSystemMXBean;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.CommandHandler;
+import io.banditoz.mchelper.database.dao.StatisticsDao;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.TimeFormat;
+
+@Singleton
 public class InfoCommand extends Command {
+    // TODO kludge
+    @Inject
+    CommandHandler commandHandler;
+    @Inject
+    ThreadPoolExecutor tpe;
+    @Inject
+    @Nullable
+    StatisticsDao dao;
+
     private static final Pattern LOAD_PATTERN = Pattern.compile("(?:\\S+\\s+){2}\\S+");
 
     @Override
@@ -49,11 +62,9 @@ public class InfoCommand extends Command {
         int totalUsers = users.size();
         long distinctUsers = users.stream().distinct().count();
 
-        StatisticsDao dao = ce.getDatabase() == null ? null : new StatisticsDaoImpl(ce.getDatabase());
-        int commandsRun = ce.getMCHelper().getCommandHandler().getCommandsRun();
+        int commandsRun = commandHandler.getCommandsRun();
         int commandsRunEver = dao == null ? 0 : dao.getTotalCommandsRun();
 
-        ThreadPoolExecutor tpe = ce.getMCHelper().getThreadPoolExecutor();
         String version = """
                 %s %s
                 %s %s""".formatted(System.getProperty("java.runtime.name"), System.getProperty("java.runtime.version"), System.getProperty("java.vm.name"), System.getProperty("java.version"));

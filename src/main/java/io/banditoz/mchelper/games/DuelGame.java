@@ -1,6 +1,13 @@
 package io.banditoz.mchelper.games;
 
-import io.banditoz.mchelper.MCHelper;
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import io.banditoz.mchelper.interactions.ButtonInteractable;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
@@ -12,13 +19,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 public class DuelGame extends Game {
     private volatile User opponent;
     private static final Random RANDOM = new Random();
@@ -27,8 +27,8 @@ public class DuelGame extends Game {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DuelGame.class);
 
-    public DuelGame(BigDecimal ante, User player, MCHelper mcHelper) {
-        super(5, 200_000, mcHelper, player, ante);
+    public DuelGame(BigDecimal ante, User player, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
+        super(5, 200_000, player, ante, gm, am, ses);
     }
 
     public void enterGame(WrappedButtonClickEvent event) {

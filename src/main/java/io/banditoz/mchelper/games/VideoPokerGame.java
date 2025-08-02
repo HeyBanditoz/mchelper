@@ -1,6 +1,13 @@
 package io.banditoz.mchelper.games;
 
-import io.banditoz.mchelper.MCHelper;
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.StringJoiner;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static io.banditoz.mchelper.games.poker.PokerScoringEngine.evaluateVideoPoker;
+
 import io.banditoz.mchelper.games.poker.PokerResult;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
@@ -10,21 +17,14 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.StringJoiner;
-
-import static io.banditoz.mchelper.games.poker.PokerScoringEngine.evaluateVideoPoker;
-
 public class VideoPokerGame extends Game {
     private final Deck deck = new Deck();
     private final CardHoldingPair[] hand = new CardHoldingPair[5];
     private PokerResult currentResult = PokerResult.LOSS;
     private static final Logger log = LoggerFactory.getLogger(VideoPokerGame.class);
 
-    public VideoPokerGame(BigDecimal ante, User u, MCHelper mcHelper) {
-        super(100, 10000, mcHelper, u, ante);
+    public VideoPokerGame(BigDecimal ante, User u, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
+        super(100, 10000, u, ante, gm, am, ses);
     }
 
     @Override

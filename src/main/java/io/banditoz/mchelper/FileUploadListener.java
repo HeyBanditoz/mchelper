@@ -1,7 +1,17 @@
 package io.banditoz.mchelper;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import io.avaje.config.Config;
+import io.banditoz.mchelper.http.PasteggClient;
 import io.banditoz.mchelper.utils.paste.Paste;
-import io.banditoz.mchelper.utils.paste.PasteggUploader;
+import io.banditoz.mchelper.utils.paste.PasteResponse;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -10,24 +20,22 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.StringJoiner;
-
+@Singleton
 public class FileUploadListener extends ListenerAdapter {
-    private final MCHelper MCHELPER;
-    private final PasteggUploader UPLOADER;
-    private final Logger LOGGER = LoggerFactory.getLogger(FileUploadListener.class);
+    private final ThreadPoolExecutor threadPoolExecutor;
+    private final PasteggClient pasteggClient;
+    private static final Logger log = LoggerFactory.getLogger(FileUploadListener.class);
 
-    public FileUploadListener(MCHelper mcHelper) {
-        this.MCHELPER = mcHelper;
-        this.UPLOADER = new PasteggUploader(mcHelper);
+    @Inject
+    public FileUploadListener(ThreadPoolExecutor threadPoolExecutor,
+                              PasteggClient pasteggClient) {
+        this.threadPoolExecutor = threadPoolExecutor;
+        this.pasteggClient = pasteggClient;
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        MCHELPER.getThreadPoolExecutor().execute(() -> {
+        threadPoolExecutor.execute(() -> {
             Message m = event.getMessage();
             User u = event.getAuthor();
             if (!m.getAttachments().isEmpty()) {
@@ -38,7 +46,7 @@ public class FileUploadListener extends ListenerAdapter {
                         String c = a.getContentType();
                         if (c != null && (c.contains("text") || c.contains("json") || c.contains("xml") || c.contains("html"))) {
                             if (a.getSize() > 1024 * 512 ) { // 512 KB
-                                LOGGER.warn("Attachment {} from message {} is too big, with size {}.", a, m, a.getSize());
+                                log.warn("Attachment {} from message {} is too big, with size {}.", a, m, a.getSize());
                                 continue;
                             }
                             try (InputStream is = a.getProxy().download().get()) {
@@ -46,12 +54,14 @@ public class FileUploadListener extends ListenerAdapter {
                                 Paste p = new Paste(pasteContent, a.getFileName());
                                 p.setName(a.getFileName() + " by " + u.getName() + " (" + u.getId() + ")");
                                 p.setDescription("Automatically generated paste from message " + event.getMessageId());
-                                String pasteUrl = UPLOADER.uploadToPastegg(p);
-                                sj.add(a.getFileName() + ": " + pasteUrl);
+                                PasteResponse pasteResponse = pasteggClient.uploadPaste(p);
+                                String baseUrl = Config.get("mchelper.pastegg.base-url");
+                                baseUrl = (baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
+                                sj.add(a.getFileName() + ": " + baseUrl + pasteResponse.getPasteId());
                             }
                         }
                     } catch (Exception ex) {
-                        LOGGER.error("Could not download/upload attachment to paste service: " + a.toString(), ex);
+                        log.error("Could not download/upload attachment to paste service: " + a.toString(), ex);
                     }
                 }
                 if (!sj.toString().isEmpty()) {

@@ -1,11 +1,18 @@
 package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.CommandHandler;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class RemoveCommandCommand extends ElevatedCommand {
+    @Inject
+    CommandHandler commandHandler; // TODO kludge
+
     @Override
     public String commandName() {
         return "removecommand";
@@ -20,7 +27,7 @@ public class RemoveCommandCommand extends ElevatedCommand {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (ce.getMCHelper().getCommandHandler().removeCommandByName(ce.getCommandArgs()[1])) {
+        if (commandHandler.removeCommandByName(ce.getCommandArgs()[1])) {
             ce.sendReply("Command successfully removed for this runtime.");
             return Status.SUCCESS;
         }

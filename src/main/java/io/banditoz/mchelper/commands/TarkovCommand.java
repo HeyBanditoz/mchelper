@@ -1,17 +1,25 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.List;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.tarkovmarket.Item;
 import io.banditoz.mchelper.tarkovmarket.TarkovMarketSearcher;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.List;
-
+@Singleton
 public class TarkovCommand extends Command {
-    private TarkovMarketSearcher SEARCHER;
+    private final TarkovMarketSearcher tarkovMarketSearcher;
+
+    @Inject
+    public TarkovCommand(TarkovMarketSearcher tarkovMarketSearcher) {
+        this.tarkovMarketSearcher = tarkovMarketSearcher;
+    }
 
     @Override
     public String commandName() {
@@ -27,11 +35,7 @@ public class TarkovCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        if (SEARCHER == null) {
-            // TODO should rework this as a constructor instead, need to rewrite part of CommandHandler for that.
-            SEARCHER = new TarkovMarketSearcher(ce.getMCHelper());
-        }
-        List<MessageEmbed> results = SEARCHER.getMarketResultsBySearch(ce.getCommandArgsString()).stream().map(Item::getAsEmbed).toList();
+        List<MessageEmbed> results = tarkovMarketSearcher.getMarketResultsBySearch(ce.getCommandArgsString()).stream().map(Item::getAsEmbed).toList();
         if (results.isEmpty()) {
             ce.sendReply("No matches found.");
             return Status.FAIL;

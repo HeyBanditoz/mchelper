@@ -1,28 +1,29 @@
 package io.banditoz.mchelper.config;
 
+import javax.annotation.Nullable;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import com.google.common.collect.Sets;
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.commands.logic.CommandPermissions;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDao;
-import io.banditoz.mchelper.utils.database.dao.GuildConfigDaoImpl;
+import io.banditoz.mchelper.database.dao.GuildConfigDao;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Guild;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Singleton, caching provider for guild-level configurations.
  */
+@Singleton
 public class ConfigurationProvider {
     private static final Set<Config> allConfigs = new LinkedHashSet<>(List.of(Config.values()));
     private static final Logger log = LoggerFactory.getLogger(ConfigurationProvider.class);
-    private boolean notifiedDatabaseDown = false;
     private final GuildConfigDao dao;
     private final Cache<GuildCacheKey, String> cache = Cache2kBuilder.of(GuildCacheKey.class, String.class)
             .expireAfterWrite(1, TimeUnit.MINUTES)
@@ -30,14 +31,14 @@ public class ConfigurationProvider {
             .permitNullValues(true)
             .build();
 
-    public ConfigurationProvider(MCHelper mcHelper) {
-        if (mcHelper.getDatabase() == null && !notifiedDatabaseDown) {
-            log.warn("The database is down. All configurations will be default!");
-            notifiedDatabaseDown = true;
+    @Inject
+    public ConfigurationProvider(@Nullable GuildConfigDao gcDao) {
+        if (gcDao == null) {
+            log.warn("The database is not configured. All configurations will be default!");
             this.dao = null;
         }
         else {
-            this.dao = new GuildConfigDaoImpl(mcHelper.getDatabase());
+            this.dao = gcDao;
         }
     }
 

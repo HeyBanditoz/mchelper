@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
@@ -7,13 +10,20 @@ import io.banditoz.mchelper.urbandictionary.UDDefinition;
 import io.banditoz.mchelper.urbandictionary.UDResult;
 import io.banditoz.mchelper.urbandictionary.UDSearcher;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Singleton
 public class UrbanDictionaryCommand extends Command {
+    private final UDSearcher udSearcher;
+
+    @Inject
+    public UrbanDictionaryCommand(UDSearcher udSearcher) {
+        this.udSearcher = udSearcher;
+    }
+
     @Override
     public String commandName() {
         return "ud";
@@ -26,9 +36,7 @@ public class UrbanDictionaryCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        UDSearcher ud = new UDSearcher(ce.getMCHelper());
-        List<MessageEmbed> embeds = createPagesFromDefinition(ud.search(ce.getCommandArgsString()));
-
+        List<MessageEmbed> embeds = createPagesFromDefinition(udSearcher.search(ce.getCommandArgsString()));
         if (embeds.isEmpty()) {
             ce.sendReply("No definition found.");
             return Status.FAIL;

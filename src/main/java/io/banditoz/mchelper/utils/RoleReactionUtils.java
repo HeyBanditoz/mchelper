@@ -1,6 +1,6 @@
 package io.banditoz.mchelper.utils;
 
-import io.banditoz.mchelper.utils.database.dao.RolesDao;
+import io.banditoz.mchelper.database.dao.RolesDao;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

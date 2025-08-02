@@ -1,17 +1,6 @@
 package io.banditoz.mchelper.weather;
 
-import io.avaje.config.Config;
-import io.banditoz.mchelper.MCHelper;
-import io.banditoz.mchelper.UserEvent;
-import io.banditoz.mchelper.http.DarkSkyClient;
-import io.banditoz.mchelper.llm.LLMService;
-import io.banditoz.mchelper.llm.anthropic.AnthropicRequest;
-import io.banditoz.mchelper.weather.darksky.DSWeather;
-import io.banditoz.mchelper.weather.geocoder.Location;
-import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +8,22 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import io.avaje.config.Config;
+import io.avaje.inject.RequiresProperty;
+import io.banditoz.mchelper.UserEvent;
+import io.banditoz.mchelper.http.DarkSkyClient;
+import io.banditoz.mchelper.llm.LLMService;
+import io.banditoz.mchelper.llm.anthropic.AnthropicRequest;
+import io.banditoz.mchelper.weather.darksky.DSWeather;
+import io.banditoz.mchelper.weather.geocoder.Location;
+import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Singleton
+@RequiresProperty("mchelper.darksky.token")
 public class WeatherService {
     private final DarkSkyClient darkSkyClient;
     private final NominatimLocationService nominatimLocationService;
@@ -28,10 +33,13 @@ public class WeatherService {
     private static final DateTimeFormatter DT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm:ss z");
     private static final Logger log = LoggerFactory.getLogger(WeatherService.class);
 
-    public WeatherService(MCHelper mcHelper) {
-        this.darkSkyClient = mcHelper.getHttp().getDarkSkyClient();
-        this.nominatimLocationService = mcHelper.getNominatimLocationService();
-        this.llmService = mcHelper.getLLMService();
+    @Inject
+    public WeatherService(DarkSkyClient darkSkyClient,
+                          NominatimLocationService nominatimLocationService,
+                          @Nullable LLMService llmService) {
+        this.darkSkyClient = darkSkyClient;
+        this.nominatimLocationService = nominatimLocationService;
+        this.llmService = llmService;
         this.llmWeatherSummariesEnabled = Config.getBool("mchelper.darksky.llm-summaries-enabled", true);
     }
 

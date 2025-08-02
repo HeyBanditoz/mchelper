@@ -1,14 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.Collection;
+import java.util.TreeMap;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 
-import java.util.Collection;
-import java.util.TreeMap;
-
+// no Singleton, this is instantiated in CommandHandler
 public class HelpCommand extends Command {
     private final TreeMap<String, Help> helps = new TreeMap<>(); // TreeMap keeps it sorted
 

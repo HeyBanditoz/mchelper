@@ -1,18 +1,29 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.ElevatedCommand;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ElevatedCommand;
+import io.banditoz.mchelper.database.Database;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
+@RequiresDatabase
 public class SqlCommand extends ElevatedCommand {
+    private final Database database;
+
+    @Inject
+    public SqlCommand(Database database) {
+        this.database = database;
+    }
+
     @Override
     public String commandName() {
         return "sql";
@@ -26,7 +37,7 @@ public class SqlCommand extends ElevatedCommand {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        try (Connection c = ce.getDatabase().getConnection()) {
+        try (Connection c = database.getConnection()) {
             ResultSet rs = c.prepareStatement(ce.getCommandArgsString()).executeQuery();
             ce.sendReply(formatTable(rs));
             rs.close();

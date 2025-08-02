@@ -1,10 +1,11 @@
 package io.banditoz.mchelper.utils.database;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+
+import io.banditoz.mchelper.database.Database;
 import io.opentelemetry.api.OpenTelemetry;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @Test(groups = {"DatabaseInitializationTests"})
 public class DatabaseInitializationTests {

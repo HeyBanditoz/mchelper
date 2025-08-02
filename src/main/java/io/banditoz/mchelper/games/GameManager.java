@@ -1,10 +1,12 @@
 package io.banditoz.mchelper.games;
 
-import net.dv8tion.jda.api.entities.User;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.User;
+
+@Singleton
 public class GameManager {
     private final Set<User> games = new HashSet<>();
 

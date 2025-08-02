@@ -3,7 +3,6 @@ package io.banditoz.mchelper.config;
 import java.sql.SQLException;
 import java.util.SortedMap;
 
-import io.banditoz.mchelper.MCHelper;
 import io.banditoz.mchelper.UserEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,21 +16,18 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 public class GuildConfigurationProvider {
     private final Guild guild;
     private final User user;
-    private final MCHelper mcHelper;
     private final ConfigurationProvider config;
 
-    public GuildConfigurationProvider(UserEvent ue) {
+    public GuildConfigurationProvider(UserEvent ue, ConfigurationProvider config) {
         this.guild = ue.getGuild();
         this.user = ue.getUser();
-        this.mcHelper = ue.getMCHelper();
-        this.config = ue.getMCHelper().getConfigurationProvider();
+        this.config = config;
     }
 
-    public GuildConfigurationProvider(Guild guild, User user, MCHelper mcHelper) {
+    public GuildConfigurationProvider(Guild guild, User user, ConfigurationProvider config) {
         this.guild = guild;
         this.user = user;
-        this.mcHelper = mcHelper;
-        this.config = mcHelper.getConfigurationProvider();
+        this.config = config;
     }
 
     public String get(Config c) {
@@ -83,7 +79,7 @@ public class GuildConfigurationProvider {
                     if (role == null || !role.getGuild().equals(guild)) {
                         throw new IllegalArgumentException("Could not find role by id " + value);
                     }
-                    if (!guild.getMemberById(mcHelper.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+                    if (!guild.getMemberById(guild.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
                         throw new IllegalArgumentException("This bot needs MANAGE_ROLES to do this.");
                     }
                 }

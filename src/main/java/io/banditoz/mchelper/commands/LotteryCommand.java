@@ -1,23 +1,36 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.money.lottery.LotteryManager;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.Lottery;
-import io.banditoz.mchelper.utils.database.LotteryEntrant;
-import net.dv8tion.jda.api.utils.TimeFormat;
-
 import java.math.BigDecimal;
 import java.util.List;
 
 import static io.banditoz.mchelper.money.AccountManager.format;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.Lottery;
+import io.banditoz.mchelper.database.LotteryEntrant;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.lottery.LotteryManager;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.utils.TimeFormat;
+
+@Singleton
+@RequiresDatabase
 public class LotteryCommand extends Command {
+    private final AccountManager am;
+    private final LotteryManager lm;
+
+    @Inject
+    public LotteryCommand(AccountManager am,
+                          LotteryManager lm) {
+        this.am = am;
+        this.lm = lm;
+    }
+
     @Override
     public String commandName() {
         return "lottery";
@@ -33,7 +46,6 @@ public class LotteryCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         // TODO reduce the massive amounts of copypaste in here
-        LotteryManager lm = ce.getMCHelper().getLotteryManager();
         Lottery l = lm.getLottery(ce.getGuild());
         if (ce.getCommandArgsString().isBlank()) {
             if (l != null) {
@@ -86,8 +98,6 @@ public class LotteryCommand extends Command {
     }
 
     private void enterLottery(CommandEvent ce, Lottery l, BigDecimal requestedTicket) throws Exception {
-        AccountManager am = ce.getMCHelper().getAccountManager();
-        LotteryManager lm = ce.getMCHelper().getLotteryManager();
         am.checkUserCanCompleteTransaction(ce.getEvent().getAuthor(), requestedTicket);
         if (l == null) {
             lm.startLotteryForGuild(ce.getEvent().getChannel().asTextChannel());

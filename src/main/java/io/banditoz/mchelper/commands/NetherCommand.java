@@ -2,10 +2,12 @@ package io.banditoz.mchelper.commands;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.CoordinatePoint;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.CoordinatePoint;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class NetherCommand extends Command {
     @Override
     public String commandName() {

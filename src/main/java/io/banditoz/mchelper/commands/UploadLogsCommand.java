@@ -1,12 +1,14 @@
 package io.banditoz.mchelper.commands;
 
+import java.io.File;
+
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 
-import java.io.File;
-
+@Singleton
 public class UploadLogsCommand extends ElevatedCommand {
     @Override
     public String commandName() {

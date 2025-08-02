@@ -1,33 +1,41 @@
 package io.banditoz.mchelper.commands;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import io.banditoz.mchelper.PollService;
+import io.banditoz.mchelper.database.Poll;
+import io.banditoz.mchelper.database.PollQuestion;
+import io.banditoz.mchelper.database.dao.PollsDao;
+import io.banditoz.mchelper.database.dao.PollsDaoImpl;
 import io.banditoz.mchelper.runnables.PollCullerRunnable;
-import io.banditoz.mchelper.utils.database.Poll;
-import io.banditoz.mchelper.utils.database.PollQuestion;
-import io.banditoz.mchelper.utils.database.dao.PollsDao;
-import io.banditoz.mchelper.utils.database.dao.PollsDaoImpl;
 import io.jenetics.facilejdbc.Query;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 @Test(dependsOnGroups = {"DatabaseInitializationTests"})
 public class PollCommandTests extends BaseCommandTest {
-    private final PollCommand pc = new PollCommand();
-    private final PollsDao dao = new PollsDaoImpl(DB);
+    private PollCommand pc;
+    private PollsDao dao;
+    private PollService pollService;
 
     @BeforeClass
     public void setup() throws Exception {
-        PollService ps = new PollService(mcHelper);
-        when(ce.getMCHelper().getPollService()).thenReturn(ps);
+        dao = new PollsDaoImpl(DB);
+        pollService = new PollService(
+                mock(JDA.class),
+                dao,
+                mock(ScheduledExecutorService.class)
+        );
+        pc = new PollCommand(pollService);
     }
 
     // TODO expand these tests. They're kinda barebones.
@@ -91,9 +99,9 @@ public class PollCommandTests extends BaseCommandTest {
 
     @Test(dependsOnMethods = {"testPollCommandSingle", "testPollCommandMultiple"})
     public void testPollCuller() throws Exception {
-        PollCullerRunnable r = new PollCullerRunnable(mcHelper);
+        PollCullerRunnable r = new PollCullerRunnable(pollService, dao, mock(JDA.class));
         // set all poll respondents to 3 days ago
-        try (Connection c = mcHelper.getDatabase().getConnection()) {
+        try (Connection c = DB.getConnection()) {
             int result = Query.of("UPDATE poll_results SET cast_on = cast_on - INTERVAL '7 DAY';")
                     .executeUpdate(c);
             assertThat(dao.getAllPolls()).hasSize(2);

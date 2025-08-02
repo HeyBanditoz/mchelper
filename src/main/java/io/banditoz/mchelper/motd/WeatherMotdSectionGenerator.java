@@ -1,36 +1,38 @@
 package io.banditoz.mchelper.motd;
 
-import io.banditoz.mchelper.MCHelper;
+import java.awt.Color;
+
+import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
+import static java.lang.Math.round;
+
+import io.avaje.inject.BeanScope;
 import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
-import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.http.DarkSkyClient;
+import io.banditoz.mchelper.weather.WeatherService;
 import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
 import io.banditoz.mchelper.weather.geocoder.Location;
+import io.banditoz.mchelper.weather.geocoder.NominatimLocationService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-import java.awt.Color;
-
-import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
-import static java.lang.Math.round;
-
 public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
     private static final Color EMBED_COLOR = new Color(212, 19, 196);
-    public WeatherMotdSectionGenerator(MCHelper mcHelper) {
-        super(mcHelper);
+    public WeatherMotdSectionGenerator(BeanScope beanScope) {
+        super(beanScope);
     }
 
     @Override
     public MessageEmbed generate(TextChannel tc) {
         long guildId = tc.getGuild().getIdLong();
-        ConfigurationProvider c = mcHelper.getConfigurationProvider();
+        ConfigurationProvider c = beanScope.get(ConfigurationProvider.class);
         String val = c.getValue(Config.WEATHER_DEFAULT_LOC, guildId);
         if (val == null) {
             return new EmbedBuilder()
@@ -39,14 +41,14 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
                     .setColor(EMBED_COLOR)
                     .build();
         }
-        Location location = mcHelper.getNominatimLocationService()
+        Location location = beanScope.get(NominatimLocationService.class)
                 .searchForLocation(c.getValue(Config.WEATHER_DEFAULT_LOC, guildId))
                 .get(0);
 
-        DSWeather response = mcHelper.getHttp().getDarkSkyClient().getForecast(location);
+        DSWeather response = beanScope.get(DarkSkyClient.class).getForecast(location);
 
         WeatherMotdSectionUserEvent fakeEvent = new WeatherMotdSectionUserEvent(tc.getGuild());
-        String description = mcHelper.getWeatherService().getSummaryForForecast(response, fakeEvent);
+        String description = beanScope.get(WeatherService.class).getSummaryForForecast(response, fakeEvent);
 
         // TODO move to proper WeatherService later in the future to centralize forecast embed generation
         Currently currently = response.currently();
@@ -75,17 +77,7 @@ public class WeatherMotdSectionGenerator extends MotdSectionGenerator {
         }
 
         @Override
-        public Database getDatabase() {
-            return null;
-        }
-
-        @Override
         public GuildConfigurationProvider getConfig() {
-            return null;
-        }
-
-        @Override
-        public MCHelper getMCHelper() {
             return null;
         }
 

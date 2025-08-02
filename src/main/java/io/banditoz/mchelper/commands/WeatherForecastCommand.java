@@ -1,9 +1,23 @@
 package io.banditoz.mchelper.commands;
 
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
+import static java.lang.Math.round;
+import static net.dv8tion.jda.api.utils.messages.MessageCreateData.fromEditData;
+
 import com.google.common.collect.Iterables;
-import io.banditoz.mchelper.commands.logic.*;
+import io.avaje.inject.RequiresProperty;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.Cooldown;
+import io.banditoz.mchelper.commands.logic.CooldownType;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.interactions.ButtonInteractable;
+import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
@@ -14,6 +28,8 @@ import io.banditoz.mchelper.weather.darksky.Currently;
 import io.banditoz.mchelper.weather.darksky.DSWeather;
 import io.banditoz.mchelper.weather.darksky.DataItem;
 import io.banditoz.mchelper.weather.geocoder.Location;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -22,17 +38,19 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static io.banditoz.mchelper.weather.TemperatureConverter.fToCHU;
-import static java.lang.Math.round;
-import static net.dv8tion.jda.api.utils.messages.MessageCreateData.fromEditData;
-
-@Requires(config = "mchelper.darksky.token")
+@Singleton
+@RequiresProperty(value = "mchelper.darksky.token")
 public class WeatherForecastCommand extends Command {
+    private final WeatherService svc;
+    private final InteractionListener interactionListener;
+
+    @Inject
+    public WeatherForecastCommand(WeatherService svc,
+                                  InteractionListener interactionListener) {
+        this.svc = svc;
+        this.interactionListener = interactionListener;
+    }
+
     @Override
     public String commandName() {
         return "wf";
@@ -56,8 +74,6 @@ public class WeatherForecastCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) {
-        WeatherService svc = ce.getMCHelper().getWeatherService();
-
         String locationToSearch = getLocationToSearch(ce);
         if (locationToSearch == null) return Status.FAIL;
 
@@ -114,7 +130,7 @@ public class WeatherForecastCommand extends Command {
                             WrappedButtonClickEvent::removeListenerAndDestroy
                     ),
                     ce.getEvent().getAuthor()::equals, 60, message, ce);
-            ce.getMCHelper().getInteractionListener().addInteractable(i);
+            interactionListener.addInteractable(i);
         });
 
         return Status.SUCCESS;

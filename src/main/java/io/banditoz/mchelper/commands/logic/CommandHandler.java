@@ -1,30 +1,59 @@
 package io.banditoz.mchelper.commands.logic;
 
-import io.banditoz.mchelper.MCHelper;
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.function.Function.identity;
+
 import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.config.Config;
+import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.ClassUtils;
-import io.banditoz.mchelper.utils.database.Database;
+import io.banditoz.mchelper.stats.service.StatsRecorder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-public class CommandHandler extends ListenerAdapter {
+@Singleton
+public class CommandHandler extends ListenerAdapter implements AutoCloseable {
+    private final ThreadPoolExecutor threadPoolExecutor;
+    private final ConfigurationProvider configurationProvider;
+    private final StatsRecorder statsRecorder;
+    private final InteractionListener interactionListener;
     /** The command map. String is the command name (what the user types) and Command is the command. */
-    private final Map<String, Command> commands = new HashMap<>();
-    private final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
-    private final MCHelper MCHELPER;
+    private final Map<String, Command> commands;
+
     private final AtomicBoolean isShutdown = new AtomicBoolean(false);
     private int commandsRun;
+    private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
+
+    @Inject
+    public CommandHandler(ThreadPoolExecutor threadPoolExecutor,
+                          ConfigurationProvider configurationProvider,
+                          StatsRecorder statsRecorder,
+                          InteractionListener interactionListener,
+                          List<Command> commands) {
+        this.threadPoolExecutor = threadPoolExecutor;
+        this.configurationProvider = configurationProvider;
+        this.statsRecorder = statsRecorder;
+        this.interactionListener = interactionListener;
+        this.commands = Stream.concat(Stream.of(new HelpCommand(commands)), commands.stream())
+                .collect(Collectors.toMap(Command::commandName, identity()));
+        log.info("{} commands registered.", commands.size());
+    }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -44,17 +73,17 @@ public class CommandHandler extends ListenerAdapter {
                 event.getChannel().sendMessage("WARN: This CommandHandler is being shutdown. No new commands will be accepted. The bot is most likely rebooting. Try again later.").queue();
                 return;
             }
-            if (c.canExecute(event, MCHELPER)) {
-                MCHELPER.getThreadPoolExecutor().execute(() -> {
+            if (c.canExecute(event)) {
+                threadPoolExecutor.execute(() -> {
                     try {
-                        Stat s = c.execute(event, MCHELPER, kind);
+                        Stat s = c.execute(event, kind, interactionListener, this, configurationProvider);
                         if (s.getStatus() == Status.SUCCESS) {
                             commandsRun++;
                         }
-                        LOGGER.info(s.getLogMessage());
-                        MCHELPER.getStatsRecorder().record(s);
+                        log.info(s.getLogMessage());
+                        statsRecorder.record(s);
                     } catch (Exception ex) {
-                        LOGGER.error("Unhandled exception in command execution. This should never happen. author=" + event.getAuthor() + " args='" + event.getMessage().getContentRaw() + "' command=" + c, ex);
+                        log.error("Unhandled exception in command execution. This should never happen. author=" + event.getAuthor() + " args='" + event.getMessage().getContentRaw() + "' command=" + c, ex);
                     }
                 });
             }
@@ -68,7 +97,7 @@ public class CommandHandler extends ListenerAdapter {
         }
         char prefix = '!';
         if (e.isFromGuild()) {
-            prefix = MCHELPER.getConfigurationProvider().getValue(Config.PREFIX, e.getGuild()).charAt(0);
+            prefix = configurationProvider.getValue(Config.PREFIX, e.getGuild()).charAt(0);
         }
         if (args[0].charAt(0) != prefix) {
             return Optional.empty();
@@ -84,54 +113,13 @@ public class CommandHandler extends ListenerAdapter {
         return commands.remove(name) != null;
     }
 
-    public CommandHandler(MCHelper MCHelper) throws Exception {
-        this.MCHELPER = MCHelper;
-        LOGGER.info("Registering commands...");
-        long before = System.currentTimeMillis();
-        Set<Class<? extends Command>> classes = ClassUtils.getAllSubtypesOf(Command.class);
-        for (Class<? extends Command> clazz : classes) {
-            if (Modifier.isAbstract(clazz.getModifiers())) {
-                // We have to catch ElevatedCommand here; that should be the only class, though.
-                continue;
-            }
-            if (clazz.equals(HelpCommand.class)) {
-                // We manually add this at the end, as we pass in a list of Commands to HelpCommand at the end.
-                continue;
-            }
-            Command c = clazz.getDeclaredConstructor().newInstance();
-            Requires r = c.getClass().getAnnotation(Requires.class);
-            if (r == null) {
-                commands.put(c.commandName(), c);
-                continue;
-            }
-            if (r.database()) {
-                if (Database.isConfigured()) {
-                    commands.put(c.commandName(), c);
-                }
-                else {
-                    LOGGER.warn("Not registering " + clazz.getSimpleName() + " as the database is not configured.");
-                }
-            }
-            else if (!r.config().isEmpty()) {
-                String s = io.avaje.config.Config.getNullable(r.config());
-                if (s != null) {
-                    commands.put(c.commandName(), c);
-                }
-                else {
-                    LOGGER.warn("Not registering {} as {} is null.", clazz.getSimpleName(), r.config());
-                }
-            }
-        }
-        HelpCommand help = new HelpCommand(commands.values());
-        commands.put(help.commandName(), help);
-        LOGGER.info(commands.size() + " commands registered in " + (System.currentTimeMillis() - before) + " ms.");
-    }
-
     public int getCommandsRun() {
         return commandsRun;
     }
 
-    public void dontAcceptNewCommands() {
+    @Override
+    public void close() throws Exception {
+        log.info("Shutting down CommandHandler...");
         isShutdown.set(true);
     }
 }

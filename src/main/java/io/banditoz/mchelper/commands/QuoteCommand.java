@@ -1,24 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.Requires;
-import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
-import io.banditoz.mchelper.utils.database.NamedQuote;
-import io.banditoz.mchelper.utils.database.StatPoint;
-import io.banditoz.mchelper.utils.database.dao.QuotesDao;
-import io.banditoz.mchelper.utils.database.dao.QuotesDaoImpl;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
-
 import java.awt.Color;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,10 +10,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Requires(database = true)
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.database.NamedQuote;
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.database.dao.QuotesDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+
+@Singleton
+@RequiresDatabase
 public class QuoteCommand extends Command {
+    private final QuotesDao dao;
+    private final JDA jda;
     private static final Color EMPTY = new Color(44, 100, 42);
     private static final Color GREEN = new Color(35, 197, 35);
+
+    @Inject
+    public QuoteCommand(QuotesDao dao,
+                        JDA jda) {
+        this.dao = dao;
+        this.jda = jda;
+    }
 
     @Override
     public String commandName() {
@@ -47,7 +59,6 @@ public class QuoteCommand extends Command {
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
         Namespace args = getDefaultArgs().parseArgs(ce.getCommandArgsWithoutName());
-        QuotesDao dao = new QuotesDaoImpl(ce.getDatabase());
         if (args.get("stats") != null && args.getBoolean("stats")) {
             ce.sendEmbedReply(new EmbedBuilder()
                     .setAuthor("Quote leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
@@ -101,7 +112,7 @@ public class QuoteCommand extends Command {
                 }
                 if (args.get("include_author")) {
                     try {
-                        User user = ce.getMCHelper().getJDA().retrieveUserById(nq.getAuthorId()).complete();
+                        User user = jda.retrieveUserById(nq.getAuthorId()).complete();
                         eb.setFooter("Added by " + user.getName(), user.getAvatarUrl());
                     } catch (ErrorResponseException ignored) {
                         eb.setFooter("Added by " + nq.getAuthorId(), "https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png");

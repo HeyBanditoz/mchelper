@@ -1,9 +1,5 @@
 package io.banditoz.mchelper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.banditoz.mchelper.utils.database.TaskResponse;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
@@ -11,6 +7,11 @@ import java.util.StringJoiner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.banditoz.mchelper.database.TaskResponse;
+import org.testng.annotations.Test;
+
+@Test
 public class TaskVerificationTests {
     private final ObjectMapper om = new ObjectMapper();
 

@@ -1,13 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
+import jakarta.inject.Singleton;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
+@Singleton
 public class UnitsCommand extends Command {
     @Override
     public String commandName() {

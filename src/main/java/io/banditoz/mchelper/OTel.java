@@ -1,6 +1,11 @@
 package io.banditoz.mchelper;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import io.avaje.config.Config;
+import io.avaje.inject.Bean;
+import io.avaje.inject.Factory;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.MeterProvider;
@@ -12,15 +17,13 @@ import io.opentelemetry.sdk.resources.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
+@Factory
 public class OTel {
     private final OpenTelemetry openTelemetry;
     private static final Logger log = LoggerFactory.getLogger(OTel.class);
 
-    public OTel(boolean enabled) {
-        if (!enabled) {
+    public OTel() {
+        if (!Config.getBool("mchelper.metrics.enabled", false)) {
             openTelemetry = OpenTelemetry.noop();
             return;
         }
@@ -49,10 +52,12 @@ public class OTel {
         log.info("OpenTelemetry built, Prometheus HTTP server listening on {}", port);
     }
 
+    @Bean
     public MeterProvider meter() {
         return openTelemetry.getMeterProvider();
     }
 
+    @Bean
     public OpenTelemetry openTelemetry() {
         return openTelemetry;
     }

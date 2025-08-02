@@ -17,7 +17,8 @@ public class LoggableCommandEvent extends CommandEvent implements Stat {
     private final Kind kind;
 
     public LoggableCommandEvent(CommandEvent ce, int executionTime, Status status, Kind kind) {
-        super(ce.getEvent(), ce.getLogger(), ce.getMCHelper(), ce.getCommandName());
+        // TODO this really should be another class
+        super(ce.getEvent(), ce.getLogger(), ce.getCommandName(), null, null, null);
         this.executionTime = executionTime;
         this.status = status;
         this.kind = kind;

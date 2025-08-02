@@ -1,10 +1,14 @@
 package io.banditoz.mchelper;
 
+import java.util.List;
+
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.MeterProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
@@ -15,13 +19,13 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
+@Singleton
 public class MetricsEventListener extends ListenerAdapter {
     private final LongCounter eventCounter;
     private final LongHistogram discordToBotDelay;
     private static final Logger log = LoggerFactory.getLogger(MetricsEventListener.class);
 
+    @Inject
     public MetricsEventListener(MeterProvider meterProvider) {
         eventCounter = meterProvider
                 .meterBuilder("event_metrics")

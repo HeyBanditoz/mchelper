@@ -1,11 +1,17 @@
 package io.banditoz.mchelper.interactions;
 
+import java.util.List;
+import java.util.concurrent.*;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.banditoz.mchelper.MCHelper;
+import io.avaje.inject.Priority;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongHistogram;
+import io.opentelemetry.api.metrics.MeterProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,9 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.concurrent.*;
-
 /**
  * The interaction listener class, listening for either:
  * <ul>
@@ -24,17 +27,18 @@ import java.util.concurrent.*;
  *     <li>{@link ModalInteractionEvent} to dispatch to {@link ModalInteractable}.</li>
  * </ul>
  */
-public class InteractionListener extends ListenerAdapter {
+@Singleton
+@Priority(1)
+public class InteractionListener extends ListenerAdapter implements AutoCloseable {
     private final ScheduledExecutorService SES;
     private final List<Interactable<?, ?>> INTERACTABLES = new CopyOnWriteArrayList<>();
-    private final MCHelper MCHELPER;
     private final LongHistogram buttonProcessingDelay;
     private static final Logger LOGGER = LoggerFactory.getLogger(InteractionListener.class);
 
-    public InteractionListener(MCHelper mcHelper) {
+    @Inject
+    public InteractionListener(MeterProvider meter) {
         this.SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("BL-Scheduled-%d").build());
-        this.MCHELPER = mcHelper;
-        this.buttonProcessingDelay = mcHelper.getOTel().meter()
+        this.buttonProcessingDelay = meter
                 .meterBuilder("interaction_metrics")
                 .build()
                 .histogramBuilder("mchelper_interaction_processing_delay")
@@ -103,7 +107,7 @@ public class InteractionListener extends ListenerAdapter {
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
-                        measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, MCHELPER)), "button", i.getCommandEvent(), event.getButton());
+                        measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, this)), "button", i.getCommandEvent(), event.getButton());
             }, () -> event.reply("Unfortunately, the button `" + event.getButton().getId() + "` you clicked " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "This button will never be valid again. Sorry!").setEphemeral(true).queue());
@@ -132,8 +136,8 @@ public class InteractionListener extends ListenerAdapter {
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
-                        measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, MCHELPER)), "modal", null, null);
-                        i.handleEvent(new WrappedModalInteractionEvent(event, MCHELPER));
+                        measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, this)), "modal", null, null);
+                        i.handleEvent(new WrappedModalInteractionEvent(event, this));
                     }, () -> event.reply("Unfortunately, the modal `" + event.getModalId() + "` you submitted " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "This modal will never be valid again. Sorry!").setEphemeral(true).queue());
@@ -176,6 +180,21 @@ public class InteractionListener extends ListenerAdapter {
                 }
             }
             buttonProcessingDelay.record(after - before, attrs.build());
+        }
+    }
+
+    @Override
+    public void close() throws Exception {
+        LOGGER.info("Shutting down InteractionListener...");
+        long then = System.currentTimeMillis();
+        int activeInteractables;
+        while ((activeInteractables = getActiveInteractables()) != 0) {
+            LOGGER.info("Waited {} ms for {} interactables to finish...", (System.currentTimeMillis() - then), activeInteractables);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
