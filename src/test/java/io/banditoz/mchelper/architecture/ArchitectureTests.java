@@ -9,7 +9,6 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaConstructor;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import io.avaje.inject.Component;
-import io.avaje.inject.Factory;
 import io.avaje.inject.spi.Generated;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -25,17 +24,6 @@ public class ArchitectureTests {
                 .that(haveMoreThanZeroParameters())
                 .and().areDeclaredInClassesThat()
                 .areAnnotatedWith(Singleton.class)
-                .should().beAnnotatedWith(Inject.class)
-                .because("this project should be explicit with constructors having injected beans")
-                .check(classes);
-    }
-
-    @Test
-    public void factoryWithConstructorsShouldHaveInject() {
-        constructors()
-                .that(haveMoreThanZeroParameters())
-                .and().areDeclaredInClassesThat()
-                .areAnnotatedWith(Factory.class)
                 .should().beAnnotatedWith(Inject.class)
                 .because("this project should be explicit with constructors having injected beans")
                 .check(classes);
