@@ -1,5 +1,5 @@
 # Commands
-There are a total of 65 commands and 6 regex listeners.
+There are a total of 65 commands and 7 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
@@ -198,6 +198,8 @@ named arguments:
 `https://reddit.app.link/\w.*`
 ### RedditShareRegexable
 `https://(www.)?reddit.com/r/\w{3,21}/s/\w+(?=/$|$)`
+### ScryfallCardRegexable
+`\[\[([^]]+)]]`
 ### TeXRegexable
 `\$\$(.*?)\$\$`
 ### TwitterRegexable
