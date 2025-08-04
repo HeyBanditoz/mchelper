@@ -1,21 +1,22 @@
 package io.banditoz.mchelper.interactions;
 
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import io.banditoz.mchelper.commands.logic.CommandEvent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.jetbrains.annotations.NotNull;
 
 public class EmbedPaginator {
     private final List<MessageEmbed> pages;
@@ -63,7 +64,7 @@ public class EmbedPaginator {
         );
         MessageCreateData messageCreate = new MessageCreateBuilder()
                 .setEmbeds(pages.get(0))
-                .addActionRow(prev, stop, next)
+                .setComponents(ActionRow.of(prev, stop, next))
                 .build();
         channel.sendMessage(messageCreate).queue(message -> {
             this.bi = new ButtonInteractable(map, canInteract, unit.toSeconds(time), message, originator);

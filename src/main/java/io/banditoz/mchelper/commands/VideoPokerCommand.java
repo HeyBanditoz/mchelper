@@ -17,9 +17,10 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -73,8 +74,8 @@ public class VideoPokerCommand extends Command {
         MessageEmbed messageEmbed = game.generateEmbed();
 
         MessageCreateData m = new MessageCreateBuilder()
-                .addActionRow(holdOne, holdTwo, holdThree, holdFour, holdFive)
-                .addActionRow(submit, haas, invert)
+                .setComponents(ActionRow.of(holdOne, holdTwo, holdThree, holdFour, holdFive),
+                               ActionRow.of(submit, haas, invert))
                 .setEmbeds(messageEmbed)
                 .build();
         ce.getEvent().getChannel().sendMessage(m).queue(message -> {

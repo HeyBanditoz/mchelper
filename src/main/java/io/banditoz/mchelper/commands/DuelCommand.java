@@ -19,11 +19,12 @@ import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -78,7 +79,7 @@ public class DuelCommand extends Command {
                 .build();
         Button play = Button.primary(UUID.randomUUID().toString(), CHECK);
         Button cancel = Button.danger(UUID.randomUUID().toString(), CANCEL);
-        MessageCreateData m = new MessageCreateBuilder().setActionRow(play, cancel).setEmbeds(embed).build();
+        MessageCreateData m = new MessageCreateBuilder().setComponents(ActionRow.of(play, cancel)).setEmbeds(embed).build();
         ce.getEvent().getChannel().sendMessage(m).queue(message -> {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(play, game::enterGame, cancel, game::cancel),

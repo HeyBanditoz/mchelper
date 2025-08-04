@@ -12,10 +12,10 @@ import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.MeterProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +100,7 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                     .ifPresentOrElse(i -> {
                         ScheduledFuture<?> future = i.getTimeoutFuture();
                         if (future != null) {
-                            LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getId() + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
+                            LOGGER.debug("Refreshing ScheduledFuture for " + event.getButton().getCustomId() + " (had " + future.getDelay(TimeUnit.SECONDS) + " seconds left.)");
                             future.cancel(false);
                             i.setTimeoutFuture(SES.schedule(() -> {
                                 i.destroy();
@@ -108,9 +108,9 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
                         measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, this)), "button", i.getCommandEvent(), event.getButton());
-            }, () -> event.reply("Unfortunately, the button `" + event.getButton().getId() + "` you clicked " +
+            }, () -> event.reply("Unfortunately, the button `" + event.getButton().getCustomId() + "` you clicked " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
-                            "This button will never be valid again. Sorry!").setEphemeral(true).queue());
+                            "You can retry, but the button may never be valid again. Sorry!").setEphemeral(true).queue());
         } catch (Exception ex) {
             LOGGER.error("Error when handling the button!", ex);
             event.reply("Error handling the button! " + ex).setEphemeral(true).queue();
@@ -140,7 +140,7 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                         i.handleEvent(new WrappedModalInteractionEvent(event, this));
                     }, () -> event.reply("Unfortunately, the modal `" + event.getModalId() + "` you submitted " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
-                            "This modal will never be valid again. Sorry!").setEphemeral(true).queue());
+                            "You can retry, but the modal may never be valid again. Sorry!").setEphemeral(true).queue());
         } catch (Exception ex) {
             LOGGER.error("Error when handling the modal!", ex);
             event.reply("Error handling the modal! " + ex).setEphemeral(true).queue(unused -> {}, unused -> {});

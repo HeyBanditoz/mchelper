@@ -23,11 +23,11 @@ import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.SnowflakeUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
@@ -75,7 +75,7 @@ public class AddquoteCommand extends Command {
             nq.setAuthorId(ce.getEvent().getAuthor().getIdLong());
             id = qd.saveQuote(nq, calculateRequiredFlags(nq));
             message = new MessageCreateBuilder()
-                    .addActionRow(b)
+                    .setComponents(ActionRow.of(b))
                     .setContent("Quote added.");
         }
         nq.setId(id);

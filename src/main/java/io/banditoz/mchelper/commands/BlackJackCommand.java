@@ -17,9 +17,10 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -85,7 +86,7 @@ public class BlackJackCommand extends Command {
         Button hit = Button.primary(UUID.randomUUID().toString(), "Hit");
         Button stay = Button.primary(UUID.randomUUID().toString(), "Stay");
         Button doubleDown = Button.danger(UUID.randomUUID().toString(), "Double Down");
-        MessageCreateData m = new MessageCreateBuilder().setEmbeds(embed).addActionRow(hit, stay, doubleDown).build();
+        MessageCreateData m = new MessageCreateBuilder().setEmbeds(embed).setComponents(ActionRow.of(hit, stay, doubleDown)).build();
         ce.getEvent().getChannel().sendMessage(m).queue(success -> {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(hit, game::hit, stay, game::stand, doubleDown, game::doubleDown),

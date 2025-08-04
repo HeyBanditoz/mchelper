@@ -13,9 +13,10 @@ import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 
 public class BlackJackGame extends Game {
     private BigDecimal currentAmount;
@@ -129,8 +130,8 @@ public class BlackJackGame extends Game {
             }
             else if (sum < 21) {
                 // drop the double down
-                List<ItemComponent> buttons = wrappedEvent.getMessage().getActionRows().get(0).getComponents().subList(0, 2);
-                wrappedEvent.getEvent().editMessageEmbeds(generate()).setActionRow(buttons).queue();
+                List<ActionRowChildComponentUnion> buttons = wrappedEvent.getMessage().getActionRows().get(0).getComponents().subList(0, 2);
+                wrappedEvent.getEvent().editMessageEmbeds(generate()).setComponents(ActionRow.of(buttons)).queue();
             }
             else {
                 while (getDealerSum() < 17) {

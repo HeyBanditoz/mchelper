@@ -31,9 +31,10 @@ import io.banditoz.mchelper.weather.geocoder.Location;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
@@ -99,19 +100,19 @@ public class WeatherForecastCommand extends Command {
         Button dailyForecastButtonDisabled = Button.primary(dailyUuid, "Daily").asDisabled();
 
         MessageEditData threeHoursMessage = new MessageEditBuilder()
-                .setActionRow(threeHoursForecastButtonDisabled, hourlyForecastButton, hourly48ForecastButton, dailyForecastButton, stop)
+                .setComponents(ActionRow.of(threeHoursForecastButtonDisabled, hourlyForecastButton, hourly48ForecastButton, dailyForecastButton, stop))
                 .setEmbeds(getThreeHoursForecast(response, location, llmWeatherSummary))
                 .build();
         MessageEditData hourlyMessage = new MessageEditBuilder()
-                .setActionRow(threeHoursForecastButton, hourlyForecastButtonDisabled, hourly48ForecastButton, dailyForecastButton, stop)
+                .setComponents(ActionRow.of(threeHoursForecastButton, hourlyForecastButtonDisabled, hourly48ForecastButton, dailyForecastButton, stop))
                 .setEmbeds(getHourlyForecast(response, location, false, llmWeatherSummary))
                 .build();
         MessageEditData hourly48Message = new MessageEditBuilder()
-                .setActionRow(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButtonDisabled, dailyForecastButton, stop)
+                .setComponents(ActionRow.of(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButtonDisabled, dailyForecastButton, stop))
                 .setEmbeds(getHourlyForecast(response, location, true, llmWeatherSummary))
                 .build();
         MessageEditData dailyMessage = new MessageEditBuilder()
-                .setActionRow(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButton, dailyForecastButtonDisabled, stop)
+                .setComponents(ActionRow.of(threeHoursForecastButton, hourlyForecastButton, hourly48ForecastButton, dailyForecastButtonDisabled, stop))
                 .setEmbeds(getDailyForecast(response, location, llmWeatherSummary))
                 .build();
 

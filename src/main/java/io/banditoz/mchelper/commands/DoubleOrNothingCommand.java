@@ -17,9 +17,10 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -66,7 +67,7 @@ public class DoubleOrNothingCommand extends Command {
         MessageEmbed embed = game.generate(ante, u);
         Button bet = Button.primary(UUID.randomUUID().toString(), "Bet");
         Button stop = Button.danger(UUID.randomUUID().toString(), "Stop");
-        MessageCreateData m = new MessageCreateBuilder().setActionRow(bet, stop).setEmbeds(embed).build();
+        MessageCreateData m = new MessageCreateBuilder().setComponents(ActionRow.of(bet, stop)).setEmbeds(embed).build();
         ce.getEvent().getChannel().sendMessage(m).queue(message -> {
             ButtonInteractable i = new ButtonInteractable(
                     Map.of(bet, game::bet, stop, game::stop),
