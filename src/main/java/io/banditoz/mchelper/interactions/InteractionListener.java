@@ -137,7 +137,6 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
                         measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, this)), "modal", null, null);
-                        i.handleEvent(new WrappedModalInteractionEvent(event, this));
                     }, () -> event.reply("Unfortunately, the modal `" + event.getModalId() + "` you submitted " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "You can retry, but the modal may never be valid again. Sorry!").setEphemeral(true).queue());
