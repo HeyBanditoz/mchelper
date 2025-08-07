@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @RequiresDatabase // inception?! nah, this annotation checks for existence of property needed to start DB... in theory
-public class Database {
+public class Database implements AutoCloseable {
     private final HikariDataSource POOL;
     private final Logger LOGGER = LoggerFactory.getLogger(Database.class);
 
@@ -83,7 +83,9 @@ public class Database {
     /**
      * Closes the underlying {@link HikariDataSource}
      */
+    @Override
     public void close() {
+        LOGGER.info("Closing {}...", this);
         POOL.close();
     }
 
