@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static feign.FeignException.errorStatus;
@@ -164,13 +165,13 @@ public class Http {
     }
 
     @Bean
-    public TarkovClient getTarkovClient() {
-        return tarkovClient;
+    public Optional<TarkovClient> getTarkovClient() {
+        return Optional.ofNullable(tarkovClient);
     }
 
     @Bean
-    public PasteggClient getPasteggClient() {
-        return pasteggClient;
+    public Optional<PasteggClient> getPasteggClient() {
+        return Optional.ofNullable(pasteggClient);
     }
 
     @Bean
@@ -179,13 +180,13 @@ public class Http {
     }
 
     @Bean
-    public FinnhubClient getFinnhubClient() {
-        return finnhubClient;
+    public Optional<FinnhubClient> getFinnhubClient() {
+        return Optional.ofNullable(finnhubClient);
     }
 
     @Bean
-    public OwlbotClient getOwlbotCLient() {
-        return owlbotClient;
+    public Optional<OwlbotClient> getOwlbotCLient() {
+        return Optional.ofNullable(owlbotClient);
     }
 
     /**
@@ -193,18 +194,18 @@ public class Http {
      * {@link io.banditoz.mchelper.weather.geocoder.NominatimLocationService#searchForLocation(String)} instead.
      */
     @Bean
-    public NominatimClient getNominatimClient() {
-        return nominatimClient;
+    public Optional<NominatimClient> getNominatimClient() {
+        return Optional.ofNullable(nominatimClient);
     }
 
     @Bean
-    public DarkSkyClient getDarkSkyClient() {
-        return darkSkyClient;
+    public Optional<DarkSkyClient> getDarkSkyClient() {
+        return Optional.ofNullable(darkSkyClient);
     }
 
     @Bean
-    public AnthropicClient getAnthropicClient() {
-        return anthropicClient;
+    public Optional<AnthropicClient> getAnthropicClient() {
+        return Optional.ofNullable(anthropicClient);
     }
 
     @Bean

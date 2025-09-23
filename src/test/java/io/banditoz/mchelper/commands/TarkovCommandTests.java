@@ -14,7 +14,7 @@ public class TarkovCommandTests extends BaseCommandTest {
     @BeforeClass
     public void tarkovCommand() {
         Http http = new Http(new ObjectMapperFactory().objectMapper());
-        TarkovMarketSearcher searcher = new TarkovMarketSearcher(http.getTarkovClient());
+        TarkovMarketSearcher searcher = new TarkovMarketSearcher(http.getTarkovClient().get());
         tc = new TarkovCommand(searcher);
     }
 
