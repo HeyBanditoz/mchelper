@@ -16,7 +16,7 @@ stages:
 package:
     stage: build
     script:
-        - ./gradlew shadowJar
+        - ./gradlew shadowJar --no-daemon
     artifacts:
         paths:
             - build/libs/*.jar
@@ -30,8 +30,8 @@ test:
         - su -c "psql --command 'ALTER USER postgres WITH PASSWORD \$\$postgres\$\$;'" postgres
         # Create initial schema (tests build.gradle script
         - ln -s src/main/resources/sql sql
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew update
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew test jacocoTestReport
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew update --no-daemon
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew test jacocoTestReport --no-daemon
     needs: ["package"]
     dependencies:
         - package
