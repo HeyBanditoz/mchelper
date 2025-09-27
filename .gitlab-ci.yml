@@ -1,22 +1,21 @@
-image: gradle:8.5.0-jdk21
+image: registry.gitlab.com/heybanditoz/mchelper-build-image:java21-postgres16
 before_script:
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
     paths:
-        - .gradle/wrapper
-        - .gradle/caches
+        - .gradle
+        - build
 
 stages:
     - build
     - test
-    - visualize
     - deploy
 
 package:
     stage: build
     script:
-        - gradle shadowJar
+        - ./gradlew shadowJar --no-daemon
     artifacts:
         paths:
             - build/libs/*.jar
@@ -25,22 +24,13 @@ package:
 test:
     stage: test
     script:
-        # Bootstrap required tools to install Postgres' signing key.
-        - apt-get update
-        - apt-get -y install gnupg software-properties-common
-        - sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        # Install their signing key
-        - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-        - apt-get update
-        # Install and start postgres
-        - apt-get -y install postgresql
-        - service postgresql start
+        - rc-service postgresql start
         # We love bash so much, this looks crazy, but you're just gonna have to trust me.
         - su -c "psql --command 'ALTER USER postgres WITH PASSWORD \$\$postgres\$\$;'" postgres
-        # Create initial schema (tests build.gradle script
         - ln -s src/main/resources/sql sql
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle update
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle test jacocoTestReport
+        # Run tests!
+        # DatabaseInitializationTests runs the migrations for us.
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew test jacocoTestReport --no-daemon
     needs: ["package"]
     dependencies:
         - package
@@ -52,35 +42,23 @@ test:
             - build/reports/tests/test/**
         reports:
             junit: build/test-results/test/**/TEST-*.xml
-
-coverage:
-    stage: visualize
-    image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
-    script:
-        # convert report from jacoco to cobertura, using relative project path
-        - python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/src/main/java/ > build/reports/cobertura.xml
-    needs: ["test"]
-    dependencies:
-        - test
-    artifacts:
-        reports:
             coverage_report:
-                coverage_format: cobertura
-                path: build/reports/cobertura.xml
+                coverage_format: jacoco
+                path: build/reports/jacoco/test/jacocoTestReport.xml
 
 create_image:
     stage: deploy
-    image: docker:20.10.16
+    image: docker:28.4.0-dind
+    cache: []
     services:
-        - docker:20.10.16-dind
+        - docker:28.4.0-dind
     variables:
         IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - DOCKER_BUILDKIT=1 docker build -t $IMAGE_TAG .
+        - docker pull $IMAGE_TAG || true
+        - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $IMAGE_TAG -t $IMAGE_TAG .
         - docker push $IMAGE_TAG
-    only:
-        - master
 
 #new_commands:
 #    stage: deploy
