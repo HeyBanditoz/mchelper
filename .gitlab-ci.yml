@@ -1,11 +1,10 @@
 image: registry.gitlab.com/heybanditoz/mchelper-build-image:java21-postgres16
 before_script:
-    - export GRADLE_USER_HOME=`pwd`/.gradle_home
+    - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
     paths:
         - .gradle
-        - .gradle_home
         - build
 
 stages:

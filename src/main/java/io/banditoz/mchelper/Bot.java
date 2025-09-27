@@ -1,9 +1,5 @@
 package io.banditoz.mchelper;
 
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
-
 import io.avaje.inject.BeanScope;
 import io.avaje.inject.BeanScopeBuilder;
 import io.banditoz.mchelper.database.Database;
@@ -15,6 +11,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 
 public class Bot {
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
@@ -38,7 +38,6 @@ public class Bot {
             System.err.println("Unknown argument " + argsList.get(0));
         }
         else {
-            log.info("Oh my! This class is now different.");
             log.info("Beginning dependency injection...");
             BeanScopeBuilder builder = BeanScope.builder();
             builder.configPlugin(new ConfigPlugin());
