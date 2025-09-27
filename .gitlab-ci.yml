@@ -28,9 +28,10 @@ test:
         - rc-service postgresql start
         # We love bash so much, this looks crazy, but you're just gonna have to trust me.
         - su -c "psql --command 'ALTER USER postgres WITH PASSWORD \$\$postgres\$\$;'" postgres
-        # Create initial schema (tests build.gradle script
         - ln -s src/main/resources/sql sql
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew update test jacocoTestReport --no-daemon
+        # Run tests!
+        # DatabaseInitializationTests runs the migrations for us.
+        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew test jacocoTestReport --no-daemon
     needs: ["package"]
     dependencies:
         - package
