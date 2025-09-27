@@ -1,10 +1,11 @@
 image: registry.gitlab.com/heybanditoz/mchelper-build-image:java21-postgres16
 before_script:
-    - export GRADLE_USER_HOME=`pwd`/.gradle
+    - export GRADLE_USER_HOME=`pwd`/.gradle_home
 
 cache:
     paths:
         - .gradle
+        - .gradle_home
         - build
 
 stages:
@@ -43,22 +44,9 @@ test:
             - build/reports/tests/test/**
         reports:
             junit: build/test-results/test/**/TEST-*.xml
-
-coverage:
-    stage: visualize
-    image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
-    cache: []
-    script:
-        # convert report from jacoco to cobertura, using relative project path
-        - python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/src/main/java/ > build/reports/cobertura.xml
-    needs: ["test"]
-    dependencies:
-        - test
-    artifacts:
-        reports:
             coverage_report:
-                coverage_format: cobertura
-                path: build/reports/cobertura.xml
+                coverage_format: jacoco
+                path: build/reports/jacoco/test/jacocoTestReport.xml
 
 create_image:
     stage: deploy
