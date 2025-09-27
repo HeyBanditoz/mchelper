@@ -47,6 +47,7 @@ test:
 coverage:
     stage: visualize
     image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
+    cache: []
     script:
         # convert report from jacoco to cobertura, using relative project path
         - python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/src/main/java/ > build/reports/cobertura.xml
@@ -62,6 +63,7 @@ coverage:
 create_image:
     stage: deploy
     image: docker:28.4.0-dind
+    cache: []
     services:
         - docker:28.4.0-dind
     variables:

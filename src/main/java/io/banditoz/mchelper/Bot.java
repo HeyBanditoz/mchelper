@@ -38,6 +38,7 @@ public class Bot {
             System.err.println("Unknown argument " + argsList.get(0));
         }
         else {
+            log.info("Oh my! This class is now different.");
             log.info("Beginning dependency injection...");
             BeanScopeBuilder builder = BeanScope.builder();
             builder.configPlugin(new ConfigPlugin());
