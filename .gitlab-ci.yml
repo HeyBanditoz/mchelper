@@ -6,6 +6,7 @@ cache:
     paths:
         - .gradle
         - build
+        - out
 
 stages:
     - build
