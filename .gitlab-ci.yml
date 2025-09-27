@@ -6,7 +6,6 @@ cache:
     paths:
         - .gradle
         - build
-        - out
 
 stages:
     - build
@@ -17,6 +16,8 @@ stages:
 package:
     stage: build
     script:
+        - find build
+        - find .gradle
         - ./gradlew shadowJar --no-daemon
     artifacts:
         paths:
@@ -26,6 +27,8 @@ package:
 test:
     stage: test
     script:
+        - find build
+        - find .gradle
         - rc-service postgresql start
         # We love bash so much, this looks crazy, but you're just gonna have to trust me.
         - su -c "psql --command 'ALTER USER postgres WITH PASSWORD \$\$postgres\$\$;'" postgres
