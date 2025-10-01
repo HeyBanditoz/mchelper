@@ -74,25 +74,6 @@ named arguments:
 ```
 ### MathCommand
 `math` - <math> - Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.
-### MessagePurgerCommand
-```
-usage: purge [-m MESSAGE_IDS] [-a AUTHORS] [-c CHANNEL]
-
-Purges message between (inclusive) by two  messages IDs. There won't be any
-message existence  checks,  just  if  the  message  falls  between  the two
-provided IDs. Be careful with this! There are no guardrails.
-
-named arguments:
-  -m MESSAGE_IDS, --message-ids MESSAGE_IDS
-                         removes all  messages  between  and  including the
-                         IDs. comma separate, i.e. first,last
-  -a AUTHORS, --authors AUTHORS
-                         only  remove  authors  from  this  comma-separated
-                         user ID list
-  -c CHANNEL, --channel CHANNEL
-                         remove messages in this  channel,  if not provided
-                         current channel will be used
-```
 ### NetherCommand
 `nether` - <x1> <z1> - Returns the nether coordinates given a Minecraftian point.
 ### NowCommand
