@@ -3,7 +3,18 @@ mchelper:
   # Also used for other concurrent operations.
   command-threads: 2
   # Whether to record command runtime stats into the `statistics` SQL table.
+  # Requires the database below, otherwise this does nothing.
   record-stats: true
+  # Database configuration. Postgres is the only supported DBMS.
+  # Comment out this entire block to disable database functionality.
+  # Commands that rely on the database won't be created.
+  database:
+    # https://jdbc.postgresql.org/documentation/use/
+    url: jdbc:postgresql://127.0.0.1:5432/postgres?currentSchema=public
+    username: mchelper
+    password: password
+    # Number of connections the pool should have. See HikariConfig#setMaximumPoolSize
+    pool-size: 2
   # Discord bot token. Get one from https://discord.com/developers/applications.
   discord.token: null
   # Owlbot token. For defining words. As of 2024-01-07 this service appears to be down.

@@ -1,41 +1,40 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.database.Transaction;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.stats.Status;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.banditoz.mchelper.ObjectMapperFactory;
-import io.banditoz.mchelper.database.Transaction;
-import io.banditoz.mchelper.database.dao.AccountsDao;
-import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
-import io.banditoz.mchelper.database.dao.TasksDaoImpl;
-import io.banditoz.mchelper.money.AccountManager;
-import org.testng.annotations.Test;
+@InjectTest
+class WorkCommandTests extends BaseCommandTest {
+    @Inject
+    WorkCommand wc;
+    @Inject
+    AccountManager am;
+    @Inject
+    AccountsDao dao;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests", "BalanceCommandTests"})
-public class WorkCommandTests extends BaseCommandTest {
-    private final WorkCommand wc;
-
-    public WorkCommandTests() {
-        this.wc = new WorkCommand(
-                new ObjectMapperFactory().objectMapper(),
-                new AccountManager(new AccountsDaoImpl(DB)),
-                new TasksDaoImpl(DB)
-        );
-        wc.populateResponses();
+    @BeforeEach
+    void clear() {
+        truncate("accounts", "transactions", "tasks");
     }
 
     @Test
-    public void testWorking() throws Exception {
+    void testWorking() throws Exception {
+        am.queryBalance(ce.getUser().getIdLong(), true); // prime the account
         wc.onCommand(ce);
         assertThat(embedCaptor.getValue().getFooter().getText()).contains("New Balance:");
-    }
 
-    @Test(dependsOnMethods = {"testWorking"})
-    public void testHasAWorkTransaction() throws Exception {
-        AccountsDao dao = new AccountsDaoImpl(DB);
         long id = ce.getEvent().getAuthor().getIdLong();
         List<Transaction> txns = dao.getNTransactionsForUser(id, 100);
         Optional<Transaction> work = txns.stream().filter(transaction -> transaction.memo().contains("work")).findAny();
@@ -46,9 +45,13 @@ public class WorkCommandTests extends BaseCommandTest {
         assertThat(txn.date()).isAfter(LocalDateTime.now().minusSeconds(60)); // should always pass
     }
 
-    @Test(dependsOnMethods = {"testHasAWorkTransaction"})
+    @Test
     public void testCannotWorkAgain() throws Exception {
-        wc.onCommand(ce);
+        am.queryBalance(ce.getUser().getIdLong(), true); // prime the account
+        Status status = wc.onCommand(ce);
+        assertThat(status).isEqualTo(Status.SUCCESS);
+        status = wc.onCommand(ce);
+        assertThat(status).isEqualTo(Status.COOLDOWN);
         assertThat(stringCaptor.getValue()).contains("You cannot work until");
     }
 }

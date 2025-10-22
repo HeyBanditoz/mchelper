@@ -1,5 +1,12 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.money.MoneyException;
+import jakarta.inject.Inject;
+import net.dv8tion.jda.api.entities.Member;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,48 +14,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import io.banditoz.mchelper.Mocks;
-import io.banditoz.mchelper.database.dao.AccountsDao;
-import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
-import io.banditoz.mchelper.money.MoneyException;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import org.testng.annotations.Test;
+@InjectTest
+class BalanceCommandTests extends BaseCommandTest {
+    @Inject
+    BalanceCommand bc;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests"}, groups = "BalanceCommandTests")
-public class BalanceCommandTests extends BaseCommandTest {
-    private final BalanceCommand bc;
-
-    public BalanceCommandTests() {
-        this.bc = new BalanceCommand(AM);
+    @BeforeEach
+    void clear() {
+        truncate("accounts", "transactions");
     }
 
     @Test
-    public void testAccountCreation() throws Exception {
+    void testAccountCreation() throws Exception {
         bc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Your balance: $1,000");
     }
 
-    @Test(dependsOnMethods = {"testAccountCreation"})
-    public void testAnotherAccountCreation() throws Exception {
-        User u = Mocks.getDifferentMockedMember().getUser();
-        when(ce.getEvent().getAuthor()).thenReturn(u);
-        bc.onCommand(ce);
-        assertThat(stringCaptor.getValue()).isEqualTo("Your balance: $1,000");
-    }
-
-    @Test(dependsOnMethods = {"testAccountCreation"})
-    public void testHasAccountAndInitialTransaction() throws Exception {
-        AccountsDao dao = new AccountsDaoImpl(DB);
-        long id = ce.getEvent().getAuthor().getIdLong();
-        long id2 = Mocks.getMockedMember().getIdLong();
-        assertThat(dao.getAllAccounts()).containsExactlyInAnyOrder(id, id2);
-        assertThat(dao.getNTransactionsForUser(id, 100)).hasSize(1);
-        assertThat(dao.getNTransactionsForUser(id2, 100)).hasSize(1);
-    }
-
-    @Test(dependsOnMethods = {"testAccountCreation", "testAnotherAccountCreation"})
-    public void testInvalidUser() {
+    @Test
+    void testInvalidUser() {
         Member m = mock(Member.class);
         when(m.getIdLong()).thenReturn(1234L);
         when(ce.getMentionedMembers()).thenReturn(List.of(m));

@@ -1,4 +1,4 @@
-package io.banditoz.mchelper.utils;
+package io.banditoz.mchelper;
 
 import org.reflections.Reflections;
 

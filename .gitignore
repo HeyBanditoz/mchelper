@@ -96,3 +96,8 @@ liquibase.properties
 
 # Generated source files
 src/main/generated
+src/test/generated_tests
+
+# YAML overrides
+/src/test/resources/*-override.yml
+/src/main/resources/*-override.yml

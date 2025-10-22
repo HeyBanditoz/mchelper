@@ -1,23 +1,27 @@
 package io.banditoz.mchelper.config;
 
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.commands.BaseCommandTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.banditoz.mchelper.commands.BaseCommandTest;
-import io.banditoz.mchelper.database.dao.GuildConfigDaoImpl;
-import org.testng.annotations.Test;
+@InjectTest
+class ConfigurationProviderTests extends BaseCommandTest {
+    @Inject
+    ConfigurationProvider provider;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests"})
-public class ConfigurationProviderTests extends BaseCommandTest {
-    private final ConfigurationProvider provider;
-
-    public ConfigurationProviderTests() {
-        this.provider = new ConfigurationProvider(new GuildConfigDaoImpl(DB));
+    @BeforeEach
+    void clear() {
+        truncate("guild_config");
     }
 
     @Test
-    public void testGetSetGet() throws SQLException {
+    void testGetSetGet() throws SQLException {
         assertThat(provider.getValue(Config.PREFIX, ce.getGuild().getIdLong())).isEqualTo("!");
         provider.writeValue(Config.PREFIX, "%", ce.getGuild().getIdLong(), ce.getEvent().getAuthor().getIdLong());
         assertThat(provider.getValue(Config.PREFIX, ce.getGuild().getIdLong())).isEqualTo("%");

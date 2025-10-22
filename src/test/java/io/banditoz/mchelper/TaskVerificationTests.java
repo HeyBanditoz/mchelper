@@ -1,5 +1,11 @@
 package io.banditoz.mchelper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.database.TaskResponse;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
@@ -7,16 +13,13 @@ import java.util.StringJoiner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.banditoz.mchelper.database.TaskResponse;
-import org.testng.annotations.Test;
-
-@Test
-public class TaskVerificationTests {
-    private final ObjectMapper om = new ObjectMapper();
+@InjectTest
+class TaskVerificationTests {
+    @Inject
+    ObjectMapper om;
 
     @Test
-    public void testWorkTaskResponses() throws IOException {
+    void testWorkTaskResponses() throws IOException {
         StringJoiner failures = new StringJoiner("\n");
         List<TaskResponse> responses = om.readValue(getClass().getClassLoader()
                 .getResource("tasks_responses.json")

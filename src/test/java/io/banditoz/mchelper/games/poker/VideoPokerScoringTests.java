@@ -3,16 +3,16 @@ package io.banditoz.mchelper.games.poker;
 import io.banditoz.mchelper.games.Card;
 import io.banditoz.mchelper.games.Rank;
 import io.banditoz.mchelper.games.Suit;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static io.banditoz.mchelper.games.poker.PokerResult.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class VideoPokerScoringTests {
+class VideoPokerScoringTests {
     @Test
-    public void testVideoPokerScoringJacksOrBetter_0() {
+    void testVideoPokerScoringJacksOrBetter_0() {
         List<Card> cs = List.of(
                 new Card(Suit.SPADES, Rank.JACK),
                 new Card(Suit.CLUBS, Rank.QUEEN),
@@ -24,7 +24,7 @@ public class VideoPokerScoringTests {
     }
 
     @Test
-    public void testVideoPokerScoringRoyalFlush_0() {
+    void testVideoPokerScoringRoyalFlush_0() {
         List<Card> cs = List.of(
                 new Card(Suit.SPADES, Rank.KING),
                 new Card(Suit.SPADES, Rank.TEN),
@@ -36,7 +36,7 @@ public class VideoPokerScoringTests {
     }
 
     @Test
-    public void testVideoPokerScoringLoss_0() {
+    void testVideoPokerScoringLoss_0() {
         List<Card> cs = List.of(
                 new Card(Suit.SPADES, Rank.TWO),
                 new Card(Suit.HEARTS, Rank.FOUR),

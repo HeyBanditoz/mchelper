@@ -1,15 +1,19 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-public class NowCommandTests extends BaseCommandTest {
-    private final NowCommand nc = new NowCommand();
+@InjectTest
+class NowCommandTests extends BaseCommandTest {
+    @Inject
+    NowCommand nc;
 
     @Test
-    public void testNowCommand() throws Exception {
+    void testNowCommand() throws Exception {
         nc.onCommand(ce);
         String result = stringCaptor.getValue();
         assertThat(result).startsWith("<t:").endsWith(">");

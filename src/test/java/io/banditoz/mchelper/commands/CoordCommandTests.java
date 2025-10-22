@@ -1,38 +1,54 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
 
-import io.banditoz.mchelper.database.dao.CoordsDaoImpl;
-import org.testng.annotations.Test;
+@InjectTest
+class CoordCommandTests extends BaseCommandTest {
+    @Inject
+    CoordCommand cc;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests"})
-public class CoordCommandTests extends BaseCommandTest {
-    private final CoordCommand cc = spy(new CoordCommand(new CoordsDaoImpl(DB)));
+    @BeforeEach
+    void clear() {
+        truncate("coordinates");
+    }
 
     @Test
-    public void testCoordinateAdd() throws Exception {
+    void testCoordinateAdd() throws Exception {
         setArgs("add TestBase 100 -100");
         cc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("100, -100 saved.");
     }
 
-    @Test(dependsOnMethods = {"testCoordinateAdd"})
-    public void testCoordinateGetOne() throws Exception {
+    @Test
+    void testCoordinateGetOne() throws Exception {
+        setArgs("add TestBase 100 -100");
+        cc.onCommand(ce);
+        resetMocks();
         setArgs("show TestBase");
         cc.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("100, -100");
     }
 
-    @Test(dependsOnMethods = {"testCoordinateAdd"})
-    public void testCoordinateGetAll() throws Exception {
+    @Test
+    void testCoordinateGetAll() throws Exception {
+        setArgs("add TestBase 100 -100");
+        cc.onCommand(ce);
+        resetMocks();
         setArgs("list");
         cc.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("TestBase: 100, -100");
     }
 
-    @Test(dependsOnMethods = {"testCoordinateGetAll"})
-    public void testCoordinateDelete() throws Exception {
+    @Test
+    void testCoordinateDelete() throws Exception {
+        setArgs("add TestBase 100 -100");
+        cc.onCommand(ce);
+        resetMocks();
         setArgs("remove test");
         cc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Deleted.");

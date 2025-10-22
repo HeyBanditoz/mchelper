@@ -1,27 +1,26 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.spy;
 
-public class WhoHasCommandTests extends BaseCommandTest {
-    private final WhoHasCommand whc;
-
-    public WhoHasCommandTests() {
-        this.whc = spy(new WhoHasCommand());
-    }
+@InjectTest
+class WhoHasCommandTests extends BaseCommandTest {
+    @Inject
+    WhoHasCommand whc;
 
     @Test
-    public void testWhoHasCommand() throws Exception {
+    void testWhoHasCommand() throws Exception {
         setArgs("732863308738330636");
         whc.onCommand(ce);
         assertThat(embedCaptor.getValue().getDescription()).isEqualTo("Members that have role *Role:*\n<@!404837963697225729>, <@!163094867910590464>");
     }
 
     @Test
-    public void testWhoHasCommandInvalidRole() {
+    void testWhoHasCommandInvalidRole() {
         setArgs("0");
         assertThatThrownBy(() -> whc.onCommand(ce));
     }

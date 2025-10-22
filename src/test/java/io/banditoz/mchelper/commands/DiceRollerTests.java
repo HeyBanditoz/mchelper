@@ -1,16 +1,15 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
 
+@InjectTest
 public class DiceRollerTests extends BaseCommandTest {
-    private final DiceRollerCommand drc;
-
-    public DiceRollerTests() {
-        this.drc = spy(new DiceRollerCommand());
-    }
+    @Inject
+    DiceRollerCommand drc;
 
     @Test
     public void testDiceRollerCommand() throws Exception {

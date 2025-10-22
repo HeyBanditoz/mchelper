@@ -110,6 +110,11 @@ dependencies {
         exclude module: 'slf4j-api' // still need an old logback version for elasticsearch logger issue
         exclude module: 'tink'
     }
+    implementation("org.slf4j:slf4j-api:1.7.36") {
+        version {
+            strictly "1.7.36" // we may never get out of dependency hell
+        }
+    }
     implementation 'ch.qos.logback:logback-classic:1.2.11' // pinned back to attempt to fix issues with missing fields in elasticsearch
     implementation 'com.udojava:EvalEx:2.7'
     implementation 'org.scilab.forge:jlatexmath:1.0.7'
@@ -127,7 +132,6 @@ dependencies {
     implementation('org.knowm.xchart:xchart:3.8.8') {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
-    implementation 'org.reflections:reflections:0.10.2'
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
     implementation 'ch.obermuhlner:java-scriptengine:2.0.0'
     implementation 'org.liquibase:liquibase-core:4.25.1'
@@ -158,12 +162,18 @@ dependencies {
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise
 
-    testImplementation 'org.testng:testng:7.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testAnnotationProcessor 'io.avaje:avaje-inject-test:11.6'
+    testImplementation "org.testcontainers:testcontainers:1.21.3"
+    testImplementation "org.testcontainers:junit-jupiter:1.21.3"
+
     testImplementation 'org.mockito:mockito-core:5.11.0'
     testImplementation 'org.assertj:assertj-core:3.25.3'
     testImplementation 'io.avaje:avaje-inject-test:11.6'
     testAnnotationProcessor 'io.avaje:avaje-inject-generator:11.6'
     testImplementation 'com.tngtech.archunit:archunit:1.4.1'
+    testImplementation 'org.reflections:reflections:0.10.2'
 
     liquibaseRuntime 'org.liquibase:liquibase-core:4.17.2'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
@@ -173,7 +183,7 @@ dependencies {
 }
 
 test {
-    useTestNG()
+    useJUnitPlatform()
     jvmArgs("--enable-preview")
 }
 

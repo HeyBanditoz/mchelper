@@ -45,17 +45,25 @@ be destroyed.
 
 MCHelper uses Java 21.
 
-For development with a database, remove the entire `mchelper` block under `services` in the docker-compose file, and
-set up your system environment variables like so:
-`HOST=127.0.0.1;DB=postgres;USER=postgres;PASS=SuperSecret;SCHEMA=public`
+For development with a database, remove the entire `mchelper` block under `services` in the docker-compose file.
 
 You will also need to add this under the `postgres` block:
 ```yaml
 ports:
-      - 5432:5432/tcp
+  - 5432:5432/tcp
 ```
 
 You can access the postgres shell by running `docker exec -u 70 -it postgres psql`.
+
+You'll have to configure database access. In `application.yml`:
+
+```yml
+mchelper:
+  database:
+    url: jdbc:postgres://127.0.0.1/postgres/?currentSchema=public
+    username: postgres
+    password: SuperSecret
+```
 
 ### Liquibase
 MCHelper uses Liquibase to handle database migrations. TODO add more details!
@@ -110,18 +118,26 @@ in Docker commands.
 ## Configuration
 
 You will need to copy `application-example.yml` to `application.yml` and edit it with your tokens. All external services
-the bot can access will be configured here, except the Postgres database. To configure that, you'll need to pass the
-following environment variables to the JVM:
-* HOST
-* DB
-* USER
-* PASS
-* SCHEMA
+the bot can access will be configured here, including the Postgres database.
 
 An example of a systemd unit file is available in the repository [here.](mchelper.service)
+Note that I don't use systemd to manage MCHelper anymore, but rather Docker. It should still work, though.
 
-To set up and configure Postgres, refer to the Ubuntu guide [here. (Ubuntu.)](https://www.postgresql.org/download/linux/ubuntu/)
+To set up and configure Postgres, refer to the Ubuntu guide
+[here. (Ubuntu.)](https://www.postgresql.org/download/linux/ubuntu/) or alternative guide for your system.
 
-## Documentation
+## Tests
 
-Some documentation is available in the [documentation folder.](docs)
+The test suite requires a configured Postgres database. By default, the suite will use a Postgres service from
+[Testcontainers](https://java.testcontainers.org/) via Docker. If you want to use a normal Postgres installation
+instead, configure the following environment variables:
+```
+NO_DOCKER_POSTGRES=true
+AVAJE_PROFILES=override
+```
+then create a `application-override.yml` file within the [test resources directory.](src/test/resources) Configure the
+database as you would normally.
+
+If using a regularly installed Postgres database it's recommended to drop all the tables either when the tests are
+finished, or before they run, especially if you're working on database migrations. Tests that use the database
+truncate tables and reset sequences between each test, though.

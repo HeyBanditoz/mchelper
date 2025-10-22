@@ -1,17 +1,5 @@
 package io.banditoz.mchelper.money.lottery;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static io.banditoz.mchelper.money.AccountManager.format;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.database.Lottery;
@@ -29,6 +17,18 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static io.banditoz.mchelper.money.AccountManager.format;
 
 @Singleton
 @RequiresDatabase
@@ -131,7 +131,7 @@ public class LotteryManager {
         List<StatPoint<String>> topBals = am.getTopBalancesForGuild(g);
         double avg = topBals.stream()
                 .mapToDouble(value -> value.getCount().doubleValue())
-                .filter(value -> value > 1000)
+                .filter(value -> value >= 1000)
                 .average()
                 .orElse(0);
         return am.scale(new BigDecimal(avg / topBals.size()));

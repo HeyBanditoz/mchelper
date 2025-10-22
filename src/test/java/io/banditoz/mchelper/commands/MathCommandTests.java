@@ -1,29 +1,26 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
 
-public class MathCommandTests extends BaseCommandTest {
-    private final MathCommand mc;
-
-    public MathCommandTests() {
-        this.mc = spy(new MathCommand());
-        doNothing().when(ce).sendReply(stringCaptor.capture());
-    }
+@InjectTest
+class MathCommandTests extends BaseCommandTest {
+    @Inject
+    MathCommand mc;
 
     @Test
-    public void testMathCommandPlainString() throws Exception {
+    void testMathCommandPlainString() throws Exception {
         setArgs("1+3*5");
         mc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("16");
     }
 
     @Test
-    public void testMathCommandEngineeringString() throws Exception {
+    void testMathCommandEngineeringString() throws Exception {
         setArgs("10^512");
         mc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("100E+510");
@@ -31,7 +28,7 @@ public class MathCommandTests extends BaseCommandTest {
 
 
     @Test
-    public void testBadInput() {
+    void testBadInput() {
         setArgs("hello world"); // -> 16
         assertThatThrownBy(() -> mc.onCommand(ce));
     }

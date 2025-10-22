@@ -1,12 +1,16 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
 import io.banditoz.mchelper.Mocks;
-import io.banditoz.mchelper.money.MoneyException;
 import io.banditoz.mchelper.database.Transaction;
-import io.banditoz.mchelper.database.dao.AccountsDaoImpl;
+import io.banditoz.mchelper.database.dao.AccountsDao;
+import io.banditoz.mchelper.money.AccountManager;
+import io.banditoz.mchelper.money.MoneyException;
+import jakarta.inject.Inject;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,20 +20,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-@Test(dependsOnGroups = {"BalanceCommandTests"}, groups = {"TransferCommandTests"})
-public class TransferCommandTests extends BaseCommandTest {
-    private final TransferCommand tc = new TransferCommand(AM);
+@InjectTest
+class TransferCommandTests extends BaseCommandTest {
+    @Inject
+    TransferCommand tc;
+    @Inject
+    AccountManager am;
+    @Inject
+    AccountsDao dao;
+
     private final Member member = Mocks.getMockedMember();
     private final User otherUser = Mocks.getDifferentMockedMember().getUser();
 
-    public TransferCommandTests() {
+    @BeforeEach
+    void init() {
+        truncate("accounts", "transactions");
         when(ce.getMentionedMembers()).thenReturn(List.of(member));
         when(ce.getRawCommandArgs()).thenReturn(new String[]{"!transfer", "", "400"});
     }
 
     @Test
-    public void testTransferCommand() throws Exception {
-        AccountsDaoImpl dao = new AccountsDaoImpl(DB);
+    void testTransferCommand() throws Exception {
+        am.queryBalance(member.getIdLong(), true);
+        am.queryBalance(otherUser.getIdLong(), true);
         when(ce.getEvent().getAuthor()).thenReturn(otherUser);
         when(ce.getMentionedMembers()).thenReturn(List.of(member));
         tc.onCommand(ce);
@@ -46,18 +59,24 @@ public class TransferCommandTests extends BaseCommandTest {
         assertThat(t.memo()).isEqualTo("transfer");
 
         // make sure balances of the test accounts are good too
-        assertThat(AM.queryBalance(otherUser.getIdLong(), false)).isEqualByComparingTo(new BigDecimal("600"));
-        assertThat(AM.queryBalance(member.getIdLong(), false)).isGreaterThanOrEqualTo(new BigDecimal("1400"));
+        assertThat(am.queryBalance(otherUser.getIdLong(), false)).isEqualByComparingTo(new BigDecimal("600"));
+        assertThat(am.queryBalance(member.getIdLong(), false)).isGreaterThanOrEqualTo(new BigDecimal("1400"));
     }
 
-    @Test(dependsOnMethods = {"testTransferCommand"})
-    public void cannotTransferNegativeAmount() {
+    @Test
+    void cannotTransferNegativeAmount() throws Exception {
+        am.queryBalance(member.getIdLong(), true);
+        am.queryBalance(otherUser.getIdLong(), true);
+
         setArgs("a -400");
         assertThatThrownBy(() -> tc.onCommand(ce)).isInstanceOf(MoneyException.class); // can't transfer negative amount
     }
 
-    @Test(dependsOnMethods = {"testTransferCommand"})
-    public void testCannotTransferToSelf() {
+    @Test
+    void testCannotTransferToSelf() throws Exception {
+        am.queryBalance(member.getIdLong(), true);
+        am.queryBalance(otherUser.getIdLong(), true);
+
         setArgs("a 400");
         User u = member.getUser();
         when(ce.getEvent().getAuthor()).thenReturn(u);

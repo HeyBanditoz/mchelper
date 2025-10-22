@@ -1,8 +1,7 @@
 package io.banditoz.mchelper.runnables;
 
-import java.util.List;
-
 import io.banditoz.mchelper.database.dao.UserCacheDao;
+import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
@@ -10,7 +9,10 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @Singleton
+@RequiresDatabase
 public class UserMaintenanceRunnable implements Runnable {
     private final JDA jda;
     private final UserCacheDao dao;

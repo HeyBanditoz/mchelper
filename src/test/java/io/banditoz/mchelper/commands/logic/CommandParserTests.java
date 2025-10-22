@@ -2,7 +2,7 @@ package io.banditoz.mchelper.commands.logic;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.banditoz.mchelper.commands.logic.CommandUtils.commandArgs;
 import static io.banditoz.mchelper.commands.logic.CommandUtils.generateCommandArgsString;
@@ -10,9 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CommandParserTests {
+class CommandParserTests {
     @Test
-    public void testCommandParser() {
+    void testCommandParser() {
         String[] test = new String[]{"this", "is", "a", "test"};
         assertThat(commandArgs("**<test>** this is a test")).isEqualTo(test);
         assertThat(commandArgs("this is a test")).isEqualTo(test);

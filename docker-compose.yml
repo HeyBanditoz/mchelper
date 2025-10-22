@@ -6,11 +6,6 @@ services:
         volumes:
             - './application.yml:/app/application.yml'
         environment:
-            - HOST=postgres
-            - DB=postgres
-            - USER=postgres
-            - PASS=SuperSecret
-            - SCHEMA=public
             - TZ=America/Denver  # swap this for your timezone, affects logging and dates in SQL
         image: registry.gitlab.com/heybanditoz/mchelper:master
         deploy:
@@ -24,4 +19,4 @@ services:
         environment:
             - TZ=America/Denver
             - POSTGRES_PASSWORD=SuperSecret
-        image: postgres:14.2-alpine
+        image: postgres:16.10-alpine

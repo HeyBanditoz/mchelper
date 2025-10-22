@@ -1,15 +1,15 @@
 package io.banditoz.mchelper.commands.logic;
 
 import net.dv8tion.jda.api.entities.User;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BotOwnerTests {
+class BotOwnerTests {
     @Test
-    public void testBotOwners_happyPath() {
+    void testBotOwners_happyPath() {
         User mockUser = mock(User.class);
         when(mockUser.getIdLong()).thenReturn(100L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isTrue();
@@ -19,7 +19,7 @@ public class BotOwnerTests {
     }
 
     @Test
-    public void testBotOwners_negative() {
+    void testBotOwners_negative() {
         User mockUser = mock(User.class);
         when(mockUser.getIdLong()).thenReturn(300L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isFalse();

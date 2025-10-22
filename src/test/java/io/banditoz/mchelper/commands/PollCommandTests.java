@@ -1,46 +1,47 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.PollService;
+import io.banditoz.mchelper.database.Database;
+import io.banditoz.mchelper.database.Poll;
+import io.banditoz.mchelper.database.PollQuestion;
+import io.banditoz.mchelper.database.dao.PollsDao;
+import io.banditoz.mchelper.runnables.PollCullerRunnable;
+import io.jenetics.facilejdbc.Query;
+import jakarta.inject.Inject;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import io.banditoz.mchelper.PollService;
-import io.banditoz.mchelper.database.Poll;
-import io.banditoz.mchelper.database.PollQuestion;
-import io.banditoz.mchelper.database.dao.PollsDao;
-import io.banditoz.mchelper.database.dao.PollsDaoImpl;
-import io.banditoz.mchelper.runnables.PollCullerRunnable;
-import io.jenetics.facilejdbc.Query;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+@InjectTest
+class PollCommandTests extends BaseCommandTest {
+    @Inject
+    PollCommand pc;
+    @Inject
+    PollsDao dao;
+    @Inject
+    PollService pollService;
+    @Inject
+    Database database;
 
-@Test(dependsOnGroups = {"DatabaseInitializationTests"})
-public class PollCommandTests extends BaseCommandTest {
-    private PollCommand pc;
-    private PollsDao dao;
-    private PollService pollService;
-
-    @BeforeClass
-    public void setup() throws Exception {
-        dao = new PollsDaoImpl(DB);
-        pollService = new PollService(
-                mock(JDA.class),
-                dao,
-                mock(ScheduledExecutorService.class)
-        );
-        pc = new PollCommand(pollService);
+    @BeforeEach
+    void clear() {
+        truncate("poll", "poll_question", "poll_results");
+        resetSequence("poll_id_seq", "poll_question_id_seq");
     }
 
     // TODO expand these tests. They're kinda barebones.
     @Test
-    public void testPollCommandSingle() throws Exception {
+    void testPollCommandSingle() throws Exception {
         Message m = mock(Message.class);
         when(m.getIdLong()).thenReturn(100L);
         when(ce.getEvent().getChannel().sendMessage(any(MessageCreateData.class)).complete()).thenReturn(m);
@@ -67,7 +68,7 @@ public class PollCommandTests extends BaseCommandTest {
     }
 
     @Test
-    public void testPollCommandMultiple() throws Exception {
+    void testPollCommandMultiple() throws Exception {
         Message m = mock(Message.class);
         when(m.getIdLong()).thenReturn(101L);
         when(ce.getEvent().getChannel().sendMessage(any(MessageCreateData.class)).complete()).thenReturn(m);
@@ -97,17 +98,27 @@ public class PollCommandTests extends BaseCommandTest {
         assertThat(results.values().stream().reduce(Integer::sum).orElse(0)).isEqualTo(2);
     }
 
-    @Test(dependsOnMethods = {"testPollCommandSingle", "testPollCommandMultiple"})
-    public void testPollCuller() throws Exception {
+    @Test
+    void testPollCuller() throws Exception {
+        Message m = mock(Message.class);
+        when(m.getIdLong()).thenReturn(100L);
+        when(ce.getEvent().getChannel().sendMessage(any(MessageCreateData.class)).complete()).thenReturn(m);
+
+        setArgs("\"Best chicken nugget\" single Fried Raw \"Double Fried\" Baked \"Air Fried\" \"Heated with Radiation\"");
+        pc.onCommand(ce);
+        Poll poll = dao.getAllPolls().get(0);
+        Map<PollQuestion, Integer> results = dao.getResults(poll.questions());
+        List<PollQuestion> pqs = results.keySet().stream().toList();
+        PollQuestion underTest = pqs.get(0);
+        dao.toggleVote(underTest.buttonUuid(), ce.getEvent().getAuthor(), poll);
+
         PollCullerRunnable r = new PollCullerRunnable(pollService, dao, mock(JDA.class));
         // set all poll respondents to 3 days ago
-        try (Connection c = DB.getConnection()) {
+        try (Connection c = database.getConnection()) {
             int result = Query.of("UPDATE poll_results SET cast_on = cast_on - INTERVAL '7 DAY';")
                     .executeUpdate(c);
-            assertThat(dao.getAllPolls()).hasSize(2);
-            assertThat(result).isGreaterThan(0); // make sure it actually updated
-            r.run();
             assertThat(dao.getAllPolls()).hasSize(1);
+            assertThat(result).isGreaterThan(0); // make sure it actually updated
             result = Query.of("UPDATE poll SET created_on = created_on - INTERVAL '7 DAY';")
                     .executeUpdate(c);
             r.run();

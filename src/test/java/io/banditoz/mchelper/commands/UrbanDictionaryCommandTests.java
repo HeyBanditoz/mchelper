@@ -1,21 +1,20 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import io.banditoz.mchelper.Http;
-import io.banditoz.mchelper.ObjectMapperFactory;
-import io.banditoz.mchelper.urbandictionary.UDSearcher;
-import org.testng.annotations.Test;
-
-public class UrbanDictionaryCommandTests extends BaseCommandTest {
-    private final UrbanDictionaryCommand udc;
-
-    public UrbanDictionaryCommandTests() {
-        this.udc = new UrbanDictionaryCommand(new UDSearcher(new Http(new ObjectMapperFactory().objectMapper()).getUrbanDictionaryClient()));
-    }
+@InjectTest
+@Tag("external-integration")
+class UrbanDictionaryCommandTests extends BaseCommandTest {
+    @Inject
+    UrbanDictionaryCommand udc;
 
     @Test
-    public void testUrbanDictionaryCommand() throws Exception {
+    void testUrbanDictionaryCommand() {
         setArgs("tarkov");
         assertThatCode(() -> udc.onCommand(ce)).doesNotThrowAnyException();
     }

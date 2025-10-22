@@ -1,8 +1,8 @@
 package io.banditoz.mchelper;
 
 import io.banditoz.mchelper.utils.ListUtils;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,12 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ListUtilsTests {
+class ListUtilsTests {
     private List<String> possibilities;
     private Random rand;
 
-    @BeforeMethod
-    public void initialize() {
+    @BeforeEach
+    void initialize() {
         this.possibilities = new ArrayList<>();
         this.possibilities.add("foo");
         this.possibilities.add("bar");
@@ -24,7 +24,7 @@ public class ListUtilsTests {
     }
 
     @Test
-    public void extractNumRandomlyShouldBeRandom() {
+    void extractNumRandomlyShouldBeRandom() {
         assertThat(ListUtils.extractNumRandomly(1, possibilities, rand)).isEqualTo("foo");
         assertThat(ListUtils.extractNumRandomly(1, possibilities, rand)).isEqualTo("bar");
         assertThat(ListUtils.extractNumRandomly(1, possibilities, rand)).isEqualTo("bar");
@@ -33,7 +33,7 @@ public class ListUtilsTests {
     }
 
     @Test
-    public void extractingMultipleEntriesFromListShouldBeRandom() {
+    void extractingMultipleEntriesFromListShouldBeRandom() {
         assertThat(ListUtils.extractNumRandomly(2, possibilities, rand)).isEqualTo("foo, bar");
         assertThat(ListUtils.extractNumRandomly(2, possibilities, rand)).isEqualTo("bar, foo");
         assertThat(ListUtils.extractNumRandomly(2, possibilities, rand)).isEqualTo("baz, foo");

@@ -1,18 +1,15 @@
 package io.banditoz.mchelper.commands;
 
-import org.testng.annotations.Test;
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
 
-public class CoinFlipCommandTests extends BaseCommandTest {
-    private final CoinFlipCommand cfc;
-
-    public CoinFlipCommandTests() {
-        this.cfc = spy(new CoinFlipCommand());
-        doNothing().when(ce).sendReply(stringCaptor.capture());
-    }
+@InjectTest
+class CoinFlipCommandTests extends BaseCommandTest {
+    @Inject
+    CoinFlipCommand cfc;
 
     @Test
     public void testCoinFlipCommand() throws Exception {

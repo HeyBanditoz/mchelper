@@ -1,4 +1,10 @@
-package io.banditoz.mchelper.utils.database;
+package io.banditoz.mchelper;
+
+import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.money.AccountManager;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -6,15 +12,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import io.banditoz.mchelper.database.StatPoint;
-import io.banditoz.mchelper.money.AccountManager;
-import org.assertj.core.api.Assertions;
-import org.testng.annotations.Test;
+class StatPointTests {
+    private List<StatPoint<String>> amounts;
 
-public class StatPointTests {
-    private final List<StatPoint<String>> amounts;
-
-    public StatPointTests() {
+    @BeforeEach
+    void init() {
         List<StatPoint<String>> localAmounts = new ArrayList<>(List.of(
                 new StatPoint<>("Mr. Foo", new BigDecimal("5.352")),
                 new StatPoint<>("Ms. Bar", new BigDecimal("2.689")),
@@ -24,7 +26,7 @@ public class StatPointTests {
     }
 
     @Test
-    public void testStatPointLeaderboardGeneration() {
+    void testStatPointLeaderboardGeneration() {
         String leaderboard = StatPoint.statsToPrettyLeaderboard(amounts,
                 10,
                 s -> s,
@@ -42,7 +44,7 @@ public class StatPointTests {
     }
 
     @Test
-    public void testStatPointLeaderboardGenerationDifferentCountFormatter() {
+    void testStatPointLeaderboardGenerationDifferentCountFormatter() {
         String leaderboard = StatPoint.statsToPrettyLeaderboard(amounts,
                 10,
                 s -> s,
@@ -60,7 +62,7 @@ public class StatPointTests {
     }
 
     @Test
-    public void testStatPointLeaderboardGenerationThingFormatter() {
+    void testStatPointLeaderboardGenerationThingFormatter() {
         String leaderboard = StatPoint.statsToPrettyLeaderboard(amounts,
                 10,
                 s -> s.toUpperCase(Locale.ROOT),
@@ -78,7 +80,7 @@ public class StatPointTests {
     }
 
     @Test
-    public void testStatPointLeaderboardGenerationStringTruncation() {
+    void testStatPointLeaderboardGenerationStringTruncation() {
         String leaderboard = StatPoint.statsToPrettyLeaderboard(amounts,
                 2,
                 s -> s,

@@ -30,7 +30,7 @@ test:
         - ln -s src/main/resources/sql sql
         # Run tests!
         # DatabaseInitializationTests runs the migrations for us.
-        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" ./gradlew test jacocoTestReport --no-daemon
+        - AVAJE_PROFILES=ci ./gradlew test jacocoTestReport --no-daemon
     needs: ["package"]
     dependencies:
         - package

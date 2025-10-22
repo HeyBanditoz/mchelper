@@ -1,22 +1,18 @@
 package io.banditoz.mchelper.commands;
 
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
-import org.testng.annotations.Test;
-
-public class EvalCommandTests extends BaseCommandTest {
-    private final EvalCommand ec;
-
-    public EvalCommandTests() {
-        this.ec = spy(new EvalCommand(null));
-        when(ce.getEvent().isFromType(any())).thenReturn(true);
-    }
+@InjectTest
+class EvalCommandTests extends BaseCommandTest {
+    @Inject
+    EvalCommand ec;
 
     @Test
-    public void testEvalCommand() throws Exception {
+    void testEvalCommand() throws Exception {
         setArgs("""
                 ```java
                 int x = 5;
@@ -27,7 +23,7 @@ public class EvalCommandTests extends BaseCommandTest {
     }
 
     @Test
-    public void testEvalCommandExternalClass() throws Exception {
+    void testEvalCommandExternalClass() throws Exception {
         setArgs("""
                 ```java
                 import com.udojava.evalex.Expression;
@@ -40,7 +36,7 @@ public class EvalCommandTests extends BaseCommandTest {
 
 
     @Test
-    public void testEvalCommandNull() throws Exception {
+    void testEvalCommandNull() throws Exception {
         setArgs("null");
         ec.onCommand(ce);
         assertThat(stringCaptor.getValue()).contains("<null output>");

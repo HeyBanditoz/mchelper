@@ -1,63 +1,62 @@
-package io.banditoz.mchelper;
+package io.banditoz.mchelper.money;
 
-import io.banditoz.mchelper.money.AccountManager;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AccountManagerFormattingTests {
+class AccountManagerFormattingTests {
     @Test
-    public void testOneZeroZero() {
+    void testOneZeroZero() {
         BigDecimal bd = new BigDecimal("1.00");
         assertEquals("1", AccountManager.format(bd));
     }
 
     @Test
-    public void testOne() {
+    void testOne() {
         BigDecimal bd = new BigDecimal("1");
         assertEquals("1", AccountManager.format(bd));
     }
 
     @Test
-    public void testOneOneZero() {
+    void testOneOneZero() {
         BigDecimal bd = new BigDecimal("1.10");
         assertEquals("1.10", AccountManager.format(bd));
     }
 
     @Test
-    public void testOneZeroOne() {
+    void testOneZeroOne() {
         BigDecimal bd = new BigDecimal("1.01");
         assertEquals("1.01", AccountManager.format(bd));
     }
 
     @Test
-    public void testZeroZeroOne() {
+    void testZeroZeroOne() {
         BigDecimal bd = new BigDecimal("0.01");
         assertEquals("0.01", AccountManager.format(bd));
     }
 
     @Test
-    public void testZeroOneZero() {
+    void testZeroOneZero() {
         BigDecimal bd = new BigDecimal("0.10");
         assertEquals("0.10", AccountManager.format(bd));
     }
 
     @Test
-    public void testLargeNumber() {
+    void testLargeNumber() {
         BigDecimal bd = new BigDecimal("1234.56");
         assertEquals("1,234.56", AccountManager.format(bd));
     }
 
     @Test
-    public void testLargeNumberTwo() {
+    void testLargeNumberTwo() {
         BigDecimal bd = new BigDecimal("1234.5");
         assertEquals("1,234.50", AccountManager.format(bd));
     }
 
     @Test
-    public void testLargeNumberThree() {
+    void testLargeNumberThree() {
         BigDecimal bd = new BigDecimal("1234");
         assertEquals("1,234", AccountManager.format(bd));
     }
