@@ -33,7 +33,7 @@ test:
         - ln -s src/main/resources/sql sql
         # Run tests!
         # DatabaseInitializationTests runs the migrations for us.
-        - ./gradlew test jacocoTestReport --no-daemon --stacktrace
+        - ./gradlew test jacocoTestReport --no-daemon --stacktrace --debug
     needs: ["package"]
     dependencies:
         - package
