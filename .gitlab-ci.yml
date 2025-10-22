@@ -23,6 +23,9 @@ package:
 
 test:
     stage: test
+    variables:
+        AVAJE_PROFILES: ci
+        NO_DOCKER_POSTGRES: true
     script:
         - rc-service postgresql start
         # We love bash so much, this looks crazy, but you're just gonna have to trust me.
@@ -30,7 +33,7 @@ test:
         - ln -s src/main/resources/sql sql
         # Run tests!
         # DatabaseInitializationTests runs the migrations for us.
-        - AVAJE_PROFILES=ci ./gradlew test jacocoTestReport --no-daemon
+        - ./gradlew test jacocoTestReport --no-daemon
     needs: ["package"]
     dependencies:
         - package
