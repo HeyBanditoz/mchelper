@@ -1,6 +1,6 @@
 # Configuration to run tests within Gitlab's CI
 mchelper:
   database:
-    url: jdbc:postgresql://127.0.0.1/postgres/?currentSchema=public
+    url: jdbc:postgresql://127.0.0.1:5432/postgres/?currentSchema=public
     username: postgres
     password: postgres

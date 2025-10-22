@@ -185,6 +185,10 @@ dependencies {
 test {
     useJUnitPlatform()
     jvmArgs("--enable-preview")
+    outputs.upToDateWhen {
+        false
+    }
+    showStandardStreams = true
 }
 
 tasks.withType(JavaCompile) {
