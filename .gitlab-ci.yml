@@ -73,6 +73,8 @@ new_commands:
         - git config user.email "noreply@thisbetternotbeadomainname.com"
         - git checkout master
         - cp -v build/COMMANDS.md COMMANDS.md
-        - git add COMMANDS.md && git commit -m "[automated] update command list [ci skip]" && git push origin master
+        - git add COMMANDS.md
+        - git commit -m "[automated] update command list [ci skip]" || true # this can fail build if no commit
+        - git push origin master
     only:
         - master
