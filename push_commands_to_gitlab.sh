@@ -22,7 +22,7 @@ if [[ $EXIT_CODE -eq 0 ]]; then
     exit 0
 elif [[ $EXIT_CODE -ne 0 ]]; then
     echo "executing curl"
-    curl -i -X PUT -H "PRIVATE-TOKEN: $(cat token)" -H "Content-Type: application/json" -d "$(generate_json)" "https://gitlab.com/api/v4/projects/13974445/repository/files/COMMANDS.md"
+    curl -i -X PUT -H "PRIVATE-TOKEN: $CI_JOB_TOKEN" -H "Content-Type: application/json" -d "$(generate_json)" "https://gitlab.com/api/v4/projects/13974445/repository/files/COMMANDS.md"
 fi
 
 #rm COMMANDS_OLD.md

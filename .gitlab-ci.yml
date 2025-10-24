@@ -34,6 +34,8 @@ test:
         # Run tests!
         # DatabaseInitializationTests runs the migrations for us.
         - ./gradlew test jacocoTestReport --no-daemon
+        # Copy COMMANDS file to cache for use in later job to push it to the repo if needed
+        - cp -v COMMANDS.md build/COMMANDS.md
     needs: ["package"]
     dependencies:
         - package
@@ -63,17 +65,14 @@ create_image:
         - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $IMAGE_TAG -t $IMAGE_TAG .
         - docker push $IMAGE_TAG
 
-#new_commands:
-#    stage: deploy
-#    needs: ["coverage"]
-#    dependencies:
-#        - coverage
-#    script:
-#        - cp -v COMMANDS.md COMMANDS_OLD.md
-#        - echo "$PRIVATE_TOKEN" > token
-#        - apt update
-#        - apt -y install curl
-#        - DB="postgres" HOST="127.0.0.1" USER="postgres" PASS="postgres" SCHEMA="public" gradle run --args="dumpcommands"
-#        - bash push_commands_to_gitlab.sh
-#    only:
-#        - master
+new_commands:
+    stage: deploy
+    script:
+        - git remote set-url origin $CI_REPOSITORY_URL
+        - git config user.name "HeyBanditoz"
+        - git config user.email "noreply@thisbetternotbeadomainname.com"
+        - git checkout master
+        - cp -v build/COMMANDS.md COMMANDS.md
+        - git add COMMANDS.md && git commit -m "[automated] update command list [ci skip]" && git push origin master
+    only:
+        - master
