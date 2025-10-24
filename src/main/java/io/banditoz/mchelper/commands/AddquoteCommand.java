@@ -1,12 +1,5 @@
 package io.banditoz.mchelper.commands;
 
-import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
-
 import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
@@ -25,11 +18,19 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+
+import java.sql.SQLException;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 @Singleton
 @RequiresDatabase
@@ -90,19 +91,19 @@ public class AddquoteCommand extends Command {
 
     private void editQuote(WrappedButtonClickEvent event, NamedQuote nq, InteractionListener il) {
         String modalId = UUID.randomUUID().toString();
-        TextInput quote = TextInput.create("quote", "Quote", TextInputStyle.PARAGRAPH)
+        Label quote = Label.of("Quote", TextInput.create("quote", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("New quote")
                 .setMaxLength(1500)
                 .setValue(nq.getQuote())
-                .build();
-        TextInput quoteAuthor = TextInput.create("quoteAuthor", "Quote Author", TextInputStyle.SHORT)
+                .build());
+        Label quoteAuthor = Label.of("Quote Author", TextInput.create("quoteAuthor", TextInputStyle.SHORT)
                 .setPlaceholder("New quote author")
                 .setMaxLength(100)
                 .setValue(nq.getQuoteAuthor())
-                .build();
+                .build());
         Modal modal = Modal.create("quoteEdit", "Quote Edit")
                 .setId(modalId)
-                .addComponents(ActionRow.of(quote), ActionRow.of(quoteAuthor))
+                .addComponents(quote, quoteAuthor)
                 .build();
         event.getEvent().replyModal(modal).queue();
         ModalInteractable interactable = new ModalInteractable.Builder()
