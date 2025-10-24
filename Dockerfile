@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install oxipng
 RUN apk update
-RUN apk add --no-cache oxipng
+RUN apk add --no-cache oxipng units
 
 COPY --from=build /build/libs/io.banditoz.mchelper-all.jar bot.jar
 
