@@ -1,5 +1,5 @@
 # Commands
-There are a total of 65 commands and 7 regex listeners.
+There are a total of 64 commands and 7 regex listeners.
 ### AddquoteCommand
 `addquote` - "<quote>" <author> - Adds a quote to the database.
 ### BalanceCommand
