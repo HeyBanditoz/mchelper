@@ -1,17 +1,5 @@
 package io.banditoz.mchelper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import static feign.FeignException.errorStatus;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import feign.*;
@@ -31,6 +19,18 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import static feign.FeignException.errorStatus;
+
 @Factory
 public class Http {
     private final OkHttpClient client;
@@ -45,6 +45,7 @@ public class Http {
     private final DarkSkyClient darkSkyClient;
     private final AnthropicClient anthropicClient;
     private final ScryfallClient scryfallClient;
+    private final XonlistClient xonlistClient;
 
     private final JacksonDecoder decoder;
     private final JacksonEncoder encoder;
@@ -148,6 +149,9 @@ public class Http {
                 .errorDecoder(bodyRedactingErrorDecoder)
                 .target(ScryfallClient.class, "https://api.scryfall.com");
 
+        xonlistClient = baseFeignBuilder()
+                .target(XonlistClient.class, "https://xonotic.lifeisabug.com");
+
         LOGGER.info("Finished building Feign clients. Current status: " + this);
     }
 
@@ -211,6 +215,11 @@ public class Http {
     @Bean
     public ScryfallClient getScryfallClient() {
         return scryfallClient;
+    }
+
+    @Bean
+    public XonlistClient getXonlistClient() {
+        return xonlistClient;
     }
 
     private static final class UserAgentInterceptor implements RequestInterceptor {
