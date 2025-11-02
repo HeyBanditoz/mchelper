@@ -21,6 +21,7 @@ public class XonlistCheckerRunnable implements Runnable {
                                   JDA jda) {
         this.notifier = notifier;
         this.jda = jda;
+        log.info("Xonlist server checker initialized.");
     }
 
     @Override

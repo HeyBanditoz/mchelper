@@ -301,6 +301,7 @@ public class Http {
                 ", darkSkyClient=" + darkSkyClient +
                 ", anthropicClient=" + anthropicClient +
                 ", scryfallClient=" + scryfallClient +
+                ", xonlistClient=" + xonlistClient +
                 '}';
     }
 }
