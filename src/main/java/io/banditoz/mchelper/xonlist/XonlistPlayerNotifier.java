@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.Color;
 import java.time.Instant;
@@ -26,7 +26,7 @@ public class XonlistPlayerNotifier {
         this.xonlistClient = xonlistClient;
     }
 
-    public void checkAndNotify(TextChannel notifChannel) {
+    public void checkAndNotify(MessageChannel notifChannel) {
         XonlistResponse xonlist = xonlistClient.getAllXonoticServers();
         List<XonoticServer> filteredServers = xonlist.servers()
                 .values()
