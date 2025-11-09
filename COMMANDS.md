@@ -35,7 +35,7 @@ There are a total of 64 commands and 7 regex listeners.
 ### EightBallCommand
 `8` - <no parameters>  - Seek wisdom of the eight ball.
 ### EvalCommand
-`eval` - \`\`\`java<newline>\`\`\` - Evaluates JShell. If you don't use code blocks, a return is added to the beginning of the code,otherwise, if you are using code blocks, you should return something. (ELEVATED)
+`eval` - \`\`\`groovy<newline>\`\`\` - Evaluates Groovy. If you don't use code blocks, a return is added to the beginning of the code, otherwise, if you are using code blocks, you should return something. (ELEVATED)
 ### FloodCommand
 `flood` - [num] <message> - Floods this channel with a message.
 ### FromMorseCommand
