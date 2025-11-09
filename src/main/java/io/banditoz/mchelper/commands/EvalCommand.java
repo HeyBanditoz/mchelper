@@ -1,11 +1,6 @@
 package io.banditoz.mchelper.commands;
 
-import javax.annotation.Nullable;
-import javax.script.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import io.avaje.inject.BeanScope;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import io.banditoz.mchelper.commands.logic.ElevatedCommand;
 import io.banditoz.mchelper.database.Database;
@@ -13,24 +8,35 @@ import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
+
+import javax.annotation.Nullable;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Singleton
 public class EvalCommand extends ElevatedCommand {
     private final ScriptEngineManager manager;
     private final Database database;
+    private final BeanScope beanScope;
+
+    private static final Pattern LANG_CODE_BLOCK_MATCHER = Pattern.compile(".*[\\s\\S]*?```(?:\\w+)?\\n([\\s\\S]*?)```");
 
     @Inject
-    public EvalCommand(@Nullable Database database) {
-        this.database = database;
+    public EvalCommand(@Nullable Database database, BeanScope beanScope) {
         manager = new ScriptEngineManager();
+        this.database = database;
+        this.beanScope = beanScope;
     }
 
     @Override
     public Help getHelp() {
-        return new Help(commandName(), true).withParameters("\\`\\`\\`java<newline>\\`\\`\\`")
-                .withDescription("Evaluates JShell. If you don't use code blocks, a return is added to the beginning of the code," +
-                        "otherwise, if you are using code blocks, you should return something.");
+        return new Help(commandName(), true).withParameters("\\`\\`\\`groovy<newline>\\`\\`\\`")
+                .withDescription("Evaluates Groovy. If you don't use code blocks, a return is added to the beginning " +
+                        "of the code, otherwise, if you are using code blocks, you should return something.");
     }
 
     @Override
@@ -41,76 +47,38 @@ public class EvalCommand extends ElevatedCommand {
     // Partially stolen from https://github.com/DV8FromTheWorld/Yui/blob/0eaeed13d97ab40225542a40014f79566e430daf/src/main/java/net/dv8tion/discord/commands/EvalCommand.java
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        ScriptEngine engine = manager.getEngineByName("java");
-        // quick n' dirty zeroth (command prefix and name) removal.
-        String args = ce.getEvent().getMessage().getContentRaw().replaceFirst(".\\w+\\s+", "");
-        if (args.startsWith("```java")) {
-            args = args.replace("```java", "").replace("```", "");
-        }
-        if (!args.contains("return ")) {
-            args = "return " + args;
-        }
-        StringBuilder imports = new StringBuilder("""
-                import java.util.*;
+        ScriptEngine engine = manager.getEngineByName("groovy");
+        Compilable compiler = (Compilable) engine;
+        String rawArgs = ce.getEvent().getMessage().getContentRaw();
+        Matcher argsMatcher = LANG_CODE_BLOCK_MATCHER.matcher(rawArgs);
+        String args = argsMatcher.matches() ? argsMatcher.group(1) : ce.getCommandArgsString().replace("`", "");
+
+        String imports = """
+                import java.sql.*;
+                import net.dv8tion.jda.*;
                 import io.banditoz.mchelper.database.*;
-                import io.banditoz.mchelper.database.dao.*;
-                import io.banditoz.mchelper.commands.logic.*;
-                import net.dv8tion.jda.api.*;
-                import net.dv8tion.jda.api.entities.*;
-                """);
-
-        List<String> argsList = new ArrayList<>(List.of(args.split("\n")));
-        Iterator<String> iterator = argsList.iterator();
-        while (iterator.hasNext()) {
-            String line = iterator.next();
-            if (line.startsWith("import ")) {
-                iterator.remove();
-                imports.append(line);
-            }
+                import io.banditoz.mchelper.money.*;
+                import io.jenetics.facilejdbc.*;
+                """;
+        engine.put("ce", ce);
+        engine.put("args", ce.getCommandArgs());
+        engine.put("jda", ce.getEvent().getJDA());
+        engine.put("db", database);
+        engine.put("database", database);
+        engine.put("bs", beanScope);
+        engine.put("beanScope", beanScope);
+        if (ce.getEvent().isFromGuild()) {
+            engine.put("guild", ce.getEvent().getGuild());
+            engine.put("member", ce.getEvent().getMember());
         }
-        args = String.join("\n", argsList).stripLeading().trim();
+        long beforeCompile = System.currentTimeMillis();
+        CompiledScript groovyScript = compiler.compile(imports + args);
+        long compileDuration = System.currentTimeMillis() - beforeCompile;
 
-        String initial = """
-                package script;
-                %s
+        long beforeRun = System.currentTimeMillis();
+        Object out = groovyScript.eval();
+        long runDuration = System.currentTimeMillis() - beforeRun;
 
-                public class Script {
-                    public CommandEvent ce;
-                    public Database db;
-                    public String[] args;
-                    public JDA jda;
-                    public Guild guild;
-                    public Member member;
-                                
-                    public Object run() throws Exception {
-                        %s%s
-                    }
-                }
-                """.formatted(imports.toString(), args, !args.endsWith(";") ? ";" : "");
-
-        Compilable c = (Compilable) engine;
-        long before = System.currentTimeMillis();
-        CompiledScript cs = null;
-        try {
-            cs = c.compile(initial);
-        } catch (ScriptException e) {
-            ScriptException ex = new ScriptException("```\n" + e.getMessage() + "```");
-            ex.initCause(e);
-            throw ex;
-        }
-        long compileDuration = System.currentTimeMillis() - before;
-        Bindings b = engine.createBindings();
-        b.put("ce", ce);
-        b.put("db", database);
-        b.put("args", ce.getCommandArgs());
-        b.put("jda", ce.getEvent().getJDA());
-        if (ce.getEvent().isFromType(ChannelType.TEXT)) {
-            b.put("guild", ce.getEvent().getGuild());
-            b.put("member", ce.getEvent().getMember());
-        }
-        before = System.currentTimeMillis();
-        Object out = cs.eval(b);
-        long runDuration = System.currentTimeMillis() - before;
         if (out == null) {
             ce.sendReply("Executed in " + runDuration + "ms. (Compile took " + compileDuration + " ms.)\n<null output>");
         }
@@ -118,6 +86,5 @@ public class EvalCommand extends ElevatedCommand {
             ce.sendPastableReply("Executed in " + runDuration + " ms. (Compile took " + compileDuration + " ms.)\n```\n" + out.toString() + "```");
         }
         return Status.SUCCESS;
-
     }
 }

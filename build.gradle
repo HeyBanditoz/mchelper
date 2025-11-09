@@ -62,7 +62,7 @@ shadowJar {
     minimize {
         exclude(dependency('org.cache2k:cache2k-core.*:.*'))
         exclude(dependency('ch.qos.logback:logback-classic.*:.*'))
-        exclude(dependency('ch.obermuhlner:java-scriptengine.*:.*'))
+        exclude(dependency('org.apache.groovy:.*:.*'))
         exclude(dependency('org.postgresql:postgresql.*:.*'))
         exclude(dependency('com.github.cgoIT:logback-elasticsearch-appender.*:.*'))
         exclude(dependency('org.liquibase:liquibase-core.*:.*'))
@@ -133,7 +133,7 @@ dependencies {
         ["graphics2d", "VectorGraphics2D", "animated-gif-lib"].each { module -> exclude module: module }
     }
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
-    implementation 'ch.obermuhlner:java-scriptengine:2.0.0'
+    implementation 'org.apache.groovy:groovy-jsr223:5.0.2'
     implementation 'org.liquibase:liquibase-core:5.0.1'
     implementation 'com.mattbertolini:liquibase-slf4j:5.1.0'
     implementation 'org.yaml:snakeyaml:2.2'
