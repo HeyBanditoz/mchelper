@@ -1,10 +1,13 @@
 package io.banditoz.mchelper.weather.darksky;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.function.ToDoubleFunction;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record DataItem(double windGust, int apparentTemperatureMinTime, double temperatureMax, String icon,
                        double precipIntensityMax, int windBearing, int temperatureMaxTime,
                        double apparentTemperatureMin, int sunsetTime, double temperatureLow, String precipType,

@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.weather.darksky;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record Currently(String summary, double precipProbability, double visibility, double windGust,
                         double precipIntensity, double precipIntensityError, String icon, double cloudCover,
                         int windBearing, double apparentTemperature, double pressure, double dewPoint, double ozone,
