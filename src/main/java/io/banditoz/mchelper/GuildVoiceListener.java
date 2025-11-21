@@ -1,9 +1,5 @@
 package io.banditoz.mchelper;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
@@ -11,6 +7,7 @@ import io.banditoz.mchelper.config.GuildConfigurationProvider;
 import io.banditoz.mchelper.database.dao.GuildConfigDao;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,6 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Singleton
 @RequiresDatabase
 public class GuildVoiceListener extends ListenerAdapter {
     private final JDA jda;
@@ -89,19 +91,20 @@ public class GuildVoiceListener extends ListenerAdapter {
             log.error("Encountered Exception while updating all voice roles.", e);
             return;
         }
-        allGuildsWith.forEach((guildId, voiceRoleId) -> {
-            Guild g = jda.getGuildById(guildId);
+        for (Map.Entry<Long, String> entry : allGuildsWith.entrySet()) {
+            String voiceRoleId = entry.getValue();
+            Guild g = jda.getGuildById(entry.getKey());
             if (g == null) {
-                return;
+                continue;
             }
             if (!voiceRoleId.equals("0")) {
                 if (!g.getMemberById(jda.getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
-                    return;
+                    continue;
                 }
                 Role toChange = g.getRoleById(voiceRoleId);
                 if (toChange == null) {
                     log.debug("There is no role in guild {} by id {}. Skipping role update.", g, voiceRoleId);
-                    return;
+                    continue;
                 }
                 int secondsDelay = 0;
                 for (GuildVoiceState vs : g.getVoiceStates()) {
@@ -121,7 +124,7 @@ public class GuildVoiceListener extends ListenerAdapter {
                 }
                 i.getAndIncrement();
             }
-        });
+        }
         log.info("Updated voice roles for {} guild(s).", i);
     }
 }
