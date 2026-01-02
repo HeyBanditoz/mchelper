@@ -76,6 +76,12 @@ shadowJar {
     }
 }
 
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "io.banditoz.mchelper.Bot"
+    }
+}
+
 tasks.shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
