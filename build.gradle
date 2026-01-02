@@ -76,8 +76,8 @@ shadowJar {
     }
 }
 
-rootProject.tasks.named("shadowJar") {
-    duplicatesStrategy = 'include'
+tasks.shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 gversion {
