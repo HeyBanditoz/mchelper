@@ -1,12 +1,5 @@
 package io.banditoz.mchelper.interactions;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import io.banditoz.mchelper.commands.logic.CommandEvent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -20,6 +13,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The base class for all messages that need to listen to a button interaction from Discord.
@@ -81,9 +81,9 @@ public class ButtonInteractable extends Interactable<Button, WrappedButtonClickE
     }
 
     /**
-     * Removes all {@link Button} in the referenced {@link Message}.
+     * Removes all {@link Button} in the referenced {@link Message}.<br>
      *
-     * @deprecated Use {@link #destroy(WrappedButtonClickEvent)} as that is the smoother path.
+     * <b>Note!</b> You probably want {@link #destroy(WrappedButtonClickEvent)} as that is the smoother path.
      */
     public void destroy() {
         LOGGER.debug("Removing all buttons for " + message);

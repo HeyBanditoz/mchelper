@@ -56,5 +56,9 @@ public enum ItemType {
     @JsonProperty("suppressor")
     SUPPRESSOR,
     @JsonProperty("disabled")
-    DISABLED;
+    DISABLED,
+    @JsonProperty("specialSlot")
+    SPECIAL_SLOT,
+    @JsonProperty("poster")
+    POSTER
 }

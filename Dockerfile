@@ -5,7 +5,7 @@ WORKDIR /build
 
 COPY ./build /build
 
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:25-jdk-alpine
 WORKDIR /app
 
 # Install oxipng
