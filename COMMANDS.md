@@ -1,63 +1,95 @@
 # Commands
 There are a total of 64 commands and 7 regex listeners.
+
+If a command name has _(S)_, it also has a slash command.
+
 ### AddquoteCommand
-`addquote` - "<quote>" <author> - Adds a quote to the database.
-### BalanceCommand
-`bal` - <no parameters>  - Checks your balance.
+`addquote` - "\<quote\>" \<author\> - Adds a quote to the database.
+
+### BalanceCommand _(S)_
+`bal` - \<no parameters\>  - Checks your balance.
+
 ### BalanceGraphCommand
 `balgraph` - [-d] - Graphs your transaction history, transaction by transaction. Use -d to use dates instead
-### BaltopCommand
-`baltop` - <no parameters>  - Gets the money leaderboard for this guild.
+
+### BaltopCommand _(S)_
+`baltop` - \<no parameters\>  - Gets the money leaderboard for this guild.
+
 ### BashCommand
-`bash` - <bash> - Executes bash if it is installed on system. (ELEVATED)
+`bash` - \<bash\> - Executes bash if it is installed on system. (ELEVATED)
+
 ### BlackJackCommand
-`blackjack` - <ante (with range 5 <= x <= 200000)> - Play double or nothing to win some money!
+`blackjack` - \<ante (with range 5 \<= x \<= 200000)\> - Play double or nothing to win some money!
+
 ### CoinFlipCommand
-`flip` - <no parameters>  - Flips a coin.
+`flip` - \<no parameters\>  - Flips a coin.
+
 ### CooldownsCommand
 `cooldowns` - [user as mention] - Returns the cooldowns for you or another user.
+
 ### CoordCommand
-`coords` - <save|add,show|list,delete|remove,help> - Saves coordinates to the database. See !coords help
-### DeleteQuoteCommand
-`delquote` - <quote ID> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
+`coords` - \<save|add,show|list,delete|remove,help\> - Saves coordinates to the database. See !coords help
+
+### DeleteQuoteCommand _(S)_
+`delquote` - \<quote ID\> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
+
 ### DeleteReminderCommand
-`delremind` - <id> - Deletes a reminder.
+`delremind` - \<id\> - Deletes a reminder.
+
 ### DiceRollerCommand
 `roll` - [dice notation] - Roll some dice following standard dice notation.
+
 ### DictionaryCommand
-`define` - <word> - Finds the definition of a word using Owlbot's API.
+`define` - \<word\> - Finds the definition of a word using Owlbot's API.
+
 ### DoubleOrNothingCommand
-`don` - <ante (with range 5 <= x <= 200000)> - Play double or nothing to win some money!
+`don` - \<ante (with range 5 \<= x \<= 200000)\> - Play double or nothing to win some money!
+
 ### DuelCommand
-`duel` - <ante> - Duel with your channel for money!
+`duel` - \<ante\> - Duel with your channel for money!
+
 ### EangleCommand
-`eangle` - <x1> <z1> <x2> <z2> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
+`eangle` - \<x1\> \<z1\> \<x2\> \<z2\> - Returns the elytra flight angle and distance between two Minecraftian coordinate points.
+
 ### EightBallCommand
-`8` - <no parameters>  - Seek wisdom of the eight ball.
+`8` - \<no parameters\>  - Seek wisdom of the eight ball.
+
 ### EvalCommand
-`eval` - \`\`\`groovy<newline>\`\`\` - Evaluates Groovy. If you don't use code blocks, a return is added to the beginning of the code, otherwise, if you are using code blocks, you should return something. (ELEVATED)
+`eval` - \`\`\`groovy\<newline\>\`\`\` - Evaluates Groovy. If you don't use code blocks, a return is added to the beginning of the code, otherwise, if you are using code blocks, you should return something. (ELEVATED)
+
 ### FloodCommand
-`flood` - [num] <message> - Floods this channel with a message.
-### FromMorseCommand
-`frommorse` - <morse> - Converts morse to text. Use / for spaces between words.
+`flood` - [num] \<message\> - Floods this channel with a message.
+
+### FromMorseCommand _(S)_
+`frommorse` - \<morse\> - Converts morse to text. Use / for spaces between words.
+
 ### GuildBalanceGraphCommand
 `gbalgraph` - [-d] - Graphs this guild's transactions history, transaction by transaction. Use -d to use dates instead
+
 ### GuildConfigCommand
-`config` - <key> <value> - Configure the bot for this guild. No arguments to view the configuration.
+`config` - \<key\> \<value\> - Configure the bot for this guild. No arguments to view the configuration.
+
 ### HeapDumpCommand
-`heapdump` - <boolean> - Dumps the heap. (ELEVATED)
+`heapdump` - \<boolean\> - Dumps the heap. (ELEVATED)
+
 ### HelpCommand
-`help` - <no parameters>  - This screen.
+`help` - \<no parameters\>  - This screen.
+
 ### InfoCommand
-`info` - <no parameters>  - Returns various bot statistics.
+`info` - \<no parameters\>  - Returns various bot statistics.
+
 ### InviteBotCommand
-`invite` - <no parameters>  - Generates an invite link to invite the bot.
+`invite` - \<no parameters\>  - Generates an invite link to invite the bot.
+
 ### JoinOrderCommand
-`joinorder` - <no parameters>  - Sends this guild's join order.
+`joinorder` - \<no parameters\>  - Sends this guild's join order.
+
 ### LoadoutCommand
-`loadout` - <no parameters>  - Points to ultimate-bravery.
+`loadout` - \<no parameters\>  - Points to ultimate-bravery.
+
 ### LotteryCommand
 `lottery` - [amount] - Enter the lottery! They last for four hours.
+
 ### ManageRolesCommand
 ```
 usage: roles [-i] [--deactivate] [-a] [-r] [-b] [params [params ...]]
@@ -72,22 +104,31 @@ named arguments:
   -r, -d, --remove-role  removes a role
   -b, --rebuild          rebuilds reaction role message
 ```
+
 ### MathCommand
-`math` - <math> - Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.
+`math` - \<math\> - Executes math. See <https://github.com/uklimaschewski/EvalEx#supported-operators> for what you can do.
+
 ### NetherCommand
-`nether` - <x1> <z1> - Returns the nether coordinates given a Minecraftian point.
+`nether` - \<x1\> \<z1\> - Returns the nether coordinates given a Minecraftian point.
+
 ### NowCommand
-`now` - <no parameters>  - Returns the current time.
+`now` - \<no parameters\>  - Returns the current time.
+
 ### OverworldCommand
-`overworld` - <x1> <z1> - Returns the overworld coordinates given a Minecraftian point.
-### PickCommand
-`pick` - [num] <options...> - Picks num from a list of options. If num is not specified, it will only pick one. Separate your words with 'or' or a space.
+`overworld` - \<x1\> \<z1\> - Returns the overworld coordinates given a Minecraftian point.
+
+### PickCommand _(S)_
+`pick` - [num] \<options...\> - Picks num from a list of options. If num is not specified, it will only pick one. Separate your words with 'or' or a space.
+
 ### PingCommand
-`ping` - <no parameters>  - Returns the current websocket and API ping.
+`ping` - \<no parameters\>  - Returns the current websocket and API ping.
+
 ### PlotCommand
-`plot` - <expression> - Plots a function, use x
+`plot` - \<expression\> - Plots a function, use x
+
 ### PollCommand
-`poll` - <"poll title"> <"poll type (single or multiple)"> <"questsion 1"> ["question 2"] ... - Create single-choice and multiple-choice anonymous polls.
+`poll` - \<"poll title"\> \<"poll type (single or multiple)"\> \<"questsion 1"\> ["question 2"] ... - Create single-choice and multiple-choice anonymous polls.
+
 ### QuoteCommand
 ```
 usage: quote [-s] [-i] [-a] [-d] [-e] [quoteAndAuthor [quoteAndAuthor ...]]
@@ -106,22 +147,31 @@ named arguments:
   -e, --exact            search exactly (by default  it performs a fulltext
                          search on quote and quote author)
 ```
+
 ### RemindmeCommand
-`remindme` - <duration> <reminder> - Creates a reminder. It is accurate give or take a second.
+`remindme` - \<duration\> \<reminder\> - Creates a reminder. It is accurate give or take a second.
+
 ### RemoveCommandCommand
-`removecommand` - <command> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
+`removecommand` - \<command\> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
+
 ### RockPaperScissorsCommand
-`rps` - <rock/paper/scissors> - Chooses a random, Rock, Paper, or Scissors
+`rps` - \<rock/paper/scissors\> - Chooses a random, Rock, Paper, or Scissors
+
 ### RussianRouletteCommand
-`roulette` - <no parameters>  - Kick a random person from your voice channel!
+`roulette` - \<no parameters\>  - Kick a random person from your voice channel!
+
 ### ServerStatusCommand
-`status` - <address[:port]> - Fetches information about a Minecraft server.
+`status` - \<address[:port]\> - Fetches information about a Minecraft server.
+
 ### SnowflakeCommand
-`snowflake` - <snowflakes...> - Converts Discord snowflake ID(s) to dates.
+`snowflake` - \<snowflakes...\> - Converts Discord snowflake ID(s) to dates.
+
 ### SqlCommand
-`sql` - <sql query> - Evaluates SQL.
+`sql` - \<sql query\> - Evaluates SQL.
+
 ### StatisticsCommand
-`stats` - <no parameters>  - Returns command and other statistics.
+`stats` - \<no parameters\>  - Returns command and other statistics.
+
 ### StockCommand
 ```
 usage: stock [-g {true,false}] [-y {true,false}] ticker
@@ -137,51 +187,74 @@ named arguments:
   -y {true,false}, --yearly {true,false}
                          generated graph will show yearly data
 ```
+
 ### TarkovCommand
-`tarkov` - <item name> - Returns pricing information about a given item from the tarkov-market API.
+`tarkov` - \<item name\> - Returns pricing information about a given item from the tarkov-market API.
+
 ### TeXCommand
-`tex` - <tex> - Generates a mathematical equation using TeX markup.
+`tex` - \<tex\> - Generates a mathematical equation using TeX markup.
+
 ### TeamsCommand
-`teams` - <no parameters>  - sends a message with your voice channel divided into teams
-### ToMorseCommand
-`tomorse` - <string> - Encodes a message to morse code.
+`teams` - \<no parameters\>  - sends a message with your voice channel divided into teams
+
+### ToMorseCommand _(S)_
+`tomorse` - \<string\> - Encodes a message to morse code.
+
 ### TransactionsCommand
-`txns` - <no parameters>  - Fetches your last 20 transactions.
-### TransferCommand
-`transfer` - <to> <amount> [memo] - Transfer money.
+`txns` - \<no parameters\>  - Fetches your last 20 transactions.
+
+### TransferCommand _(S)_
+`transfer` - \<to\> \<amount\> [memo] - Transfer money.
+
 ### UnitsCommand
-`units` - <conversion> - Launches a conversion between two units separated by 'to'.
+`units` - \<conversion\> - Launches a conversion between two units separated by 'to'.
+
 ### UploadLogsCommand
-`uploadlogs` - <no parameters>  - Uploads this bot session's logs to the current channel (ELEVATED)
+`uploadlogs` - \<no parameters\>  - Uploads this bot session's logs to the current channel (ELEVATED)
+
 ### UrbanDictionaryCommand
-`ud` - <word> - Gets a definition from Urban Dictionary's API.
+`ud` - \<word\> - Gets a definition from Urban Dictionary's API.
+
 ### UserInfoCommand
 `userinfo` - [mentions] - Returns information about a user.
+
 ### VersionCommand
-`version` - <no parameters>  - Returns the bot's version.
+`version` - \<no parameters\>  - Returns the bot's version.
+
 ### VideoPokerCommand
-`poker` - <ante (with range 100 <= x <= 500 )> - Play video poker to win some money! For the paytable, visit https://en.wikipedia.org/w/index.php?title=Video_poker&oldid=1094389801#Jacks_or_Better
+`poker` - \<ante (with range 100 \<= x \<= 500 )\> - Play video poker to win some money! For the paytable, visit https://en.wikipedia.org/w/index.php?title=Video\_poker&oldid=1094389801#Jacks\_or_Better
+
 ### WeatherCommand
-`w` - <location> - Returns the current weather of a location.
+`w` - \<location\> - Returns the current weather of a location.
+
 ### WeatherForecastCommand
-`wf` - <location> - Returns the weather forecast of a location.
+`wf` - \<location\> - Returns the weather forecast of a location.
+
 ### WhoHasCommand
-`whohas` - <role ID> - Returns who has a certain role in the guild.
+`whohas` - \<role ID\> - Returns who has a certain role in the guild.
+
 ### WorkCommand
-`work` - <no parameters>  - Work for money every day.
+`work` - \<no parameters\>  - Work for money every day.
 
 # Regex Listeners
 ### BetRegexable
 `\bbet((s)?|(ting)?|(ted))\b`
+
 ### DadRegexable
 `^(i['’]?)m(ma)?\b`
+
 ### RedditRegexable
 `https://reddit.app.link/\w.*`
+
 ### RedditShareRegexable
 `https://(www.)?reddit.com/r/\w{3,21}/s/\w+(?=/$|$)`
+
 ### ScryfallCardRegexable
 `\[\[([^]]+)]]`
+
 ### TeXRegexable
 `\$\$(.*?)\$\$`
+
 ### TwitterRegexable
 `https://(www.)?(twitter|x).com/\w{1,45}/status/\d+`
+
