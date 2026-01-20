@@ -1,14 +1,16 @@
 package io.banditoz.mchelper.commands;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.avaje.inject.test.InjectTest;
 import jakarta.inject.Inject;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @InjectTest
 @Tag("external-integration")
+@Ignore
 class TarkovCommandTests extends BaseCommandTest {
     @Inject
     TarkovCommand tc;

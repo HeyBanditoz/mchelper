@@ -1,5 +1,13 @@
 package io.banditoz.mchelper.commands;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import io.avaje.inject.test.InjectTest;
 import io.banditoz.mchelper.Mocks;
 import io.banditoz.mchelper.database.Transaction;
@@ -11,14 +19,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @InjectTest
 class TransferCommandTests extends BaseCommandTest {
@@ -43,7 +43,7 @@ class TransferCommandTests extends BaseCommandTest {
     void testTransferCommand() throws Exception {
         am.queryBalance(member.getIdLong(), true);
         am.queryBalance(otherUser.getIdLong(), true);
-        when(ce.getEvent().getAuthor()).thenReturn(otherUser);
+        when(ce.getUser()).thenReturn(otherUser);
         when(ce.getMentionedMembers()).thenReturn(List.of(member));
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Transfer of $400 to <@!163094867910590464> complete. You have $600 left.");

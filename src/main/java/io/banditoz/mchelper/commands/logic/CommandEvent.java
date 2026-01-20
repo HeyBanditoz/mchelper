@@ -18,13 +18,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 /**
  * Class which holds the MessageReceivedEvent and command arguments.
  */
-public class CommandEvent implements UserEvent {
+public class CommandEvent implements UserEvent, ICommandEvent {
     private String COMMAND_ARGS_STRING;
     private String RAW_COMMAND_ARGS_STRING;
     private String[] COMMAND_ARGS;
@@ -147,13 +148,14 @@ public class CommandEvent implements UserEvent {
         CommandUtils.sendExceptionMessage(this.EVENT, ex, LOGGER);
     }
 
-    /**
-     * Sends a reply. All mentions will be sanitized.
-     *
-     * @param msg The reply.
-     */
+    @Override
     public void sendReply(String msg) {
         CommandUtils.sendReply(msg, EVENT);
+    }
+
+    @Override
+    public void sendReply(MessageCreateData msg) {
+        EVENT.getChannel().sendMessage(msg).queue();
     }
 
     /**
@@ -192,14 +194,14 @@ public class CommandEvent implements UserEvent {
     /**
      * Sends an EmbedReply.
      *
-     * @param me The reply.
+     * @param embed The reply.
      */
-    public void sendEmbedReply(MessageEmbed me) {
-        EVENT.getChannel().sendMessageEmbeds(me).queue();
+    public void sendEmbedReply(MessageEmbed embed) {
+        EVENT.getChannel().sendMessageEmbeds(embed).queue();
     }
 
-    public void sendEmbedsReply(MessageEmbed... mes) {
-        EVENT.getChannel().sendMessageEmbeds(Arrays.asList(mes)).queue();
+    public void sendEmbedsReply(MessageEmbed... embeds) {
+        EVENT.getChannel().sendMessageEmbeds(Arrays.asList(embeds)).queue();
     }
 
     public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {
@@ -258,15 +260,6 @@ public class CommandEvent implements UserEvent {
     public boolean isElevated() {
         return IS_ELEVATED;
     }
-
-    /**
-     * Returns the MCHelper instance the CommandEvent came from.
-     *
-     * @return The MCHelper instance.
-     */
-//    public MCHelper getMCHelper() {
-//        return MCHELPER;
-//    }
 
     protected Logger getLogger() {
         return LOGGER;

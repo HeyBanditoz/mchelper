@@ -27,6 +27,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Singleton entry-point for execution of <i>text-based</i> commands.
+ */
 @Singleton
 public class CommandHandler extends ListenerAdapter implements AutoCloseable {
     private final ThreadPoolExecutor threadPoolExecutor;
@@ -73,7 +76,7 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
                 event.getChannel().sendMessage("WARN: This CommandHandler is being shutdown. No new commands will be accepted. The bot is most likely rebooting. Try again later.").queue();
                 return;
             }
-            if (c.canExecute(event)) {
+            if (c.canExecute(event.getAuthor())) {
                 threadPoolExecutor.execute(() -> {
                     try {
                         Stat s = c.execute(event, kind, interactionListener, this, configurationProvider);
@@ -86,6 +89,10 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
                         log.error("Unhandled exception in command execution. This should never happen. author=" + event.getAuthor() + " args='" + event.getMessage().getContentRaw() + "' command=" + c, ex);
                     }
                 });
+            }
+            else {
+                CommandUtils.sendReply(String.format("User <%s> does not have permission to run this command!",
+                        event.getAuthor()), event);
             }
         });
     }

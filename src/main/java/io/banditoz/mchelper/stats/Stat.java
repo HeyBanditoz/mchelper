@@ -1,20 +1,17 @@
 package io.banditoz.mchelper.stats;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
 import java.time.LocalDateTime;
 
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
+
 /**
- * A class which represents anything that the bot runs on behalf of a user, such as a command or a listener, to be
+ * A class which represents anything that the bot <i>ran</i> on behalf of a user, such as a command or a listener, to be
  * recorded by a statistics recorder.
  */
 public interface Stat {
-    /**
-     * Returns the {@link MessageReceivedEvent} associated with this statistic.
-     *
-     * @return The {@link MessageReceivedEvent}.
-     */
-    MessageReceivedEvent getEvent();
+    User getUser(); // TODO javadoc
+    Channel getChannel(); // TODO javadoc
     /**
      * Returns the name of the command, regexable, or anything that the bot could run on behalf of the user's class
      * name.
@@ -63,8 +60,8 @@ public interface Stat {
                 this.getStatus(),
                 this.getExecutionTime(),
                 this.getKind(),
-                this.getEvent().getAuthor().toString(),
-                this.getEvent().getChannel().toString(),
+                this.getUser().toString(),
+                this.getChannel().toString(),
                 this.getArgs().isEmpty() ? "<no arguments>" : this.getArgs());
     }
 }

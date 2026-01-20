@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import net.dv8tion.jda.api.entities.channel.Channel;
 
 /**
  * Represents a {@link CommandEvent} <i>after</i> the command has finished running. It contains how long a command
@@ -30,6 +31,11 @@ public class LoggableCommandEvent extends CommandEvent implements Stat {
     }
 
     @Override
+    public Channel getChannel() {
+        return getEvent().getChannel();
+    }
+
+    @Override
     public String getClassName() {
         return getCommandName();
     }
@@ -47,5 +53,10 @@ public class LoggableCommandEvent extends CommandEvent implements Stat {
     @Override
     public Kind getKind() {
         return kind;
+    }
+
+    @Override
+    public String getLogMessage() {
+        return Stat.super.getLogMessage();
     }
 }

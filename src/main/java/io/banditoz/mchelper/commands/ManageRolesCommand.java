@@ -54,7 +54,7 @@ public class ManageRolesCommand extends Command {
     }
 
     @Override
-    protected EnumSet<Permission> getRequiredPermissions() {
+    public EnumSet<Permission> getRequiredPermissions() {
         return EnumSet.of(Permission.ADMINISTRATOR);
     }
 

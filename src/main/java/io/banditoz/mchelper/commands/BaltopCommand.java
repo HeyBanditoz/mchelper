@@ -4,6 +4,9 @@ import java.util.List;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.commands.logic.slash.Slash;
+import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
 import io.banditoz.mchelper.database.StatPoint;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.money.AccountManager;
@@ -36,12 +39,22 @@ public class BaltopCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
+        go(ce);
+        return Status.SUCCESS;
+    }
+
+    @Slash
+    public Status onSlashCommand(SlashCommandEvent sce) throws Exception {
+        go(sce);
+        return Status.SUCCESS;
+    }
+
+    private void go(ICommandEvent ce) throws Exception {
         List<StatPoint<String>> organized = accountManager.getTopBalancesForGuild(ce.getGuild());
         ce.sendEmbedReply(new EmbedBuilder()
                 .setAuthor("Money leaderboard for " + ce.getGuild().getName(), null, ce.getGuild().getIconUrl())
                 .appendDescription(generateBaltopTable(organized))
                 .build());
-        return Status.SUCCESS;
     }
 
     private String generateBaltopTable(List<StatPoint<String>> stats) {

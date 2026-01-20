@@ -9,10 +9,13 @@ import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.MeterProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.Interaction;
 import org.jetbrains.annotations.NotNull;
@@ -48,15 +51,25 @@ public class MetricsEventListener extends ListenerAdapter {
         AttributesBuilder attr = Attributes.builder()
                 .put("event_name", event.getClass().getSimpleName());
         switch (event) {
-            case GenericGuildEvent e ->
-                    attr.put("guild", e.getGuild().getIdLong());
-            case GenericMessageEvent e when e.isFromGuild() ->
-                    attr.put("guild", e.getGuild().getIdLong());
-            case Interaction e when e.getGuild() != null ->
-                    attr.put("guild", e.getGuild().getIdLong());
+            case GenericGuildEvent e -> attr.put("guild", e.getGuild().getIdLong());
+            case GenericMessageEvent e when e.isFromGuild() -> {
+                attr.put("guild", e.getGuild().getIdLong());
+                if (e instanceof MessageUpdateEvent mue) {
+                    User u = mue.getMessage().getAuthor();
+                    String accountType = u.isBot() ? "bot" : u.isSystem() ? "system" : "user";
+                    attr.put("user_type", accountType);
+                }
+            }
+            case Interaction e when e.getGuild() != null -> {
+                attr.put("guild", e.getGuild().getIdLong());
+                if (e instanceof SlashCommandInteractionEvent scie) {
+                    attr.put("name", scie.getFullCommandName());
+                }
+            }
             case HttpRequestEvent e ->
                     attr.put("route", "%s /%s".formatted(e.getRoute().getBaseRoute().getMethod(), e.getRoute().getBaseRoute().getRoute()));
-            default -> {}
+            default -> {
+            }
         }
 
         eventCounter.add(1, attr.build());
@@ -68,8 +81,7 @@ public class MetricsEventListener extends ListenerAdapter {
             if (delay < 0) {
                 log.warn("Event {} has time traveled with a negative delay of {}", event.getClass().getSimpleName(), delay);
             }
-            Attributes attrs = Attributes.builder().put("event_name", event.getClass().getSimpleName()).build();
-            discordToBotDelay.record(delay, attrs);
+            discordToBotDelay.record(delay, attr.build());
         }
     }
 }

@@ -205,7 +205,7 @@ test {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    options.compilerArgs.add("--enable-preview")
+    options.compilerArgs.addAll(["--enable-preview", "-parameters"])
 }
 
 project.compileJava.dependsOn(createVersionFile)

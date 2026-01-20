@@ -1,5 +1,7 @@
 package io.banditoz.mchelper.utils;
 
+import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
+
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 
 public class Help {
@@ -29,12 +31,32 @@ public class Help {
         return this;
     }
 
+    public String getCommandName() {
+        return commandName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getParameters() {
+        return parameters;
+    }
+
+    public ArgumentParser getParser() {
+        return parser;
+    }
+
+    public boolean isElevated() {
+        return isElevated;
+    }
+
     @Override
     public String toString() {
         if (parser == null) {
             return "`" + commandName + "` - " +
-                    ((parameters == null) ? "<no parameters> " : parameters) + " - " +
-                    description + ((isElevated) ? " (ELEVATED)" : "");
+                    ((parameters == null) ? "\\<no parameters\\> " : escape(parameters).replaceAll("<", "\\\\<").replaceAll(">", "\\\\>")) + " - " +
+                    escape(description) + ((isElevated) ? " (ELEVATED)" : "");
         }
         else {
             return "```\n" + parser.formatHelp() + "```";

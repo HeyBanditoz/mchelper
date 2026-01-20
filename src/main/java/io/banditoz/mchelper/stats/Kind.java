@@ -5,5 +5,7 @@ public enum Kind {
     /** This command was invoked via text (i.e. !pick). */
     TEXT,
     /** The command was originally invoked via text (i.e. !pick), and was re-processed into the command handler. */
-    TEXT_REPLAY
+    TEXT_REPLAY,
+    /** This command was invoked via Discord slash command. */
+    SLASH
 }

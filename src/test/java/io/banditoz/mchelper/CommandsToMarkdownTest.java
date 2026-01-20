@@ -1,12 +1,5 @@
 package io.banditoz.mchelper;
 
-import io.avaje.inject.test.InjectTest;
-import io.banditoz.mchelper.commands.HelpCommand;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.regexable.Regexable;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
-
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +10,14 @@ import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.avaje.inject.test.InjectTest;
+import io.banditoz.mchelper.commands.HelpCommand;
+import io.banditoz.mchelper.commands.logic.Command;
+import io.banditoz.mchelper.commands.logic.slash.SlashCommand;
+import io.banditoz.mchelper.regexable.Regexable;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 /**
  * This isn't really a test, but it generates the list of commands for use in the repository.<br>
@@ -29,6 +30,8 @@ class CommandsToMarkdownTest {
     List<Command> diCommands;
     @Inject
     List<Regexable> diRegexables;
+    @Inject
+    List<SlashCommand> diSlashCommands;
 
     private static final ClassNameComparator comp = new ClassNameComparator();
 
@@ -67,21 +70,28 @@ class CommandsToMarkdownTest {
         StringBuilder markdown = new StringBuilder("# Commands\n");
 
         markdown.append("There are a total of ").append(diCommands.size()).append(" commands and ")
-                .append(regexables.size()).append(" regex listeners.\n");
+                .append(regexables.size()).append(" regex listeners.\n\nIf a command name has _(S)_, it also has a slash command.\n\n");
 
+        List<? extends Class<? extends Command>> slashCommandClasses = diSlashCommands
+                .stream()
+                .map(sc -> sc.getCommand().getClass())
+                .toList();
         for (Command command : diCommands.stream().sorted(comp).toList()) {
             markdown.append("### ").append(command.getClass().getSimpleName());
+            if (slashCommandClasses.contains(command.getClass())) {
+                markdown.append(" _(S)_");
+            }
             markdown.append("\n");
             markdown.append(command.getHelp().toString());
-            markdown.append("\n");
+            markdown.append("\n\n");
         }
 
-        markdown.append("\n# Regex Listeners\n");
+        markdown.append("# Regex Listeners\n");
 
         for (Regexable regexable : diRegexables.stream().sorted(comp).toList()) {
             markdown.append("### ").append(regexable.getClass().getSimpleName()).append('\n');
             markdown.append("`").append(escape(regexable.getPattern().toString())).append('`');
-            markdown.append('\n');
+            markdown.append("\n\n");
         }
         Files.write(Path.of("COMMANDS.md"), markdown.toString().getBytes());
     }

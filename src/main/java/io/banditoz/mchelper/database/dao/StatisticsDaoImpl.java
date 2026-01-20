@@ -17,8 +17,9 @@ import io.jenetics.facilejdbc.Query;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 @Singleton
 @RequiresDatabase
@@ -30,14 +31,14 @@ public class StatisticsDaoImpl extends Dao implements StatisticsDao {
 
     @Override
     public void log(Stat s) throws SQLException {
-        MessageChannelUnion channel = s.getEvent().getChannel();
+        Channel channel = s.getChannel();
         try (Connection c = database.getConnection()) {
             Query.of("INSERT INTO statistics VALUES (:a, :b, :t, :c, :d, :e, :f, :k, :g, :h)")
                     .on(
-                            Param.value("a", s.getEvent().isFromGuild() ? s.getEvent().getGuild().getIdLong() : Optional.empty()),
+                            Param.value("a", channel instanceof GuildChannel gc ? gc.getGuild().getIdLong() : Optional.empty()),
                             Param.value("b", channel instanceof ThreadChannel t ? t.getParentChannel().getIdLong() : channel.getIdLong()),
                             Param.value("t", (channel instanceof ThreadChannel t ? t.getIdLong() : Optional.empty())),
-                            Param.value("c", s.getEvent().getAuthor().getIdLong()),
+                            Param.value("c", s.getUser().getIdLong()),
                             Param.value("d", s.getClassName()),
                             Param.value("e", s.getArgs()),
                             Param.value("f", s.getStatus().getValue()),

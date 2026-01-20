@@ -65,6 +65,102 @@ mchelper:
     password: SuperSecret
 ```
 
+### Dependency Injection
+MCHelper uses [avaje-inject](https://avaje.io/inject/) to handle dependency injection and overall application lifecycle.
+It's very similar to Spring, however much more lightweight, as the act of dependency injection is shifted to
+compile-time to actually generate the code to inject the dependencies. Dependency injection was eventually chosen
+because the act of managing all the classes for the project became a Sisyphean effort, as `MCHelperImpl` became a
+[god object](https://en.wikipedia.org/wiki/God_object) for managing it all.
+
+As for what it does, it takes care of injecting dependencies into classes. Instead of a class reaching out to a huge
+object to get a dependency (such as the HTTP clients) it's just injected into the class for you, as a dependency. This
+massively promotes separation of concerns and testability overall.
+
+### Commands
+MCHelper uses a home-grown framework with support for text-based commands, slash commands, along with cooldowns, 
+permissions (bot owner level, via `ElevatedCommand`, guild-level permissions, via `Command#getRequiredPermissions`),
+and single-shot button and modal interactions.
+
+If you're looking for a solid base to start a JDA-based Discord bot, this isn't it. You're going to want
+Freya022's [BotCommands](https://github.com/freya022/BotCommands) or another fabulous command library for JDA, instead.
+Hit up the JDA guild to find one!
+
+MCHelper is not interested in refactoring to use a third-party command framework.
+
+#### Your first command
+Let's examine the anatomy of a basic command that interacts with the database.
+```java
+@Singleton
+@RequiresDatabase
+public class ThingFetcherCommand extends Command {
+    private final ThingDao thingDao;
+
+    @Inject
+    public ThingFetcherCommand(ThingDao thingDao) {
+        this.thingDao = thingDao;
+    }
+
+    @Override
+    public String commandName() {
+        return "getthing";
+    }
+
+    @Override
+    public Help getHelp() {
+        return new Help(commandName(), false)
+                .withParameters("<count>")
+                .withDescription("Gets a bunch of things!");
+    }
+
+    @Override
+    protected Status onCommand(CommandEvent ce) throws Exception {
+        int count = Integer.parseInt(ce.getCommandArgsString());
+        return handleThings(ce, count);
+    }
+    
+    @Slash
+    public Status onSlashCommand(SlashCommandEvent sce,
+                                 @Param(desc = "The count of things to fetch.") int count) {
+        return handleThings(sce, count);
+    }
+    
+    private Status handleThings(ICommandEvent ce, int count) {
+        List<Thing> things = thingDao.getThings(count);
+        if (things.isEmpty()) {
+            ce.sendReply("There are no things! :(");
+            return Status.FAIL;
+        }
+        ce.sendReply("Here are your things! " + things);
+        return Status.SUCCESS;
+    }
+}
+```
+Here's how some of the annotations work:
+* `@Singleton` -> Marks a Java class as being managed by the dependency injection framework. This makes it available
+  to inject into other classes. In the context of a Command, this allows it to be given to the CommandHandler and
+  SlashCommandHandler for registration.
+* `@Inject` -> Not required, but stylistically denotes a constructor is *asking* for those classes to be passed into it
+  by the dependency injection framework.
+* `@RequiresDatabase` -> The framework won't attempt to create the command unless the database is configured. All
+  corresponding DAO classes should also be annotated this way.
+* `@Slash` -> This marks the method as receiving an executed slash command. Due to legacy and design, slash commands
+  were bolted on to regular commands to try to centralize logic. Therefore, slash command methods must be annotated with
+  * `@Slash` annotated `onSlashCommand` methods, return a `Status` enum, and have at least one parameter, of which the
+     first *must* have a `SlashCommandEvent` class.
+
+DAO classes (interactions with the database) live in the `/database/dao` package. Each should have a corresponding
+interface and impl. In the future, this "single-interface-single-implementation" (sorry, I know this is silly) pattern
+would make it easier to swap out database backends.
+
+Notice how there are three command event classes, `ICommandEvent`, `CommandEvent`, and `SlashCommandEvent`.
+`ICommandEvent` is the interface that both other classes inherit from. It contains common behavior applicable to both
+text and slash commands. `CommandEvent` comes from text command invocation and contains raw text arguments in various
+forms, as well as wrapping the `MessageReceivedEvent`. `SlashCommandEvent` is more barebones but wraps the
+`SlashCommandInteractionEvent` from JDA and enables the interface.
+
+You'll want to use `ICommandEvent` for most things, and falling back to the implementations if you need methods
+specific to slash commands or text commands.
+
 ### Liquibase
 MCHelper uses Liquibase to handle database migrations. TODO add more details!
 

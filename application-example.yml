@@ -49,3 +49,9 @@ mchelper:
     enabled: true
     # The port to listen on for Prometheus to scrape metrics from.
     port: 9092
+  slash-commands:
+    # A CSV list of guilds to register slash commands with. If this is configured, global slash commands won't be created.
+    dev-guilds: 123456789012346578
+    # How long to wait to defer the slash command response. Discord gives three seconds, so tune a bit lower than
+    # that accounting for latency and other unknowns.
+    deferment-wait-millis: 2000
