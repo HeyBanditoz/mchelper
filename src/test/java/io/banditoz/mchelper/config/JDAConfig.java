@@ -1,5 +1,9 @@
 package io.banditoz.mchelper.config;
 
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
+
 import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
 import io.avaje.inject.test.TestScope;
@@ -7,12 +11,8 @@ import io.banditoz.mchelper.jda.JDAFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.ApplicationInfo;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import java.util.Collections;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @TestScope
 @Factory
@@ -32,6 +32,9 @@ public class JDAConfig {
         RestAction mock = mock(RestAction.class);
         when(mock.complete()).thenReturn(Collections.emptyList());
         when(jda.retrieveApplicationEmojis()).thenReturn(mock);
+        CommandListUpdateAction action = mock(CommandListUpdateAction.class);
+        when(action.addCommands(anyList())).thenReturn(action);
+        when(jda.updateCommands()).thenReturn(action);
         return jda;
     }
 
