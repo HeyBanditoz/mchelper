@@ -9,7 +9,7 @@ If a command name has _(S)_, it also has a slash command.
 ### BalanceCommand _(S)_
 `bal` - \<no parameters\>  - Checks your balance.
 
-### BalanceGraphCommand
+### BalanceGraphCommand _(S)_
 `balgraph` - [-d] - Graphs your transaction history, transaction by transaction. Use -d to use dates instead
 
 ### BaltopCommand _(S)_
@@ -233,7 +233,7 @@ named arguments:
 ### WhoHasCommand
 `whohas` - \<role ID\> - Returns who has a certain role in the guild.
 
-### WorkCommand
+### WorkCommand _(S)_
 `work` - \<no parameters\>  - Work for money every day.
 
 # Regex Listeners
