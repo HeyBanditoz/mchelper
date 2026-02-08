@@ -1,10 +1,15 @@
 package io.banditoz.mchelper.commands;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.commands.logic.slash.Param;
+import io.banditoz.mchelper.commands.logic.slash.Slash;
+import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
 import io.banditoz.mchelper.database.Transaction;
 import io.banditoz.mchelper.database.dao.AccountsDao;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
@@ -53,21 +58,28 @@ public class BalanceGraphCommand extends Command {
             } catch (NumberFormatException ignored) {
             }
         }
-        List<Transaction> txns = accountsDao.getNTransactionsForUser(u.getIdLong(), count);
-        if (txns.isEmpty()) {
-            throw new MoneyException("There is no account history for " + u.getName());
-        }
-
-        TransactionHistoryPlotter thp = new TransactionHistoryPlotter(u.getName(), txns);
-        ByteArrayOutputStream plot;
-        if (ce.getCommandArgsString().contains("-d")) {
-            plot = thp.plotWithDates();
-        }
-        else {
-            plot = thp.plot();
-        }
-        ce.sendImageReply("Last " + txns.size() + " transactions for " + u.getName(), plot);
+        sendHistory(ce, u, count, ce.getCommandArgsString().contains("-d"));
         return Status.SUCCESS;
+    }
 
+    @Slash
+    public Status onSlashCommand(SlashCommandEvent sce,
+                          @Nullable @Param(desc = "User to retrieve balance for. Defaults to self.") User user,
+                          @Nullable @Param(desc = "Max number of transactions to graph. If you choose 10, it will retrieve the newest 10.") Integer limit,
+                          @Nullable @Param(desc = "Whether to plot by dates. Put anything here to use this.") String plotUsingDates)
+            throws Exception {
+        sendHistory(sce, user == null ? sce.getUser() : user, limit == null ? Integer.MAX_VALUE : limit, plotUsingDates != null && !plotUsingDates.isBlank());
+        return Status.SUCCESS;
+    }
+
+    private void sendHistory(ICommandEvent ce, User who, int limit, boolean withDates) throws Exception {
+        List<Transaction> txns = accountsDao.getNTransactionsForUser(who.getIdLong(), limit);
+        if (txns.isEmpty()) {
+            throw new MoneyException("There is no account history for " + who.getName());
+        }
+
+        TransactionHistoryPlotter thp = new TransactionHistoryPlotter(who.getName(), txns);
+        ByteArrayOutputStream plot = withDates ? thp.plotWithDates() : thp.plot();
+        ce.sendImageReply("Last " + txns.size() + " transactions for " + who.getName(), plot);
     }
 }

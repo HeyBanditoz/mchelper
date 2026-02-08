@@ -204,8 +204,12 @@ public class CommandEvent implements UserEvent, ICommandEvent {
         EVENT.getChannel().sendMessageEmbeds(Arrays.asList(embeds)).queue();
     }
 
-    public void sendImageReply(String msg, ByteArrayOutputStream image) throws Exception {
-        CommandUtils.sendImageReply(msg, image, this.EVENT, true);
+    public void sendImageReply(String msg, ByteArrayOutputStream image) {
+        try {
+            CommandUtils.sendImageReply(msg, image, this.EVENT, true);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex); // kludge
+        }
     }
 
     public void sendEmbedImageReply(MessageEmbed me, ByteArrayOutputStream image) throws Exception {

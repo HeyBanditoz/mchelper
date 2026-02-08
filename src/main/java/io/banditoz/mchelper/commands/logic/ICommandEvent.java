@@ -1,6 +1,7 @@
 package io.banditoz.mchelper.commands.logic;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,6 +22,14 @@ public interface ICommandEvent {
      * @param msg The message.
      */
     void sendReply(MessageCreateData msg);
+
+    /**
+     * Sends a reply with a single attachment. All mentions will be sanitized.
+     *
+     * @param msg The reply.
+     * @param data The image.
+     */
+    void sendImageReply(String msg, ByteArrayOutputStream data);
 
     /**
      * Sends a reply with one {@link MessageEmbed}.

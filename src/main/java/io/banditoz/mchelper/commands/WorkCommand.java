@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.commands.logic.slash.Slash;
+import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
 import io.banditoz.mchelper.database.TaskResponse;
 import io.banditoz.mchelper.database.dao.TasksDao;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
@@ -73,25 +76,34 @@ public class WorkCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
-        LocalDateTime ldt = dao.getWhenCanExecute(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+        return go(ce);
+    }
+
+    @Slash
+    public Status onSlashCommand(SlashCommandEvent sce) throws Exception {
+        return go(sce);
+    }
+
+    private Status go(ICommandEvent ce) throws Exception {
+        LocalDateTime ldt = dao.getWhenCanExecute(ce.getUser().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {
             BigDecimal randAmount = Task.WORK.getRandomAmount();
-            if (am.isUserShadowbanned(ce.getEvent().getAuthor())) {
+            if (am.isUserShadowbanned(ce.getUser())) {
                 BigDecimal earnings = randAmount.multiply(BigDecimal.valueOf(0.25));
-                BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (shadowbanned 75% of full earnings)");
-                dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                BigDecimal newBal = am.add(earnings, ce.getUser().getIdLong(), "daily work (shadowbanned 75% of full earnings)");
+                dao.putOrUpdateTask(ce.getUser().getIdLong(), Task.WORK);
                 sendMessage(ce, earnings, newBal, false);
             }
             else {
                 if (random.nextDouble() <= 0.10) {
                     BigDecimal earnings = randAmount.multiply(five);
-                    BigDecimal newBal = am.add(earnings, ce.getEvent().getAuthor().getIdLong(), "daily work (rare)");
-                    dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                    BigDecimal newBal = am.add(earnings, ce.getUser().getIdLong(), "daily work (rare)");
+                    dao.putOrUpdateTask(ce.getUser().getIdLong(), Task.WORK);
                     sendMessage(ce, earnings, newBal, true);
                 }
                 else {
-                    BigDecimal newBal = am.add(randAmount, ce.getEvent().getAuthor().getIdLong(), "daily work");
-                    dao.putOrUpdateTask(ce.getEvent().getAuthor().getIdLong(), Task.WORK);
+                    BigDecimal newBal = am.add(randAmount, ce.getUser().getIdLong(), "daily work");
+                    dao.putOrUpdateTask(ce.getUser().getIdLong(), Task.WORK);
                     sendMessage(ce, randAmount, newBal, false);
                 }
             }
@@ -104,9 +116,9 @@ public class WorkCommand extends Command {
         }
     }
 
-    private void sendMessage(CommandEvent ce, BigDecimal earnings, BigDecimal newBal, boolean isRare) {
+    private void sendMessage(ICommandEvent ce, BigDecimal earnings, BigDecimal newBal, boolean isRare) {
         TaskResponse randResponse = isRare ? rareResponses.get(random.nextInt(rareResponses.size())) : workResponses.get(random.nextInt(workResponses.size()));
-        String stringResponse = randResponse.getResponse(ce.getEvent().getAuthor().getIdLong(), earnings, Task.WORK);
+        String stringResponse = randResponse.getResponse(ce.getUser().getIdLong(), earnings, Task.WORK);
         EmbedBuilder eb = new EmbedBuilder()
                 .appendDescription(stringResponse)
                 .setFooter("New Balance: $" + AccountManager.format(newBal));

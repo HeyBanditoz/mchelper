@@ -1,6 +1,8 @@
 package io.banditoz.mchelper.commands.logic.slash;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -11,15 +13,20 @@ import java.util.stream.Collectors;
 
 import io.avaje.config.Config;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.utils.FileUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SlashCommandEvent implements ICommandEvent {
+    private static final Logger log = LoggerFactory.getLogger(SlashCommandEvent.class);
     private final SlashCommandInteractionEvent event;
     private final SlashCommand command;
     private final String paramString;
@@ -79,6 +86,21 @@ public class SlashCommandEvent implements ICommandEvent {
     public void sendReply(MessageCreateData msg) {
         defermentFuture.cancel(false);
         (event.isAcknowledged() ? event.getHook().sendMessage(msg) : event.reply(msg)).queue();
+    }
+
+    @Override
+    public void sendImageReply(String msg, ByteArrayOutputStream data) {
+        FileUpload image = FileUtils.compressPNG(data);
+        defermentFuture.cancel(false);
+        MessageCreateData message = new MessageCreateBuilder()
+                .setContent(msg)
+                .setAllowedMentions(Collections.emptyList())
+                .addFiles(image)
+                .build();
+        (event.isAcknowledged() ? event.getHook().sendMessage(message) : event.reply(message)).queue();
+        if (!new File(image.getName()).delete()) {
+            log.warn("File {} was not deleted!", image.getName());
+        }
     }
 
     @Override
