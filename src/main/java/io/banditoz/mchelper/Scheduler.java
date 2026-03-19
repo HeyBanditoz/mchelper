@@ -1,17 +1,15 @@
 package io.banditoz.mchelper;
 
-import io.avaje.inject.PostConstruct;
-import io.banditoz.mchelper.runnables.PollCullerRunnable;
-import io.banditoz.mchelper.runnables.QotdRunnable;
-import io.banditoz.mchelper.runnables.UserMaintenanceRunnable;
-import io.banditoz.mchelper.runnables.XonlistCheckerRunnable;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Nullable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import io.avaje.config.Config;
+import io.avaje.inject.PostConstruct;
+import io.banditoz.mchelper.runnables.*;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class Scheduler {
@@ -19,6 +17,7 @@ public class Scheduler {
     private final UserMaintenanceRunnable userMaintenanceRunnable;
     private final PollCullerRunnable pollCullerRunnable;
     private final XonlistCheckerRunnable xonlistCheckerRunnable;
+    private final DiscordPingRunnable discordPingRunnable;
     private final QotdRunnable qotdRunnable;
 
     @Inject
@@ -26,11 +25,13 @@ public class Scheduler {
                      @Nullable UserMaintenanceRunnable userMaintenanceRunnable,
                      @Nullable PollCullerRunnable pollCullerRunnable,
                      @Nullable XonlistCheckerRunnable xonlistCheckerRunnable,
+                     @Nullable DiscordPingRunnable discordPingRunnable,
                      QotdRunnable qotdRunnable) {
         this.ses = ses;
         this.userMaintenanceRunnable = userMaintenanceRunnable;
         this.pollCullerRunnable = pollCullerRunnable;
         this.xonlistCheckerRunnable = xonlistCheckerRunnable;
+        this.discordPingRunnable = discordPingRunnable;
         this.qotdRunnable = qotdRunnable;
     }
 
@@ -44,6 +45,9 @@ public class Scheduler {
         }
         if (xonlistCheckerRunnable != null) {
             ses.scheduleWithFixedDelay(xonlistCheckerRunnable, 10, 600, TimeUnit.SECONDS);
+        }
+        if (discordPingRunnable != null) {
+            ses.scheduleWithFixedDelay(discordPingRunnable, 0, Config.getInt("mchelper.metrics.ping-stats.ping-delay-seconds"), TimeUnit.SECONDS);
         }
         ses.scheduleAtFixedRate(qotdRunnable,
                 QotdRunnable.getDelay().getSeconds(),

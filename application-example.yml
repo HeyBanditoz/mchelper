@@ -49,6 +49,11 @@ mchelper:
     enabled: true
     # The port to listen on for Prometheus to scrape metrics from.
     port: 9092
+    ping-stats:
+      # Whether to periodically record ping metrics.
+      enabled: true
+      # Delay on when to call the REST get users API to record how long it took.
+      ping-delay-seconds: 30
   slash-commands:
     # A CSV list of guilds to register slash commands with. If this is configured, global slash commands won't be created.
     dev-guilds: 123456789012346578
