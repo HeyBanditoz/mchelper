@@ -1,6 +1,7 @@
 package io.banditoz.mchelper;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
@@ -27,6 +28,7 @@ public class MetricsEventListener extends ListenerAdapter {
     private final LongCounter eventCounter;
     private final LongHistogram discordToBotDelay;
     private static final Logger log = LoggerFactory.getLogger(MetricsEventListener.class);
+    private static final AtomicInteger spamCounter = new AtomicInteger(0);
 
     @Inject
     public MetricsEventListener(MeterProvider meterProvider) {
@@ -78,8 +80,11 @@ public class MetricsEventListener extends ListenerAdapter {
             // this long -> OffsetDateTime -> Instant -> long is wasteful...
             // this metric also relies on an accurate system clock!
             long delay = System.currentTimeMillis() - interaction.getTimeCreated().toInstant().toEpochMilli();
-            if (delay < 0) {
+            if (delay < 0 && spamCounter.get() <= 5) {
                 log.warn("Event {} has time traveled with a negative delay of {}", event.getClass().getSimpleName(), delay);
+                if (spamCounter.incrementAndGet() > 5) {
+                    log.warn("Too many time travel messages, will no longer log for this session. Check your system clock!");
+                }
             }
             discordToBotDelay.record(delay, attr.build());
         }
