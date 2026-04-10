@@ -3,6 +3,7 @@ package io.banditoz.mchelper.games;
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.MoneyException;
+import io.banditoz.mchelper.money.TipModifierCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -29,10 +30,14 @@ public class BlackJackGame extends Game {
     private WrappedButtonClickEvent doubleDownEvent;
     /** If this game has already been accessed post-command invocation. */
     private boolean dirty = false;
+    private final TipModifierCache tipModifierCache;
+    private BigDecimal tipModifier;
+    private String tipStr;
 
-    public BlackJackGame(User player, BigDecimal initialBet, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
+    public BlackJackGame(User player, BigDecimal initialBet, GameManager gm, AccountManager am, ScheduledExecutorService ses, TipModifierCache tipModifierCache) {
         super(5, 200_000, player, initialBet, gm, am, ses);
         this.currentAmount = initialBet;
+        this.tipModifierCache = tipModifierCache;
         if (DECKS.get(player) == null) {
             DECKS.put(player, new Deck(2));
         }
@@ -229,6 +234,12 @@ public class BlackJackGame extends Game {
     }
 
     public MessageEmbed lose() {
+        // we have reached maximum levels of hacky
+        if (tipModifier == null) {
+            this.tipModifier = tipModifierCache.get(player.getIdLong());
+            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
+        }
+
         String playerString = getHandsAsString(getPlayerHand());
         String dealerString = getHandsAsString(getDealerHand());
         stopPlaying();
@@ -245,15 +256,21 @@ public class BlackJackGame extends Game {
     }
 
     public MessageEmbed win(WinState state) {
+        // we have reached maximum levels of hacky
+        if (tipModifier == null) {
+            this.tipModifier = tipModifierCache.get(player.getIdLong());
+            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
+        }
+
         String playerString = getHandsAsString(getPlayerHand());
         String dealerString = getHandsAsString(getDealerHand());
-        String image = "", won = "You won $" + AccountManager.format(currentAmount) + "! Good job!";
+        String image = "", won = "You won $" + AccountManager.format(currentAmount) + "! Good job! (You elected to tip " + tipStr + " to the dealer for their hard work!)";
         Color c = Color.GREEN;
         switch (state) {
             case NORMAL -> image = "https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif";
             case BLACKJACK -> image = "https://media1.giphy.com/media/l2SpK57WpLOP845Rm/giphy.gif";
             case STANDOFF -> {
-                won = "You hit a stand off and got your $" + AccountManager.format(currentAmount) + " back!";
+                won = "You hit a stand off and got your $" + AccountManager.format(currentAmount) + " back! (You elected to tip " + tipStr + " to the dealer for their hard work!)";
                 c = Color.YELLOW;
                 image = "https://media1.tenor.com/images/70d670f744495cc6c02b50efbc14a1ca/tenor.gif?itemid=15805326";
             }
@@ -302,17 +319,33 @@ public class BlackJackGame extends Game {
     }
 
     public void payout(boolean twentyOne) throws Exception {
+        // we have reached maximum levels of hacky
+        if (tipModifier == null) {
+            this.tipModifier = tipModifierCache.get(player.getIdLong());
+            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
+        }
+
         if (twentyOne) {
             currentAmount = currentAmount.divide(TWO, RoundingMode.UP).multiply(THREE).add(currentAmount);
         }
         else {
             currentAmount = currentAmount.multiply(TWO);
         }
-        add(currentAmount, player.getIdLong(), twentyOne ? "blackjack 21 winnings" : "blackjack winnings");
+        BigDecimal modifier = currentAmount.multiply(tipModifier);
+        currentAmount = currentAmount.subtract(modifier);
+        add(currentAmount, player.getIdLong(), (twentyOne ? "blackjack 21 winnings (" : "blackjack winnings (") + "tip " + tipStr + ")");
     }
 
     public void standOff() throws Exception {
-        add(currentAmount, player.getIdLong(), "blackjack standoff");
+        // we have reached maximum levels of hacky
+        if (tipModifier == null) {
+            this.tipModifier = tipModifierCache.get(player.getIdLong());
+            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
+        }
+
+        BigDecimal modifier = currentAmount.multiply(tipModifier);
+        currentAmount = currentAmount.subtract(modifier);
+        add(currentAmount, player.getIdLong(), "blackjack standoff (tip " + tipStr + ")");
     }
 
     public enum WinState {

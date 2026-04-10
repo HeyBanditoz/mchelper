@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
@@ -114,6 +116,11 @@ public class ButtonInteractable extends Interactable<Button, WrappedButtonClickE
         LOGGER.debug("Removing all buttons for " + message);
         super.destroy();
         message.editMessageComponents(Collections.emptyList()).setEmbeds(me).queue();
+    }
+
+    public void destroy(MessageEditData msg, ButtonInteractionEvent event) {
+        super.destroy();
+        event.editMessage(msg).queue();
     }
 
     public void destroyAndAddNewButtons(ActionRow... rows) {

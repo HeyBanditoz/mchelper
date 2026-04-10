@@ -3,9 +3,7 @@ package io.banditoz.mchelper.commands.logic;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import io.banditoz.mchelper.UserEvent;
@@ -39,6 +37,7 @@ public class CommandEvent implements UserEvent, ICommandEvent {
     private final GuildConfigurationProvider CONFIG;
     private final InteractionListener INTERACTION_LISTENER;
     private final CommandHandler COMMAND_HANDLER;
+    private final Map<String, Object> CONTEXT = new HashMap<>(); // this is not staying
 
     public CommandEvent(@NotNull MessageReceivedEvent event,
                         Logger logger,
@@ -339,5 +338,13 @@ public class CommandEvent implements UserEvent, ICommandEvent {
     @Override
     public long getUserId() {
         return EVENT.getAuthor().getIdLong();
+    }
+
+    public void addToContext(String key, Object value) {
+        CONTEXT.put(key, value);
+    }
+
+    public Object getFromContext(String key) {
+        return CONTEXT.get(key);
     }
 }
