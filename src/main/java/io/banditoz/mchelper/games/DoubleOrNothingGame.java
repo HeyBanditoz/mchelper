@@ -7,7 +7,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import io.banditoz.mchelper.interactions.WrappedButtonClickEvent;
 import io.banditoz.mchelper.money.AccountManager;
-import io.banditoz.mchelper.money.TipModifierCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -19,14 +18,10 @@ public class DoubleOrNothingGame extends Game {
     private BigDecimal currentBet;
     private final Random rand = new Random();
     private int times = 0;
-    private final TipModifierCache tipModifierCache;
-    private BigDecimal tipModifier;
-    private String tipStr;
     private static final Logger LOGGER = LoggerFactory.getLogger(DoubleOrNothingGame.class);
 
-    public DoubleOrNothingGame(BigDecimal initialBet, User player, GameManager gm, AccountManager am, ScheduledExecutorService ses, TipModifierCache tipModifierCache) {
+    public DoubleOrNothingGame(BigDecimal initialBet, User player, GameManager gm, AccountManager am, ScheduledExecutorService ses) {
         super(5, 200_000, player, initialBet, gm, am, ses);
-        this.tipModifierCache = tipModifierCache;
         this.currentBet = initialBet;
     }
 
@@ -50,12 +45,6 @@ public class DoubleOrNothingGame extends Game {
      * Method called when a user intends to play for more money.
      */
     public void bet(WrappedButtonClickEvent wrappedEvent) {
-        // we have reached maximum levels of hacky
-        if (tipModifier == null) {
-            this.tipModifier = tipModifierCache.get(player.getIdLong());
-            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
-        }
-
         ButtonInteractionEvent event = wrappedEvent.getEvent();
 
         if (play()) {
@@ -71,11 +60,6 @@ public class DoubleOrNothingGame extends Game {
      * Method called when a user intends to cash out their winnings.
      */
     public void stop(WrappedButtonClickEvent wrappedEvent) {
-        // we have reached maximum levels of hacky
-        if (tipModifier == null) {
-            this.tipModifier = tipModifierCache.get(player.getIdLong());
-            this.tipStr = tipModifier.multiply(new BigDecimal("100")).toPlainString() + "%";
-        }
         stopPlaying();
         // TODO better exception handling
         try {
@@ -88,9 +72,7 @@ public class DoubleOrNothingGame extends Game {
     }
 
     public void payout() throws Exception {
-        BigDecimal modifier = currentBet.multiply(tipModifier);
-        currentBet = currentBet.subtract(modifier);
-        add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ") (tip " + tipStr + ")");
+        add(currentBet, player.getIdLong(), "double or nothing winnings (bet x" + times + ")");
     }
 
     public MessageEmbed generate(BigDecimal currentAmount, User u) {
@@ -116,7 +98,7 @@ public class DoubleOrNothingGame extends Game {
         return new EmbedBuilder()
                 .setTitle("Double or Nothing!")
                 .setColor(Color.GREEN)
-                .setDescription("You cashed in $" + AccountManager.format(currentAmount) + "! Good job!  (You elected to tip " + tipStr + " to the DON machine for its hard work!)")
+                .setDescription("You cashed in $" + AccountManager.format(currentAmount) + "! Good job!")
                 .setImage("https://i.pinimg.com/originals/d9/c7/5b/d9c75bdc08ceb24ca15a462c3eaa4a7f.gif")
                 .setFooter(u.getName(), u.getEffectiveAvatarUrl())
                 .build();

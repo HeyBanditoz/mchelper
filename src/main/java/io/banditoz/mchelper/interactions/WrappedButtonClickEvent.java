@@ -4,15 +4,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.banditoz.mchelper.commands.logic.CommandEvent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +65,6 @@ public class WrappedButtonClickEvent implements Interaction {
         removeListener();
     }
 
-    public CommandEvent getCommandEvent() {
-        return bi.getCommandEvent();
-    }
-
     /**
      * Removes the underlying {@link ButtonInteractable} from {@link InteractionListener}'s list, and <i>replaces</i> all
      * buttons with the new {@link ActionRow ActionRows.}
@@ -81,12 +74,6 @@ public class WrappedButtonClickEvent implements Interaction {
      */
     public void destroyThenReplaceWith(ButtonInteractable bi, ActionRow... rows) {
         bi.destroyAndAddNewButtons(rows);
-        removeListener();
-        il.addInteractable(bi);
-    }
-
-    public void destroyThenReplaceWith(ButtonInteractable bi, MessageEditData message) {
-        bi.destroy(message, getEvent());
         removeListener();
         il.addInteractable(bi);
     }

@@ -82,15 +82,6 @@ public class SlashCommandEvent implements ICommandEvent {
         (event.isAcknowledged() ? event.getHook().sendMessage(message) : event.reply(message)).queue();
     }
 
-    /**
-     * Does not check for event acknowledgement!
-     *
-     * @param msg The message to reply with. Not transformed.
-     */
-    public void sendEphermalReply(String msg) {
-        event.reply(msg).setEphemeral(true).queue();
-    }
-
     @Override
     public void sendReply(MessageCreateData msg) {
         defermentFuture.cancel(false);
