@@ -60,3 +60,7 @@ mchelper:
     # How long to wait to defer the slash command response. Discord gives three seconds, so tune a bit lower than
     # that accounting for latency and other unknowns.
     deferment-wait-millis: 2000
+  web:
+    enabled: false
+    port: 9999
+    key: uuid-here
