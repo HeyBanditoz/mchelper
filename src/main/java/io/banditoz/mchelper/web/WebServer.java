@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@RequiresProperty("mchelper.web.enabled")
+@RequiresProperty(value = "mchelper.web.enabled", equalTo = "true")
 public class WebServer implements AutoCloseable {
     private final JDA jda;
     private final Jex.Server server;

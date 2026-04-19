@@ -6,7 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
-@RequiresProperty("mchelper.metrics.ping-stats.enabled")
+@RequiresProperty(value = "mchelper.metrics.ping-stats.enabled", equalTo = "true")
 public class DiscordPingRunnable implements Runnable {
     private final DiscordPingMonitor discordPingMonitor;
 

@@ -10,7 +10,7 @@ import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
 
 @Singleton
-@RequiresProperty("mchelper.metrics.ping-stats.enabled")
+@RequiresProperty(value = "mchelper.metrics.ping-stats.enabled", equalTo = "true")
 public class DiscordPingMonitor {
     private final JDA jda;
     private final LongHistogram restDelay;
