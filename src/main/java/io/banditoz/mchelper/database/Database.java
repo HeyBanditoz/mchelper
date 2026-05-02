@@ -1,7 +1,12 @@
 package io.banditoz.mchelper.database;
 
+import java.lang.reflect.Proxy;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import com.zaxxer.hikari.HikariDataSource;
 import io.avaje.config.Config;
+import io.banditoz.mchelper.database.transaction.TransactionContext;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.jenetics.facilejdbc.Query;
 import io.opentelemetry.api.OpenTelemetry;
@@ -16,9 +21,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Has-a class for managing a {@link HikariDataSource} pool for requesting database connections.<br>
@@ -67,11 +69,36 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * @return A new {@link Connection} to use.
-     * @throws SQLException If a database access error occurs
+     * @return A {@link Connection} to use, either one from the transaction, or a raw pool connection, if we're not in
+     * a transaction.
+     * @throws SQLException If a database access error occurs.
      */
     public Connection getConnection() throws SQLException {
+        Connection tx = TransactionContext.current();
+        return tx != null ? nonClosing(tx) : pool.getConnection();
+    }
+
+    /**
+     * Gets a SQL connection to the pool.<br>
+     * <b>Don't use this!</b> You will in 99% of cases want {@link Database#getConnection()} instead!
+     *
+     * @return A {@link Connection} to use, guaranteed not bound by any transaction.
+     * @throws SQLException If a database access error occurs.
+     */
+    public Connection getRawConnection() throws SQLException {
         return pool.getConnection();
+    }
+
+    private Connection nonClosing(Connection c) {
+        return (Connection) Proxy.newProxyInstance(
+                c.getClass().getClassLoader(),
+                new Class[]{Connection.class},
+                (_, method, args) -> switch (method.getName()) {
+                    case "close" -> null;
+                    case "toString" -> "proxied transactional connection for " + method.invoke(c, args);
+                    default -> method.invoke(c, args);
+                }
+        );
     }
 
     /**

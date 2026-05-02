@@ -1,5 +1,8 @@
 package io.banditoz.mchelper.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.constructors;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -10,9 +13,6 @@ import io.avaje.inject.spi.Generated;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.constructors;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 class ArchitectureTests {
     private final JavaClasses classes = new ClassFileImporter().importPackages("io.banditoz.mchelper");
@@ -31,6 +31,7 @@ class ArchitectureTests {
     @Test
     void componentShouldNotBeUsed() {
         noClasses()
+                .that().haveNameNotMatching(".*\\$Proxy")
                 .should().beAnnotatedWith(Component.class)
                 .because("this project prefers Jakarta EE @Singleton")
                 .check(classes);

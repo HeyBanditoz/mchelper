@@ -12,6 +12,7 @@ import static io.banditoz.mchelper.database.NamedQuote.Flag;
 import io.banditoz.mchelper.database.Database;
 import io.banditoz.mchelper.database.NamedQuote;
 import io.banditoz.mchelper.database.StatPoint;
+import io.banditoz.mchelper.database.transaction.Transactional;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.jenetics.facilejdbc.Param;
 import io.jenetics.facilejdbc.Query;
@@ -29,9 +30,9 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
     }
 
     @Override
+    @Transactional
     public int saveQuote(NamedQuote nq, EnumSet<Flag> flags) throws SQLException {
         try (Connection c = database.getConnection()) {
-            c.setAutoCommit(false);
             int qid = Query.of("INSERT INTO quotes (guild_id, author_id, quote, quote_author) VALUES (:g, :a, :q, :qa) RETURNING id")
                     .on(
                             Param.value("g", nq.getGuildId()),
@@ -52,8 +53,6 @@ public class QuotesDaoImpl extends Dao implements QuotesDao {
                         )
                         .executeInsert(c);
             }
-            c.commit();
-            c.setAutoCommit(true);
             return qid;
         }
     }

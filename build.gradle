@@ -105,6 +105,7 @@ jacocoTestReport {
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
+
     mavenCentral()
     maven {
         url = 'https://m2.dv8tion.net/releases'
@@ -168,8 +169,9 @@ dependencies {
     compileOnly 'io.avaje:avaje-record-builder:1.2'
     annotationProcessor 'io.avaje:avaje-record-builder:1.2'
 
-    implementation 'io.avaje:avaje-inject:11.6'
-    annotationProcessor('io.avaje:avaje-inject-generator:11.6')
+    implementation 'io.avaje:avaje-inject:12.6-RC1'
+    implementation 'io.avaje:avaje-inject-aop:12.5'
+    annotationProcessor('io.avaje:avaje-inject-generator:12.5')
     implementation 'io.avaje:avaje-jex:3.5'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
