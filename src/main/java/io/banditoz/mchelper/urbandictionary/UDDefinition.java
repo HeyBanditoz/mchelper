@@ -1,11 +1,13 @@
 package io.banditoz.mchelper.urbandictionary;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UDDefinition implements Comparable<UDDefinition> {
     @JsonProperty("defid")
     private int defid;

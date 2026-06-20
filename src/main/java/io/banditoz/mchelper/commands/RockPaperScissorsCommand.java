@@ -1,12 +1,16 @@
 package io.banditoz.mchelper.commands;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import io.banditoz.mchelper.commands.logic.Command;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.commands.logic.slash.Param;
+import io.banditoz.mchelper.commands.logic.slash.Slash;
+import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Singleton;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 @Singleton
 public class RockPaperScissorsCommand extends Command {
@@ -23,8 +27,17 @@ public class RockPaperScissorsCommand extends Command {
 
     @Override
     protected Status onCommand(CommandEvent ce) throws Exception {
+        return handle(ce, ce.getCommandArgs()[1]);
+    }
+
+    @Slash
+    public Status onSlashCommand(SlashCommandEvent sce,
+                                 @Param(desc = "Your choice: rock, paper, or scissors.") String args) {
+        return handle(sce, args);
+    }
+
+    private Status handle(ICommandEvent ce, String args) {
         int result = ThreadLocalRandom.current().nextInt(3) + 1;
-        String args = ce.getCommandArgs()[1];
         if (args.equalsIgnoreCase("rock") || args.equalsIgnoreCase("paper") || args.equalsIgnoreCase("scissors")) {
             if (args.equalsIgnoreCase("rock") && result == 1) {
                 ce.sendReply("Rock Vs. Rock: **Tie!**");
@@ -65,4 +78,3 @@ public class RockPaperScissorsCommand extends Command {
         return Status.SUCCESS;
     }
 }
-

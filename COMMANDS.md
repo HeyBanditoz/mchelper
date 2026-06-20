@@ -21,7 +21,7 @@ If a command name has _(S)_, it also has a slash command.
 ### BlackJackCommand
 `blackjack` - \<ante (with range 5 \<= x \<= 200000)\> - Play double or nothing to win some money!
 
-### CoinFlipCommand
+### CoinFlipCommand _(S)_
 `flip` - \<no parameters\>  - Flips a coin.
 
 ### CooldownsCommand
@@ -154,7 +154,7 @@ named arguments:
 ### RemoveCommandCommand
 `removecommand` - \<command\> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
 
-### RockPaperScissorsCommand
+### RockPaperScissorsCommand _(S)_
 `rps` - \<rock/paper/scissors\> - Chooses a random, Rock, Paper, or Scissors
 
 ### RussianRouletteCommand
