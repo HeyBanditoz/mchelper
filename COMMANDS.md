@@ -149,7 +149,7 @@ named arguments:
 ```
 
 ### RemindmeCommand
-`remindme` - \<duration\> \<reminder\> - Creates a reminder. It is accurate give or take a second.
+`remindme` - \<duration/date/time\> \<reminder\> - Creates a reminder. It is accurate give or take a second.
 
 ### RemoveCommandCommand
 `removecommand` - \<command\> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
