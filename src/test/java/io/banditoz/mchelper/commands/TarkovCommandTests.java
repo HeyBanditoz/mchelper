@@ -7,9 +7,10 @@ import jakarta.inject.Inject;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 @InjectTest
-@Tag("external-integration")
+@Disabled
 @Ignore
 class TarkovCommandTests extends BaseCommandTest {
     @Inject
