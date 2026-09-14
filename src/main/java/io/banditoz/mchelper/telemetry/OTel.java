@@ -1,4 +1,4 @@
-package io.banditoz.mchelper;
+package io.banditoz.mchelper.telemetry;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

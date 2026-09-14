@@ -1,4 +1,4 @@
-package io.banditoz.mchelper;
+package io.banditoz.mchelper.telemetry;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
