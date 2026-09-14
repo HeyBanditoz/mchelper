@@ -8,6 +8,7 @@ import io.banditoz.mchelper.UserEvent;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.config.GuildConfigurationProvider;
+import io.banditoz.mchelper.telemetry.SkipAspect;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -70,6 +71,7 @@ public class RegexCommandEvent implements UserEvent {
     /**
      * Sends typing to where this event came from.
      */
+    @SkipAspect
     public void sendTyping() {
         getEvent().getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
     }

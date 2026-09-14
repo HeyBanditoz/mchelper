@@ -3,6 +3,7 @@ package io.banditoz.mchelper.commands.logic;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.telemetry.Tracing;
 import net.dv8tion.jda.api.entities.channel.Channel;
 
 /**
@@ -16,6 +17,8 @@ public class LoggableCommandEvent extends CommandEvent implements Stat {
     private final Status status;
     /** How this command came in. */
     private final Kind kind;
+    /** Trace ID captured at construction, see {@link Stat#getTraceId()}. */
+    private final String traceId = Tracing.currentTraceId();
 
     public LoggableCommandEvent(CommandEvent ce, int executionTime, Status status, Kind kind) {
         // TODO this really should be another class
@@ -58,5 +61,10 @@ public class LoggableCommandEvent extends CommandEvent implements Stat {
     @Override
     public String getLogMessage() {
         return Stat.super.getLogMessage();
+    }
+
+    @Override
+    public String getTraceId() {
+        return traceId;
     }
 }

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-trace-id-to-statistics
+      author: Hayden
+      comment: Adds a trace_id column to statistics to correlate command runs with logs.
+      changes:
+        - addColumn:
+            tableName: statistics
+            columns:
+              - column:
+                  name: trace_id
+                  type: uuid
+                  constraints:
+                    nullable: true

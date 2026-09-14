@@ -1,24 +1,5 @@
 package io.banditoz.mchelper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import feign.*;
-import feign.codec.Decoder;
-import feign.codec.ErrorDecoder;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import io.avaje.config.Config;
-import io.avaje.inject.Bean;
-import io.avaje.inject.Factory;
-import io.banditoz.mchelper.http.*;
-import io.banditoz.mchelper.utils.Whitebox;
-import io.banditoz.mchelper.weather.geocoder.Location;
-import jakarta.inject.Inject;
-import okhttp3.OkHttp;
-import okhttp3.OkHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -30,6 +11,26 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static feign.FeignException.errorStatus;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
+import feign.*;
+import feign.codec.Decoder;
+import feign.codec.ErrorDecoder;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import io.avaje.config.Config;
+import io.avaje.inject.Bean;
+import io.avaje.inject.Factory;
+import io.banditoz.mchelper.http.*;
+import io.banditoz.mchelper.telemetry.HttpTracingInterceptor;
+import io.banditoz.mchelper.utils.Whitebox;
+import io.banditoz.mchelper.weather.geocoder.Location;
+import jakarta.inject.Inject;
+import okhttp3.OkHttp;
+import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Factory
 public class Http {
@@ -55,15 +56,17 @@ public class Http {
     private static final Logger LOGGER = LoggerFactory.getLogger(Http.class);
 
     @Inject
-    public Http(ObjectMapper om) {
+    public Http(ObjectMapper om, HttpTracingInterceptor tracingInterceptor) {
         LOGGER.info("Building Feign HTTP clients...");
         client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(tracingInterceptor)
                 .build();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS);
+                .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(tracingInterceptor);
         // what the hell? why is this necessary? thanks kotlin...
         builder.setFollowRedirects$okhttp(false);
         builder.setFollowSslRedirects$okhttp(false);

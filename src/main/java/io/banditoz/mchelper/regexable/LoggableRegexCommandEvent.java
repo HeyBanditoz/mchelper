@@ -3,6 +3,7 @@ package io.banditoz.mchelper.regexable;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.telemetry.Tracing;
 import net.dv8tion.jda.api.entities.channel.Channel;
 
 /**
@@ -14,6 +15,8 @@ public class LoggableRegexCommandEvent extends RegexCommandEvent implements Stat
     private final int executionTime;
     /** What the command success was. */
     private final Status status;
+    /** Trace ID captured at construction, see {@link Stat#getTraceId()}. */
+    private final String traceId = Tracing.currentTraceId();
 
     public LoggableRegexCommandEvent(RegexCommandEvent rce, int executionTime, Status status) {
         super(rce.getEvent(), rce.getArgs(), rce.getLogger(), rce.getClassName(), null);
@@ -42,5 +45,10 @@ public class LoggableRegexCommandEvent extends RegexCommandEvent implements Stat
 
     public int getExecutionTime() {
         return executionTime;
+    }
+
+    @Override
+    public String getTraceId() {
+        return traceId;
     }
 }

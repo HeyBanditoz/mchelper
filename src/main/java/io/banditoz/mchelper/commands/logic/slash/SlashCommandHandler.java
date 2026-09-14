@@ -12,7 +12,10 @@ import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.jda.OwnerMessenger;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
+import io.banditoz.mchelper.telemetry.Tracing;
 import io.banditoz.mchelper.utils.StringUtils;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
@@ -34,6 +37,7 @@ public class SlashCommandHandler extends ListenerAdapter {
     private final StatsRecorder statsRecorder;
     private final JDA jda;
     private final OwnerMessenger ownerMessenger;
+    private final Tracing tracing;
     private final Map<String, SlashCommand> commands = new HashMap<>();
 
     private static final Logger log = LoggerFactory.getLogger(SlashCommandHandler.class);
@@ -44,11 +48,13 @@ public class SlashCommandHandler extends ListenerAdapter {
                                StatsRecorder statsRecorder,
                                JDA jda,
                                OwnerMessenger ownerMessenger,
+                               Tracing tracing,
                                List<SlashCommand> commands) {
         this.ses = ses;
         this.tpe = tpe;
         this.statsRecorder = statsRecorder;
         this.ownerMessenger = ownerMessenger;
+        this.tracing = tracing;
         this.jda = jda;
         for (SlashCommand slashCommand : commands) {
             this.commands.put(slashCommand.getCommand().commandName(), slashCommand);
@@ -89,15 +95,23 @@ public class SlashCommandHandler extends ListenerAdapter {
             return;
         }
         tpe.execute(() -> {
+            Span span = tracing.startRootSpan("slash " + command.getCommand().getClass().getSimpleName(),
+                    Tracing.discordAttributes(event.getFullCommandName(), event.getUser(), event.getChannel(), event.getGuild()));
+            Scope scope = Tracing.makeCurrent(span);
             try {
                 Stat s = command.invoke(event, ses);
+                Tracing.recordStat(span, s);
                 log.info(s.getLogMessage());
                 statsRecorder.record(s);
             } catch (Throwable ex) {
+                Tracing.recordException(span, ex);
                 String msg = "**Exception caught before invocation of slash command occurred!** " + StringUtils.truncate(MarkdownSanitizer.escape(ex.toString()), 500, true);
                 event.reply(msg).queue();
                 log.error("Exception while handling slash command " + event, ex);
                 ownerMessenger.messageOwner(msg);
+            } finally {
+                scope.close();
+                span.end();
             }
         });
     }

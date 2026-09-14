@@ -1,5 +1,6 @@
 package io.banditoz.mchelper.stats;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
 import net.dv8tion.jda.api.entities.User;
@@ -49,6 +50,11 @@ public interface Stat {
      * @return The kind.
      */
     Kind getKind();
+    /**
+     * @return The trace ID, or null if we aren't traced.
+     */
+    @Nullable
+    String getTraceId();
     /**
      * Returns a String representation of this {@link Stat}, meant for logging.
      *

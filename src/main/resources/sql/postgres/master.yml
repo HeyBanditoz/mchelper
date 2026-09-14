@@ -41,3 +41,6 @@ databaseChangeLog:
   - include:
       file: 20240728-llm-usage-tracker.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20260913-add-trace-id-to-statistics.yml
+      relativeToChangelogFile: true

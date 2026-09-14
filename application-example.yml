@@ -54,6 +54,15 @@ mchelper:
       enabled: true
       # Delay on when to call the REST get users API to record how long it took.
       ping-delay-seconds: 30
+  environment: prod
+  tracing:
+    enabled: false
+    service-name: mchelper
+    # Either grpc or http
+    protocol: grpc
+    endpoint: http://localhost:4317
+    timeout-seconds: 10
+    sample-ratio: 1.0
   slash-commands:
     # A CSV list of guilds to register slash commands with. If this is configured, global slash commands won't be created.
     dev-guilds: 123456789012346578

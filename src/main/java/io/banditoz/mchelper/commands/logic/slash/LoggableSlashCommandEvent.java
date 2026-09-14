@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.telemetry.Tracing;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 
@@ -21,6 +22,8 @@ public class LoggableSlashCommandEvent implements Stat {
     private final LocalDateTime executedWhen;
     /** Command args. */
     private final String args;
+    /** Trace ID captured at construction, see {@link Stat#getTraceId()}. */
+    private final String traceId = Tracing.currentTraceId();
 
     public LoggableSlashCommandEvent(SlashCommandEvent slashCommandEvent, int executionTime, Status status, Kind kind, LocalDateTime executedWhen) {
         this.slashCommandEvent = slashCommandEvent;
@@ -69,5 +72,10 @@ public class LoggableSlashCommandEvent implements Stat {
     @Override
     public Kind getKind() {
         return kind;
+    }
+
+    @Override
+    public String getTraceId() {
+        return traceId;
     }
 }

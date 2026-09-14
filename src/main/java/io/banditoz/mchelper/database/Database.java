@@ -1,11 +1,16 @@
 package io.banditoz.mchelper.database;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import com.zaxxer.hikari.HikariDataSource;
 import io.avaje.config.Config;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.jenetics.facilejdbc.Query;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.hikaricp.v3_0.HikariTelemetry;
+import io.opentelemetry.instrumentation.jdbc.datasource.JdbcTelemetry;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import liquibase.Contexts;
@@ -17,9 +22,6 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 /**
  * Has-a class for managing a {@link HikariDataSource} pool for requesting database connections.<br>
  * Only Dao classes should interact with this class.
@@ -28,6 +30,7 @@ import java.sql.SQLException;
 @RequiresDatabase // inception?! nah, this annotation checks for existence of property needed to start DB... in theory
 public class Database implements AutoCloseable {
     private final HikariDataSource pool;
+    private final DataSource tracedPool;
     private static final Logger log = LoggerFactory.getLogger(Database.class);
 
     @Inject
@@ -38,8 +41,12 @@ public class Database implements AutoCloseable {
         pool.setPassword(Config.get("mchelper.database.password"));
         pool.setMaximumPoolSize(Config.getInt("mchelper.database.pool-size", 2));
         pool.setMetricsTrackerFactory(HikariTelemetry.create(openTelemetry).createMetricsTrackerFactory());
+        tracedPool = JdbcTelemetry.builder(openTelemetry)
+                .setDataSourceInstrumenterEnabled(false)
+                .build()
+                .wrap(pool);
 
-        try (Connection c = getConnection()) {
+        try (Connection c = pool.getConnection()) {
             String res = Query.of("SELECT VERSION();").as((rs, conn) -> {
                 rs.next();
                 return rs.getString(1);
@@ -59,7 +66,7 @@ public class Database implements AutoCloseable {
             Thread.sleep(5000);
         }
 
-        try (Connection c = getConnection()) {
+        try (Connection c = pool.getConnection()) {
             liquibase.database.Database mgDb = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
             Liquibase liquibase = new Liquibase("sql/postgres/master.yml", new ClassLoaderResourceAccessor(), mgDb);
             liquibase.update(new Contexts(), new LabelExpression());
@@ -71,7 +78,7 @@ public class Database implements AutoCloseable {
      * @throws SQLException If a database access error occurs
      */
     public Connection getConnection() throws SQLException {
-        return pool.getConnection();
+        return tracedPool.getConnection();
     }
 
     /**

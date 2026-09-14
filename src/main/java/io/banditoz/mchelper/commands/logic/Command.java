@@ -7,6 +7,7 @@ import io.banditoz.mchelper.interactions.InteractionListener;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
+import io.banditoz.mchelper.telemetry.SkipAspect;
 import io.banditoz.mchelper.utils.Help;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -135,7 +136,7 @@ public abstract class Command {
             return new LoggableCommandEvent(ce, (int) ((System.nanoTime() - before) / 1000000), Status.COOLDOWN, kind);
         }
 
-        e.getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
+        sendTyping(e);
         ISnowflake entity = getCooldown() != null && getCooldown().getType() == CooldownType.PER_USER
                 ? e.getAuthor() : e.isFromGuild()
                     ? e.getGuild() : null;
@@ -169,5 +170,10 @@ public abstract class Command {
         if (entity != null && cooldown != null) {
             cooldown.remove(entity);
         }
+    }
+
+    @SkipAspect
+    private static void sendTyping(MessageReceivedEvent e) {
+        e.getChannel().sendTyping().queue(unused -> {}, throwable -> {}); // silence sendTyping errors when Discord shuts that endpoint off
     }
 }

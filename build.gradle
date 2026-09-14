@@ -34,6 +34,8 @@ plugins {
 
     // Database version control
     id 'org.liquibase.gradle' version '3.1.0'
+
+    id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
 }
 
 java {
@@ -73,6 +75,9 @@ shadowJar {
         exclude(dependency('com.github.cgoIT:logback-elasticsearch-appender.*:.*'))
         exclude(dependency('org.liquibase:liquibase-core.*:.*'))
         exclude(dependency('io.avaje:.*:.*'))
+        exclude(dependency('io.opentelemetry:opentelemetry-exporter-.*:.*'))
+        exclude(dependency('io.opentelemetry.instrumentation:.*:.*'))
+        exclude(dependency('org.aspectj:.*:.*'))
     }
 }
 
@@ -84,6 +89,7 @@ tasks.jar {
 
 tasks.shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    mergeServiceFiles()
 }
 
 gversion {
@@ -159,11 +165,14 @@ dependencies {
     implementation 'io.avaje:avaje-config:4.1'
 
     implementation(platform('io.opentelemetry:opentelemetry-bom:1.51.0'))
+    implementation(platform('io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.17.0-alpha'))
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-jdbc'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0'
     implementation 'io.opentelemetry:opentelemetry-api'
     implementation 'io.opentelemetry:opentelemetry-sdk'
     implementation 'io.opentelemetry.instrumentation:opentelemetry-runtime-metrics:1.26.0-alpha'
     implementation 'io.opentelemetry:opentelemetry-exporter-prometheus:1.51.0-alpha'
-    implementation 'io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0:2.17.0-alpha'
 
     compileOnly 'io.avaje:avaje-record-builder:1.2'
     annotationProcessor 'io.avaje:avaje-record-builder:1.2'
@@ -171,6 +180,7 @@ dependencies {
     implementation 'io.avaje:avaje-inject:11.6'
     annotationProcessor('io.avaje:avaje-inject-generator:11.6')
     implementation 'io.avaje:avaje-jex:3.5'
+    implementation 'org.aspectj:aspectjrt:1.9.25.1'
 
     runtimeOnly 'org.cache2k:cache2k-core:1.2.3.Final'
     runtimeOnly 'org.antlr:antlr4-runtime:4.7.2' // holding out of date as the dice roller will throw warnings otherwise

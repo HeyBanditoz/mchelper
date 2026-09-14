@@ -1,11 +1,20 @@
 package io.banditoz.mchelper.regexable;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.regex.Matcher;
+
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
+import io.banditoz.mchelper.telemetry.Tracing;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,28 +22,25 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.regex.Matcher;
-
 @Singleton
 public class RegexableHandler extends ListenerAdapter {
     private final ThreadPoolExecutor threadPoolExecutor;
     private final StatsRecorder statsRecorder;
     private final ConfigurationProvider config;
     private final List<Regexable> regexables;
+    private final Tracing tracing;
     private static final Logger log = LoggerFactory.getLogger(RegexableHandler.class);
 
     @Inject
     public RegexableHandler(ThreadPoolExecutor threadPoolExecutor,
                             StatsRecorder statsRecorder,
                             ConfigurationProvider config,
+                            Tracing tracing,
                             List<Regexable> regexables) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.statsRecorder = statsRecorder;
         this.config = config;
+        this.tracing = tracing;
         this.regexables = regexables;
         log.info("{} regexables registered.", regexables.size());
     }
@@ -57,19 +63,28 @@ public class RegexableHandler extends ListenerAdapter {
                     if (m.find()) {
                         // regex matched... let's continue.
                         RegexCommandEvent rce = new RegexCommandEvent(event, m.group(), r.LOGGER, r.getClass().getSimpleName(), config);
+                        Span span = tracing.startRootSpan("regex " + r.getClass().getSimpleName(),
+                                Tracing.discordAttributes(r.getClass().getSimpleName(), event.getAuthor(), event.getChannel(), event.isFromGuild() ? event.getGuild() : null));
+                        Scope scope = Tracing.makeCurrent(span);
                         try {
                             Status status = r.onRegexCommand(rce);
                             Stat s = new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, status);
+                            Tracing.recordStat(span, s);
                             statsRecorder.record(s);
                             log.info(s.getLogMessage());
                         } catch (Exception e) {
+                            Tracing.recordException(span, e);
                             statsRecorder.record(new LoggableRegexCommandEvent(rce, (int) (System.nanoTime() - before) / 1000000, Status.EXCEPTIONAL_FAILURE));
                             CommandUtils.sendExceptionMessage(event, e, r.LOGGER);
                         } catch (Throwable t) {
+                            Tracing.recordException(span, t);
                             if (t instanceof OutOfMemoryError) {
                                 System.gc();
                             }
                             throw t; // rethrow
+                        } finally {
+                            scope.close();
+                            span.end();
                         }
                     }
                     else {

@@ -20,6 +20,9 @@ import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
+import io.banditoz.mchelper.telemetry.Tracing;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -36,6 +39,7 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
     private final ConfigurationProvider configurationProvider;
     private final StatsRecorder statsRecorder;
     private final InteractionListener interactionListener;
+    private final Tracing tracing;
     /** The command map. String is the command name (what the user types) and Command is the command. */
     private final Map<String, Command> commands;
 
@@ -48,11 +52,13 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
                           ConfigurationProvider configurationProvider,
                           StatsRecorder statsRecorder,
                           InteractionListener interactionListener,
+                          Tracing tracing,
                           List<Command> commands) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.configurationProvider = configurationProvider;
         this.statsRecorder = statsRecorder;
         this.interactionListener = interactionListener;
+        this.tracing = tracing;
         this.commands = Stream.concat(Stream.of(new HelpCommand(commands)), commands.stream())
                 .collect(Collectors.toMap(Command::commandName, identity()));
         log.info("{} commands registered.", commands.size());
@@ -78,15 +84,23 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
             }
             if (c.canExecute(event.getAuthor())) {
                 threadPoolExecutor.execute(() -> {
+                    Span span = tracing.startRootSpan("command " + c.getClass().getSimpleName(),
+                            Tracing.discordAttributes(c.commandName(), event.getAuthor(), event.getChannel(), event.isFromGuild() ? event.getGuild() : null));
+                    Scope scope = Tracing.makeCurrent(span);
                     try {
                         Stat s = c.execute(event, kind, interactionListener, this, configurationProvider);
                         if (s.getStatus() == Status.SUCCESS) {
                             commandsRun++;
                         }
+                        Tracing.recordStat(span, s);
                         log.info(s.getLogMessage());
                         statsRecorder.record(s);
                     } catch (Exception ex) {
+                        Tracing.recordException(span, ex);
                         log.error("Unhandled exception in command execution. This should never happen. author=" + event.getAuthor() + " args='" + event.getMessage().getContentRaw() + "' command=" + c, ex);
+                    } finally {
+                        scope.close();
+                        span.end();
                     }
                 });
             }
