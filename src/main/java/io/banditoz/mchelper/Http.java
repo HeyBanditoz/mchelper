@@ -148,8 +148,7 @@ public class Http {
                         .target(AnthropicClient.class, Config.get("mchelper.anthropic.endpoint", "https://api.anthropic.com")))
                 .orElse(null);
 
-        scryfallClient = baseFeignBuilder()
-                .errorDecoder(bodyRedactingErrorDecoder)
+        scryfallClient = baseFeignBuilderReducedUserAgent()
                 .target(ScryfallClient.class, "https://api.scryfall.com");
 
         xonlistClient = baseFeignBuilder()
@@ -164,6 +163,14 @@ public class Http {
                 .decoder(decoder)
                 .options(new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true))
                 .requestInterceptor(userAgentInterceptor);
+    }
+
+    private Feign.Builder baseFeignBuilderReducedUserAgent() {
+        return new Feign.Builder()
+                .client(feignClient)
+                .decoder(decoder)
+                .options(new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true))
+                .requestInterceptor((template) -> template.header("User-Agent", "MCHelper/" + Version.GIT_SHA + " (+https://gitlab.com/HeyBanditoz/mchelper)"));
     }
 
     @Bean

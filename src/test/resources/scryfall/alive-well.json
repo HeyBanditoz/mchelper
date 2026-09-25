@@ -1,0 +1,174 @@
+{
+    "object": "card",
+    "id": "db84415e-048a-4cfc-9121-5ae17a412198",
+    "oracle_id": "57ad3c3a-6ac7-4a35-bc07-00f6ea0988c5",
+    "multiverse_ids": [
+        369041
+    ],
+    "mtgo_id": 48530,
+    "tcgplayer_id": 67946,
+    "cardmarket_id": 261427,
+    "name": "Alive // Well",
+    "lang": "en",
+    "released_at": "2013-05-03",
+    "uri": "https://api.scryfall.com/cards/db84415e-048a-4cfc-9121-5ae17a412198",
+    "scryfall_uri": "https://scryfall.com/card/dgm/121/alive-well?utm_source=api",
+    "layout": "split",
+    "highres_image": true,
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T10:53:37Z",
+    "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.jpg?1783940017",
+        "normal": "https://cards.scryfall.io/normal/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.jpg?1783940017",
+        "large": "https://cards.scryfall.io/large/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.jpg?1783940017",
+        "png": "https://cards.scryfall.io/png/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.png?1783940017",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.jpg?1783940017",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.jpg?1783940017",
+        "thumb": "https://cards.scryfall.io/thumb/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.webp?1783940017",
+        "grid": "https://cards.scryfall.io/grid/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.webp?1783940017",
+        "display": "https://cards.scryfall.io/display/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.webp?1783940017",
+        "art": "https://cards.scryfall.io/art/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.webp?1783940017",
+        "crop": "https://cards.scryfall.io/crop/front/d/b/db84415e-048a-4cfc-9121-5ae17a412198.webp?1783940017"
+    },
+    "mana_cost": "{3}{G} // {W}",
+    "cmc": 5.0,
+    "type_line": "Sorcery // Sorcery",
+    "colors": [
+        "G",
+        "W"
+    ],
+    "color_identity": [
+        "G",
+        "W"
+    ],
+    "keywords": [
+        "Fuse"
+    ],
+    "card_faces": [
+        {
+            "object": "card_face",
+            "name": "Alive",
+            "mana_cost": "{3}{G}",
+            "type_line": "Sorcery",
+            "oracle_text": "Create a 3/3 green Centaur creature token.\nFuse (You may cast one or both halves of this card from your hand.)",
+            "watermark": "selesnya",
+            "artist": "Nils Hamm",
+            "artist_id": "c540d1fc-1500-457f-93cf-d6069ee66546",
+            "illustration_id": "0c8fd763-d266-4ac8-ab17-e729cf179e89"
+        },
+        {
+            "object": "card_face",
+            "name": "Well",
+            "mana_cost": "{W}",
+            "type_line": "Sorcery",
+            "oracle_text": "You gain 2 life for each creature you control.\nFuse (You may cast one or both halves of this card from your hand.)",
+            "watermark": "selesnya",
+            "artist": "Nils Hamm",
+            "artist_id": "c540d1fc-1500-457f-93cf-d6069ee66546"
+        }
+    ],
+    "all_parts": [
+        {
+            "object": "related_card",
+            "id": "db84415e-048a-4cfc-9121-5ae17a412198",
+            "component": "combo_piece",
+            "name": "Alive // Well",
+            "type_line": "Sorcery // Sorcery",
+            "uri": "https://api.scryfall.com/cards/db84415e-048a-4cfc-9121-5ae17a412198"
+        },
+        {
+            "object": "related_card",
+            "id": "5f657b65-67fc-4b7d-bc9e-840190f69362",
+            "component": "token",
+            "name": "Centaur",
+            "type_line": "Token Creature — Centaur",
+            "uri": "https://api.scryfall.com/cards/5f657b65-67fc-4b7d-bc9e-840190f69362"
+        }
+    ],
+    "legalities": {
+        "standard": "not_legal",
+        "future": "not_legal",
+        "historic": "legal",
+        "timeless": "legal",
+        "gladiator": "legal",
+        "pioneer": "legal",
+        "modern": "legal",
+        "legacy": "legal",
+        "pauper": "not_legal",
+        "vintage": "legal",
+        "penny": "legal",
+        "commander": "legal",
+        "oathbreaker": "legal",
+        "standardbrawl": "not_legal",
+        "brawl": "legal",
+        "competitivebrawl": "legal",
+        "alchemy": "not_legal",
+        "paupercommander": "not_legal",
+        "duel": "legal",
+        "oldschool": "not_legal",
+        "premodern": "not_legal",
+        "predh": "not_legal",
+        "tlr": "not_legal"
+    },
+    "games": [
+        "paper",
+        "mtgo"
+    ],
+    "reserved": false,
+    "game_changer": false,
+    "foil": true,
+    "nonfoil": true,
+    "finishes": [
+        "nonfoil",
+        "foil"
+    ],
+    "oversized": false,
+    "promo": false,
+    "reprint": false,
+    "variation": false,
+    "set_id": "c8bd8520-cd98-45cd-b533-8d40c2087426",
+    "set": "dgm",
+    "set_name": "Dragon's Maze",
+    "set_type": "expansion",
+    "set_uri": "https://api.scryfall.com/sets/c8bd8520-cd98-45cd-b533-8d40c2087426",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Adgm&unique=prints",
+    "scryfall_set_uri": "https://scryfall.com/sets/dgm?utm_source=api",
+    "rulings_uri": "https://api.scryfall.com/cards/db84415e-048a-4cfc-9121-5ae17a412198/rulings",
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A57ad3c3a-6ac7-4a35-bc07-00f6ea0988c5&unique=prints",
+    "collector_number": "121",
+    "digital": false,
+    "rarity": "uncommon",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "artist": "Nils Hamm",
+    "artist_ids": [
+        "c540d1fc-1500-457f-93cf-d6069ee66546"
+    ],
+    "illustration_id": "0c8fd763-d266-4ac8-ab17-e729cf179e89",
+    "border_color": "black",
+    "frame": "2003",
+    "full_art": false,
+    "textless": false,
+    "booster": true,
+    "story_spotlight": false,
+    "edhrec_rank": 21570,
+    "penny_rank": 11593,
+    "prices": {
+        "usd": "0.08",
+        "usd_foil": "0.41",
+        "usd_etched": null,
+        "eur": "0.07",
+        "eur_foil": "0.32",
+        "tix": "0.03"
+    },
+    "related_uris": {
+        "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=369041&printed=false",
+        "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DAlive%2B%252F%252F%2BWell",
+        "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DAlive%2B%252F%252F%2BWell",
+        "edhrec": "https://edhrec.com/route/?cc=Alive+%2F%2F+Well"
+    },
+    "purchase_uris": {
+        "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F67946%3Fpage%3D1",
+        "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=261427&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+        "cardhoarder": "https://www.cardhoarder.com/cards/48530?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+    }
+}
