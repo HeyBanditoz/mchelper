@@ -1,10 +1,10 @@
 package io.banditoz.mchelper.mtg;
 
-import javax.annotation.Nullable;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import static java.util.function.Function.identity;
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.sanitize;
 
-import io.banditoz.mchelper.http.ScryfallClient;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,24 +20,36 @@ import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 @Singleton
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType") // the database lookup only exists when a database is configured
 public class ScryfallService {
-    private final ScryfallClient scryfallClient;
+    private final Optional<DatabaseScryfallCardLookup> databaseLookup;
+    private final HttpScryfallCardLookup httpLookup;
     private final Map<String, Emoji> emojis;
     private static final Emoji UNKNOWN = Emoji.fromUnicode("❓");
     private static final Pattern MANA_MATCHER = Pattern.compile("\\{(\\w+)}");
     private static final Color MTG_COLOR = new Color(201, 56, 20);
 
     @Inject
-    public ScryfallService(@Nullable ScryfallClient scryfallClient, // TODO WHY IS THIS NULL!
+    public ScryfallService(Optional<DatabaseScryfallCardLookup> databaseLookup,
+                           HttpScryfallCardLookup httpLookup,
                            List<ApplicationEmoji> applicationEmojis) {
-        this.scryfallClient = scryfallClient;
+        this.databaseLookup = databaseLookup;
+        this.httpLookup = httpLookup;
         emojis = applicationEmojis.stream()
                 .filter(emoji -> emoji.getName().startsWith("mana"))
                 .collect(Collectors.toMap(ApplicationEmoji::getName, identity()));
     }
 
+    /** @return One embed per card face, or an empty list if no card matches. */
     public List<MessageEmbed> getMtgEmbedByFuzzy(String fuzzy) {
-        ScryfallCard card = scryfallClient.getCardByFuzzySearch(fuzzy);
+        // prefer db lookup if available
+        Optional<ScryfallCard> found = databaseLookup
+                .flatMap(db -> db.findByFuzzyName(fuzzy))
+                .or(() -> httpLookup.findByFuzzyName(fuzzy));
+        if (found.isEmpty()) {
+            return List.of();
+        }
+        ScryfallCard card = found.get();
         List<MessageEmbed> list = new ArrayList<>(card.faces().size());
         int x = 0;
         for (ScryfallCardFace cardFace : card.faces()) {

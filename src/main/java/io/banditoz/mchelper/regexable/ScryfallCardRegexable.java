@@ -45,8 +45,16 @@ public class ScryfallCardRegexable extends Regexable {
         for (int i = 0; messageMatcher.find(); i++) {
             String search = messageMatcher.group(1);
             try {
-                embeds.addAll(scryfallService.getMtgEmbedByFuzzy(search));
-                anySuccess = true;
+                List<MessageEmbed> cardEmbeds = scryfallService.getMtgEmbedByFuzzy(search);
+                if (cardEmbeds.isEmpty()) {
+                    embeds.add(new EmbedBuilder()
+                            .setTitle("Card not found")
+                            .setDescription("No MTG card matches `%s` closely enough".formatted(sanitize(search)))
+                            .build());
+                } else {
+                    embeds.addAll(cardEmbeds);
+                    anySuccess = true;
+                }
             } catch (FeignException ex) {
                 LOGGER.warn("\"Couldn't fetch card details.\" name=\"{}\"", search, ex);
                 MessageEmbed errorEmbed = new EmbedBuilder()

@@ -24,7 +24,7 @@ public class ExecutorFactory {
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
-        return new NonBlockingOnCloseScheduledExecutorService(1, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
+        return new NonBlockingOnCloseScheduledExecutorService(2, new ThreadFactoryBuilder().setNameFormat("Scheduled-%d")
                 .build());
     }
 }

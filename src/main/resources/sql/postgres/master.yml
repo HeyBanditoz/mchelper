@@ -44,3 +44,6 @@ databaseChangeLog:
   - include:
       file: 20260913-add-trace-id-to-statistics.yml
       relativeToChangelogFile: true
+  - include:
+      file: 20260926-add-mtg-cards.yml
+      relativeToChangelogFile: true

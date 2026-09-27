@@ -46,6 +46,7 @@ public class Http {
     private final DarkSkyClient darkSkyClient;
     private final AnthropicClient anthropicClient;
     private final ScryfallClient scryfallClient;
+    private final ScryfallBulkClient scryfallBulkClient;
     private final XonlistClient xonlistClient;
 
     private final JacksonDecoder decoder;
@@ -151,6 +152,9 @@ public class Http {
         scryfallClient = baseFeignBuilderReducedUserAgent()
                 .target(ScryfallClient.class, "https://api.scryfall.com");
 
+        scryfallBulkClient = baseFeignBuilderReducedUserAgent()
+                .target(ScryfallBulkClient.class, "?"); // URLs are passed in by the feign client, maybe we should just give it its own HTTP client instead...
+
         xonlistClient = baseFeignBuilder()
                 .target(XonlistClient.class, "https://xonotic.lifeisabug.com");
 
@@ -225,6 +229,11 @@ public class Http {
     @Bean
     public ScryfallClient getScryfallClient() {
         return scryfallClient;
+    }
+
+    @Bean
+    public ScryfallBulkClient getScryfallBulkClient() {
+        return scryfallBulkClient;
     }
 
     @Bean

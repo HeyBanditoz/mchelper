@@ -1,0 +1,107 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-mtg-cards
+      author: Hayden
+      comment: Adds an mtg_cards table holding Scryfall's default-cards bulk data, for looking up cards.
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+        - createTable:
+            tableName: mtg_cards
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                  remarks: Scryfall's identifier for this printing.
+              - column:
+                  name: oracle_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                  remarks: Identifier shared by every printing of the same card.
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+                  remarks: Card name as Scryfall has it, multiple faces joined like `Alive // Well`.
+              - column:
+                  name: search_name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+                  remarks: Lowercased name, used for fuzzy matching.
+              - column:
+                  name: lang
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: set_code
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: collector_number
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: released_at
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: layout
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: normal_print
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  remarks: True for a regular printing (normal set, border and frame, not a promo or reprint list). Lookups
+                    prefer these when picking which printing of a card to show.
+              - column:
+                  name: edhrec_rank
+                  type: INT
+                  constraints:
+                    nullable: true
+                  remarks: EDHREC popularity rank, lower is more popular.
+              - column:
+                  name: data
+                  type: JSONB
+                  constraints:
+                    nullable: false
+                  remarks: Full Scryfall card object as it appears in the bulk data.
+              - column:
+                  name: imported_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: false
+                  remarks: When the bulk import that last wrote this row started.
+        # No reason for proper table since reimporting is cheap
+        - sql:
+            sql: ALTER TABLE mtg_cards SET UNLOGGED;
+        - createIndex:
+            tableName: mtg_cards
+            indexName: mtg_cards_set_code_collector_number_lang_idx
+            unique: true
+            columns:
+              - column:
+                  name: set_code
+              - column:
+                  name: collector_number
+              - column:
+                  name: lang
+        - createIndex:
+            tableName: mtg_cards
+            indexName: mtg_cards_oracle_id_idx
+            column:
+              name: oracle_id
+        - sql:
+            sql: CREATE INDEX mtg_cards_search_name_trgm_idx ON mtg_cards USING gin (search_name gin_trgm_ops);

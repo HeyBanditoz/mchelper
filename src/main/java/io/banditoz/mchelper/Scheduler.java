@@ -19,6 +19,7 @@ public class Scheduler {
     private final XonlistCheckerRunnable xonlistCheckerRunnable;
     private final DiscordPingRunnable discordPingRunnable;
     private final QotdRunnable qotdRunnable;
+    private final ScryfallBulkRunnable scryfallBulkRunnable;
 
     @Inject
     public Scheduler(ScheduledExecutorService ses,
@@ -26,13 +27,15 @@ public class Scheduler {
                      @Nullable PollCullerRunnable pollCullerRunnable,
                      @Nullable XonlistCheckerRunnable xonlistCheckerRunnable,
                      @Nullable DiscordPingRunnable discordPingRunnable,
-                     QotdRunnable qotdRunnable) {
+                     QotdRunnable qotdRunnable,
+                     @Nullable ScryfallBulkRunnable scryfallBulkRunnable) {
         this.ses = ses;
         this.userMaintenanceRunnable = userMaintenanceRunnable;
         this.pollCullerRunnable = pollCullerRunnable;
         this.xonlistCheckerRunnable = xonlistCheckerRunnable;
         this.discordPingRunnable = discordPingRunnable;
         this.qotdRunnable = qotdRunnable;
+        this.scryfallBulkRunnable = scryfallBulkRunnable;
     }
 
     @PostConstruct
@@ -48,6 +51,9 @@ public class Scheduler {
         }
         if (discordPingRunnable != null) {
             ses.scheduleWithFixedDelay(discordPingRunnable, 0, Config.getInt("mchelper.metrics.ping-stats.ping-delay-seconds"), TimeUnit.SECONDS);
+        }
+        if (scryfallBulkRunnable != null) {
+            ses.scheduleWithFixedDelay(scryfallBulkRunnable, 0, 6, TimeUnit.HOURS);
         }
         ses.scheduleAtFixedRate(qotdRunnable,
                 QotdRunnable.getDelay().getSeconds(),
