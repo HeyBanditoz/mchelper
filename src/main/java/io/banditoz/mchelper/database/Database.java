@@ -43,6 +43,7 @@ public class Database implements AutoCloseable {
         pool.setMetricsTrackerFactory(HikariTelemetry.create(openTelemetry).createMetricsTrackerFactory());
         tracedPool = JdbcTelemetry.builder(openTelemetry)
                 .setDataSourceInstrumenterEnabled(false)
+                .setTransactionInstrumenterEnabled(true)
                 .build()
                 .wrap(pool);
 
