@@ -10,6 +10,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.semconv.CodeAttributes;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.RestAction;
 
@@ -72,15 +73,15 @@ public class JdaTracing {
         String type = actionType(action);
         return tracer().spanBuilder("discord " + type)
                 .setSpanKind(SpanKind.CLIENT)
-                .setAttribute("discord.rest_action", type)
-                .setAttribute("discord.call", call)
-                .setAttribute("code.function", caller);
+                .setAttribute(MCHelperAttributes.DISCORD_REST_ACTION, type)
+                .setAttribute(MCHelperAttributes.DISCORD_CALL, call)
+                .setAttribute(CodeAttributes.CODE_FUNCTION_NAME, caller);
     }
 
     private static void record(Span span, Throwable t) {
         Tracing.recordException(span, t);
         if (t instanceof ErrorResponseException ere) {
-            span.setAttribute("discord.error_code", (long) ere.getErrorCode());
+            span.setAttribute(MCHelperAttributes.DISCORD_ERROR_CODE, (long) ere.getErrorCode());
         }
     }
 

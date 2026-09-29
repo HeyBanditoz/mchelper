@@ -27,6 +27,7 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
+import io.opentelemetry.semconv.ServiceAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,8 +126,8 @@ public class OTel {
 
     private Resource tracingResource(Attributes base) {
         AttributesBuilder b = base.toBuilder()
-                .put("service.name", Config.get("mchelper.tracing.service-name", "mchelper"))
-                .put("service.version", Version.GIT_SHA);
+                .put(ServiceAttributes.SERVICE_NAME, Config.get("mchelper.tracing.service-name", "mchelper"))
+                .put(ServiceAttributes.SERVICE_VERSION, Version.GIT_SHA);
         Config.getOptional("mchelper.environment")
                 .ifPresent(env -> b.put("deployment.environment.name", env));
         return Resource.create(b.build());

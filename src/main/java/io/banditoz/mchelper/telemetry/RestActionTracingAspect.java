@@ -40,6 +40,6 @@ public class RestActionTracingAspect {
 
     private static String callerName(JoinPoint.EnclosingStaticPart caller) {
         Signature s = caller.getSignature();
-        return s.getDeclaringType().getSimpleName() + '#' + s.getName();
+        return s.getDeclaringTypeName() + '.' + s.getName();
     }
 }

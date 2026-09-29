@@ -3,6 +3,7 @@ package io.banditoz.mchelper.telemetry;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
@@ -30,6 +31,12 @@ public class MetricsEventListener extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(MetricsEventListener.class);
     private static final AtomicInteger spamCounter = new AtomicInteger(0);
 
+    private static final AttributeKey<String> EVENT_NAME = AttributeKey.stringKey("event_name");
+    private static final AttributeKey<Long> GUILD = AttributeKey.longKey("guild");
+    private static final AttributeKey<String> USER_TYPE = AttributeKey.stringKey("user_type");
+    private static final AttributeKey<String> NAME = AttributeKey.stringKey("name");
+    private static final AttributeKey<String> ROUTE = AttributeKey.stringKey("route");
+
     @Inject
     public MetricsEventListener(MeterProvider meterProvider) {
         eventCounter = meterProvider
@@ -51,25 +58,25 @@ public class MetricsEventListener extends ListenerAdapter {
     @Override
     public void onGenericEvent(@NotNull GenericEvent event) {
         AttributesBuilder attr = Attributes.builder()
-                .put("event_name", event.getClass().getSimpleName());
+                .put(EVENT_NAME, event.getClass().getSimpleName());
         switch (event) {
-            case GenericGuildEvent e -> attr.put("guild", e.getGuild().getIdLong());
+            case GenericGuildEvent e -> attr.put(GUILD, e.getGuild().getIdLong());
             case GenericMessageEvent e when e.isFromGuild() -> {
-                attr.put("guild", e.getGuild().getIdLong());
+                attr.put(GUILD, e.getGuild().getIdLong());
                 if (e instanceof MessageUpdateEvent mue) {
                     User u = mue.getMessage().getAuthor();
                     String accountType = u.isBot() ? "bot" : u.isSystem() ? "system" : "user";
-                    attr.put("user_type", accountType);
+                    attr.put(USER_TYPE, accountType);
                 }
             }
             case Interaction e when e.getGuild() != null -> {
-                attr.put("guild", e.getGuild().getIdLong());
+                attr.put(GUILD, e.getGuild().getIdLong());
                 if (e instanceof SlashCommandInteractionEvent scie) {
-                    attr.put("name", scie.getFullCommandName());
+                    attr.put(NAME, scie.getFullCommandName());
                 }
             }
             case HttpRequestEvent e ->
-                    attr.put("route", "%s /%s".formatted(e.getRoute().getBaseRoute().getMethod(), e.getRoute().getBaseRoute().getRoute()));
+                    attr.put(ROUTE, "%s /%s".formatted(e.getRoute().getBaseRoute().getMethod(), e.getRoute().getBaseRoute().getRoute()));
             default -> {
             }
         }

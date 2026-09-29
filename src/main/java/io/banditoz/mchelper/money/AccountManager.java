@@ -11,6 +11,8 @@ import io.banditoz.mchelper.database.StatPoint;
 import io.banditoz.mchelper.database.Transaction;
 import io.banditoz.mchelper.database.dao.AccountsDao;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
+import io.banditoz.mchelper.telemetry.Observed;
+import io.banditoz.mchelper.telemetry.SkipAspect;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,12 +21,13 @@ import net.dv8tion.jda.api.entities.User;
 
 /**
  * The class that handles monetary user accounts and their transactions. Use this class
- * (from {@link io.banditoz.mchelper.MCHelper#getAccountManager()}) instead of creating a new one, as this class does
+ * (from dependency injection) instead of creating a new one, as this class does
  * synchronization to ensure money remains the same while a thread operates on a user's account.<br><br>
  * In the comments, user and accounts are used synonymously to represent a user's account, which holds a balance.
  */
 @Singleton
 @RequiresDatabase
+@Observed
 public class AccountManager {
     private final AccountsDao dao;
     /** The {@link DecimalFormat} to cleanly format {@link BigDecimal BigDecimals} as {@link String Strings}. */
@@ -190,6 +193,7 @@ public class AccountManager {
      * @param d The {@link BigDecimal} to check.
      * @return A scaled {@link BigDecimal}.
      */
+    @SkipAspect
     public BigDecimal scale(BigDecimal d) {
         return d.setScale(2, RoundingMode.HALF_UP);
     }
@@ -201,6 +205,7 @@ public class AccountManager {
      * @param d The {@link BigDecimal} to format.
      * @return The formatted number as a {@link String}.
      */
+    @SkipAspect
     public static String format(BigDecimal d) {
         d = d.stripTrailingZeros();
         // other threads *could* potentially access this and change minimumFractionDigits, so synchronize it

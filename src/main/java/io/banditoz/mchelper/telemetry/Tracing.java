@@ -34,11 +34,19 @@ public class Tracing {
 
     public static Scope makeCurrent(Span span) {
         Scope scope = span.makeCurrent();
-        if (span.getSpanContext().isValid()) {
-            MDC.put(MDC_TRACE_ID, span.getSpanContext().getTraceId());
+        if (!span.getSpanContext().isValid()) {
+            return scope;
         }
+        // save/restore rather than remove, so closing a nested scope does not strip the trace ID from the outer one
+        String previous = MDC.get(MDC_TRACE_ID);
+        MDC.put(MDC_TRACE_ID, span.getSpanContext().getTraceId());
         return () -> {
-            MDC.remove(MDC_TRACE_ID);
+            if (previous == null) {
+                MDC.remove(MDC_TRACE_ID);
+            }
+            else {
+                MDC.put(MDC_TRACE_ID, previous);
+            }
             scope.close();
         };
     }
@@ -54,21 +62,21 @@ public class Tracing {
 
     public static Attributes discordAttributes(String name, User user, @Nullable Channel channel, @Nullable Guild guild) {
         var builder = Attributes.builder()
-                .put("mchelper.name", name)
-                .put("discord.user_id", user.getIdLong());
+                .put(MCHelperAttributes.MCHELPER_NAME, name)
+                .put(MCHelperAttributes.DISCORD_USER_ID, user.getIdLong());
         if (channel != null) {
-            builder.put("discord.channel_id", channel.getIdLong());
+            builder.put(MCHelperAttributes.DISCORD_CHANNEL_ID, channel.getIdLong());
         }
         if (guild != null) {
-            builder.put("discord.guild_id", guild.getIdLong());
+            builder.put(MCHelperAttributes.DISCORD_GUILD_ID, guild.getIdLong());
         }
         return builder.build();
     }
 
     public static void recordStat(Span span, Stat s) {
-        span.setAttribute("mchelper.status", s.getStatus().name());
-        span.setAttribute("mchelper.kind", s.getKind().name());
-        span.setAttribute("mchelper.execution_time_ms", s.getExecutionTime());
+        span.setAttribute(MCHelperAttributes.MCHELPER_STATUS, s.getStatus().name());
+        span.setAttribute(MCHelperAttributes.MCHELPER_KIND, s.getKind().name());
+        span.setAttribute(MCHelperAttributes.MCHELPER_EXECUTION_TIME_MS, s.getExecutionTime());
         if (s.getStatus() != Status.SUCCESS) {
             span.setStatus(StatusCode.ERROR, s.getStatus().name());
         }

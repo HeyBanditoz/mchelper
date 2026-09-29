@@ -171,6 +171,7 @@ dependencies {
     implementation 'io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0'
     implementation 'io.opentelemetry:opentelemetry-api'
     implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry.semconv:opentelemetry-semconv'
     implementation 'io.opentelemetry.instrumentation:opentelemetry-runtime-metrics:1.26.0-alpha'
     implementation 'io.opentelemetry:opentelemetry-exporter-prometheus:1.51.0-alpha'
 
