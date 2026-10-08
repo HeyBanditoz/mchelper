@@ -6,10 +6,13 @@ import java.util.concurrent.*;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.avaje.inject.Priority;
 import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.telemetry.Tracing;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.MeterProvider;
+import io.opentelemetry.api.trace.*;
+import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -33,10 +36,11 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
     private final ScheduledExecutorService SES;
     private final List<Interactable<?, ?>> INTERACTABLES = new CopyOnWriteArrayList<>();
     private final LongHistogram buttonProcessingDelay;
+    private final Tracer tracer;
     private static final Logger LOGGER = LoggerFactory.getLogger(InteractionListener.class);
 
     @Inject
-    public InteractionListener(MeterProvider meter) {
+    public InteractionListener(MeterProvider meter, Tracer tracer) {
         this.SES = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("BL-Scheduled-%d").build());
         this.buttonProcessingDelay = meter
                 .meterBuilder("interaction_metrics")
@@ -46,6 +50,7 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                 .ofLongs()
                 .setExplicitBucketBoundariesAdvice(List.of(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 15L, 20L, 25L, 50L, 75L, 100L, 250L, 500L, 750L, 1000L, 2500L))
                 .build();
+        this.tracer = tracer;
     }
 
     public void addInteractable(Interactable<?, ?> i) {
@@ -107,7 +112,7 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
-                        measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, this)), "button", i.getCommandEvent(), event.getButton());
+                        measure(() -> i.handleEvent(new WrappedButtonClickEvent(event, i, this)), "button", i.getCommandEvent(), event.getButton(), i.getOrigin());
             }, () -> event.reply("Unfortunately, the button `" + event.getButton().getCustomId() + "` you clicked " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "You can retry, but the button may never be valid again. Sorry!").setEphemeral(true).queue());
@@ -136,7 +141,7 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
                                 INTERACTABLES.remove(i);
                             }, i.getTimeoutSeconds(), TimeUnit.SECONDS));
                         }
-                        measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, this)), "modal", null, null);
+                        measure(() -> i.handleEvent(new WrappedModalInteractionEvent(event, this)), "modal", null, null, i.getOrigin());
                     }, () -> event.reply("Unfortunately, the modal `" + event.getModalId() + "` you submitted " +
                             "wasn't contained within the InteractionListener. It could have expired, or otherwise departed this world. " +
                             "You can retry, but the modal may never be valid again. Sorry!").setEphemeral(true).queue());
@@ -146,16 +151,25 @@ public class InteractionListener extends ListenerAdapter implements AutoCloseabl
         }
     }
 
-    private void measure(Runnable runnable, String interactionType, CommandEvent commandEvent, Button button) {
+    private void measure(Runnable runnable, String interactionType, CommandEvent commandEvent, Button button, SpanContext origin) {
         long before = System.currentTimeMillis();
+        SpanBuilder builder = tracer.spanBuilder("interaction " + interactionType)
+                .setSpanKind(SpanKind.CONSUMER)
+                .setNoParent();
+        if (origin.isValid()) {
+            builder.addLink(origin);
+        }
+        Span span = builder.startSpan();
         boolean exceptionally = false;
-        try {
+        try (Scope ignored = span.makeCurrent()) {
             runnable.run();
         } catch (Exception e) {
             // rare case, button interactions shouldn't throw uncaught exceptions
+            Tracing.recordException(span, e);
             exceptionally = true;
             throw e; // rethrow
         } finally {
+            span.end();
             long after = System.currentTimeMillis();
             AttributesBuilder attrs = Attributes.builder()
                     .put("interaction_type", interactionType)
