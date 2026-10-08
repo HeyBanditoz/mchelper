@@ -26,7 +26,7 @@ import jakarta.inject.Singleton;
 @Singleton
 @RequiresDatabase
 public class ScryfallDaoImpl extends Dao implements ScryfallDao {
-    private static final int INSERT_BATCH_SIZE = 1000;
+    private static final int INSERT_BATCH_SIZE = 100;
     private final ObjectMapper objectMapper;
 
     @Inject

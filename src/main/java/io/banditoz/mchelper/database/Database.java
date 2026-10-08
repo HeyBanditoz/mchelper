@@ -40,6 +40,7 @@ public class Database implements AutoCloseable {
         pool.setUsername(Config.get("mchelper.database.username"));
         pool.setPassword(Config.get("mchelper.database.password"));
         pool.setMaximumPoolSize(Config.getInt("mchelper.database.pool-size", 2));
+        pool.addDataSourceProperty("reWriteBatchedInserts", "true");
         pool.setMetricsTrackerFactory(HikariTelemetry.create(openTelemetry).createMetricsTrackerFactory());
         tracedPool = JdbcTelemetry.builder(openTelemetry)
                 .setDataSourceInstrumenterEnabled(false)
