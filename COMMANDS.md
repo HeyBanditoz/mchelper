@@ -1,5 +1,5 @@
 # Commands
-There are a total of 64 commands and 7 regex listeners.
+There are a total of 65 commands and 7 regex listeners.
 
 If a command name has _(S)_, it also has a slash command.
 
@@ -159,6 +159,9 @@ named arguments:
 
 ### RussianRouletteCommand
 `roulette` - \<no parameters\>  - Kick a random person from your voice channel!
+
+### ScryCommand _(S)_
+`scry` - \<card name\> - Looks up a Magic: the Gathering card. The name does not need to be exact.
 
 ### ServerStatusCommand
 `status` - \<address[:port]\> - Fetches information about a Minecraft server.
