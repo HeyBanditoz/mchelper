@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -104,7 +105,7 @@ public class SlashCommandEvent implements ICommandEvent {
     }
 
     @Override
-    public void sendEmbedsReply(MessageEmbed... embeds) {
+    public void sendEmbedsReply(List<MessageEmbed> embeds) {
         defermentFuture.cancel(false);
         MessageCreateData message = new MessageCreateBuilder()
                 .setEmbeds(embeds)

@@ -46,10 +46,11 @@ public class ScryfallService {
         Optional<ScryfallCard> found = databaseLookup
                 .flatMap(db -> db.findByFuzzyName(fuzzy))
                 .or(() -> httpLookup.findByFuzzyName(fuzzy));
-        if (found.isEmpty()) {
-            return List.of();
-        }
-        ScryfallCard card = found.get();
+        return found.map(this::getMtgEmbeds).orElse(List.of());
+    }
+
+    /** @return One embed per face of this specific card printing. */
+    public List<MessageEmbed> getMtgEmbeds(ScryfallCard card) {
         List<MessageEmbed> list = new ArrayList<>(card.faces().size());
         int x = 0;
         for (ScryfallCardFace cardFace : card.faces()) {

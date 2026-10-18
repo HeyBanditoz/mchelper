@@ -188,6 +188,7 @@ public class SlashCommand {
             String name = parameter.getName();
             String desc = parameter.getName();
             boolean isRequired = true;
+            boolean autoComplete = false;
 
             // annotations on method parameter
             for (Annotation annotation : parameter.getAnnotations()) {
@@ -199,6 +200,7 @@ public class SlashCommand {
                         if (!p.desc().isEmpty()) {
                             desc = p.desc();
                         }
+                        autoComplete = p.autoComplete();
                     }
                     case Nullable n -> {
                         if (parameter.getType().isPrimitive()) {
@@ -211,7 +213,12 @@ public class SlashCommand {
                     default -> {}
                 }
             }
-            commandData.addOption(optionType, name.toLowerCase(), desc, isRequired);
+            if (autoComplete && !(command instanceof Autocompletable)) {
+                // JDA already rejects autocomplete on option types that can't support it, so only this needs checking
+                throw new IllegalArgumentException(command.getClass().getSimpleName() + " autocompletes parameter "
+                        + name + " but does not implement Autocompletable.");
+            }
+            commandData.addOption(optionType, name.toLowerCase(), desc, isRequired, autoComplete);
             if (!command.getRequiredPermissions().isEmpty()) {
                 commandData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(command.getRequiredPermissions()));
             }

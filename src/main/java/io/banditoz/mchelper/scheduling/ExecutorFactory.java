@@ -9,6 +9,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.avaje.config.Config;
 import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
+import io.avaje.inject.Secondary;
+import jakarta.inject.Named;
 import org.slf4j.LoggerFactory;
 
 @Factory
@@ -20,6 +22,19 @@ public class ExecutorFactory {
                 new ThreadFactoryBuilder().setNameFormat("Command-%d").build());
         LoggerFactory.getLogger(ExecutorFactory.class).info("ThreadPollExecutor built with {} threads.", threads);
         return threadPoolExecutor;
+    }
+
+    /**
+     * Autocomplete replies can't be deferred and Discord discards them after three seconds, so they get their own
+     * threads rather than queueing behind whatever slow command is occupying the (small) shared command pool.
+     * Secondary so that injecting a plain {@link ThreadPoolExecutor} still gets the command pool.
+     */
+    @Bean
+    @Secondary
+    @Named("autocomplete")
+    public ThreadPoolExecutor autoCompleteExecutor() {
+        return new ContextPropagatingThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("Autocomplete-%d").build());
     }
 
     @Bean

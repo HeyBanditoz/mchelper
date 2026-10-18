@@ -13,4 +13,10 @@ public @interface Param {
     String name() default "";
     /** Default is the parameter name, if empty string (not overridden.)*/
     String desc() default "";
+    /**
+     * Whether Discord should ask the bot for suggestions as the user types this parameter. The {@link
+     * io.banditoz.mchelper.commands.logic.Command Command} declaring it must implement {@link Autocompletable},
+     * otherwise the suggestions would be requested and never answered.
+     */
+    boolean autoComplete() default false;
 }

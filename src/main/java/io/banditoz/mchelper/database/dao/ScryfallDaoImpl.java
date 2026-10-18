@@ -4,8 +4,11 @@ import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -15,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.banditoz.mchelper.database.Database;
 import io.banditoz.mchelper.database.ScryfallCardRow;
+import io.banditoz.mchelper.database.ScryfallPrinting;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.mtg.ScryfallCard;
 import io.jenetics.facilejdbc.Dctor;
@@ -134,6 +138,103 @@ public class ScryfallDaoImpl extends Dao implements ScryfallDao {
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @Override
+    public List<String> findNamesStartingWith(String search, int limit) throws SQLException {
+        try (Connection c = database.getConnection()) {
+            // only English printings, so the same card doesn't crowd the list out in twenty languages. reversible cards
+            // and double-faced tokens are named like `Sol Ring // Sol Ring`, so fold those into the single name
+            return Query.of("""
+                    SELECT CASE WHEN split_part(name, ' // ', 1) = split_part(name, ' // ', 2)
+                                THEN split_part(name, ' // ', 1)
+                                ELSE name END AS suggestion
+                    FROM mtg_cards
+                    WHERE lang = 'en'
+                      AND (search_name LIKE :q || '%' OR search_name LIKE '% ' || :q || '%')
+                    GROUP BY suggestion
+                    ORDER BY bool_or(search_name LIKE :q || '%') DESC,
+                             MIN(edhrec_rank) NULLS LAST,
+                             suggestion
+                    LIMIT :lim""")
+                    .on(Param.value("q", escapeLike(search.toLowerCase(Locale.ROOT))), Param.value("lim", limit))
+                    .as((rs, conn) -> {
+                        List<String> names = new ArrayList<>();
+                        while (rs.next()) {
+                            names.add(rs.getString(1));
+                        }
+                        return names;
+                    }, c);
+        }
+    }
+
+    @Override
+    public List<ScryfallPrinting> findPrintings(String printingId, String filter, int limit) throws SQLException {
+        try (Connection c = database.getConnection()) {
+            // every word has to match something, so `secret 1512` narrows down to the one Secret Lair printing
+            return Query.of("""
+                    SELECT set_code, data->>'set_name', collector_number, released_at
+                    FROM mtg_cards
+                    WHERE oracle_id = (SELECT oracle_id FROM mtg_cards WHERE id = CAST(:id AS uuid))
+                      AND lang = 'en'
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM unnest(string_to_array(:f, ' ')) AS word
+                          WHERE word <> ''
+                            AND NOT (set_code LIKE word || '%'
+                                     OR lower(collector_number) LIKE word || '%'
+                                     OR lower(data->>'set_name') LIKE '%' || word || '%'))
+                    ORDER BY released_at DESC, set_code, collector_number
+                    LIMIT :lim""")
+                    .on(Param.value("id", printingId),
+                            Param.value("f", escapeLike(filter.toLowerCase(Locale.ROOT))),
+                            Param.value("lim", limit))
+                    .as((rs, conn) -> {
+                        List<ScryfallPrinting> printings = new ArrayList<>();
+                        while (rs.next()) {
+                            printings.add(new ScryfallPrinting(rs.getString(1), rs.getString(2), rs.getString(3),
+                                    rs.getObject(4, LocalDate.class)));
+                        }
+                        return printings;
+                    }, c);
+        }
+    }
+
+    @Override
+    public Optional<ScryfallCard> findPrinting(String printingId, String setCode, String collectorNumber)
+            throws SQLException {
+        Optional<String> json;
+        try (Connection c = database.getConnection()) {
+            json = Query.of("""
+                    SELECT data
+                    FROM mtg_cards
+                    WHERE oracle_id = (SELECT oracle_id FROM mtg_cards WHERE id = CAST(:id AS uuid))
+                      AND set_code = :s
+                      AND (:cn = '' OR lower(collector_number) = :cn)
+                    ORDER BY lang = 'en' DESC,
+                             normal_print DESC,
+                             released_at DESC,
+                             substring(collector_number FROM '^[0-9]+')::int ASC NULLS LAST,
+                             collector_number,
+                             id
+                    LIMIT 1""")
+                    .on(Param.value("id", printingId),
+                            Param.value("s", setCode.toLowerCase(Locale.ROOT)),
+                            Param.value("cn", collectorNumber.toLowerCase(Locale.ROOT)))
+                    .as((rs, conn) -> rs.next() ? Optional.of(rs.getString(1)) : Optional.empty(), c);
+        }
+        try {
+            return json.isPresent()
+                    ? Optional.of(objectMapper.readValue(json.get(), ScryfallCard.class))
+                    : Optional.empty();
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /** Escapes what LIKE treats as wildcards, so a user typing them searches for the literal character. */
+    private static String escapeLike(String search) {
+        return search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     @Override

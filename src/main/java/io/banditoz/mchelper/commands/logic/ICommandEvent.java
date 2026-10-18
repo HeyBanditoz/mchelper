@@ -2,6 +2,8 @@ package io.banditoz.mchelper.commands.logic;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -45,7 +47,16 @@ public interface ICommandEvent {
      *
      * @param embeds The embeds to send.
      */
-    void sendEmbedsReply(MessageEmbed... embeds);
+    default void sendEmbedsReply(MessageEmbed... embeds) {
+        sendEmbedsReply(Arrays.asList(embeds));
+    }
+
+    /**
+     * Sends a reply with a {@link List} of {@link MessageEmbed MessageEmbeds}.
+     *
+     * @param embeds The embeds to send.
+     */
+    void sendEmbedsReply(List<MessageEmbed> embeds);
 
     /**
      * @return The {@link User} that executed this command.

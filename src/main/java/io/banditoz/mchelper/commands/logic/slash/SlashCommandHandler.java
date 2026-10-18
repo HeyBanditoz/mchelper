@@ -17,8 +17,10 @@ import io.banditoz.mchelper.utils.StringUtils;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -39,12 +41,14 @@ public class SlashCommandHandler extends ListenerAdapter {
     private final OwnerMessenger ownerMessenger;
     private final Tracing tracing;
     private final Map<String, SlashCommand> commands = new HashMap<>();
+    private final ThreadPoolExecutor autoCompleteExecutor;
 
     private static final Logger log = LoggerFactory.getLogger(SlashCommandHandler.class);
 
     @Inject
     public SlashCommandHandler(ScheduledExecutorService ses,
                                ThreadPoolExecutor tpe,
+                               @Named("autocomplete") ThreadPoolExecutor autoCompleteExecutor,
                                StatsRecorder statsRecorder,
                                JDA jda,
                                OwnerMessenger ownerMessenger,
@@ -52,6 +56,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                                List<SlashCommand> commands) {
         this.ses = ses;
         this.tpe = tpe;
+        this.autoCompleteExecutor = autoCompleteExecutor;
         this.statsRecorder = statsRecorder;
         this.ownerMessenger = ownerMessenger;
         this.tracing = tracing;
@@ -84,6 +89,27 @@ public class SlashCommandHandler extends ListenerAdapter {
             jda.updateCommands().addCommands(list)
                     .queue(cmds -> log.info("{} slash commands globally registered.", cmds.size()), ex -> log.error("Exception registering global slash commands!", ex));
         }
+    }
+
+    @Override
+    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
+        SlashCommand command = commands.get(event.getFullCommandName());
+        if (command == null || !(command.getCommand() instanceof Autocompletable autocompletable)) {
+            return;
+        }
+        autoCompleteExecutor.execute(() -> {
+            Span span = tracing.startRootSpan("autocomplete " + command.getCommand().getClass().getSimpleName(),
+                    Tracing.discordAttributes(event.getFullCommandName(), event.getUser(), event.getChannel(), event.getGuild()));
+            try (Scope scope = Tracing.makeCurrent(span)) {
+                event.replyChoices(autocompletable.onAutoComplete(event))
+                        .queue();
+            } catch (Exception ex) {
+                Tracing.recordException(span, ex);
+                log.warn("Exception while autocompleting {}.", event.getFullCommandName(), ex);
+            } finally {
+                span.end();
+            }
+        });
     }
 
     @Override
