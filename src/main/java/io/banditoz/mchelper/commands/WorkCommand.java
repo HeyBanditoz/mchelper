@@ -11,18 +11,16 @@ import java.util.Random;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.avaje.inject.PostConstruct;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.BoundCommand;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
 import io.banditoz.mchelper.database.TaskResponse;
 import io.banditoz.mchelper.database.dao.TasksDao;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.money.Task;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,7 +28,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 
 @Singleton
 @RequiresDatabase
-public class WorkCommand extends Command {
+public class WorkCommand extends BoundCommand {
     private final ObjectMapper objectMapper;
     private final AccountManager am;
     private final TasksDao dao;
@@ -69,22 +67,16 @@ public class WorkCommand extends Command {
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withParameters(null)
-                .withDescription("Work for money every day.");
+    protected String description() {
+        return "Work for money every day.";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) throws Exception {
-        return go(ce);
+    protected Handler declare() {
+        return Params.empty(this::work);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce) throws Exception {
-        return go(sce);
-    }
-
-    private Status go(ICommandEvent ce) throws Exception {
+    private Status work(ICommandEvent ce) throws Exception {
         LocalDateTime ldt = dao.getWhenCanExecute(ce.getUser().getIdLong(), Task.WORK);
         if (ldt.isBefore(LocalDateTime.now())) {
             BigDecimal randAmount = Task.WORK.getRandomAmount();

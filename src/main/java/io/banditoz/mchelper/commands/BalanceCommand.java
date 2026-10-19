@@ -1,24 +1,22 @@
 package io.banditoz.mchelper.commands;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.BoundCommand;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Param;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
+import io.banditoz.mchelper.commands.logic.params.ParamTypes;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 
 @Singleton
 @RequiresDatabase
-public class BalanceCommand extends Command {
+public class BalanceCommand extends BoundCommand {
     private final AccountManager accountManager;
 
     @Inject
@@ -32,42 +30,25 @@ public class BalanceCommand extends Command {
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withDescription("Checks your balance.")
-                .withParameters(null);
+    protected String description() {
+        return "Checks your balance.";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) throws Exception {
-        User user = null;
-        if (!ce.getMentionedUsers().isEmpty()) {
-            user = ce.getMentionedUsers().getFirst();
-        }
-        return go(ce, user);
+    protected Handler declare() {
+        return Params.of()
+                .optional("user", "The member to fetch the balance for.", ParamTypes.MEMBER)
+                .handle(this::balance);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce,
-                                 @Param(desc = "The member to fetch the balance for.") @Nullable User user) throws Exception {
-        return go(sce, user);
-    }
-
-    private Status go(ICommandEvent ce, User user) throws Exception {
-        if (ce.isFromGuild() && user != null && ce.getGuild().getMemberById(user.getIdLong()) == null) {
-            throw new IllegalArgumentException("User is not in this guild.");
-        }
-
-        if (user == null) {
+    private Status balance(ICommandEvent ce, Optional<Member> maybeMember) throws Exception {
+        if (maybeMember.isEmpty()) {
             ce.sendReply("Your balance: $" + AccountManager.format(accountManager.queryBalance(ce.getUser().getIdLong(), true)));
             return Status.SUCCESS;
         }
-        else if (ce.isFromGuild() && ce.getGuild().getMemberById(user.getIdLong()) != null) {
-            ce.sendReply(user.getAsMention() + "'s balance: $" + AccountManager.format(accountManager.queryBalance(user.getIdLong(), false)));
-            return Status.SUCCESS;
-        }
-        else {
-            ce.sendReply("Unable to fetch that user's balance.");
-            return Status.FAIL;
-        }
+        // MEMBER only binds someone in this guild, so there is nothing left to check here.
+        Member member = maybeMember.get();
+        ce.sendReply(member.getAsMention() + "'s balance: $" + AccountManager.format(accountManager.queryBalance(member.getIdLong(), false)));
+        return Status.SUCCESS;
     }
 }

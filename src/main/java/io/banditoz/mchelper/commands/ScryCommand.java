@@ -1,25 +1,21 @@
 package io.banditoz.mchelper.commands;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+import static io.banditoz.mchelper.commands.logic.params.ParamTypes.STRING;
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.sanitize;
 
 import feign.FeignException;
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
+import io.banditoz.mchelper.commands.logic.BoundCommand;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Autocompletable;
-import io.banditoz.mchelper.commands.logic.slash.Param;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
 import io.banditoz.mchelper.database.ScryfallPrinting;
 import io.banditoz.mchelper.mtg.DatabaseScryfallCardLookup;
 import io.banditoz.mchelper.mtg.ScryfallCard;
 import io.banditoz.mchelper.mtg.ScryfallService;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.StringUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -36,7 +32,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
  */
 @Singleton
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // the database lookup only exists when a database is configured
-public class ScryCommand extends Command implements Autocompletable {
+public class ScryCommand extends BoundCommand {
     private final ScryfallService scryfallService;
     private final Optional<DatabaseScryfallCardLookup> databaseLookup;
 
@@ -52,44 +48,34 @@ public class ScryCommand extends Command implements Autocompletable {
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<card name>")
-                .withDescription("Looks up a Magic: the Gathering card. The name does not need to be exact.");
+    protected String description() {
+        return "Looks up a Magic: the Gathering card by approximate name. In text, quote names with spaces.";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) {
-        return handle(ce.getCommandArgsString(), ce);
+    protected Handler declare() {
+        return Params.of()
+                .arg("card", "Card to look up. The name does not need to be exact.", STRING, this::suggestCards)
+                .optional("print", "Specific printing, like SLD 1512. Leave empty for the usual one.", STRING,
+                        this::suggestPrintings)
+                .handle(this::scry);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce,
-                                 @Param(desc = "Card to look up. The name does not need to be exact.",
-                                         autoComplete = true) String card,
-                                 @Param(desc = "Specific printing, like SLD 1512. Leave empty for the usual one.",
-                                         autoComplete = true) @Nullable String print) {
+    private Status scry(ICommandEvent ce, String card, Optional<String> print) {
         // printings are only known from the bulk data, so without a database the print is ignored
-        if (print != null && !print.isBlank() && databaseLookup.isPresent()) {
-            return handlePrinting(card, print, sce);
+        if (print.isPresent() && !print.get().isBlank() && databaseLookup.isPresent()) {
+            return handlePrinting(card, print.get(), ce);
         }
-        return handle(card, sce);
+        return handle(card, ce);
     }
 
     /**
-     * Suggests card names, or printings of the chosen card, out of the local bulk data. Without a database there is
-     * nothing to suggest from, and going to Scryfall's API on every keystroke isn't worth it, so the options are simply
-     * left as free text.
+     * Suggests card names out of the local bulk data. Without a database there is nothing to suggest from, and going
+     * to Scryfall's API on every keystroke isn't worth it, so the option is simply left as free text.
      */
-    @Override
-    public List<Choice> onAutoComplete(CommandAutoCompleteInteractionEvent event) {
+    private List<Choice> suggestCards(CommandAutoCompleteInteractionEvent event) {
         String typed = event.getFocusedOption().getValue().trim();
-        if (databaseLookup.isEmpty()) {
-            return List.of();
-        }
-        if (event.getFocusedOption().getName().equals("print")) {
-            return suggestPrintings(event.getOption("card"), typed);
-        }
-        if (typed.isEmpty()) {
+        if (databaseLookup.isEmpty() || typed.isEmpty()) {
             return List.of();
         }
         return databaseLookup.get().findNamesStartingWith(typed, OptionData.MAX_CHOICES).stream()
@@ -101,10 +87,12 @@ public class ScryCommand extends Command implements Autocompletable {
      * Lists printings of whichever card is in the card option so far, labelled like
      * <code>SLD #1512 (Secret Lair Drop) · 2024</code>, with the value being <code>sld 1512</code>.
      */
-    private List<Choice> suggestPrintings(@Nullable OptionMapping card, String typed) {
-        if (card == null || card.getAsString().isBlank()) {
+    private List<Choice> suggestPrintings(CommandAutoCompleteInteractionEvent event) {
+        OptionMapping card = event.getOption("card");
+        if (databaseLookup.isEmpty() || card == null || card.getAsString().isBlank()) {
             return List.of();
         }
+        String typed = event.getFocusedOption().getValue().trim();
         Optional<ScryfallCard> found = databaseLookup.get().findByFuzzyName(card.getAsString());
         if (found.isEmpty()) {
             return List.of();

@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import io.avaje.config.Config;
 import io.avaje.inject.PostConstruct;
+import io.banditoz.mchelper.commands.logic.params.Completer;
 import io.banditoz.mchelper.jda.OwnerMessenger;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
@@ -23,6 +24,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import org.jetbrains.annotations.NotNull;
@@ -94,14 +97,17 @@ public class SlashCommandHandler extends ListenerAdapter {
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
         SlashCommand command = commands.get(event.getFullCommandName());
-        if (command == null || !(command.getCommand() instanceof Autocompletable autocompletable)) {
+        Completer completer = command == null ? null : command.completerFor(event.getFocusedOption().getName());
+        if (completer == null) {
+            log.warn("Discord sent unknown command {} for autocompletion, event: {}", event.getFullCommandName(), event);
             return;
         }
         autoCompleteExecutor.execute(() -> {
             Span span = tracing.startRootSpan("autocomplete " + command.getCommand().getClass().getSimpleName(),
                     Tracing.discordAttributes(event.getFullCommandName(), event.getUser(), event.getChannel(), event.getGuild()));
             try (Scope scope = Tracing.makeCurrent(span)) {
-                event.replyChoices(autocompletable.onAutoComplete(event))
+                List<Choice> choices = completer.complete(event);
+                event.replyChoices(choices.size() > OptionData.MAX_CHOICES ? choices.subList(0, OptionData.MAX_CHOICES) : choices)
                         .queue();
             } catch (Exception ex) {
                 Tracing.recordException(span, ex);
@@ -123,8 +129,7 @@ public class SlashCommandHandler extends ListenerAdapter {
         tpe.execute(() -> {
             Span span = tracing.startRootSpan("slash " + command.getCommand().getClass().getSimpleName(),
                     Tracing.discordAttributes(event.getFullCommandName(), event.getUser(), event.getChannel(), event.getGuild()));
-            Scope scope = Tracing.makeCurrent(span);
-            try {
+            try (Scope scope = Tracing.makeCurrent(span)) {
                 Stat s = command.invoke(event, ses);
                 Tracing.recordStat(span, s);
                 log.info(s.getLogMessage());
@@ -136,7 +141,6 @@ public class SlashCommandHandler extends ListenerAdapter {
                 log.error("Exception while handling slash command " + event, ex);
                 ownerMessenger.messageOwner(msg);
             } finally {
-                scope.close();
                 span.end();
             }
         });

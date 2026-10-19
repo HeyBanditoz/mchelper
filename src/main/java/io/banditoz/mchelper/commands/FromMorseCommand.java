@@ -1,38 +1,32 @@
 package io.banditoz.mchelper.commands;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Param;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.BoundCommand;
+import io.banditoz.mchelper.commands.logic.ICommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import io.banditoz.mchelper.utils.MorseUtils;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class FromMorseCommand extends Command {
+public class FromMorseCommand extends BoundCommand {
     @Override
     public String commandName() {
         return "frommorse";
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<morse>")
-                .withDescription("Converts morse to text. Use / for spaces between words.");
+    protected String description() {
+        return "Converts morse to text. Use / for spaces between words.";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) throws Exception {
-        ce.sendReply(MorseUtils.fromMorse(ce.getCommandArgsString()));
-        return Status.SUCCESS;
+    protected Handler declare() {
+        return Params.of().rest("morse", "Morse code to convert.", this::fromMorse);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce,
-                                    @Param(desc = "Morse code to convert.") String morse) {
-        sce.sendReply(MorseUtils.fromMorse(morse));
+    private Status fromMorse(ICommandEvent ce, String morse) {
+        ce.sendReply(MorseUtils.fromMorse(morse));
         return Status.SUCCESS;
     }
 }

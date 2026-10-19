@@ -2,78 +2,68 @@ package io.banditoz.mchelper.commands;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
+import static io.banditoz.mchelper.commands.logic.params.ParamTypes.enumOf;
+
+import io.banditoz.mchelper.commands.logic.BoundCommand;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Param;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class RockPaperScissorsCommand extends Command {
+public class RockPaperScissorsCommand extends BoundCommand {
+    public enum Choice {
+        ROCK,
+        PAPER,
+        SCISSORS;
+
+        /** @return The choice this one beats. */
+        Choice beats() {
+            return switch (this) {
+                case ROCK -> SCISSORS;
+                case PAPER -> ROCK;
+                case SCISSORS -> PAPER;
+            };
+        }
+
+        /** @return The name as it appears in the reply, such as "Rock". */
+        String display() {
+            return name().charAt(0) + name().substring(1).toLowerCase();
+        }
+    }
+
+    private static final Choice[] CHOICES = Choice.values();
+
     @Override
     public String commandName() {
         return "rps";
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withParameters("<rock/paper/scissors>")
-                .withDescription("Chooses a random, Rock, Paper, or Scissors");
+    protected String description() {
+        return "Chooses a random, Rock, Paper, or Scissors";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) throws Exception {
-        return handle(ce, ce.getCommandArgs()[1]);
+    protected Handler declare() {
+        return Params.of()
+                .arg("choice", "Your choice: rock, paper, or scissors.", enumOf(Choice.class))
+                .handle(this::play);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce,
-                                 @Param(desc = "Your choice: rock, paper, or scissors.") String args) {
-        return handle(sce, args);
-    }
+    private Status play(ICommandEvent ce, Choice choice) {
+        Choice bot = CHOICES[ThreadLocalRandom.current().nextInt(CHOICES.length)];
+        String matchup = choice.display() + " Vs. " + bot.display() + ": ";
 
-    private Status handle(ICommandEvent ce, String args) {
-        int result = ThreadLocalRandom.current().nextInt(3) + 1;
-        if (args.equalsIgnoreCase("rock") || args.equalsIgnoreCase("paper") || args.equalsIgnoreCase("scissors")) {
-            if (args.equalsIgnoreCase("rock") && result == 1) {
-                ce.sendReply("Rock Vs. Rock: **Tie!**");
-            }
-            else if (args.equalsIgnoreCase("paper") && result == 2) {
-                ce.sendReply("Paper Vs. Paper: **Tie!**");
-            }
-            else if (args.equalsIgnoreCase("scissors") && result == 3) {
-                ce.sendReply("Scissors Vs. Scissors: **Tie!**");
-            }
-            else if (args.equalsIgnoreCase("rock") && result == 2) {
-                ce.sendReply("Rock Vs. Paper: **Bot wins!**");
-            }
-            else if (args.equalsIgnoreCase("rock") && result == 3) {
-                ce.sendReply("Rock Vs. Scissors: **You win!**");
-            }
-            else if (args.equalsIgnoreCase("paper") && result == 1) {
-                ce.sendReply("Paper Vs. Rock: **You win!**");
-            }
-            else if (args.equalsIgnoreCase("paper") && result == 3) {
-                ce.sendReply("Paper Vs. Scissors: **Bot wins!**");
-            }
-            else if (args.equalsIgnoreCase("scissors") && result == 1) {
-                ce.sendReply("Scissors Vs. Rock: **Bot wins!**");
-            }
-            else if (args.equalsIgnoreCase("scissors") && result == 2) {
-                ce.sendReply("Scissors Vs. Paper: **You win!**");
-            }
-            else {
-                ce.sendReply("An error occurred.");
-                return Status.FAIL;
-            }
+        if (choice == bot) {
+            ce.sendReply(matchup + "**Tie!**");
+        }
+        else if (choice.beats() == bot) {
+            ce.sendReply(matchup + "**You win!**");
         }
         else {
-            ce.sendReply("Invalid parameter! Try rock, paper, or scissors.");
-            return Status.FAIL;
+            ce.sendReply(matchup + "**Bot wins!**");
         }
         return Status.SUCCESS;
     }

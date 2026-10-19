@@ -42,16 +42,10 @@ import org.slf4j.LoggerFactory;
  *          ce.sendReply("Pong!");
  *          return Status.SUCCESS;
  *      }
- *
- *      &#064;Slash
- *      public Status onSlashCommand(SlashCommandEvent sce) throws Exception {
- *          sce.sendReply("Pong!");
- *          return Status.SUCCESS;
- *      }
  * }
  * </pre>
  *
- * @see CommandHandler
+ * @apiNote This class is legacy and will only result in a text command! You want to use {@link BoundCommand} instead.
  */
 public abstract class Command {
     protected abstract Status onCommand(CommandEvent ce) throws Exception;

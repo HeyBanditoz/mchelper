@@ -17,7 +17,9 @@ public enum Status {
     /** While trying to execute this executable, the user did not have bot owner permissions. */
     BOT_OWNER_CHECK_FAILED(5),
     /** The runnable is not configured for this guild when trying to invoke it. */
-    NOT_CONFIGURED(6);
+    NOT_CONFIGURED(6),
+    /** The arguments could not be bound to the parameters the command declared. */
+    BINDING_FAIL(7);
 
     private final int value;
 

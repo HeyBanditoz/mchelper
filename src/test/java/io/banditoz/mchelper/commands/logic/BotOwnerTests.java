@@ -1,11 +1,10 @@
 package io.banditoz.mchelper.commands.logic;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class BotOwnerTests {
     @Test
@@ -24,5 +23,27 @@ class BotOwnerTests {
         when(mockUser.getIdLong()).thenReturn(300L);
         assertThat(CommandPermissions.isBotOwner(mockUser)).isFalse();
         assertThat(CommandPermissions.isBotOwner(300L)).isFalse();
+    }
+
+    @Test
+    void elevatedBoundCommandsAreOwnerOnly() {
+        BoundCommand command = mock(BoundCommand.class, CALLS_REAL_METHODS);
+        doReturn(true).when(command).isElevated();
+
+        assertThat(command.canExecute(userWithId(100L))).isTrue();
+        assertThat(command.canExecute(userWithId(300L))).isFalse();
+    }
+
+    @Test
+    void boundCommandsAreOpenToEveryoneByDefault() {
+        BoundCommand command = mock(BoundCommand.class, CALLS_REAL_METHODS);
+
+        assertThat(command.canExecute(userWithId(300L))).isTrue();
+    }
+
+    private static User userWithId(long id) {
+        User user = mock(User.class);
+        when(user.getIdLong()).thenReturn(id);
+        return user;
     }
 }

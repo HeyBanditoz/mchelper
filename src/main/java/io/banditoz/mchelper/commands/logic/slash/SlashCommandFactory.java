@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Factory class for building a list of slash commands.
- * Regular commands don't follow this pattern, as they're already singletons. Slash commands have reflection that needs
- * to be handled at runtime.
+ * Regular commands don't follow this pattern, as they're already singletons. A SlashCommand is a wrapper
+ * around a {@link io.banditoz.mchelper.commands.logic.BoundCommand}.
  */
 @Factory
 public class SlashCommandFactory {
@@ -31,7 +31,7 @@ public class SlashCommandFactory {
         for (Command command : commands) {
             try {
                 slashCommands.add(new SlashCommand(command));
-            } catch (MissingMethodException ignored) {
+            } catch (NotBindableException ignored) {
                 // not converted yet/no slash command
             } catch (Exception ex) {
                 log.error("Exception generating slash command for {}", command.commandName(), ex);

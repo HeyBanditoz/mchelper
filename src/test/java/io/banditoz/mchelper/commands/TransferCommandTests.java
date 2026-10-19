@@ -1,7 +1,6 @@
 package io.banditoz.mchelper.commands;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,11 +31,15 @@ class TransferCommandTests extends BaseCommandTest {
     private final Member member = Mocks.getMockedMember();
     private final User otherUser = Mocks.getDifferentMockedMember().getUser();
 
+    /** The recipient now arrives as a bound parameter, so it is resolved from the mention in the message. */
+    private static final String MENTION = "<@163094867910590464>";
+
     @BeforeEach
     void init() {
         truncate("accounts", "transactions");
-        when(ce.getMentionedMembers()).thenReturn(List.of(member));
-        when(ce.getRawCommandArgs()).thenReturn(new String[]{"!transfer", "", "400"});
+        // Resolved before stubbing starts; calling a mock inside thenReturn() leaves the stubbing unfinished.
+        User user = member.getUser();
+        when(ce.getEvent().getJDA().getUserById(member.getIdLong())).thenReturn(user);
     }
 
     @Test
@@ -44,7 +47,7 @@ class TransferCommandTests extends BaseCommandTest {
         am.queryBalance(member.getIdLong(), true);
         am.queryBalance(otherUser.getIdLong(), true);
         when(ce.getUser()).thenReturn(otherUser);
-        when(ce.getMentionedMembers()).thenReturn(List.of(member));
+        setArgs(MENTION + " 400");
         tc.onCommand(ce);
         assertThat(stringCaptor.getValue()).isEqualTo("Transfer of $400 to <@!163094867910590464> complete. You have $600 left.");
 
@@ -68,7 +71,7 @@ class TransferCommandTests extends BaseCommandTest {
         am.queryBalance(member.getIdLong(), true);
         am.queryBalance(otherUser.getIdLong(), true);
 
-        setArgs("a -400");
+        setArgs(MENTION + " -400");
         assertThatThrownBy(() -> tc.onCommand(ce)).isInstanceOf(MoneyException.class); // can't transfer negative amount
     }
 
@@ -77,10 +80,23 @@ class TransferCommandTests extends BaseCommandTest {
         am.queryBalance(member.getIdLong(), true);
         am.queryBalance(otherUser.getIdLong(), true);
 
-        setArgs("a 400");
-        User u = member.getUser();
-        when(ce.getEvent().getAuthor()).thenReturn(u);
-        when(ce.getMentionedMembers()).thenReturn(List.of(member));
+        // ce.getUser() is the mocked member, and the mention resolves to the same person
+        setArgs(MENTION + " 400");
         assertThatThrownBy(() -> tc.onCommand(ce)).isInstanceOf(MoneyException.class); // can't transfer to self
+    }
+
+    @Test
+    void amountKeepsItsPrecision() throws Exception {
+        am.queryBalance(member.getIdLong(), true);
+        am.queryBalance(otherUser.getIdLong(), true);
+        when(ce.getUser()).thenReturn(otherUser);
+        setArgs(MENTION + " 0.10");
+        tc.onCommand(ce);
+
+        Optional<Transaction> transfer = dao.getNTransactionsForUser(member.getIdLong(), 100).stream()
+                .filter(transaction -> transaction.memo().contains("transfer"))
+                .findAny();
+        assertThat(transfer).isNotEmpty();
+        assertThat(transfer.get().amount()).isEqualByComparingTo(new BigDecimal("-0.10"));
     }
 }

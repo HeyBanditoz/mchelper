@@ -18,6 +18,7 @@ import io.banditoz.mchelper.commands.logic.slash.SlashCommand;
 import io.banditoz.mchelper.regexable.Regexable;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * This isn't really a test, but it generates the list of commands for use in the repository.<br>
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
  * <i>dependencies</i>, we can't easily create them.
  */
 @InjectTest
+@EnabledIfEnvironmentVariable(named = "CI", matches = "true")
 class CommandsToMarkdownTest {
     @Inject
     List<Command> diCommands;

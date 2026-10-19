@@ -3,23 +3,23 @@ package io.banditoz.mchelper.commands;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import io.banditoz.mchelper.commands.logic.Command;
-import io.banditoz.mchelper.commands.logic.CommandEvent;
+import static io.banditoz.mchelper.commands.logic.params.ParamTypes.DECIMAL;
+import static io.banditoz.mchelper.commands.logic.params.ParamTypes.USER;
+
+import io.banditoz.mchelper.commands.logic.BoundCommand;
 import io.banditoz.mchelper.commands.logic.ICommandEvent;
-import io.banditoz.mchelper.commands.logic.slash.Param;
-import io.banditoz.mchelper.commands.logic.slash.Slash;
-import io.banditoz.mchelper.commands.logic.slash.SlashCommandEvent;
+import io.banditoz.mchelper.commands.logic.params.Handler;
+import io.banditoz.mchelper.commands.logic.params.Params;
 import io.banditoz.mchelper.di.annotations.RequiresDatabase;
 import io.banditoz.mchelper.money.AccountManager;
 import io.banditoz.mchelper.stats.Status;
-import io.banditoz.mchelper.utils.Help;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.dv8tion.jda.api.entities.User;
 
 @Singleton
 @RequiresDatabase
-public class TransferCommand extends Command {
+public class TransferCommand extends BoundCommand {
     private final AccountManager accountManager;
 
     @Inject
@@ -33,52 +33,37 @@ public class TransferCommand extends Command {
     }
 
     @Override
-    public Help getHelp() {
-        return new Help(commandName(), false).withDescription("Transfer money.")
-                .withParameters("<to> <amount> [memo]");
+    protected String description() {
+        return "Transfer money.";
     }
 
     @Override
-    protected Status onCommand(CommandEvent ce) throws Exception {
-        User to = ce.getMentionedMembers().get(0).getUser();
-        BigDecimal amount = new BigDecimal(ce.getRawCommandArgs()[2]);
-        transferMoney(ce, ce.getUser(), to, amount);
-        return Status.SUCCESS;
+    protected Handler declare() {
+        return Params.of()
+                .arg("to", "Who the recipient of your gift is.", USER)
+                .arg("amount", "How much to send.", DECIMAL)
+                .handle(this::transfer);
     }
 
-    @Slash
-    public Status onSlashCommand(SlashCommandEvent sce,
-                                 @Param(desc = "Who the recipient of your gift is.") User to,
-                                 @Param(desc = "How much to send.") double amount) throws Exception {
-        transferMoney(sce, sce.getEvent().getUser(), to, new BigDecimal(amount));
-        return Status.SUCCESS;
-    }
-
-
-    private void transferMoney(ICommandEvent ce, User invoker, User recipient, BigDecimal amount) throws Exception {
+    private Status transfer(ICommandEvent ce, User recipient, BigDecimal amount) throws Exception {
         long to = recipient.getIdLong();
+        long from = ce.getUser().getIdLong();
+
         // if account is blacklisted apply a 95% tax to transfers
         if (accountManager.isUserShadowbanned(ce.getUser())) {
             BigDecimal deduction = amount.multiply(BigDecimal.valueOf(0.95));
             amount = amount.multiply(BigDecimal.valueOf(0.05));
-            accountManager.remove(deduction, invoker.getIdLong(), "transfer tax");
-            BigDecimal remainingAmount = accountManager.transferTo(
-                    amount,
-                    invoker.getIdLong(),
-                    to,
-                    "transfer"); // placeholder
+            accountManager.remove(deduction, from, "transfer tax");
+            BigDecimal remainingAmount = accountManager.transferTo(amount, from, to, "transfer"); // placeholder
             ce.sendReply("After paying taxes on your transaction the remaining $" + AccountManager.format(amount.setScale(2, RoundingMode.HALF_UP))
                     + " to <@!" + to + "> was completed. You have $" + AccountManager.format(remainingAmount) + " left.");
         }
         // if not blacklisted proceed as normal
         else {
-            BigDecimal remainingAmount = accountManager.transferTo(
-                    amount,
-                    invoker.getIdLong(),
-                    to,
-                    "transfer"); // placeholder
+            BigDecimal remainingAmount = accountManager.transferTo(amount, from, to, "transfer"); // placeholder
             ce.sendReply("Transfer of $" + AccountManager.format(amount.setScale(2, RoundingMode.HALF_UP))
                     + " to <@!" + to + "> complete. You have $" + AccountManager.format(remainingAmount) + " left.");
         }
+        return Status.SUCCESS;
     }
 }
