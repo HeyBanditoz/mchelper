@@ -1,5 +1,5 @@
 # Commands
-There are a total of 65 commands and 7 regex listeners.
+There are a total of 66 commands and 7 regex listeners.
 
 If a command name has _(S)_, it also has a slash command.
 
@@ -7,13 +7,16 @@ If a command name has _(S)_, it also has a slash command.
 `addquote` - "\<quote\>" \<author\> - Adds a quote to the database.
 
 ### BalanceCommand _(S)_
-`bal` - \<no parameters\>  - Checks your balance.
+`bal` - [user] - Checks your balance.
 
 ### BalanceGraphCommand _(S)_
-`balgraph` - [-d] - Graphs your transaction history, transaction by transaction. Use -d to use dates instead
+`balgraph` - [limit] [user] [dates] - Graphs your transaction history, transaction by transaction. Pass yes for dates to use dates instead.
 
 ### BaltopCommand _(S)_
 `baltop` - \<no parameters\>  - Gets the money leaderboard for this guild.
+
+### Base64Command _(S)_
+`base64` - \<mode\> \<text...\> - Encodes or decodes base64.
 
 ### BashCommand
 `bash` - \<bash\> - Executes bash if it is installed on system. (ELEVATED)
@@ -31,7 +34,7 @@ If a command name has _(S)_, it also has a slash command.
 `coords` - \<save|add,show|list,delete|remove,help\> - Saves coordinates to the database. See !coords help
 
 ### DeleteQuoteCommand _(S)_
-`delquote` - \<quote ID\> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
+`delquote` - \<quoteid\> - Deletes a quote from the database. You must have MANAGE_SERVER permissions on the guild.
 
 ### DeleteReminderCommand
 `delremind` - \<id\> - Deletes a reminder.
@@ -61,7 +64,7 @@ If a command name has _(S)_, it also has a slash command.
 `flood` - [num] \<message\> - Floods this channel with a message.
 
 ### FromMorseCommand _(S)_
-`frommorse` - \<morse\> - Converts morse to text. Use / for spaces between words.
+`frommorse` - \<morse...\> - Converts morse to text. Use / for spaces between words.
 
 ### GuildBalanceGraphCommand
 `gbalgraph` - [-d] - Graphs this guild's transactions history, transaction by transaction. Use -d to use dates instead
@@ -118,7 +121,7 @@ named arguments:
 `overworld` - \<x1\> \<z1\> - Returns the overworld coordinates given a Minecraftian point.
 
 ### PickCommand _(S)_
-`pick` - [num] \<options...\> - Picks num from a list of options. If num is not specified, it will only pick one. Separate your words with 'or' or a space.
+`pick` - \<options...\> - Picks num from a list of options. If num is not specified, it will only pick one. Separate your words with 'or' or a space.
 
 ### PingCommand
 `ping` - \<no parameters\>  - Returns the current websocket and API ping.
@@ -155,13 +158,13 @@ named arguments:
 `removecommand` - \<command\> - Removes a command from the command handler. Persists until the bot restarts. (ELEVATED)
 
 ### RockPaperScissorsCommand _(S)_
-`rps` - \<rock/paper/scissors\> - Chooses a random, Rock, Paper, or Scissors
+`rps` - \<choice\> - Chooses a random, Rock, Paper, or Scissors
 
 ### RussianRouletteCommand
 `roulette` - \<no parameters\>  - Kick a random person from your voice channel!
 
 ### ScryCommand _(S)_
-`scry` - \<card name\> - Looks up a Magic: the Gathering card. The name does not need to be exact.
+`scry` - \<card\> [print] - Looks up a Magic: the Gathering card by approximate name. In text, quote names with spaces.
 
 ### ServerStatusCommand
 `status` - \<address[:port]\> - Fetches information about a Minecraft server.
@@ -201,13 +204,13 @@ named arguments:
 `teams` - \<no parameters\>  - sends a message with your voice channel divided into teams
 
 ### ToMorseCommand _(S)_
-`tomorse` - \<string\> - Encodes a message to morse code.
+`tomorse` - \<text...\> - Encodes a message to morse code.
 
 ### TransactionsCommand
 `txns` - \<no parameters\>  - Fetches your last 20 transactions.
 
 ### TransferCommand _(S)_
-`transfer` - \<to\> \<amount\> [memo] - Transfer money.
+`transfer` - \<to\> \<amount\> - Transfer money.
 
 ### UnitsCommand
 `units` - \<conversion\> - Launches a conversion between two units separated by 'to'.
