@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import io.banditoz.mchelper.commands.logic.CommandUtils;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
+import io.banditoz.mchelper.jda.IgnoredChannels;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
@@ -29,6 +30,7 @@ public class RegexableHandler extends ListenerAdapter {
     private final ConfigurationProvider config;
     private final List<Regexable> regexables;
     private final Tracing tracing;
+    private final IgnoredChannels ignoredChannels;
     private static final Logger log = LoggerFactory.getLogger(RegexableHandler.class);
 
     @Inject
@@ -36,11 +38,13 @@ public class RegexableHandler extends ListenerAdapter {
                             StatsRecorder statsRecorder,
                             ConfigurationProvider config,
                             Tracing tracing,
+                            IgnoredChannels ignoredChannels,
                             List<Regexable> regexables) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.statsRecorder = statsRecorder;
         this.config = config;
         this.tracing = tracing;
+        this.ignoredChannels = ignoredChannels;
         this.regexables = regexables;
         log.info("{} regexables registered.", regexables.size());
     }
@@ -50,6 +54,7 @@ public class RegexableHandler extends ListenerAdapter {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong()) return;
         // don't try to run a listener if a command is (probably) present
         if (event.isFromGuild() && event.getMessage().getContentRaw().length() > 0 && config.getValue(Config.PREFIX, event.getGuild()).charAt(0) == event.getMessage().getContentRaw().charAt(0)) return;
+        if (ignoredChannels.isIgnored(event.getChannel())) return;
 
         getRegexableByEvent(event).forEach(r -> threadPoolExecutor.execute(() -> {
             if (r.handleCooldown(event.getChannel().getId())) {

@@ -16,6 +16,7 @@ import io.banditoz.mchelper.commands.HelpCommand;
 import io.banditoz.mchelper.config.Config;
 import io.banditoz.mchelper.config.ConfigurationProvider;
 import io.banditoz.mchelper.interactions.InteractionListener;
+import io.banditoz.mchelper.jda.IgnoredChannels;
 import io.banditoz.mchelper.stats.Kind;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.Status;
@@ -40,6 +41,7 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
     private final StatsRecorder statsRecorder;
     private final InteractionListener interactionListener;
     private final Tracing tracing;
+    private final IgnoredChannels ignoredChannels;
     /** The command map. String is the command name (what the user types) and Command is the command. */
     private final Map<String, Command> commands;
 
@@ -53,12 +55,14 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
                           StatsRecorder statsRecorder,
                           InteractionListener interactionListener,
                           Tracing tracing,
+                          IgnoredChannels ignoredChannels,
                           List<Command> commands) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.configurationProvider = configurationProvider;
         this.statsRecorder = statsRecorder;
         this.interactionListener = interactionListener;
         this.tracing = tracing;
+        this.ignoredChannels = ignoredChannels;
         this.commands = Stream.concat(Stream.of(new HelpCommand(commands)), commands.stream())
                 .collect(Collectors.toMap(Command::commandName, identity()));
         log.info("{} commands registered.", commands.size());
@@ -77,6 +81,8 @@ public class CommandHandler extends ListenerAdapter implements AutoCloseable {
     protected void go(@Nonnull MessageReceivedEvent event, Kind kind) {
         if (event.getAuthor().getIdLong() == event.getJDA().getSelfUser().getIdLong() || event.getMessage().isWebhookMessage())
             return; // don't execute own commands, or webhook messages
+        if (ignoredChannels.isIgnored(event.getChannel()))
+            return;
         getCommandByEvent(event).ifPresent(c -> {
             if (isShutdown.get()) {
                 event.getChannel().sendMessage("WARN: This CommandHandler is being shutdown. No new commands will be accepted. The bot is most likely rebooting. Try again later.").queue();

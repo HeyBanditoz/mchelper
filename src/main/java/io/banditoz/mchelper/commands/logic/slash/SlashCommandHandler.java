@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import io.avaje.config.Config;
 import io.avaje.inject.PostConstruct;
 import io.banditoz.mchelper.commands.logic.params.Completer;
+import io.banditoz.mchelper.jda.IgnoredChannels;
 import io.banditoz.mchelper.jda.OwnerMessenger;
 import io.banditoz.mchelper.stats.Stat;
 import io.banditoz.mchelper.stats.service.StatsRecorder;
@@ -43,6 +44,7 @@ public class SlashCommandHandler extends ListenerAdapter {
     private final JDA jda;
     private final OwnerMessenger ownerMessenger;
     private final Tracing tracing;
+    private final IgnoredChannels ignoredChannels;
     private final Map<String, SlashCommand> commands = new HashMap<>();
     private final ThreadPoolExecutor autoCompleteExecutor;
 
@@ -56,6 +58,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                                JDA jda,
                                OwnerMessenger ownerMessenger,
                                Tracing tracing,
+                               IgnoredChannels ignoredChannels,
                                List<SlashCommand> commands) {
         this.ses = ses;
         this.tpe = tpe;
@@ -63,6 +66,7 @@ public class SlashCommandHandler extends ListenerAdapter {
         this.statsRecorder = statsRecorder;
         this.ownerMessenger = ownerMessenger;
         this.tracing = tracing;
+        this.ignoredChannels = ignoredChannels;
         this.jda = jda;
         for (SlashCommand slashCommand : commands) {
             this.commands.put(slashCommand.getCommand().commandName(), slashCommand);
@@ -120,6 +124,10 @@ public class SlashCommandHandler extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        if (ignoredChannels.isIgnored(event.getChannel())) {
+            event.reply("This channel cannot process commands. Sorry about that.").setEphemeral(true).queue();
+            return;
+        }
         SlashCommand command = commands.get(event.getFullCommandName());
         if (command == null) {
             event.reply("Command not found within the bot. You probably shouldn't see this.").setEphemeral(true).queue();

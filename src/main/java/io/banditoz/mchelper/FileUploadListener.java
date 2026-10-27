@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import io.avaje.config.Config;
 import io.banditoz.mchelper.http.PasteggClient;
+import io.banditoz.mchelper.jda.IgnoredChannels;
 import io.banditoz.mchelper.utils.paste.Paste;
 import io.banditoz.mchelper.utils.paste.PasteResponse;
 import jakarta.inject.Inject;
@@ -24,17 +25,21 @@ import org.slf4j.LoggerFactory;
 public class FileUploadListener extends ListenerAdapter {
     private final ThreadPoolExecutor threadPoolExecutor;
     private final PasteggClient pasteggClient;
+    private final IgnoredChannels ignoredChannels;
     private static final Logger log = LoggerFactory.getLogger(FileUploadListener.class);
 
     @Inject
     public FileUploadListener(ThreadPoolExecutor threadPoolExecutor,
-                              PasteggClient pasteggClient) {
+                              PasteggClient pasteggClient,
+                              IgnoredChannels ignoredChannels) {
         this.threadPoolExecutor = threadPoolExecutor;
         this.pasteggClient = pasteggClient;
+        this.ignoredChannels = ignoredChannels;
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (ignoredChannels.isIgnored(event.getChannel())) return;
         threadPoolExecutor.execute(() -> {
             Message m = event.getMessage();
             User u = event.getAuthor();

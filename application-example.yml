@@ -2,6 +2,9 @@ mchelper:
   # Number of threads available for commands and regex listeners to use.
   # Also used for other concurrent operations.
   command-threads: 2
+  ignore:
+    # Comma separated channel IDs (text, voice text, threads) to ignore. Threads aren't covered by their parent's ID.
+    channel-ids: 123456789012345678
   # Whether to record command runtime stats into the `statistics` SQL table.
   # Requires the database below, otherwise this does nothing.
   record-stats: true
