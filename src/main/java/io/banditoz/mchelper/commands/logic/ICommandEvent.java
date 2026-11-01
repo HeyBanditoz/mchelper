@@ -59,6 +59,16 @@ public interface ICommandEvent {
     void sendEmbedsReply(List<MessageEmbed> embeds);
 
     /**
+     * Sends a reply with one {@link MessageEmbed} and a PNG attachment to be used as its thumbnail. The embed should
+     * reference the thumbnail as {@code attachment://<randomUUID>.png}.
+     *
+     * @param me The embed to send.
+     * @param image The PNG thumbnail.
+     * @param randomUUID The attachment's file name, without the {@code .png} extension.
+     */
+    void sendEmbedThumbnailReply(MessageEmbed me, ByteArrayOutputStream image, String randomUUID) throws Exception;
+
+    /**
      * @return The {@link User} that executed this command.
      */
     User getUser();

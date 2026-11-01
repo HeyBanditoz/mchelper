@@ -1,11 +1,11 @@
 package io.banditoz.mchelper.serverstatus;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.ByteStreams;
-
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 
 /**
  * Modified from https://gist.github.com/zh32/7190955 to support Jackson instead.
@@ -13,25 +13,10 @@ import java.net.Socket;
  * @author zh32 <zh32 at zh32.de>
  */
 public class MinecraftServerStatus {
-    private final InetSocketAddress host;
-    private final int timeout;
-    private final ObjectMapper om;
-
-    public MinecraftServerStatus(InetSocketAddress host, int timeout, ObjectMapper om) {
-        this.host = host;
-        this.timeout = timeout;
-        this.om = om;
+    private MinecraftServerStatus() {
     }
 
-    public InetSocketAddress getAddress() {
-        return this.host;
-    }
-
-    int getTimeout() {
-        return this.timeout;
-    }
-
-    public int readVarInt(DataInputStream in) throws IOException {
+    private static int readVarInt(DataInputStream in) throws IOException {
         int i = 0;
         int j = 0;
         while (true) {
@@ -43,7 +28,7 @@ public class MinecraftServerStatus {
         return i;
     }
 
-    public void writeVarInt(DataOutputStream out, int paramInt) throws IOException {
+    private static void writeVarInt(DataOutputStream out, int paramInt) throws IOException {
         while (true) {
             if ((paramInt & 0xFFFFFF80) == 0) {
                 out.writeByte(paramInt);
@@ -61,7 +46,7 @@ public class MinecraftServerStatus {
      * @return A {@link StatusResponse} object containing information about this server.
      * @throws IOException If there was a problem connecting to the server or parsing the data.
      */
-    public StatusResponse fetchData() throws IOException {
+    public static StatusResponse fetchData(InetSocketAddress host, int timeout, ObjectMapper om) throws IOException {
         Socket socket = null;
         OutputStream outputStream = null;
         DataOutputStream dataOutputStream = null;
@@ -69,7 +54,7 @@ public class MinecraftServerStatus {
         try {
             socket = new Socket();
 
-            socket.setSoTimeout(this.timeout);
+            socket.setSoTimeout(timeout);
             socket.connect(host, timeout);
 
             outputStream = socket.getOutputStream();
@@ -80,8 +65,8 @@ public class MinecraftServerStatus {
             DataOutputStream handshake = new DataOutputStream(b);
             handshake.writeByte(0x00); //packet id for handshake
             writeVarInt(handshake, 4); //protocol version
-            writeVarInt(handshake, this.host.getHostString().length()); //host length
-            handshake.writeBytes(this.host.getHostString()); //host string
+            writeVarInt(handshake, host.getHostString().length()); //host length
+            handshake.writeBytes(host.getHostString()); //host string
             handshake.writeShort(host.getPort()); //port
             writeVarInt(handshake, 1); //state (1 for handshake)
 
@@ -130,12 +115,8 @@ public class MinecraftServerStatus {
             if (id != 0x01) {
                 throw new IOException("Invalid packetID (got " + id + ")");
             }
-            long pingtime = dataInputStream.readLong(); //read response
 
-            StatusResponse response = om.readValue(json, StatusResponse.class);
-            response.setTime((int) (now - pingtime));
-
-            return response;
+            return om.readValue(json, StatusResponse.class);
         } finally {
             if (socket != null) {
                 socket.close();

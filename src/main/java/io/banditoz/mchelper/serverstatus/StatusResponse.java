@@ -1,25 +1,15 @@
 package io.banditoz.mchelper.serverstatus;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StatusResponse {
-    private JsonNode description;
-    private Players players;
-    private Version version;
-    private String favicon;
-    private int time;
-
-    public JsonNode getDescription() {
-        return description;
-    }
-
+public record StatusResponse(JsonNode description, Players players, Version version, String favicon, int time) {
     // these should be actual objects, but we don't need all the crap that comes with them, look at https://wiki.vg/Chat
     public String getDescriptionAsString() {
         StringBuilder descStringBuilder = new StringBuilder();
@@ -39,18 +29,6 @@ public class StatusResponse {
         return descStringBuilder.toString();
     }
 
-    public Players getPlayers() {
-        return players;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public String getFavicon() {
-        return favicon;
-    }
-
     public ByteArrayOutputStream getFaviconAsImage() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (this.favicon == null) {
@@ -62,13 +40,5 @@ public class StatusResponse {
             baos.write(Base64.getDecoder().decode(this.favicon.substring(this.favicon.indexOf(",") + 1).replace("\n", "")));
         }
         return baos;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
     }
 }

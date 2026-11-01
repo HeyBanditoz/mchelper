@@ -216,6 +216,7 @@ public class CommandEvent implements UserEvent, ICommandEvent {
         CommandUtils.sendEmbedImageReply(me, image, this.EVENT);
     }
 
+    @Override
     public void sendEmbedThumbnailReply(MessageEmbed me, ByteArrayOutputStream image, String randomUUID) throws Exception {
         CommandUtils.sendEmbedThumbnailReply(me, image, randomUUID, this.EVENT);
     }

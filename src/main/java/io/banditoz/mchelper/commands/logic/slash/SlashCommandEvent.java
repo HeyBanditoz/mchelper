@@ -113,4 +113,19 @@ public class SlashCommandEvent implements ICommandEvent {
                 .build();
         (event.isAcknowledged() ? event.getHook().sendMessage(message) : event.reply(message)).queue();
     }
+
+    @Override
+    public void sendEmbedThumbnailReply(MessageEmbed me, ByteArrayOutputStream image, String randomUUID) {
+        FileUpload thumbnail = FileUtils.compressPNG(image, randomUUID + ".png");
+        defermentFuture.cancel(false);
+        MessageCreateData message = new MessageCreateBuilder()
+                .setEmbeds(me)
+                .setAllowedMentions(Collections.emptyList())
+                .addFiles(thumbnail)
+                .build();
+        (event.isAcknowledged() ? event.getHook().sendMessage(message) : event.reply(message)).queue();
+        if (!new File(thumbnail.getName()).delete()) {
+            log.warn("File {} was not deleted!", thumbnail.getName());
+        }
+    }
 }

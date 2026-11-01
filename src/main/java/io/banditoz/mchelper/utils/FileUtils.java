@@ -19,7 +19,18 @@ public class FileUtils {
      * underlying {@link FileInputStream} will be closed.
      */
     public static FileUpload compressPNG(ByteArrayOutputStream image) {
-        String imageName = UUID.randomUUID().toString().replace("-", "") + ".png";
+        return compressPNG(image, UUID.randomUUID().toString().replace("-", "") + ".png");
+    }
+
+    /**
+     * Optionally compresses a PNG.
+     *
+     * @param image PNG image, as a ByteArrayOutputStream
+     * @param imageName The file name to write to and upload as, including the extension.
+     * @return A FileUpload holding the given file name and the compressed image. If uploading to Discord, the
+     * underlying {@link FileInputStream} will be closed.
+     */
+    public static FileUpload compressPNG(ByteArrayOutputStream image, String imageName) {
         File f = new File(imageName);
 
         try (OutputStream outputStream = new FileOutputStream(imageName)) {
