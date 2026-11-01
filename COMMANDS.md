@@ -166,7 +166,7 @@ named arguments:
 ### ScryCommand _(S)_
 `scry` - \<card\> [print] - Looks up a Magic: the Gathering card by approximate name. In text, quote names with spaces.
 
-### ServerStatusCommand
+### ServerStatusCommand _(S)_
 `status` - \<address[:port]\> - Fetches information about a Minecraft server.
 
 ### SnowflakeCommand
