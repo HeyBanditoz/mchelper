@@ -38,7 +38,6 @@ public class Http {
     private final OkHttpClient nonRedirectingClient;
     private final feign.Client feignClient;
     private final TarkovClient tarkovClient;
-    private final PasteggClient pasteggClient;
     private final UrbanDictionaryClient urbanDictionaryClient;
     private final FinnhubClient finnhubClient;
     private final OwlbotClient owlbotClient;
@@ -84,18 +83,6 @@ public class Http {
                         .encoder(encoder)
                         .retryer(new Retryer.Default(1000L, 3000L, 2))
                         .target(TarkovClient.class, url))
-                .orElse(null);
-
-        pasteggClient = Config.getOptional("mchelper.pastegg.api-url")
-                .map(url -> {
-                    Feign.Builder b = baseFeignBuilder()
-                            .encoder(encoder);
-                    String key = Config.getNullable("mchelper.pastegg.api-key");
-                    if (key != null) {
-                        b.requestInterceptor(template -> template.header("Authorization", "Key " + key));
-                    }
-                    return b.target(PasteggClient.class, url);
-                })
                 .orElse(null);
 
         darkSkyClient = Config.getOptional("mchelper.darksky.token")
@@ -185,11 +172,6 @@ public class Http {
     @Bean
     public Optional<TarkovClient> getTarkovClient() {
         return Optional.ofNullable(tarkovClient);
-    }
-
-    @Bean
-    public Optional<PasteggClient> getPasteggClient() {
-        return Optional.ofNullable(pasteggClient);
     }
 
     @Bean
@@ -312,7 +294,6 @@ public class Http {
                 "client=" + client +
                 ", nonRedirectingClient=" + nonRedirectingClient +
                 ", tarkovClient=" + tarkovClient +
-                ", pasteggClient=" + pasteggClient +
                 ", urbanDictionaryClient=" + urbanDictionaryClient +
                 ", finnhubClient=" + finnhubClient +
                 ", owlbotClient=" + owlbotClient +
