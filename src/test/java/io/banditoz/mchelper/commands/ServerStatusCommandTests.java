@@ -1,16 +1,16 @@
 package io.banditoz.mchelper.commands;
 
-import io.avaje.inject.test.InjectTest;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
 import java.awt.Color;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+
+import io.avaje.inject.test.InjectTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 @InjectTest
 class ServerStatusCommandTests extends BaseCommandTest {
@@ -27,13 +27,13 @@ class ServerStatusCommandTests extends BaseCommandTest {
     void testMinecraftServerStatusCommand() throws Exception {
         setArgs("mc.hypixel.net");
         ssc.onCommand(ce);
-        assertThat(embedCaptor.getValue().getColor()).isEqualTo(Color.GREEN);
+        assertThat(embedCaptor.getValue().getColor()).isEqualTo(new Color(74, 111, 40));
     }
 
     @Test
     void testMinecraftServerStatusCommandBadServer() throws Exception {
         setArgs("127.0.0.1");
         ssc.onCommand(ce);
-        assertThat(embedCaptor.getValue().getColor()).isEqualTo(Color.RED);
+        assertThat(embedCaptor.getValue().getColor()).isEqualTo(new Color(214, 52, 49));
     }
 }
