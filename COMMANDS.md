@@ -167,7 +167,7 @@ named arguments:
 `scry` - \<card\> [print] - Looks up a Magic: the Gathering card by approximate name. In text, quote names with spaces.
 
 ### ServerStatusCommand _(S)_
-`status` - \<address[:port]\> - Fetches information about a Minecraft server.
+`status` - \<address...\> - Fetches information about a Minecraft server.
 
 ### SnowflakeCommand
 `snowflake` - \<snowflakes...\> - Converts Discord snowflake ID(s) to dates.
